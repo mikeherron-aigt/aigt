@@ -539,8 +539,8 @@ body {
   font-weight: 400;
   line-height: 26px;
   margin: 0 0 24px 0;
-  padding-left: 0;
-  list-style: none;
+  padding-left: 20px;
+  list-style: disc;
 }
 
 @media (min-width: 1024px) {
@@ -550,8 +550,6 @@ body {
 }
 
 .institutional-list li {
-  position: relative;
-  padding-left: 0;
   margin-bottom: 4px;
 }
 
@@ -638,23 +636,24 @@ body {
 .transparency-list {
   width: 100%;
   margin: 0;
-  padding: 0;
-  list-style: none;
+  padding-left: 20px;
+  list-style: disc;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 12px;
 }
 
 .transparency-list li {
   color: var(--archive-slate);
   font-family: Georgia, serif;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 400;
-  line-height: 36px;
+  line-height: 30px;
 }
 
 @media (min-width: 1024px) {
   .transparency-list li {
-    font-size: 28px;
+    font-size: 20px;
+    line-height: 32px;
   }
 }
