@@ -20,15 +20,12 @@ export default function Home() {
             </div>
 
             {/* Navigation */}
-            <nav className="hidden lg:flex items-center gap-4">
+            <nav className="flex items-center gap-4 ml-auto">
               <a href="#about" className="nav-link">About</a>
               <a href="#offerings" className="nav-link">Offerings</a>
               <a href="#stewardship" className="nav-link">Stewardship</a>
               <button className="btn-primary">Request Access</button>
             </nav>
-
-            {/* Mobile Contact Button */}
-            <button className="btn-primary lg:hidden"><p>Request Access</p></button>
           </div>
         </div>
       </header>
