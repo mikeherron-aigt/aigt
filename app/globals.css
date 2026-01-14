@@ -407,3 +407,254 @@ body {
     font-size: 16px;
   }
 }
+
+/* Stewardship Section */
+.stewardship-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-title {
+    font-size: 40px;
+  }
+}
+
+.stewardship-description {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 24px 0;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-description {
+    font-size: 16px;
+  }
+}
+
+.stewardship-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 32px;
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  border: none;
+}
+
+.stewardship-cta:hover {
+  opacity: 0.9;
+}
+
+.stewardship-card {
+  display: flex;
+  height: 202px;
+  padding: 40px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--gallery-plaster);
+  backdrop-filter: blur(3.3px);
+}
+
+.stewardship-card-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 36px;
+  margin: 0;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-card-title {
+    font-size: 28px;
+  }
+}
+
+.stewardship-card-description {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-card-description {
+    font-size: 16px;
+  }
+}
+
+/* Institutional Context Section */
+.institutional-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .institutional-title {
+    font-size: 40px;
+  }
+}
+
+.institutional-description {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .institutional-description {
+    font-size: 16px;
+  }
+}
+
+.institutional-list {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 24px 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+@media (min-width: 1024px) {
+  .institutional-list {
+    font-size: 16px;
+  }
+}
+
+.institutional-list li {
+  position: relative;
+  padding-left: 0;
+  margin-bottom: 4px;
+}
+
+.institutional-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 32px;
+  border: 2px solid var(--ledger-stone);
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.institutional-cta:hover {
+  opacity: 0.9;
+}
+
+/* Transparency Section */
+.transparency-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .transparency-title {
+    font-size: 40px;
+  }
+}
+
+.transparency-description {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 24px 0;
+}
+
+@media (min-width: 1024px) {
+  .transparency-description {
+    font-size: 16px;
+  }
+}
+
+.transparency-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 32px;
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  border: none;
+}
+
+.transparency-cta:hover {
+  opacity: 0.9;
+}
+
+.transparency-list-panel {
+  display: flex;
+  padding: 40px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  background: var(--gallery-plaster);
+  min-height: 495px;
+}
+
+.transparency-list {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.transparency-list li {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 36px;
+}
+
+@media (min-width: 1024px) {
+  .transparency-list li {
+    font-size: 28px;
+  }
+}
