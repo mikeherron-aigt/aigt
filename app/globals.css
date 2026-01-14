@@ -28,7 +28,7 @@ body {
   padding: 12px 8px;
   color: var(--archive-slate);
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 22px;
   text-decoration: none;
   transition: opacity 0.2s;
@@ -46,7 +46,7 @@ body {
   background: var(--ledger-stone);
   color: var(--paper-white);
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 22px;
   border: none;
   cursor: pointer;
