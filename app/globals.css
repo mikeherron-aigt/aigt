@@ -178,7 +178,7 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
   margin: 0;
-  margin-right: -126px;
+  min-width: 100%;
   padding-right: 126px;
 }
 
