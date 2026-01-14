@@ -178,7 +178,7 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
   margin: 0;
-  width: calc(100% + 300px);
+  width: auto;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
