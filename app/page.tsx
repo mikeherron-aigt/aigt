@@ -21,10 +21,12 @@ export default function Home() {
 
             {/* Navigation */}
             <nav className="flex items-center gap-8 ml-auto">
-              <a href="#about" className="nav-link">About</a>
-              <a href="#offerings" className="nav-link">Offerings</a>
+              <a href="#system" className="nav-link">System</a>
+              <a href="#funds" className="nav-link">Funds</a>
+              <a href="#governance" className="nav-link">Governance</a>
+              <a href="#museum" className="nav-link">Museum Infrastructure</a>
               <a href="#stewardship" className="nav-link">Stewardship</a>
-              <button className="btn-primary">Request Access</button>
+              <button className="btn-primary">Contact</button>
             </nav>
           </div>
         </div>
