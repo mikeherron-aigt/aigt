@@ -1,3 +1,6 @@
+"use client";
+
+
 import BuilderClientPage from "./BuilderClientPage";
 
 export default function Home() {
