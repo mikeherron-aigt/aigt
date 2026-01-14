@@ -8,28 +8,15 @@ export default function Home() {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[120px] py-4">
           <div className="flex items-center justify-between gap-6">
             {/* Logo */}
-            <div className="flex-shrink-0">
-              <div className="w-[140px] sm:w-[180px] lg:w-[205px] h-[35px] sm:h-[45px] lg:h-[52px] relative">
-                <svg viewBox="0 0 205 52" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                  <rect width="8" height="8" fill="#252E3A"/>
-                  <rect x="10" width="8" height="8" fill="#252E3A"/>
-                  <rect x="20" width="8" height="8" fill="#252E3A"/>
-                  <rect y="10" width="8" height="8" fill="#252E3A"/>
-                  <rect y="20" width="8" height="8" fill="#252E3A"/>
-                  <rect x="10" y="10" width="8" height="8" fill="#A1A69D"/>
-                  <rect x="20" y="10" width="8" height="8" fill="#A1A69D"/>
-                  <rect x="10" y="20" width="8" height="8" fill="#A1A69D"/>
-                  <rect x="20" y="20" width="8" height="8" fill="#A1A69D"/>
-                </svg>
-              </div>
-              <div className="mt-1">
-                <div className="text-[10px] sm:text-xs text-archive-slate font-normal leading-tight">
-                  Art Investment
-                </div>
-                <div className="text-[10px] sm:text-xs text-archive-slate font-normal leading-tight">
-                  Group Trust
-                </div>
-              </div>
+            <div className="flex-shrink-0 relative w-[140px] sm:w-[200px] lg:w-[280px] h-[35px] sm:h-[50px] lg:h-[70px]">
+              <Image
+                src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
+                alt="Art Investment Group Trust Logo"
+                fill
+                className="object-contain object-left"
+                priority
+                sizes="(max-width: 640px) 140px, (max-width: 1024px) 200px, 280px"
+              />
             </div>
 
             {/* Navigation */}
