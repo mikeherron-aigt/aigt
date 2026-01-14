@@ -175,7 +175,7 @@ body {
 .artwork-slider {
   display: flex;
   gap: 18px;
-  overflow-x: visible;
+  overflow-x: hidden;
   overflow-y: hidden;
   margin: 0;
   padding-right: 0;
