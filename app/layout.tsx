@@ -15,14 +15,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={`${openSans.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
         {children}
       </body>
     </html>
   );
 }
+
