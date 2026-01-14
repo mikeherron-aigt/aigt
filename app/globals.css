@@ -163,6 +163,7 @@ body {
   font-weight: 400;
   line-height: 36px;
   margin: 0;
+  margin-bottom: 40px;
 }
 
 @media (min-width: 1024px) {
@@ -174,28 +175,10 @@ body {
 .artwork-slider {
   display: flex;
   gap: 18px;
-  overflow-x: auto;
+  overflow-x: visible;
   overflow-y: hidden;
-  scroll-behavior: smooth;
-  padding-bottom: 12px;
   margin: 0;
-}
-
-.artwork-slider::-webkit-scrollbar {
-  height: 6px;
-}
-
-.artwork-slider::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.artwork-slider::-webkit-scrollbar-thumb {
-  background: var(--gallery-plaster);
-  border-radius: 3px;
-}
-
-.artwork-slider::-webkit-scrollbar-thumb:hover {
-  background: var(--ledger-stone);
+  padding-right: 0;
 }
 
 .artwork-card {
