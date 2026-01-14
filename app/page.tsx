@@ -372,46 +372,48 @@ export default function Home() {
         </section>
 
         {/* Two Funds Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
-          <div className="max-w-[1441px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="flex flex-col items-center gap-12 sm:gap-16 lg:gap-20">
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-[104px]">
+          <div className="max-w-[1441px] mx-auto">
+            <div className="flex flex-col items-center gap-20">
               {/* Top Content */}
-              <div className="flex flex-col items-center gap-4 max-w-[995px] w-full">
-                <h2 className="funds-title">
-                  Two funds. Separate mandates. One standard of care.
-                </h2>
-                <p className="funds-description">
-                  The platform supports multiple funds with independent economics and governance. This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
-                </p>
-                <button className="funds-cta">
-                  Review Governance
-                </button>
+              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
+                <div className="flex flex-col items-center gap-4 max-w-[995px]">
+                  <h2 className="funds-title">
+                    Two funds. Separate mandates. One standard of care.
+                  </h2>
+                  <p className="funds-description">
+                    The platform supports multiple funds with independent economics and governance. This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
+                  </p>
+                  <button className="funds-cta">
+                    Review Governance
+                  </button>
+                </div>
               </div>
 
               {/* Fund Cards */}
-              <div className="flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full">
-                {/* Ethereum Art Fund Card */}
-                <div className="fund-card">
-                  <div className="fund-card-content">
-                    <h3 className="fund-card-title">Ethereum Art Fund</h3>
-                    <h4 className="fund-card-subtitle">A unified catalog strategy governed as a single cultural asset.</h4>
-                    <p className="fund-card-description">
-                      Acquires and governs a coherent body of contemporary work as a long-duration asset. Value creation is driven by provenance integrity, catalog consolidation, institutional placement, and disciplined stewardship.
-                    </p>
+              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full">
+                  {/* Ethereum Art Fund Card */}
+                  <div className="fund-card">
+                    <div className="fund-card-content">
+                      <h3 className="fund-card-title">Ethereum Art Fund</h3>
+                      <h4 className="fund-card-subtitle">A unified catalog strategy governed as a single cultural asset.</h4>
+                      <p className="fund-card-description">
+                        Acquires and governs a coherent body of contemporary work as a long-duration asset. Value creation is driven by provenance integrity, catalog consolidation, institutional placement, and disciplined stewardship.
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                {/* Blue Chip Art Fund Card */}
-                <div className="fund-card">
-                  <div className="fund-card-content">
-                    <h3 className="fund-card-title">Blue Chip Art Fund</h3>
-                    <h4 className="fund-card-subtitle">An independently capitalized anchor focused on established museum-grade works.</h4>
-                    <p className="fund-card-description">
-                      Targets historically significant works with emphasis on integrity, preservation, and long-term positioning. Operates independently with separate assets and oversight.
-                    </p>
+                  {/* Blue Chip Art Fund Card */}
+                  <div className="fund-card">
+                    <div className="fund-card-content">
+                      <h3 className="fund-card-title">Blue Chip Art Fund</h3>
+                      <h4 className="fund-card-subtitle">An independently capitalized anchor focused on established museum-grade works.</h4>
+                      <p className="fund-card-description">
+                        Targets historically significant works with emphasis on integrity, preservation, and long-term positioning. Operates independently with separate assets and oversight.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </section>
