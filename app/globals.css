@@ -657,3 +657,113 @@ body {
     line-height: 32px;
   }
 }
+
+/* Footer Section */
+.footer-tagline {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 48px;
+  text-align: center;
+  margin: 0;
+  max-width: 912px;
+}
+
+@media (min-width: 1024px) {
+  .footer-tagline {
+    font-size: 40px;
+  }
+}
+
+.footer-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 32px;
+  border: 2px solid var(--ledger-stone);
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.footer-cta-primary:hover {
+  opacity: 0.9;
+}
+
+.footer-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 32px;
+  border: 2px solid var(--ledger-stone);
+  background: transparent;
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.footer-cta-secondary:hover {
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+}
+
+.footer-links {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  text-align: center;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .footer-links {
+    font-size: 16px;
+  }
+}
+
+.footer-copyright {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  text-align: center;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .footer-copyright {
+    font-size: 16px;
+  }
+}
+
+.footer-disclaimer {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 26px;
+  text-align: center;
+  margin: 0;
+  max-width: 1205px;
+}
+
+@media (min-width: 1024px) {
+  .footer-disclaimer {
+    font-size: 12px;
+  }
+}
