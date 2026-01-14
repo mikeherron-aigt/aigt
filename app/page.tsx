@@ -92,11 +92,11 @@ export default function Home() {
           {/* Footer Bar */}
           <div className="h-[36px] relative">
             {/* Left portion - #DADADA */}
-            <div className="absolute left-0 top-0 h-full bg-gallery-plaster hidden lg:block" style={{width: 'calc(60% - 16px)'}}></div>
+            <div className="absolute left-0 top-0 h-full bg-gallery-plaster hidden lg:block" style={{width: 'calc(60% - 32px)'}}></div>
             {/* Right portion - #A1A69D */}
-            <div className="absolute top-0 h-full bg-ledger-stone hidden lg:block" style={{left: 'calc(60% + 16px)', right: '0'}}></div>
+            <div className="absolute top-0 h-full bg-ledger-stone hidden lg:block" style={{left: 'calc(60%)', right: '0'}}></div>
             {/* Dark green square at intersection */}
-            <div className="absolute top-0 w-8 h-full bg-deep-patina hidden lg:block" style={{left: 'calc(60% - 16px)'}}></div>
+            <div className="absolute top-0 w-8 h-full bg-deep-patina hidden lg:block" style={{left: 'calc(60% - 32px)'}}></div>
           </div>
         </div>
       </main>
