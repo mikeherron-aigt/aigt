@@ -188,7 +188,13 @@ body {
   flex-direction: column;
   gap: 4px;
   flex-shrink: 0;
-  width: 320px;
+  width: 280px;
+}
+
+.artwork-card img {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .artwork-image-wrapper {
