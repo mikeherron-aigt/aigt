@@ -5,17 +5,17 @@ export default function Home() {
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
       <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[120px] py-4">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-4">
           <div className="flex items-center justify-between gap-6">
             {/* Logo */}
-            <div className="flex-shrink-0 relative w-[140px] sm:w-[200px] lg:w-[280px] h-[35px] sm:h-[50px] lg:h-[70px]">
+            <div className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
               <Image
                 src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
                 alt="Art Investment Group Trust Logo"
                 fill
                 className="object-contain object-left"
                 priority
-                sizes="(max-width: 640px) 140px, (max-width: 1024px) 200px, 280px"
+                sizes="(max-width: 640px) 119px, (max-width: 1024px) 170px, 238px"
               />
             </div>
 
