@@ -50,7 +50,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <main>
-        <div className="max-w-[1440px] mx-auto">
+        <div className="max-w-[1440px] mx-auto relative">
           <div className="grid lg:grid-cols-2 gap-0">
             {/* Content Column */}
             <div className="px-4 sm:px-8 lg:px-[120px] py-12 sm:py-16 lg:py-24 flex items-center">
@@ -98,10 +98,8 @@ export default function Home() {
           </div>
 
           {/* Decorative Elements - Positioned outside image */}
-          <div className="relative h-0 hidden lg:block">
-            <div className="absolute lg:left-[calc(50%-32px)] -top-1/4 w-8 h-1/2 bg-white"></div>
-            <div className="absolute lg:left-[calc(50%-32px)] -top-[calc(25%+32px)] w-8 h-1/4 bg-ledger-stone"></div>
-          </div>
+          <div className="absolute lg:left-[calc(50%-32px)] top-[calc(100%-25%-32px)] w-8 h-1/2 bg-white hidden lg:block"></div>
+          <div className="absolute lg:left-[calc(50%-32px)] top-[calc(100%-32px)] w-8 h-1/4 bg-ledger-stone hidden lg:block"></div>
 
           {/* Footer Bar */}
           <div className="h-[36px] bg-gallery-plaster relative">
