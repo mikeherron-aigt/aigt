@@ -335,6 +335,86 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Governance Section */}
+        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
+              {/* Content Column */}
+              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-[132px] flex items-center">
+                <div className="max-w-[579px]">
+                  <h2 className="governance-title">
+                    Governance is the product.
+                  </h2>
+                  <p className="governance-description">
+                    This platform is built as a trust-led framework where custody, authority, and oversight are structurally separated. The objective is continuity: decisions remain disciplined, assets remain protected, and participation remains controlled.
+                  </p>
+                  <button className="governance-cta">
+                    Review Governance
+                  </button>
+                </div>
+              </div>
+
+              {/* Image Column */}
+              <div className="relative h-[400px] sm:h-[500px] lg:h-[892px] overflow-hidden">
+                <div className="absolute inset-0">
+                  <Image
+                    src="https://api.builder.io/api/v1/image/assets/TEMP/e21bd6681b65794951201d363a4ebcc461feb16c?width=1355"
+                    alt="Contemporary artwork representing governance structure"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Two Funds Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1441px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center gap-12 sm:gap-16 lg:gap-20">
+              {/* Top Content */}
+              <div className="flex flex-col items-center gap-4 max-w-[995px] w-full">
+                <h2 className="funds-title">
+                  Two funds. Separate mandates. One standard of care.
+                </h2>
+                <p className="funds-description">
+                  The platform supports multiple funds with independent economics and governance. This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
+                </p>
+                <button className="funds-cta">
+                  Review Governance
+                </button>
+              </div>
+
+              {/* Fund Cards */}
+              <div className="flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full">
+                {/* Ethereum Art Fund Card */}
+                <div className="fund-card">
+                  <div className="fund-card-content">
+                    <h3 className="fund-card-title">Ethereum Art Fund</h3>
+                    <h4 className="fund-card-subtitle">A unified catalog strategy governed as a single cultural asset.</h4>
+                    <p className="fund-card-description">
+                      Acquires and governs a coherent body of contemporary work as a long-duration asset. Value creation is driven by provenance integrity, catalog consolidation, institutional placement, and disciplined stewardship.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Blue Chip Art Fund Card */}
+                <div className="fund-card">
+                  <div className="fund-card-content">
+                    <h3 className="fund-card-title">Blue Chip Art Fund</h3>
+                    <h4 className="fund-card-subtitle">An independently capitalized anchor focused on established museum-grade works.</h4>
+                    <p className="fund-card-description">
+                      Targets historically significant works with emphasis on integrity, preservation, and long-term positioning. Operates independently with separate assets and oversight.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
