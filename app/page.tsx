@@ -5,8 +5,8 @@ export default function Home() {
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
       <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-4">
-          <div className="flex items-center justify-between gap-6">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] lg:pr-0 py-4">
+          <div className="flex items-center gap-6">
             {/* Logo */}
             <div className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
               <Image
