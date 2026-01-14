@@ -20,7 +20,7 @@ export default function Home() {
             </div>
 
             {/* Navigation */}
-            <nav className="flex items-center gap-4 ml-auto">
+            <nav className="flex items-center gap-8 ml-auto">
               <a href="#about" className="nav-link">About</a>
               <a href="#offerings" className="nav-link">Offerings</a>
               <a href="#stewardship" className="nav-link">Stewardship</a>
