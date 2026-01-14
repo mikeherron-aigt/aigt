@@ -417,6 +417,131 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Stewardship Section */}
+        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
+              {/* Content Column */}
+              <div className="px-4 sm:px-8 lg:px-[128px] flex items-start">
+                <div className="max-w-[581px] pt-0">
+                  <h2 className="stewardship-title">
+                    Stewardship is enforced through process.
+                  </h2>
+                  <p className="stewardship-description">
+                    The platform supports multiple funds with independent economics and governance. This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
+                  </p>
+                  <button className="stewardship-cta">
+                    See the Stewardship Standard
+                  </button>
+                </div>
+              </div>
+
+              {/* Cards Column */}
+              <div className="px-4 sm:px-8 lg:px-[80px] lg:pr-[116px] flex flex-col gap-[30px]">
+                {/* Custody Card */}
+                <div className="stewardship-card">
+                  <h3 className="stewardship-card-title">Custody</h3>
+                  <p className="stewardship-card-description">
+                    Assets are held within a controlled custody approach designed to reduce ambiguity and preserve integrity.
+                  </p>
+                </div>
+
+                {/* Provenance Card */}
+                <div className="stewardship-card">
+                  <h3 className="stewardship-card-title">Provenance</h3>
+                  <p className="stewardship-card-description">
+                    Documentation is treated as a primary asset, tracked and maintained as part of the platform's long-term standard.
+                  </p>
+                </div>
+
+                {/* Oversight Card */}
+                <div className="stewardship-card">
+                  <h3 className="stewardship-card-title">Oversight</h3>
+                  <p className="stewardship-card-description">
+                    Decision-making is governed through defined authority, review, and accountability.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Institutional Context Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-[169px]">
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid lg:grid-cols-[482px_1fr] gap-8 lg:gap-[80px]">
+              {/* Image Column */}
+              <div className="px-4 sm:px-8 lg:pl-[125px] lg:pr-0">
+                <div className="relative w-full aspect-[482/612]">
+                  <Image
+                    src="https://api.builder.io/api/v1/image/assets/TEMP/d49e6516dcaa72fcde4a33a5cdc6a6b517677ce7?width=964"
+                    alt="Contemporary artwork illustrating institutional context"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 482px"
+                  />
+                </div>
+              </div>
+
+              {/* Content Column */}
+              <div className="px-4 sm:px-8 lg:pr-[125px] lg:pl-0 flex items-center">
+                <div className="max-w-[579px]">
+                  <h2 className="institutional-title">
+                    Institutional context is part of the custody model.
+                  </h2>
+                  <p className="institutional-description">
+                    A museum structure supports exhibition and placement while preserving separation from fund economics. Cultural infrastructure is treated as permanent context, not a marketing layer.
+                  </p>
+                  <ul className="institutional-list">
+                    <li>Nonprofit museum structure</li>
+                    <li>Art is loaned, not sold</li>
+                    <li>Curatorial depth strengthens long-duration positioning</li>
+                    <li>Mission remains distinct from investment operations</li>
+                  </ul>
+                  <button className="institutional-cta">
+                    Explore the Museum Model
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Transparency Section */}
+        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
+              {/* Content Column */}
+              <div className="px-4 sm:px-8 lg:px-[128px] flex items-start">
+                <div className="max-w-[581px]">
+                  <h2 className="transparency-title">
+                    Transparency without exposure
+                  </h2>
+                  <p className="transparency-description">
+                    Transparency is presented as controlled documentation. Where appropriate, the platform provides read-only views designed for verification and clarity.
+                  </p>
+                  <button className="transparency-cta">
+                    See the Stewardship Standard
+                  </button>
+                </div>
+              </div>
+
+              {/* List Column */}
+              <div className="px-4 sm:px-8 lg:px-[80px] lg:pr-[116px]">
+                <div className="transparency-list-panel">
+                  <ul className="transparency-list">
+                    <li>Provenance documentation</li>
+                    <li>Custody and location status</li>
+                    <li>Catalog structure and holdings</li>
+                    <li>Governance and oversight framework</li>
+                    <li>Reporting and disclosures</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
