@@ -94,6 +94,102 @@ export default function Home() {
             <div className="absolute top-0 w-8 h-full bg-deep-patina hidden lg:block" style={{left: 'calc(60% - 32px)'}}></div>
           </div>
         </div>
+
+        {/* Featured Collection Section */}
+        <section className="w-full bg-white py-16 sm:py-20 lg:py-[104px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <h2 className="section-heading mb-8 sm:mb-12 lg:mb-[60px]">
+              Featured Collection
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 sm:gap-[18px]">
+              {/* Artwork Card 1 */}
+              <div className="artwork-card">
+                <div className="artwork-image-wrapper">
+                  <Image
+                    src="https://api.builder.io/api/v1/image/assets/TEMP/25ee69383552e9f873f3551083817292fb7fbc14?width=539"
+                    alt="Artwork Painting"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                  />
+                </div>
+                <div className="artwork-info">
+                  <h3 className="artwork-title">Artwork Painting Title</h3>
+                  <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
+                </div>
+              </div>
+
+              {/* Artwork Card 2 */}
+              <div className="artwork-card">
+                <div className="artwork-image-wrapper">
+                  <Image
+                    src="https://api.builder.io/api/v1/image/assets/TEMP/313b3f436ad7a871d72459a182f82360d9123c0e?width=539"
+                    alt="Artwork Painting"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                  />
+                </div>
+                <div className="artwork-info">
+                  <h3 className="artwork-title">Artwork Painting Title</h3>
+                  <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
+                </div>
+              </div>
+
+              {/* Artwork Card 3 */}
+              <div className="artwork-card">
+                <div className="artwork-image-wrapper">
+                  <Image
+                    src="https://api.builder.io/api/v1/image/assets/TEMP/8d3bcb814a5fd11404bd954a1295075a5be7f529?width=539"
+                    alt="Artwork Painting"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                  />
+                </div>
+                <div className="artwork-info">
+                  <h3 className="artwork-title">Artwork Painting Title</h3>
+                  <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
+                </div>
+              </div>
+
+              {/* Artwork Card 4 */}
+              <div className="artwork-card">
+                <div className="artwork-image-wrapper">
+                  <Image
+                    src="https://api.builder.io/api/v1/image/assets/TEMP/d2c57baf20a78edb5c4e08b53ad5b7b52298bd73?width=539"
+                    alt="Artwork Painting"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                  />
+                </div>
+                <div className="artwork-info">
+                  <h3 className="artwork-title">Artwork Painting Title</h3>
+                  <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
+                </div>
+              </div>
+
+              {/* Artwork Card 5 */}
+              <div className="artwork-card">
+                <div className="artwork-image-wrapper">
+                  <Image
+                    src="https://api.builder.io/api/v1/image/assets/TEMP/7fa7dcff6f05eaec42b8b896c2be111486030e46?width=539"
+                    alt="Artwork Painting"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                  />
+                </div>
+                <div className="artwork-info">
+                  <h3 className="artwork-title">Artwork Painting Title</h3>
+                  <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
