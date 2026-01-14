@@ -173,14 +173,12 @@ body {
 
 .artwork-slider {
   display: flex;
-  gap: 24px;
+  gap: 18px;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  padding-bottom: 8px;
-  margin: 0 -80px;
-  padding-left: 80px;
-  padding-right: 80px;
+  padding-bottom: 12px;
+  margin: 0;
 }
 
 .artwork-slider::-webkit-scrollbar {
