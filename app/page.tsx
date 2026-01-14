@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
       <header className="w-full bg-white">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[120px] py-4">
