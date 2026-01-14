@@ -186,7 +186,7 @@ body {
   flex-direction: column;
   gap: 4px;
   flex-shrink: 0;
-  width: 280px;
+  width: 320px;
 }
 
 .artwork-image-wrapper {
