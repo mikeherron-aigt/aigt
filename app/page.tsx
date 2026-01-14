@@ -151,7 +151,18 @@ export default function Home() {
 
           <div className="overflow-hidden">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-              <div className="artwork-slider">
+              <div
+                ref={sliderRef}
+                className="artwork-slider"
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                style={{ cursor: isDragging ? 'grabbing' : 'grab', userSelect: 'none' }}
+              >
               {/* Artwork Card 1 */}
               <div className="artwork-card">
                 <div className="artwork-image-wrapper">
