@@ -96,8 +96,8 @@ export default function Home() {
               </div>
 
               {/* Decorative Elements */}
-              <div className="absolute left-0 top-0 w-8 h-1/2 bg-white hidden lg:block"></div>
-              <div className="absolute left-0 bottom-0 w-8 bg-ledger-stone hidden lg:block" style={{height: '25%'}}></div>
+              <div className="absolute lg:left-[calc(50%-32px)] top-0 w-8 h-1/2 bg-white hidden lg:block"></div>
+              <div className="absolute lg:left-[calc(50%-32px)] top-1/2 w-8 h-1/4 bg-ledger-stone hidden lg:block"></div>
             </div>
           </div>
 
