@@ -552,6 +552,57 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Footer Section */}
+        <footer className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[120px]">
+            <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
+              {/* Logo */}
+              <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
+                <Image
+                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
+                  alt="Art Investment Group Trust Logo"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 640px) 180px, (max-width: 1024px) 200px, 205px"
+                />
+              </div>
+
+              {/* Tagline */}
+              <h2 className="footer-tagline">
+                Governed platforms for the long-term stewardship of culturally significant art.
+              </h2>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-[18px]">
+                <button className="footer-cta-primary">
+                  Request Access
+                </button>
+                <button className="footer-cta-secondary">
+                  Schedule a Discussion
+                </button>
+              </div>
+            </div>
+
+            {/* Footer Info */}
+            <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px]">
+              {/* Links */}
+              <p className="footer-links">
+                Disclosures   |   Privacy   |   Terms   |   Contact
+              </p>
+
+              {/* Copyright */}
+              <p className="footer-copyright">
+                COPYRIGHT ©2026. ALL RIGHTS RESERVED.
+              </p>
+
+              {/* Disclaimer */}
+              <p className="footer-disclaimer">
+                Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
+              </p>
+            </div>
+          </div>
+        </footer>
       </main>
     </div>
   );
