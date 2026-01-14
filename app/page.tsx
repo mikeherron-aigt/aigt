@@ -100,11 +100,14 @@ export default function Home() {
         {/* Featured Collection Section */}
         <section className="w-full bg-white py-16 sm:py-20 lg:py-[104px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <h2 className="section-heading mb-8 sm:mb-12 lg:mb-[60px]">
+            <h2 className="section-heading">
               Featured Collection
             </h2>
+          </div>
 
-            <div className="artwork-slider">
+          <div className="overflow-hidden">
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+              <div className="artwork-slider">
               {/* Artwork Card 1 */}
               <div className="artwork-card">
                 <div className="artwork-image-wrapper">
@@ -188,6 +191,7 @@ export default function Home() {
                   <h3 className="artwork-title">Artwork Painting Title</h3>
                   <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
                 </div>
+              </div>
               </div>
             </div>
           </div>
