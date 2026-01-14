@@ -30,7 +30,7 @@ export default function Home() {
             </nav>
 
             {/* Mobile Contact Button */}
-            <button className="btn-primary lg:hidden">Contact</button>
+            <button className="btn-primary lg:hidden"><p>Request Access</p></button>
           </div>
         </div>
       </header>
@@ -38,7 +38,7 @@ export default function Home() {
       {/* Hero Section */}
       <main>
         <div className="max-w-[1440px] mx-auto relative">
-          <div className="grid lg:grid-cols-2 gap-0">
+          <div className="grid lg:grid-cols-[1fr_40%] gap-0">
             {/* Content Column */}
             <div className="px-4 sm:px-8 lg:px-[120px] py-12 sm:py-16 lg:py-24 flex items-center">
               <div className="max-w-[637px]">
