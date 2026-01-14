@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
@@ -82,7 +84,16 @@ export default function Home() {
 
             {/* Image Column */}
             <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
-              <div className="absolute inset-0" />
+              <div className="absolute inset-0">
+                <Image
+                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fffdf589de0bc4ea786d46b0d19e5477d?format=webp&width=800"
+                  alt="Cultural artwork representing the trust's collection"
+                  fill
+                  className="object-cover object-center"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
 
               {/* Decorative Elements */}
               <div className="absolute right-0 top-0 w-8 h-1/2 bg-white hidden lg:block"></div>
