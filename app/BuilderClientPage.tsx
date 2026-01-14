@@ -1,5 +1,7 @@
 "use client";
 
-export default function BuilderClientPage({ children }: { children: React.ReactNode }) {
+import type { ReactNode } from "react";
+
+export default function BuilderClientPage({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
