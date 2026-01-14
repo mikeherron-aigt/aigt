@@ -27,9 +27,9 @@ body {
 .nav-link {
   padding: 12px 8px;
   color: var(--archive-slate);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 22px;
+  line-height: 24px;
   text-decoration: none;
   transition: opacity 0.2s;
 }
@@ -45,9 +45,9 @@ body {
   padding: 16px 28px;
   background: var(--ledger-stone);
   color: var(--paper-white);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 22px;
+  line-height: 24px;
   border: none;
   cursor: pointer;
   transition: opacity 0.2s;
