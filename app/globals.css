@@ -171,12 +171,41 @@ body {
   }
 }
 
+.artwork-slider {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  padding-bottom: 8px;
+  margin: 0 -80px;
+  padding-left: 80px;
+  padding-right: 80px;
+}
+
+.artwork-slider::-webkit-scrollbar {
+  height: 6px;
+}
+
+.artwork-slider::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.artwork-slider::-webkit-scrollbar-thumb {
+  background: var(--gallery-plaster);
+  border-radius: 3px;
+}
+
+.artwork-slider::-webkit-scrollbar-thumb:hover {
+  background: var(--ledger-stone);
+}
+
 .artwork-card {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: 100%;
-  min-width: 0;
+  flex-shrink: 0;
+  width: 252px;
 }
 
 .artwork-image-wrapper {
