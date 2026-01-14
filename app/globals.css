@@ -154,3 +154,57 @@ body {
     line-height: 26px;
   }
 }
+
+/* Featured Collection Section */
+.section-heading {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 36px;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .section-heading {
+    font-size: 28px;
+  }
+}
+
+.artwork-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.artwork-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 247 / 206;
+  overflow: hidden;
+  background: var(--gallery-plaster);
+}
+
+.artwork-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.artwork-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0;
+}
+
+.artwork-details {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: normal;
+  margin: 0;
+}
