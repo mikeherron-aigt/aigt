@@ -418,6 +418,16 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Decorative Bar - Above Stewardship */}
+        <div className="w-full h-[36px] relative hidden lg:block">
+          {/* Left portion - Gallery Plaster */}
+          <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{width: 'calc(60% - 32px)'}}></div>
+          {/* Right portion - Ledger Stone */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(60%)', right: '0'}}></div>
+          {/* Dark green square at intersection */}
+          <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+        </div>
+
         {/* Stewardship Section */}
         <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto">
