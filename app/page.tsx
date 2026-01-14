@@ -84,17 +84,8 @@ export default function Home() {
 
             {/* Image Column */}
             <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
-              <div className="absolute inset-0">
-                <Image
-                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F042e46a9a4d64d5b983275d825e8d545?format=webp&width=800"
-                  alt="Cultural artwork representing the trust's collection"
-                  fill
-                  className="object-cover object-center"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              </div>
-              
+              <div className="absolute inset-0" />
+
               {/* Decorative Elements */}
               <div className="absolute right-0 top-0 w-8 h-1/2 bg-white hidden lg:block"></div>
               <div className="absolute right-0 bottom-0 w-8 bg-ledger-stone hidden lg:block" style={{height: '25%'}}></div>
