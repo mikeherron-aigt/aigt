@@ -94,11 +94,13 @@ export default function Home() {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               </div>
-
-              {/* Decorative Elements */}
-              <div className="absolute lg:left-[calc(50%-32px)] bottom-1/4 w-8 h-1/2 bg-white hidden lg:block"></div>
-              <div className="absolute lg:left-[calc(50%-32px)] bottom-0 w-8 h-1/4 bg-ledger-stone hidden lg:block"></div>
             </div>
+          </div>
+
+          {/* Decorative Elements - Positioned outside image */}
+          <div className="relative h-0 hidden lg:block">
+            <div className="absolute lg:left-[calc(50%-32px)] -top-1/4 w-8 h-1/2 bg-white"></div>
+            <div className="absolute lg:left-[calc(50%-32px)] -top-[calc(25%+32px)] w-8 h-1/4 bg-ledger-stone"></div>
           </div>
 
           {/* Footer Bar */}
