@@ -175,10 +175,24 @@ body {
 .artwork-slider {
   display: flex;
   gap: 18px;
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: hidden;
   margin: 0;
   width: calc(100% + 300px);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.artwork-slider::-webkit-scrollbar {
+  height: 0px;
+}
+
+.artwork-slider::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.artwork-slider::-webkit-scrollbar-thumb {
+  background: transparent;
 }
 
 .artwork-card {
