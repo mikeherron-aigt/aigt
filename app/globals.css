@@ -242,12 +242,14 @@ body {
 @media (min-width: 1024px) {
   .governance-title {
     font-size: 40px;
+    line-height: 48px;
   }
 }
 
 .governance-description {
   color: var(--archive-slate);
-  font-size: 15px;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
   font-weight: 400;
   line-height: 26px;
   margin: 0 0 24px 0;
@@ -292,12 +294,14 @@ body {
 @media (min-width: 1024px) {
   .funds-title {
     font-size: 40px;
+    line-height: 48px;
   }
 }
 
 .funds-description {
   color: var(--archive-slate);
-  font-size: 15px;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
   font-weight: 400;
   line-height: 26px;
   text-align: center;
