@@ -97,9 +97,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Decorative Elements - Positioned above footer */}
-          <div className="absolute lg:left-[calc(50%-32px)] w-8 hidden lg:block pointer-events-none" style={{top: 'calc(100% - 36px - 25% - 32px)', height: '50%', backgroundColor: 'white'}}></div>
-          <div className="absolute lg:left-[calc(50%-32px)] w-8 h-1/4 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 36px - 32px)'}}></div>
+          {/* Decorative Elements - Positioned at bottom of image, above footer */}
+          <div className="absolute lg:left-[calc(50%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: 'calc(100% - 36px - 170px)', height: '170px'}}></div>
+          <div className="absolute lg:left-[calc(50%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 36px)', height: '170px'}}></div>
 
           {/* Footer Bar */}
           <div className="h-[36px] bg-gallery-plaster relative">
