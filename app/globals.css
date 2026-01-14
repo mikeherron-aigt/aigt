@@ -228,3 +228,172 @@ body {
   line-height: normal;
   margin: 0;
 }
+
+/* Governance Section */
+.governance-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .governance-title {
+    font-size: 40px;
+  }
+}
+
+.governance-description {
+  color: var(--archive-slate);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 24px 0;
+}
+
+@media (min-width: 1024px) {
+  .governance-description {
+    font-size: 16px;
+  }
+}
+
+.governance-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: 2px solid var(--ledger-stone);
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.governance-cta:hover {
+  opacity: 0.9;
+}
+
+/* Two Funds Section */
+.funds-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  text-align: center;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .funds-title {
+    font-size: 40px;
+  }
+}
+
+.funds-description {
+  color: var(--archive-slate);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 26px;
+  text-align: center;
+  margin: 0;
+  max-width: 789px;
+}
+
+@media (min-width: 1024px) {
+  .funds-description {
+    font-size: 16px;
+  }
+}
+
+.funds-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 32px;
+  border: 2px solid var(--ledger-stone);
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 8px;
+}
+
+.funds-cta:hover {
+  opacity: 0.9;
+}
+
+.fund-card {
+  display: flex;
+  width: 100%;
+  max-width: 582px;
+  padding: 40px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--paper-white);
+  backdrop-filter: blur(3.3px);
+}
+
+.fund-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.fund-card-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 36px;
+  margin: 0;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .fund-card-title {
+    font-size: 28px;
+  }
+}
+
+.fund-card-subtitle {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 0;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .fund-card-subtitle {
+    font-size: 22px;
+  }
+}
+
+.fund-card-description {
+  color: var(--archive-slate);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .fund-card-description {
+    font-size: 16px;
+  }
+}
