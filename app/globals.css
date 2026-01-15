@@ -203,6 +203,7 @@ body {
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  box-sizing: border-box;
 }
 
 .artwork-slider::-webkit-scrollbar {
