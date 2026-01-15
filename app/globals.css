@@ -344,19 +344,17 @@ body {
   background: linear-gradient(
     to right,
     transparent 0%,
-    var(--archive-slate) 10%,
-    var(--archive-slate) 90%,
+    var(--archive-slate) 8%,
+    var(--archive-slate) 70%,
     transparent 100%
   );
-  opacity: 0.3;
-  width: 100%;
-  margin: 48px 0;
-}
-
-@media (min-width: 1024px) {
-  .divider-line {
-    margin: 64px 0;
-  }
+  opacity: 0.25;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 
 .governance-cta {
