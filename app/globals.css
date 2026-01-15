@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --ledger-stone: #a1a69d;
   --gallery-plaster: #dadada;
