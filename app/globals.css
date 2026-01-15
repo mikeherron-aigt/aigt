@@ -976,7 +976,8 @@ footer {
 
 .image-modal-info {
   text-align: center;
-  padding: 0 20px;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .image-modal-title {
