@@ -546,12 +546,22 @@ export default function Home() {
                 Governed platforms for the long-term stewardship of culturally significant art.
               </h2>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-[18px]">
+              {/* Private Conversations Section */}
+              <div className="private-conversations text-center flex flex-col items-center">
+                <h3 className="private-conversations-title">
+                  Private Conversations
+                </h3>
+                <p className="private-conversations-text max-w-[789px]">
+                  Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not transactions.
+                </p>
+                <p className="private-conversations-text max-w-[789px]">
+                  These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
+                </p>
+              </div>
+
+              {/* CTA Button */}
+              <div className="flex justify-center">
                 <button className="footer-cta-primary">
-                  Request Access
-                </button>
-                <button className="footer-cta-secondary">
                   Schedule a Discussion
                 </button>
               </div>
