@@ -213,10 +213,10 @@ export default function Home() {
 
         {/* Footer Bar - Full Width */}
         <div className="w-full h-[36px] relative hidden lg:block">
-          {/* Left portion - Gallery Plaster - extends to right edge of dark green square */}
-          <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{right: 'calc(100vw - (100vw - 1440px) / 2 - 864px)'}}></div>
-          {/* Right portion - Ledger Stone - starts after dark green square */}
-          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc((100vw - 1440px) / 2 + 864px)', right: '0'}}></div>
+          {/* Left portion - Gallery Plaster - Full Width */}
+          <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
+          {/* Right portion - Ledger Stone - Full Width */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 144px)', right: '0'}}></div>
 
           {/* Centered container for dark green square */}
           <div className="h-full relative flex justify-center hidden lg:flex">
