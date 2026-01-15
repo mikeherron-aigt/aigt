@@ -341,7 +341,7 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[124px] pt-12 sm:pt-16 lg:pt-[132px] pb-0 flex items-center">
+              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-[132px] flex items-center justify-start h-full">
                 <div className="max-w-[579px]">
                   <h2 className="governance-title">
                     Governance is the product.
