@@ -243,6 +243,27 @@ body {
   margin: 0;
 }
 
+.slider-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--ledger-stone);
+  background: transparent;
+  color: var(--archive-slate);
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 4px;
+}
+
+.slider-nav-btn:hover {
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+}
+
 /* Governance Section */
 .governance-title {
   color: var(--archive-slate);
