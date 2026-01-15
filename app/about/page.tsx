@@ -142,7 +142,7 @@ export default function AboutPage() {
                 <div className="flex justify-center lg:justify-start">
                   <div className="relative w-[310px] h-[310px] rounded-full overflow-hidden">
                     <Image
-                      src="https://api.builder.io/api/v1/image/assets/TEMP/5d9889dd68020021e18d3ebf590dcb30cf36417d?width=620"
+                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620"
                       alt="John Dowling Jr."
                       fill
                       className="object-cover"
