@@ -102,10 +102,10 @@ export default function AboutPage() {
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24 flex items-center">
                 <div className="max-w-[711px]">
-                  <h1 className="about-hero-title">
+                  <h1 className="about-hero-title" style={{fontFamily: 'Georgia, serif'}}>
                     Stewardship Requires Accountability
                   </h1>
-                  <div className="about-hero-description">
+                  <div className="about-hero-description" style={{fontFamily: 'Georgia, serif'}}>
                     <p>
                       Art Investment Group Trust is governed by a board and leadership team with experience across art, culture, finance, and institutional stewardship.
                     </p>
