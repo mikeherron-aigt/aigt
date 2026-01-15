@@ -322,6 +322,40 @@ body {
   }
 }
 
+.governance-subtitle {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: left;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .governance-subtitle {
+    font-size: 17px;
+    line-height: 28px;
+  }
+}
+
+.divider-line {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--archive-slate) 10%,
+    var(--archive-slate) 90%,
+    transparent 100%
+  ) !important;
+  opacity: 0.5;
+  width: 100% !important;
+  max-width: 500px !important;
+  display: block !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
 .governance-cta {
   display: inline-flex;
   align-items: center;
@@ -356,6 +390,23 @@ body {
   .funds-title {
     font-size: 40px;
     line-height: 48px;
+  }
+}
+
+.funds-subtitle {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: center;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .funds-subtitle {
+    font-size: 17px;
+    line-height: 28px;
   }
 }
 

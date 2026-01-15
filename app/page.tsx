@@ -301,22 +301,37 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 flex items-center justify-start h-full">
+              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-24 flex flex-col">
                 <div className="max-w-[579px]">
-                  <h2 className="governance-title">
-                    Governance is the product.
-                  </h2>
-                  <p className="governance-description">
-                    This platform is built as a trust-led framework where custody, authority, and oversight are structurally separated. The objective is continuity: decisions remain disciplined, assets remain protected, and participation remains controlled.
-                  </p>
-                  <button className="governance-cta">
-                    Review Governance
-                  </button>
+                  {/* Our Purpose */}
+                  <div>
+                    <h2 className="governance-title">
+                      Our Purpose
+                    </h2>
+                    <p className="governance-description">
+                      Art carries cultural weight long before it carries financial value. When important works are treated primarily as assets, their context, integrity, and long-term significance are often compromised.<br /><br />Art Investment Group Trust exists to address this imbalance. We provide structures designed to protect cultural importance, resist short-term pressures, and ensure that significant works are held with intention, care, and institutional discipline.<br /><br />This philosophy guides every acquisition, every governance decision, and every relationship we enter.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="divider-line my-12 lg:my-16"></div>
+
+                <div className="max-w-[579px]">
+                  {/* Our Approach */}
+                  <div>
+                    <h2 className="governance-title">
+                      Stewardship Before Everything
+                    </h2>
+                    <p className="governance-description">
+                      We approach art through the lens of stewardship rather than speculation. That means prioritizing long-horizon ownership, rigorous governance, and responsible custody over velocity or volume.<br /><br />Our structures are intentionally designed to slow the process, encourage patience, and align participants around preservation, context, and care. Liquidity is episodic. Cultural responsibility is continuous.<br /><br />This approach applies equally across all mediums.
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Image Column */}
-              <div className="relative w-full aspect-square overflow-hidden">
+              <div className="relative w-full h-full overflow-hidden min-h-[900px]">
                 <div className="absolute inset-0">
                   <Image
                     src="https://api.builder.io/api/v1/image/assets/TEMP/e21bd6681b65794951201d363a4ebcc461feb16c?width=1355"
@@ -339,14 +354,14 @@ export default function Home() {
               <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
                 <div className="flex flex-col items-center gap-4 max-w-[995px]">
                   <h2 className="funds-title">
-                    Two funds. Separate mandates. One standard of care.
+                    Investment Offerings
                   </h2>
+                  <h3 className="funds-subtitle">
+                    Distinct Platforms.  One Philosophy
+                  </h3>
                   <p className="funds-description">
-                    The platform supports multiple funds with independent economics and governance. This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
+                    Art Investment Group Trust operates multiple governed platforms, each designed to support different forms of cultural expression while adhering to the same standards of stewardship and oversight.
                   </p>
-                  <button className="funds-cta">
-                    Review Governance
-                  </button>
                 </div>
               </div>
 
@@ -356,9 +371,8 @@ export default function Home() {
                   <div className="fund-card">
                     <div className="fund-card-content">
                       <h3 className="fund-card-title">Ethereum Art Fund</h3>
-                      <h4 className="fund-card-subtitle">A unified catalog strategy governed as a single cultural asset.</h4>
                       <p className="fund-card-description">
-                        Acquires and governs a coherent body of contemporary work as a long-duration asset. Value creation is driven by provenance integrity, catalog consolidation, institutional placement, and disciplined stewardship.
+                        The Ethereum Art Fund extends the same stewardship philosophy to Ethereum native artworks. These works are approached not as speculative instruments, but as culturally relevant expressions native to a digital medium.<br /><br />Governance, custody, and long-term intent mirror those applied to traditional art, with optional structures introduced only where appropriate and permitted.
                       </p>
                     </div>
                   </div>
@@ -367,9 +381,8 @@ export default function Home() {
                   <div className="fund-card">
                     <div className="fund-card-content">
                       <h3 className="fund-card-title">Blue Chip Art Fund</h3>
-                      <h4 className="fund-card-subtitle">An independently capitalized anchor focused on established museum-grade works.</h4>
                       <p className="fund-card-description">
-                        Targets historically significant works with emphasis on integrity, preservation, and long-term positioning. Operates independently with separate assets and oversight.
+                        Focused on established works with deep cultural and historical significance, the Blue Chip Art Fund acquires and stewards museum-quality artworks through long-horizon ownership and institutional governance.<br /><br />The emphasis is on preservation, context, and disciplined acquisition rather than transaction frequency or short-term outcomes.
                       </p>
                     </div>
                   </div>
