@@ -456,15 +456,55 @@ export default function Home() {
               </div>
 
               {/* Image Column */}
-              <div className="px-4 sm:px-8 lg:pr-[0px] lg:pl-0 flex items-center justify-center lg:justify-end">
-                <div className="relative w-full max-w-[613px] aspect-[613/692]">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
+                <div className="relative w-full max-w-[482px] aspect-[482/612]">
                   <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fff3aa19c151b47828155d20afa25d3bf?format=webp&width=800"
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F191d1f3757b744a3bb4c98c59bd49eba?format=webp&width=800"
                     alt="Contemporary artwork representing artistic stewardship"
                     fill
                     className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 613px"
+                    sizes="(max-width: 1024px) 100vw, 482px"
                   />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Stewardship in Practice Section */}
+        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24">
+            {/* Header */}
+            <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20">
+              <h2 className="stewardship-practice-title">
+                Stewardship in Practice
+              </h2>
+              <p className="stewardship-practice-description">
+                Structured governance and a long horizon perspective ensure each work is protected, contextualized, and allowed to mature culturally over time.
+              </p>
+            </div>
+
+            {/* Cards */}
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-[1280px] mx-auto">
+              {/* Governance and Care Card */}
+              <div className="practice-card">
+                <div className="practice-card-content">
+                  <h3 className="practice-card-title">Governance and Care</h3>
+                  <h4 className="practice-card-subtitle">Responsibility Requires Structure</h4>
+                  <p className="practice-card-description">
+                    Stewardship without governance is fragile. Art Investment Trust Group operates with centralized oversight, clear separation between economic participation and control, and institutional standards for custody, insurance, conservation, and compliance.<br /><br />The governance framework exists to protect the artwork first, ensuring decisions are made with long term cultural responsibility rather than short term incentives.
+                  </p>
+                </div>
+              </div>
+
+              {/* Perspective Card */}
+              <div className="practice-card">
+                <div className="practice-card-content">
+                  <h3 className="practice-card-title">Perspective</h3>
+                  <h4 className="practice-card-subtitle">Art Requires Time</h4>
+                  <p className="practice-card-description">
+                    The value of important art unfolds over years, not quarters. Cultural relevance is shaped through context, exhibition, scholarship, and preservation.<br /><br />The structures are designed to reflect this reality. Outcomes are not rushed, liquidity is not forced, and art is not framed through performance metrics. Time is allowed to do its work.
+                  </p>
                 </div>
               </div>
             </div>
