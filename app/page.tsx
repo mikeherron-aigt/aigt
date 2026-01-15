@@ -401,65 +401,16 @@ export default function Home() {
           <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
         </div>
 
-        {/* Stewardship Section */}
-        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+        {/* One Standard Across Mediums Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
-              {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[128px] flex items-center justify-start h-full">
-                <div className="max-w-[581px] pt-0">
-                  <h2 className="stewardship-title">
-                    Stewardship is enforced through process.
-                  </h2>
-                  <p className="stewardship-description">
-                    The platform supports multiple funds with independent economics and governance. This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
-                  </p>
-                  <button className="stewardship-cta">
-                    See the Stewardship Standard
-                  </button>
-                </div>
-              </div>
-
-              {/* Cards Column */}
-              <div className="px-4 sm:px-8 lg:px-[80px] lg:pr-[116px] flex flex-col gap-[30px]">
-                {/* Custody Card */}
-                <div className="stewardship-card">
-                  <h3 className="stewardship-card-title">Custody</h3>
-                  <p className="stewardship-card-description">
-                    Assets are held within a controlled custody approach designed to reduce ambiguity and preserve integrity.
-                  </p>
-                </div>
-
-                {/* Provenance Card */}
-                <div className="stewardship-card">
-                  <h3 className="stewardship-card-title">Provenance</h3>
-                  <p className="stewardship-card-description">
-                    Documentation is treated as a primary asset, tracked and maintained as part of the platform's long-term standard.
-                  </p>
-                </div>
-
-                {/* Oversight Card */}
-                <div className="stewardship-card">
-                  <h3 className="stewardship-card-title">Oversight</h3>
-                  <p className="stewardship-card-description">
-                    Decision-making is governed through defined authority, review, and accountability.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Institutional Context Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-[169px]">
-          <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[482px_1fr] gap-8 lg:gap-[80px]">
+            <div className="grid lg:grid-cols-[1fr_1fr] gap-0">
               {/* Image Column */}
-              <div className="px-4 sm:px-8 lg:pl-[125px] lg:pr-0">
-                <div className="relative w-full aspect-[482/612]">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
+                <div className="relative w-full max-w-[482px] aspect-[482/612]">
                   <Image
-                    src="https://api.builder.io/api/v1/image/assets/TEMP/d49e6516dcaa72fcde4a33a5cdc6a6b517677ce7?width=964"
-                    alt="Contemporary artwork illustrating institutional context"
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800"
+                    alt="Contemporary artwork representing cultural significance across mediums"
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 482px"
@@ -468,58 +419,52 @@ export default function Home() {
               </div>
 
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:pr-[125px] lg:pl-0 flex items-center">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
                 <div className="max-w-[579px]">
-                  <h2 className="institutional-title">
-                    Institutional context is part of the custody model.
+                  <h2 className="one-standard-title">
+                    One Standard Across Mediums
                   </h2>
-                  <p className="institutional-description">
-                    A museum structure supports exhibition and placement while preserving separation from fund economics. Cultural infrastructure is treated as permanent context, not a marketing layer.
+                  <h3 className="one-standard-subtitle">
+                    Cultural Significance Is Medium Agnostic
+                  </h3>
+                  <p className="one-standard-description">
+                    Whether a work exists on canvas or on chain, our standards do not change. Cultural relevance, provenance, context, and stewardship guide our decisions, not the medium itself.<br /><br />By applying the same governance framework across traditional and digital art, we aim to normalize contemporary forms of expression within an institutional and culturally legitimate context.
                   </p>
-                  <ul className="institutional-list">
-                    <li>Nonprofit museum structure</li>
-                    <li>Art is loaned, not sold</li>
-                    <li>Curatorial depth strengthens long-duration positioning</li>
-                    <li>Mission remains distinct from investment operations</li>
-                  </ul>
-                  <button className="institutional-cta">
-                    Explore the Museum Model
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Transparency Section */}
-        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+        {/* Art and Artists Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
+            <div className="grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-[138px]">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[128px] flex items-center justify-start h-full">
-                <div className="max-w-[581px]">
-                  <h2 className="transparency-title">
-                    Transparency without exposure
+              <div className="px-4 sm:px-8 lg:pl-[115px] lg:pr-0 flex items-center">
+                <div className="max-w-[579px]">
+                  <h2 className="art-artists-title">
+                    Art and Artists
                   </h2>
-                  <p className="transparency-description">
-                    Transparency is presented as controlled documentation. Where appropriate, the platform provides read-only views designed for verification and clarity.
+                  <h3 className="art-artists-subtitle">
+                    The Works We Steward
+                  </h3>
+                  <p className="art-artists-description">
+                    AIGT stewards a curated collection of culturally significant works, selected for their artistic relevance, historical importance, and long-term cultural contribution.<br /><br />In addition to fund held works, we also support the placement and stewardship of select individual artworks through private acquisition. These works are approached with the same care, discretion, and contextual consideration.<br /><br />Art is never treated as inventory. Each work is considered within its broader cultural and curatorial narrative.
                   </p>
-                  <button className="transparency-cta">
-                    See the Stewardship Standard
-                  </button>
                 </div>
               </div>
 
-              {/* List Column */}
-              <div className="px-4 sm:px-8 lg:px-[80px] lg:pr-[116px]">
-                <div className="transparency-list-panel">
-                  <ul className="transparency-list">
-                    <li>Provenance documentation</li>
-                    <li>Custody and location status</li>
-                    <li>Catalog structure and holdings</li>
-                    <li>Governance and oversight framework</li>
-                    <li>Reporting and disclosures</li>
-                  </ul>
+              {/* Image Column */}
+              <div className="px-4 sm:px-8 lg:pr-[0px] lg:pl-0 flex items-center justify-center lg:justify-end">
+                <div className="relative w-full max-w-[613px] aspect-[613/692]">
+                  <Image
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fff3aa19c151b47828155d20afa25d3bf?format=webp&width=800"
+                    alt="Contemporary artwork representing artistic stewardship"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 613px"
+                  />
                 </div>
               </div>
             </div>
