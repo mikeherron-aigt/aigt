@@ -148,7 +148,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="w-full overflow-x-auto">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
               <div
                 ref={sliderRef}
