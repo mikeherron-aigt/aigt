@@ -547,24 +547,21 @@ export default function Home() {
               </h2>
 
               {/* Private Conversations Section */}
-              <div className="private-conversations">
+              <div className="private-conversations text-center flex flex-col items-center">
                 <h3 className="private-conversations-title">
                   Private Conversations
                 </h3>
-                <p className="private-conversations-text">
+                <p className="private-conversations-text max-w-[789px]">
                   Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue.
                 </p>
-                <p className="private-conversations-text">
+                <p className="private-conversations-text max-w-[789px]">
                   We believe the stewardship of important art begins with thoughtful conversation, not transactions.
                 </p>
               </div>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-[18px]">
+              {/* CTA Button */}
+              <div className="flex justify-center">
                 <button className="footer-cta-primary">
-                  Request Access
-                </button>
-                <button className="footer-cta-secondary">
                   Schedule a Discussion
                 </button>
               </div>
