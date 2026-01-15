@@ -336,10 +336,13 @@ export default function Home() {
               <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
                 <div className="flex flex-col items-center gap-4 max-w-[995px]">
                   <h2 className="funds-title">
-                    Two funds. Separate mandates. One standard of care.
+                    Investment platforms
                   </h2>
+                  <h3 className="funds-subtitle">
+                    Distinct Platforms.  One Philosophy
+                  </h3>
                   <p className="funds-description">
-                    The platform supports multiple funds with independent economics and governance. This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
+                    Art Investment Group Trust operates multiple governed platforms, each designed to support different forms of cultural expression while adhering to the same standards of stewardship and oversight.
                   </p>
                   <button className="funds-cta">
                     Review Governance
