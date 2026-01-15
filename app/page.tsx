@@ -84,15 +84,12 @@ export default function Home() {
               <div className="max-w-[637px]">
                 {/* Heading */}
                 <h1 className="hero-title">
-                  <p>The Art That Matters</p>
-                  <p>The Stewardship It Deserves</p>
+                  The Art That Matters<br />The Stewardship It Deserves
                 </h1>
 
                 {/* Subtitle */}
                 <p className="hero-subtitle">
-                  <p>
-                    Art Investment Group Trust was established to acquire, hold, and steward artworks of cultural significance within a disciplined, governed framework. We believe important art requires time, context, and responsible care. Our role is not to trade or promote, but to provide a long-term home for works that matter, supported by institutional standards of governance, custody, and stewardship across both traditional and Ethereum native mediums.
-                  </p>
+                  Art Investment Group Trust was established to acquire, hold, and steward artworks of cultural significance within a disciplined, governed framework. We believe important art requires time, context, and responsible care. Our role is not to trade or promote, but to provide a long-term home for works that matter, supported by institutional standards of governance, custody, and stewardship across both traditional and Ethereum native mediums.
                 </p>
 
                 {/* CTA Buttons */}
