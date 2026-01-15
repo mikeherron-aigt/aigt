@@ -553,8 +553,8 @@ export default function Home() {
                 </h3>
                 <p className="private-conversations-text max-w-[789px]">
                   Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue.
-                </p>
-                <p className="private-conversations-text max-w-[789px]">
+                  <br />
+                  <br />
                   We believe the stewardship of important art begins with thoughtful conversation, not transactions.
                 </p>
                 <p className="private-conversations-text max-w-[789px]">
