@@ -304,10 +304,10 @@ export default function Home() {
               <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 flex items-center justify-start h-full">
                 <div className="max-w-[579px]">
                   <h2 className="governance-title">
-                    Governance is the product.
+                    Our Purpose
                   </h2>
                   <p className="governance-description">
-                    This platform is built as a trust-led framework where custody, authority, and oversight are structurally separated. The objective is continuity: decisions remain disciplined, assets remain protected, and participation remains controlled.
+                    Art carries cultural weight long before it carries financial value. When important works are treated primarily as assets, their context, integrity, and long-term significance are often compromised.<br /><br />Art Investment Group Trust exists to address this imbalance. We provide structures designed to protect cultural importance, resist short-term pressures, and ensure that significant works are held with intention, care, and institutional discipline.<br /><br />This philosophy guides every acquisition, every governance decision, and every relationship we enter.
                   </p>
                   <button className="governance-cta">
                     Review Governance
