@@ -81,7 +81,7 @@ export default function Home() {
         <div className="max-w-[1440px] mx-auto relative">
           <div className="grid lg:grid-cols-[1fr_40%] gap-0">
             {/* Content Column */}
-            <div className="px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24 flex items-center">
+            <div className="px-4 sm:px-8 lg:px-[80px] pt-0 pb-12 sm:pb-16 lg:pb-24 flex items-center">
               <div className="max-w-[637px]">
                 {/* Heading */}
                 <h1 className="hero-title" style={{marginBottom: '17px'}}>
