@@ -186,12 +186,10 @@ section:has(.slider-wrapper) {
 
 .slider-wrapper {
   width: 100%;
-  max-width: 100%;
   margin: 0;
-  padding: 0 0 0 1rem;
+  padding-left: 1rem;
   box-sizing: border-box;
   overflow: hidden;
-  display: block;
 }
 
 @media (min-width: 640px) {
