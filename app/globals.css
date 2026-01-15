@@ -322,6 +322,23 @@ body {
   }
 }
 
+.governance-subtitle {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: left;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .governance-subtitle {
+    font-size: 17px;
+    line-height: 28px;
+  }
+}
+
 .governance-cta {
   display: inline-flex;
   align-items: center;
