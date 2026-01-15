@@ -748,6 +748,52 @@ section:has(.slider-wrapper) {
   opacity: 0.9;
 }
 
+/* Art and Artists Section */
+.art-artists-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .art-artists-title {
+    font-size: 40px;
+  }
+}
+
+.art-artists-subtitle {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .art-artists-subtitle {
+    font-size: 22px;
+  }
+}
+
+.art-artists-description {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .art-artists-description {
+    font-size: 16px;
+  }
+}
+
 /* Transparency Section */
 .transparency-title {
   color: var(--archive-slate);
