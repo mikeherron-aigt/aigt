@@ -1440,35 +1440,35 @@ footer {
 }
 
 .stewardship-ways-title {
-  color: var(--archive-slate);
-  font-family: Georgia, serif;
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 48px;
-  text-align: center;
-  margin: 0;
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 32px !important;
+  font-weight: 400 !important;
+  line-height: 48px !important;
+  text-align: center !important;
+  margin: 0 !important;
 }
 
 @media (min-width: 1024px) {
   .stewardship-ways-title {
-    font-size: 40px;
+    font-size: 40px !important;
   }
 }
 
 .stewardship-ways-subtitle {
-  color: var(--archive-slate);
-  font-family: Georgia, serif;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 30px;
-  text-align: center;
-  margin: 0;
-  max-width: 593px;
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  line-height: 30px !important;
+  text-align: center !important;
+  margin: 0 !important;
+  max-width: 593px !important;
 }
 
 @media (min-width: 1024px) {
   .stewardship-ways-subtitle {
-    font-size: 22px;
+    font-size: 22px !important;
   }
 }
 
