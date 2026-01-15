@@ -436,47 +436,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Institutional Context Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-[169px]">
-          <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[482px_1fr] gap-8 lg:gap-[80px]">
-              {/* Image Column */}
-              <div className="px-4 sm:px-8 lg:pl-[125px] lg:pr-0">
-                <div className="relative w-full aspect-[482/612]">
-                  <Image
-                    src="https://api.builder.io/api/v1/image/assets/TEMP/d49e6516dcaa72fcde4a33a5cdc6a6b517677ce7?width=964"
-                    alt="Contemporary artwork illustrating institutional context"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 482px"
-                  />
-                </div>
-              </div>
-
-              {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:pr-[125px] lg:pl-0 flex items-center">
-                <div className="max-w-[579px]">
-                  <h2 className="institutional-title">
-                    Institutional context is part of the custody model.
-                  </h2>
-                  <p className="institutional-description">
-                    A museum structure supports exhibition and placement while preserving separation from fund economics. Cultural infrastructure is treated as permanent context, not a marketing layer.
-                  </p>
-                  <ul className="institutional-list">
-                    <li>Nonprofit museum structure</li>
-                    <li>Art is loaned, not sold</li>
-                    <li>Curatorial depth strengthens long-duration positioning</li>
-                    <li>Mission remains distinct from investment operations</li>
-                  </ul>
-                  <button className="institutional-cta">
-                    Explore the Museum Model
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Art and Artists Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto">
