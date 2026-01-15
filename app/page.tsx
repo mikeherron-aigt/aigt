@@ -401,48 +401,34 @@ export default function Home() {
           <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
         </div>
 
-        {/* Stewardship Section */}
-        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+        {/* One Standard Across Mediums Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-[169px]">
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
-              {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[128px] flex items-center justify-start h-full">
-                <div className="max-w-[581px] pt-0">
-                  <h2 className="stewardship-title">
-                    Stewardship is enforced through process.
-                  </h2>
-                  <p className="stewardship-description">
-                    The platform supports multiple funds with independent economics and governance. This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
-                  </p>
-                  <button className="stewardship-cta">
-                    See the Stewardship Standard
-                  </button>
+            <div className="grid lg:grid-cols-[482px_1fr] gap-8 lg:gap-[80px]">
+              {/* Image Column */}
+              <div className="px-4 sm:px-8 lg:pl-[125px] lg:pr-0">
+                <div className="relative w-full aspect-[482/612]">
+                  <Image
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F1295f4f519534fd9bdd11dcbac77e37a?format=webp&width=800"
+                    alt="Contemporary artwork representing cultural significance across mediums"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 482px"
+                  />
                 </div>
               </div>
 
-              {/* Cards Column */}
-              <div className="px-4 sm:px-8 lg:px-[80px] lg:pr-[116px] flex flex-col gap-[30px]">
-                {/* Custody Card */}
-                <div className="stewardship-card">
-                  <h3 className="stewardship-card-title">Custody</h3>
-                  <p className="stewardship-card-description">
-                    Assets are held within a controlled custody approach designed to reduce ambiguity and preserve integrity.
-                  </p>
-                </div>
-
-                {/* Provenance Card */}
-                <div className="stewardship-card">
-                  <h3 className="stewardship-card-title">Provenance</h3>
-                  <p className="stewardship-card-description">
-                    Documentation is treated as a primary asset, tracked and maintained as part of the platform's long-term standard.
-                  </p>
-                </div>
-
-                {/* Oversight Card */}
-                <div className="stewardship-card">
-                  <h3 className="stewardship-card-title">Oversight</h3>
-                  <p className="stewardship-card-description">
-                    Decision-making is governed through defined authority, review, and accountability.
+              {/* Content Column */}
+              <div className="px-4 sm:px-8 lg:pr-[125px] lg:pl-0 flex items-center">
+                <div className="max-w-[579px]">
+                  <h2 className="one-standard-title">
+                    One Standard Across Mediums
+                  </h2>
+                  <h3 className="one-standard-subtitle">
+                    Cultural Significance Is Medium Agnostic
+                  </h3>
+                  <p className="one-standard-description">
+                    Whether a work exists on canvas or on chain, our standards do not change. Cultural relevance, provenance, context, and stewardship guide our decisions, not the medium itself.<br /><br />By applying the same governance framework across traditional and digital art, we aim to normalize contemporary forms of expression within an institutional and culturally legitimate context.
                   </p>
                 </div>
               </div>
