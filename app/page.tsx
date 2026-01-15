@@ -588,7 +588,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px]">
               {/* Links */}
               <p className="footer-links">
-                Disclosures   |   Privacy   |   Terms   |   Contact
+                Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
               </p>
 
               {/* Copyright */}
