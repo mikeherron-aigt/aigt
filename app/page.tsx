@@ -213,12 +213,12 @@ export default function Home() {
 
         {/* Footer Bar - Full Width */}
         <div className="w-full h-[36px] relative hidden lg:block">
-          {/* Left portion - Gallery Plaster */}
-          <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{width: 'calc((100vw - 1440px) / 2 + 845px)'}}></div>
+          {/* Left portion - Gallery Plaster - extends to 60% of viewport accounting for container centering */}
+          <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{width: 'calc(50% + 288px)'}}></div>
           {/* Right portion - Ledger Stone */}
-          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc((100vw - 1440px) / 2 + 877px)', right: '0'}}></div>
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50% + 320px)', right: '0'}}></div>
           {/* Dark green square at intersection */}
-          <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc((100vw - 1440px) / 2 + 845px)'}}></div>
+          <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(50% + 288px)'}}></div>
         </div>
 
         {/* Featured Collection Section */}
