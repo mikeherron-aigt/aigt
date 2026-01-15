@@ -660,7 +660,25 @@ body {
 
 /* Footer Section */
 footer {
-  background-color: var(--paper-white) !important;
+  background-color: var(--paper-white);
+}
+
+.footer-content-box {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 0;
+}
+
+@media (min-width: 640px) {
+  .footer-content-box {
+    padding: 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-content-box {
+    padding: 80px;
+  }
 }
 
 .footer-tagline {
