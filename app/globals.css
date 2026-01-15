@@ -344,13 +344,16 @@ body {
   background: linear-gradient(
     to right,
     transparent 0%,
-    var(--archive-slate) 15%,
-    var(--archive-slate) 85%,
+    var(--archive-slate) 10%,
+    var(--archive-slate) 90%,
     transparent 100%
-  );
-  opacity: 0.4;
-  width: 100%;
-  max-width: 600px;
+  ) !important;
+  opacity: 0.5;
+  width: 100% !important;
+  max-width: 500px !important;
+  display: block !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
 }
 
 .governance-cta {
