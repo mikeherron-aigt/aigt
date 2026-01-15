@@ -795,20 +795,23 @@ footer {
 
 .private-conversations {
   margin-bottom: 48px;
+  text-align: center;
 }
 
 .private-conversations-title {
   color: var(--archive-slate);
   font-family: Georgia, serif;
-  font-size: 24px;
-  font-weight: 400;
-  line-height: 36px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: center;
   margin: 0 0 16px 0;
 }
 
 @media (min-width: 1024px) {
   .private-conversations-title {
-    font-size: 28px;
+    font-size: 17px;
+    line-height: 28px;
   }
 }
 
@@ -819,6 +822,7 @@ footer {
   font-weight: 400;
   line-height: 26px;
   margin: 0 0 16px 0;
+  text-align: center;
 }
 
 @media (min-width: 1024px) {
