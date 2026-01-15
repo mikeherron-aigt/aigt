@@ -384,7 +384,7 @@ export default function RequestAccessPage() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-12 sm:py-16 lg:py-[80px] mt-16">
+      <footer className="w-full py-6 sm:py-8 lg:py-12 mt-16">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
           <div className="footer-content-box flex flex-col items-center gap-10">
             {/* Logo */}
