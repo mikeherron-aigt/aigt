@@ -148,8 +148,8 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="overflow-hidden">
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+          <div className="px-4 sm:px-8 lg:px-[80px]">
+            <div className="overflow-hidden -mx-4 sm:-mx-8 lg:-mx-[80px]">
               <div
                 ref={sliderRef}
                 className="artwork-slider"
