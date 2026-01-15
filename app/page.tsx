@@ -150,7 +150,7 @@ export default function Home() {
 
             {/* Navigation */}
             <nav className="flex items-center gap-8 ml-auto">
-              <a href="#about" className="nav-link">About</a>
+              <Link href="/about" className="nav-link">About</Link>
               <a href="#investment-offerings" className="nav-link">Offerings</a>
               <a href="#gallery" className="nav-link">Gallery</a>
               <a href="#stewardship-in-practice" className="nav-link">Stewardship</a>
