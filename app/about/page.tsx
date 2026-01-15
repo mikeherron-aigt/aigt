@@ -105,7 +105,7 @@ export default function AboutPage() {
                   <h1 className="about-hero-title" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>
                     Stewardship Requires Accountability
                   </h1>
-                  <div className="about-hero-description">
+                  <div className="about-hero-description" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>
                     <p>
                       Art Investment Group Trust is governed by a board and leadership team with experience across art, culture, finance, and institutional stewardship.
                     </p>
@@ -151,8 +151,8 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                  <h2 className="about-john-title">About John Dowling Jr.</h2>
-                  <h3 className="about-john-subtitle">A Legacy Being Stewarded in Real Time</h3>
+                  <h2 className="about-john-title" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>About John Dowling Jr.</h2>
+                  <h3 className="about-john-subtitle" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>A Legacy Being Stewarded in Real Time</h3>
                 </div>
               </div>
 
@@ -181,10 +181,10 @@ export default function AboutPage() {
             <div className="flex flex-col items-center gap-12 sm:gap-16 lg:gap-20">
               {/* Header */}
               <div className="flex flex-col items-center gap-4 max-w-[995px]">
-                <h2 className="stewardship-ways-title">
+                <h2 className="stewardship-ways-title" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>
                   Two Ways to Steward the Work
                 </h2>
-                <p className="stewardship-ways-subtitle">
+                <p className="stewardship-ways-subtitle" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>
                   The Ethereum Art Fund supports two complementary forms of stewardship for John Dowling Jr.'s work.
                 </p>
               </div>
@@ -193,7 +193,7 @@ export default function AboutPage() {
               <div className="grid md:grid-cols-2 gap-6 lg:gap-[34px] w-full max-w-[1198px]">
                 {/* Fund Held Works Card */}
                 <div className="stewardship-way-card">
-                  <h3 className="stewardship-way-card-title">Fund Held Works</h3>
+                  <h3 className="stewardship-way-card-title" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>Fund Held Works</h3>
                   <p className="stewardship-way-card-description">
                     Selected works are acquired and stewarded within the Ethereum Art Fund as part of a governed, long horizon strategy.
                   </p>
@@ -204,7 +204,7 @@ export default function AboutPage() {
 
                 {/* Private Placement Card */}
                 <div className="stewardship-way-card">
-                  <h3 className="stewardship-way-card-title">Private Placement of Individual Works</h3>
+                  <h3 className="stewardship-way-card-title" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>Private Placement of Individual Works</h3>
                   <p className="stewardship-way-card-description">
                     Select works are made available for direct private acquisition by aligned collectors and institutions, including hospitality, cultural, and architectural partners.
                   </p>
@@ -225,7 +225,7 @@ export default function AboutPage() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             {/* Header */}
             <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20 max-w-[995px] mx-auto">
-              <h2 className="team-section-title">
+              <h2 className="team-section-title" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>
                 Stewardship Requires Accountability
               </h2>
               <p className="team-section-description">
@@ -252,7 +252,7 @@ export default function AboutPage() {
                   </div>
 
                   {/* Name */}
-                  <h3 className="team-member-name">{member.name}</h3>
+                  <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>
 
                   {/* Title */}
                   <p className="team-member-title">{member.title}</p>
