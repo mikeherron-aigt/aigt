@@ -82,7 +82,7 @@ export default function AboutPage() {
 
             {/* Navigation */}
             <nav className="flex items-center gap-8 ml-auto">
-              <Link href="/#about" className="nav-link">About</Link>
+              <Link href="/about" className="nav-link">About</Link>
               <Link href="/#investment-offerings" className="nav-link">Offerings</Link>
               <Link href="/#gallery" className="nav-link">Gallery</Link>
               <Link href="/#stewardship-in-practice" className="nav-link">Stewardship</Link>
