@@ -902,7 +902,7 @@ footer {
   position: relative;
   width: 100%;
   max-width: 90vw;
-  max-height: 90vh;
+  height: 90vh;
   display: flex;
   flex-direction: column;
   gap: 20px;
