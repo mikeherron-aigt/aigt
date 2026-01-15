@@ -557,6 +557,9 @@ export default function Home() {
                 <p className="private-conversations-text max-w-[789px]">
                   We believe the stewardship of important art begins with thoughtful conversation, not transactions.
                 </p>
+                <p className="private-conversations-text max-w-[789px]">
+                  These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
+                </p>
               </div>
 
               {/* CTA Button */}
