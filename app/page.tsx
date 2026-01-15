@@ -162,7 +162,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+          <div className="slider-wrapper">
             <div className="slider-container">
               <div
                 ref={sliderRef}
