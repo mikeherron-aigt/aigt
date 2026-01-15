@@ -344,27 +344,18 @@ body {
   background: linear-gradient(
     to right,
     transparent 0%,
-    var(--archive-slate) 15%,
-    var(--archive-slate) 85%,
+    var(--archive-slate) 10%,
+    var(--archive-slate) 90%,
     transparent 100%
   );
-  opacity: 0.25;
-  margin-left: -124px;
-  margin-right: 0;
-  width: calc(100% + 124px);
+  opacity: 0.3;
+  width: 100%;
+  margin: 48px 0;
 }
 
-@media (max-width: 1024px) {
+@media (min-width: 1024px) {
   .divider-line {
-    margin-left: -32px;
-    width: calc(100% + 32px);
-  }
-}
-
-@media (max-width: 640px) {
-  .divider-line {
-    margin-left: -16px;
-    width: calc(100% + 16px);
+    margin: 64px 0;
   }
 }
 
