@@ -192,6 +192,7 @@ section:has(.slider-wrapper) {
   box-sizing: border-box;
   overflow: hidden;
   display: block;
+  background-color: rgba(255, 0, 0, 0.1);
 }
 
 @media (min-width: 640px) {
