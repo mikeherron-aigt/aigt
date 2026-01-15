@@ -542,7 +542,7 @@ export default function Home() {
         </section>
 
         {/* Footer Section */}
-        <footer className="w-full py-6 sm:py-8 lg:py-12">
+        <footer className="w-full py-2 sm:py-3 lg:py-4">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
             <div className="footer-content-box flex flex-col items-center gap-10">
               {/* Logo */}
