@@ -301,8 +301,8 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-24">
-                <div className="max-w-[579px] space-y-12">
+              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-24 flex flex-col">
+                <div className="max-w-[579px]">
                   {/* Our Purpose */}
                   <div>
                     <h2 className="governance-title">
@@ -312,10 +312,12 @@ export default function Home() {
                       Art carries cultural weight long before it carries financial value. When important works are treated primarily as assets, their context, integrity, and long-term significance are often compromised.<br /><br />Art Investment Group Trust exists to address this imbalance. We provide structures designed to protect cultural importance, resist short-term pressures, and ensure that significant works are held with intention, care, and institutional discipline.<br /><br />This philosophy guides every acquisition, every governance decision, and every relationship we enter.
                     </p>
                   </div>
+                </div>
 
-                  {/* Divider */}
-                  <div className="divider-line my-12 lg:my-16"></div>
+                {/* Divider */}
+                <div className="divider-line my-12 lg:my-16 -mx-4 sm:-mx-8 lg:-mx-[124px]"></div>
 
+                <div className="max-w-[579px]">
                   {/* Our Approach */}
                   <div>
                     <h2 className="governance-title">
