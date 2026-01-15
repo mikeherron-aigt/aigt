@@ -582,24 +582,24 @@ export default function Home() {
                   Schedule a Discussion
                 </button>
               </div>
+            </div>
 
-              {/* Footer Info */}
-              <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px] w-full">
-                {/* Links */}
-                <p className="footer-links">
-                  Disclosures   |   Privacy   |   Terms   |   Contact
-                </p>
+            {/* Footer Info */}
+            <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px]">
+              {/* Links */}
+              <p className="footer-links">
+                Disclosures   |   Privacy   |   Terms   |   Contact
+              </p>
 
-                {/* Copyright */}
-                <p className="footer-copyright">
-                  COPYRIGHT ©2026. ALL RIGHTS RESERVED.
-                </p>
+              {/* Copyright */}
+              <p className="footer-copyright">
+                COPYRIGHT ©2026. ALL RIGHTS RESERVED.
+              </p>
 
-                {/* Disclaimer */}
-                <p className="footer-disclaimer">
-                  Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
-                </p>
-              </div>
+              {/* Disclaimer */}
+              <p className="footer-disclaimer">
+                Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
+              </p>
             </div>
           </div>
         </footer>
