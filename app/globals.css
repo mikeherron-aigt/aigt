@@ -249,16 +249,22 @@ body {
 }
 
 .slider-nav-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: auto !important;
+  height: auto !important;
   color: var(--archive-slate);
   cursor: pointer;
   transition: all 0.3s ease;
-  padding: 8px;
+  padding: 0 !important;
+  margin: 0 !important;
   flex-shrink: 0;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .slider-nav-arrow:hover {
@@ -273,6 +279,7 @@ body {
 .slider-nav-arrow svg {
   width: 24px;
   height: 24px;
+  stroke-width: 2;
 }
 
 /* Governance Section */
