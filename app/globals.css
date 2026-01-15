@@ -1521,79 +1521,79 @@ footer {
 }
 
 .team-section-title {
-  color: var(--archive-slate);
-  font-family: Georgia, serif;
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 48px;
-  text-align: center;
-  margin: 0;
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 32px !important;
+  font-weight: 400 !important;
+  line-height: 48px !important;
+  text-align: center !important;
+  margin: 0 !important;
 }
 
 @media (min-width: 1024px) {
   .team-section-title {
-    font-size: 40px;
+    font-size: 40px !important;
   }
 }
 
 .team-section-description {
-  color: var(--archive-slate);
-  font-family: Georgia, serif;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 30px;
-  text-align: center;
-  margin: 0;
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  line-height: 30px !important;
+  text-align: center !important;
+  margin: 0 !important;
 }
 
 @media (min-width: 1024px) {
   .team-section-description {
-    font-size: 22px;
+    font-size: 22px !important;
   }
 }
 
 .team-member-name {
-  color: var(--archive-slate);
-  font-family: Georgia, serif;
-  font-size: 20px;
-  font-weight: 400;
-  line-height: normal;
-  margin: 0 0 8px 0;
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  margin: 0 0 8px 0 !important;
 }
 
 @media (min-width: 1024px) {
   .team-member-name {
-    font-size: 22px;
+    font-size: 22px !important;
   }
 }
 
 .team-member-title {
-  color: var(--archive-slate);
-  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 26px;
-  margin: 0 0 12px 0;
+  color: var(--archive-slate) !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  margin: 0 0 12px 0 !important;
 }
 
 @media (min-width: 1024px) {
   .team-member-title {
-    font-size: 16px;
+    font-size: 16px !important;
   }
 }
 
 .team-member-description {
-  color: var(--archive-slate);
-  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 26px;
-  margin: 0;
+  color: var(--archive-slate) !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  margin: 0 !important;
 }
 
 @media (min-width: 1024px) {
   .team-member-description {
-    font-size: 16px;
+    font-size: 16px !important;
   }
 }
 
