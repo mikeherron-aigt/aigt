@@ -344,9 +344,6 @@ export default function Home() {
                   <p className="funds-description">
                     Art Investment Group Trust operates multiple governed platforms, each designed to support different forms of cultural expression while adhering to the same standards of stewardship and oversight.
                   </p>
-                  <button className="funds-cta">
-                    Review Governance
-                  </button>
                 </div>
               </div>
 
