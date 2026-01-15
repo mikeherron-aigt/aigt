@@ -1529,6 +1529,30 @@ footer {
   opacity: 0.8;
 }
 
+/* Form Submit Divider */
+.form-submit-divider {
+  position: relative;
+  margin-top: 48px;
+  padding-top: 48px;
+}
+
+.form-submit-divider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--archive-slate) 10%,
+    var(--archive-slate) 90%,
+    transparent 100%
+  );
+  opacity: 0.5;
+}
+
 /* Disclaimer */
 .form-disclaimer {
   color: var(--ledger-stone);
