@@ -1473,50 +1473,50 @@ footer {
 }
 
 .stewardship-way-card {
-  display: flex;
-  width: 100%;
-  min-height: 350px;
-  padding: 60px 40px;
-  flex-direction: column;
-  gap: 16px;
-  background: #ffffff;
-  backdrop-filter: blur(3.3px);
+  display: flex !important;
+  width: 100% !important;
+  min-height: 350px !important;
+  padding: 60px 40px !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  background: #ffffff !important;
+  backdrop-filter: blur(3.3px) !important;
 }
 
 @media (min-width: 1024px) {
   .stewardship-way-card {
-    padding: 80px 40px;
-    min-height: 429px;
+    padding: 80px 40px !important;
+    min-height: 429px !important;
   }
 }
 
 .stewardship-way-card-title {
-  color: var(--archive-slate);
-  font-family: Georgia, serif;
-  font-size: 24px;
-  font-weight: 400;
-  line-height: 36px;
-  margin: 0;
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  line-height: 36px !important;
+  margin: 0 !important;
 }
 
 @media (min-width: 1024px) {
   .stewardship-way-card-title {
-    font-size: 28px;
+    font-size: 28px !important;
   }
 }
 
 .stewardship-way-card-description {
-  color: var(--archive-slate);
-  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 26px;
-  margin: 0;
+  color: var(--archive-slate) !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  margin: 0 !important;
 }
 
 @media (min-width: 1024px) {
   .stewardship-way-card-description {
-    font-size: 16px;
+    font-size: 16px !important;
   }
 }
 
