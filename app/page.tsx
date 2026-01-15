@@ -45,6 +45,20 @@ export default function Home() {
   const handleTouchEnd = () => {
     setIsDragging(false);
   };
+
+  const scrollSlider = (direction: 'left' | 'right') => {
+    if (!sliderRef.current) return;
+    const scrollAmount = 350; // Amount to scroll per click
+    const newScrollLeft = direction === 'left'
+      ? sliderRef.current.scrollLeft - scrollAmount
+      : sliderRef.current.scrollLeft + scrollAmount;
+
+    sliderRef.current.scrollTo({
+      left: newScrollLeft,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
@@ -148,11 +162,10 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="overflow-x-auto">
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-              <div
-                ref={sliderRef}
-                className="artwork-slider"
+          <div className="w-full overflow-x-auto">
+            <div
+              ref={sliderRef}
+              className="artwork-slider px-4 sm:px-8 lg:px-[80px]"
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
@@ -331,8 +344,25 @@ export default function Home() {
                   <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
                 </div>
               </div>
-              </div>
             </div>
+          </div>
+
+          {/* Slider Navigation Arrows */}
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center items-center gap-4 mt-8">
+            <button
+              onClick={() => scrollSlider('left')}
+              className="slider-nav-btn"
+              aria-label="Scroll left"
+            >
+              ←
+            </button>
+            <button
+              onClick={() => scrollSlider('right')}
+              className="slider-nav-btn"
+              aria-label="Scroll right"
+            >
+              →
+            </button>
           </div>
         </section>
 

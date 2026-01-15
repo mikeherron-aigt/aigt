@@ -184,11 +184,17 @@ body {
   gap: 18px;
   margin: 0;
   width: 100%;
-  max-width: 100%;
+  min-width: min-content;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  overflow-x: visible;
+  overflow-x: auto;
   overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.artwork-slider::-webkit-scrollbar {
+  display: none;
 }
 
 .artwork-card {
@@ -235,6 +241,27 @@ body {
   font-weight: 400;
   line-height: normal;
   margin: 0;
+}
+
+.slider-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--ledger-stone);
+  background: transparent;
+  color: var(--archive-slate);
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 4px;
+}
+
+.slider-nav-btn:hover {
+  background: var(--ledger-stone);
+  color: var(--paper-white);
 }
 
 /* Governance Section */
