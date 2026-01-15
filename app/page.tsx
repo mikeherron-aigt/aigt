@@ -554,9 +554,9 @@ export default function Home() {
         </section>
 
         {/* Footer Section */}
-        <footer className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[120px]">
-            <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
+        <footer className="w-full py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
+            <div className="footer-content-box flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
               {/* Logo */}
               <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
                 <Image
@@ -582,24 +582,24 @@ export default function Home() {
                   Schedule a Discussion
                 </button>
               </div>
-            </div>
 
-            {/* Footer Info */}
-            <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px]">
-              {/* Links */}
-              <p className="footer-links">
-                Disclosures   |   Privacy   |   Terms   |   Contact
-              </p>
+              {/* Footer Info */}
+              <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px] w-full">
+                {/* Links */}
+                <p className="footer-links">
+                  Disclosures   |   Privacy   |   Terms   |   Contact
+                </p>
 
-              {/* Copyright */}
-              <p className="footer-copyright">
-                COPYRIGHT ©2026. ALL RIGHTS RESERVED.
-              </p>
+                {/* Copyright */}
+                <p className="footer-copyright">
+                  COPYRIGHT ©2026. ALL RIGHTS RESERVED.
+                </p>
 
-              {/* Disclaimer */}
-              <p className="footer-disclaimer">
-                Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
-              </p>
+                {/* Disclaimer */}
+                <p className="footer-disclaimer">
+                  Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
+                </p>
+              </div>
             </div>
           </div>
         </footer>
@@ -607,4 +607,3 @@ export default function Home() {
     </div>
   );
 }
-
