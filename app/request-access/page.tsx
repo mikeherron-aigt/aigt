@@ -386,7 +386,7 @@ export default function RequestAccessPage() {
       {/* Footer */}
       <footer className="w-full py-12 sm:py-16 lg:py-[80px] mt-16">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
-          <div className="footer-content-box flex flex-col items-center gap-10">
+          <div className="footer-content-box flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
             {/* Logo */}
             <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
               <Image
@@ -398,8 +398,33 @@ export default function RequestAccessPage() {
               />
             </div>
 
+            {/* Tagline */}
+            <h2 className="footer-tagline">
+              Governed platforms for the long-term stewardship of culturally significant art.
+            </h2>
+
+            {/* Private Conversations Section */}
+            <div className="private-conversations text-center flex flex-col items-center">
+              <h3 className="private-conversations-title">
+                Private Conversations
+              </h3>
+              <p className="private-conversations-text max-w-[789px]">
+                Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not transactions.
+              </p>
+              <p className="private-conversations-text max-w-[789px]">
+                These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
+              </p>
+            </div>
+
+            {/* CTA Button */}
+            <div className="flex justify-center">
+              <Link href="/request-access" className="footer-cta-primary" style={{textDecoration: 'none', display: 'inline-flex'}}>
+                Schedule a Discussion
+              </Link>
+            </div>
+
             {/* Footer Info */}
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px]">
               {/* Links */}
               <p className="footer-links">
                 Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
