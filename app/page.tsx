@@ -336,7 +336,7 @@ export default function Home() {
               <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
                 <div className="flex flex-col items-center gap-4 max-w-[995px]">
                   <h2 className="funds-title">
-                    <strong>Investment Offerings</strong>
+                    Investment Offerings
                   </h2>
                   <h3 className="funds-subtitle">
                     Distinct Platforms.  One Philosophy
