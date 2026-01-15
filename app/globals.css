@@ -934,23 +934,24 @@ footer {
 
 .image-modal-close {
   position: absolute;
-  top: -50px;
-  right: 0;
-  background: none;
-  border: none;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   cursor: pointer;
-  padding: 8px;
+  padding: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  z-index: 10000;
+  transition: all 0.2s ease;
+  z-index: 10001;
+  border-radius: 4px;
 }
 
 .image-modal-close:hover {
-  opacity: 0.8;
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .image-modal-close:focus {
@@ -961,6 +962,7 @@ footer {
 .image-modal-close svg {
   width: 24px;
   height: 24px;
+  stroke-width: 2;
 }
 
 .image-modal-info {
