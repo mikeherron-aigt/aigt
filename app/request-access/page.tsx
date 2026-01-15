@@ -61,6 +61,7 @@ export default function RequestAccessPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
+    setIsSubmitted(true);
   };
 
   const relationshipOptions = [
