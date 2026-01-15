@@ -659,6 +659,10 @@ body {
 }
 
 /* Footer Section */
+footer {
+  background-color: var(--paper-white) !important;
+}
+
 .footer-tagline {
   color: var(--archive-slate);
   font-family: Georgia, serif;
