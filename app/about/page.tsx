@@ -102,7 +102,7 @@ export default function AboutPage() {
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24 flex items-center">
                 <div className="max-w-[711px]">
-                  <h1 className="about-hero-title">
+                  <h1 className="about-hero-title" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>
                     Stewardship Requires Accountability
                   </h1>
                   <div className="about-hero-description">
