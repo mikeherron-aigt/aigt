@@ -2,8 +2,29 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function RequestAccessPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission
+    console.log('Form submitted:', formData);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
@@ -23,83 +44,91 @@ export default function RequestAccessPage() {
             </Link>
 
             {/* Navigation */}
-            <div className="ml-auto">
-              <Link href="/" className="nav-link">Back to Home</Link>
-            </div>
+            <nav className="flex items-center gap-8 ml-auto">
+              <Link href="/#about" className="nav-link">About</Link>
+              <Link href="/#investment-offerings" className="nav-link">Offerings</Link>
+              <Link href="/#gallery" className="nav-link">Gallery</Link>
+              <Link href="/#stewardship-in-practice" className="nav-link">Stewardship</Link>
+              <span className="nav-separator">|</span>
+              <Link href="/" className="btn-primary">Back to Home</Link>
+            </nav>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-16 sm:py-24 lg:py-32">
-        <div className="max-w-[637px] mx-auto">
-          {/* Heading */}
-          <h1 className="hero-title" style={{marginBottom: '24px', textAlign: 'center'}}>
-            Request Access
-          </h1>
+      <main className="w-full py-16 sm:py-20 lg:py-24">
+        <div className="max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+          <div className="grid grid-cols-1 lg:grid-cols-[579px_1fr] gap-8 lg:gap-12 items-start">
+            {/* Left Column - Text Content */}
+            <div className="flex flex-col gap-4">
+              <h1 className="request-access-title">
+                Request Access
+              </h1>
+              <p className="request-access-description">
+                Access to Art Investment Growth Trust, its platforms and conversations is considered and intentional. Requests are reviewed to ensure alignment with our stewardship philosophy and governance standards.
+              </p>
+            </div>
 
-          {/* Subtitle */}
-          <div className="hero-subtitle" style={{textAlign: 'center', marginBottom: '40px'}}>
-            <p>
-              Join Art Investment Group Trust to explore opportunities in art stewardship and culturally significant acquisitions.
-            </p>
-          </div>
-
-          {/* Form Section */}
-          <div className="bg-white p-8 sm:p-12 lg:p-16 rounded-lg">
-            <form className="flex flex-col gap-6">
+            {/* Right Column - Form */}
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {/* Name Field */}
-              <div className="flex flex-col gap-2">
-                <label className="request-form-label">Full Name</label>
+              <div className="request-form-field">
                 <input
                   type="text"
-                  placeholder="Your full name"
-                  className="request-form-input"
+                  name="name"
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="request-form-input-white"
                   required
                 />
               </div>
 
-              {/* Email Field */}
-              <div className="flex flex-col gap-2">
-                <label className="request-form-label">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="your.email@example.com"
-                  className="request-form-input"
-                  required
-                />
-              </div>
-
-              {/* Company Field */}
-              <div className="flex flex-col gap-2">
-                <label className="request-form-label">Organization</label>
-                <input
-                  type="text"
-                  placeholder="Your organization"
-                  className="request-form-input"
-                />
+              {/* Email and Phone Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="request-form-field">
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="request-form-input-white"
+                    required
+                  />
+                </div>
+                <div className="request-form-field">
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="request-form-input-white"
+                  />
+                </div>
               </div>
 
               {/* Message Field */}
-              <div className="flex flex-col gap-2">
-                <label className="request-form-label">Message</label>
+              <div className="request-form-field">
                 <textarea
-                  placeholder="Tell us about your interest in AIGT"
-                  className="request-form-input resize-none"
-                  rows={5}
+                  name="message"
+                  placeholder="Message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="request-form-input-white resize-none"
+                  rows={7}
                 />
               </div>
 
               {/* Submit Button */}
-              <button type="submit" className="cta-primary" style={{marginTop: '16px', width: '100%'}}>
-                Submit Request
-              </button>
+              <div className="flex justify-end mt-2">
+                <button type="submit" className="request-submit-button">
+                  Send
+                </button>
+              </div>
             </form>
-
-            {/* Info Text */}
-            <p className="request-form-info" style={{marginTop: '32px', textAlign: 'center'}}>
-              We take your privacy seriously. Your information will be used solely to connect with you about access to Art Investment Group Trust opportunities.
-            </p>
           </div>
         </div>
       </main>
@@ -119,10 +148,23 @@ export default function RequestAccessPage() {
               />
             </div>
 
-            {/* Copyright */}
-            <p className="footer-copyright">
-              COPYRIGHT ©2026. ALL RIGHTS RESERVED.
-            </p>
+            {/* Footer Info */}
+            <div className="flex flex-col items-center gap-3">
+              {/* Links */}
+              <p className="footer-links">
+                Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
+              </p>
+
+              {/* Copyright */}
+              <p className="footer-copyright">
+                COPYRIGHT ©2026. ALL RIGHTS RESERVED.
+              </p>
+
+              {/* Disclaimer */}
+              <p className="footer-disclaimer">
+                Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
+              </p>
+            </div>
           </div>
         </div>
       </footer>
