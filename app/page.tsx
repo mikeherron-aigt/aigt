@@ -166,7 +166,7 @@ export default function Home() {
             <div className="slider-container">
               <div
                 ref={sliderRef}
-                className="artwork-slider"
+                className="artwork-slider px-4 sm:px-8 lg:px-[80px]"
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
