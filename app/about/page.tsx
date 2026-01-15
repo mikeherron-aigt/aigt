@@ -121,7 +121,7 @@ export default function AboutPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden">
                 <Image
-                  src="https://api.builder.io/api/v1/image/assets/TEMP/28fb29d0a8ab8f4dcb20d3c0c63481443e596dd4?width=1361"
+                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F8ed0757f4d7d41f9a6492d6376f81844?format=webp&width=800"
                   alt="Art collage representing stewardship and accountability"
                   fill
                   className="object-cover object-center"
