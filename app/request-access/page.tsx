@@ -4,26 +4,90 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
+interface FormData {
+  fullName: string;
+  email: string;
+  organization: string;
+  country: string;
+  relationshipToArt: string;
+  areasOfInterest: string[];
+  interestDescription: string;
+  investmentHorizon: string;
+  experience: string;
+  followUpPreference: string;
+  howYouHeard: string;
+}
+
 export default function RequestAccessPage() {
-  const [formData, setFormData] = useState({
-    name: '',
+  const [formData, setFormData] = useState<FormData>({
+    fullName: '',
     email: '',
-    phone: '',
-    message: ''
+    organization: '',
+    country: '',
+    relationshipToArt: '',
+    areasOfInterest: [],
+    interestDescription: '',
+    investmentHorizon: '',
+    experience: '',
+    followUpPreference: '',
+    howYouHeard: ''
   });
+
+  const [charCount, setCharCount] = useState(0);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    if (name === 'interestDescription') {
+      setCharCount(value.length);
+    }
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      areasOfInterest: checked
+        ? [...prev.areasOfInterest, name]
+        : prev.areasOfInterest.filter(item => item !== name)
+    }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
     console.log('Form submitted:', formData);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const relationshipOptions = [
+    'Collector',
+    'Artist or Estate Representative',
+    'Advisor or Family Office',
+    'Institution',
+    'Other'
+  ];
+
+  const areasOfInterestOptions = [
+    'Fund participation',
+    'Individual artwork acquisition',
+    'Stewardship or placement discussions',
+    'Research or institutional collaboration'
+  ];
+
+  const horizonOptions = [
+    'Long term',
+    'Very long term',
+    'Exploratory'
+  ];
+
+  const followUpOptions = [
+    'Email',
+    'Introductory call',
+    'No preference'
+  ];
 
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
@@ -58,78 +122,209 @@ export default function RequestAccessPage() {
 
       {/* Main Content */}
       <main className="w-full py-16 sm:py-20 lg:py-24">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-          <div className="grid grid-cols-1 lg:grid-cols-[579px_1fr] gap-8 lg:gap-12 items-start">
-            {/* Left Column - Text Content */}
-            <div className="flex flex-col gap-4">
-              <h1 className="request-access-title">
-                Request Access
-              </h1>
-              <p className="request-access-description">
-                Access to Art Investment Growth Trust, its platforms and conversations is considered and intentional. Requests are reviewed to ensure alignment with our stewardship philosophy and governance standards.
-              </p>
-            </div>
+        <div className="max-w-[900px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+          {/* Header */}
+          <div className="mb-12 lg:mb-16">
+            <h1 className="request-access-title mb-4">
+              Request Access
+            </h1>
+            <p className="request-access-description">
+              Access to Art Investment Group Trust, its platforms and conversations is considered and intentional. Requests are reviewed to ensure alignment with our stewardship philosophy and governance standards.
+            </p>
+          </div>
 
-            {/* Right Column - Form */}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              {/* Name Field */}
-              <div className="request-form-field">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-12">
+            {/* Section 1: Identity */}
+            <div className="form-section">
+              <h2 className="form-section-title">Identity</h2>
+              
+              <div className="form-group">
+                <label className="form-label">Full Name <span className="form-required">*</span></label>
                 <input
                   type="text"
-                  name="name"
-                  placeholder="Name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="request-form-input-white"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  className="form-input"
                   required
                 />
               </div>
 
-              {/* Email and Phone Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="request-form-field">
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="request-form-input-white"
-                    required
-                  />
-                </div>
-                <div className="request-form-field">
-                  <input
-                    type="tel"
-                    name="phone"
-                    placeholder="Phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="request-form-input-white"
-                  />
-                </div>
-              </div>
-
-              {/* Message Field */}
-              <div className="request-form-field">
-                <textarea
-                  name="message"
-                  placeholder="Message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="request-form-input-white resize-none"
-                  rows={7}
+              <div className="form-group">
+                <label className="form-label">Email Address <span className="form-required">*</span></label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
                 />
               </div>
 
-              {/* Submit Button */}
-              <div className="flex justify-end mt-2">
-                <button type="submit" className="request-submit-button">
-                  Send
-                </button>
+              <div className="form-group">
+                <label className="form-label">Organization or Affiliation</label>
+                <input
+                  type="text"
+                  name="organization"
+                  value={formData.organization}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="Optional"
+                />
               </div>
-            </form>
-          </div>
+
+              <div className="form-group">
+                <label className="form-label">Country of Residence <span className="form-required">*</span></label>
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Section 2: Nature of Interest */}
+            <div className="form-section">
+              <h2 className="form-section-title">Nature of Interest</h2>
+              
+              <div className="form-group">
+                <label className="form-label">Relationship to Art <span className="form-required">*</span></label>
+                <select
+                  name="relationshipToArt"
+                  value={formData.relationshipToArt}
+                  onChange={handleInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select one</option>
+                  {relationshipOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Area of Interest</label>
+                <div className="space-y-3">
+                  {areasOfInterestOptions.map(option => (
+                    <div key={option} className="form-checkbox-group">
+                      <input
+                        type="checkbox"
+                        id={option}
+                        name={option}
+                        checked={formData.areasOfInterest.includes(option)}
+                        onChange={handleCheckboxChange}
+                        className="form-checkbox"
+                      />
+                      <label htmlFor={option} className="form-checkbox-label">{option}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Intent and Alignment */}
+            <div className="form-section">
+              <h2 className="form-section-title">Intent and Alignment</h2>
+              
+              <div className="form-group">
+                <label className="form-label">Briefly describe your interest in engaging with Art Investment Group Trust <span className="form-required">*</span></label>
+                <textarea
+                  name="interestDescription"
+                  value={formData.interestDescription}
+                  onChange={handleInputChange}
+                  className="form-textarea"
+                  rows={5}
+                  maxLength={300}
+                  required
+                  placeholder="Please share your interest and intent..."
+                />
+                <div className="form-helper-text">{charCount} / 300 characters</div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Investment or Stewardship Horizon <span className="form-required">*</span></label>
+                <select
+                  name="investmentHorizon"
+                  value={formData.investmentHorizon}
+                  onChange={handleInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select one</option>
+                  {horizonOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Section 4: Experience and Context */}
+            <div className="form-section">
+              <h2 className="form-section-title">Experience and Context</h2>
+              
+              <div className="form-group">
+                <label className="form-label">Experience with art stewardship, collecting, or institutional engagement</label>
+                <textarea
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleInputChange}
+                  className="form-textarea"
+                  rows={4}
+                  placeholder="Optional. Share relevant background or experience..."
+                />
+              </div>
+            </div>
+
+            {/* Section 5: Follow Up Preferences */}
+            <div className="form-section">
+              <h2 className="form-section-title">Follow Up Preferences</h2>
+              
+              <div className="form-group">
+                <label className="form-label">Preferred method of follow up <span className="form-required">*</span></label>
+                <select
+                  name="followUpPreference"
+                  value={formData.followUpPreference}
+                  onChange={handleInputChange}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select one</option>
+                  {followUpOptions.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">How did you hear about Art Investment Group Trust?</label>
+                <input
+                  type="text"
+                  name="howYouHeard"
+                  value={formData.howYouHeard}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="Optional"
+                />
+              </div>
+            </div>
+
+            {/* Submit Button and Disclaimer */}
+            <div className="mt-16 pt-12 border-t border-gallery-plaster">
+              <button type="submit" className="request-submit-button">
+                Request Access
+              </button>
+              
+              <p className="form-disclaimer">
+                Submissions are reviewed confidentially. A request does not obligate participation or access.
+              </p>
+            </div>
+          </form>
         </div>
       </main>
 
