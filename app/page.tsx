@@ -212,13 +212,13 @@ export default function Home() {
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-deep-patina hidden lg:block pointer-events-none" style={{top: 'calc(100% - 36px)', height: '36px'}}></div>
 
           {/* Footer Bar - Extends full width */}
-          <div className="absolute h-[36px] hidden lg:block" style={{top: '100%', left: '50%', width: '100vw', transform: 'translateX(-50%)'}}>
+          <div className="w-full h-[36px] relative hidden lg:block" style={{marginLeft: 'calc((100vw - 100%) / -2)', marginRight: 'calc((100vw - 100%) / -2)', width: '100vw'}}>
             {/* Left portion - #DADADA */}
-            <div className="absolute top-0 h-full bg-gallery-plaster hidden lg:block" style={{left: 'calc(50vw - 720px)', width: 'calc(60% - 32px)'}}></div>
+            <div className="absolute left-0 top-0 h-full bg-gallery-plaster hidden lg:block" style={{width: 'calc(50vw + 60% - 32px - 720px)'}}></div>
             {/* Right portion - #A1A69D */}
-            <div className="absolute top-0 h-full bg-ledger-stone hidden lg:block" style={{left: 'calc(50vw - 288px)', right: '0'}}></div>
+            <div className="absolute top-0 h-full bg-ledger-stone hidden lg:block" style={{left: 'calc(50vw + 60% - 32px - 720px)', right: '0'}}></div>
             {/* Dark green square at intersection */}
-            <div className="absolute top-0 w-8 h-full bg-deep-patina hidden lg:block" style={{left: 'calc(50vw - 720px + 60% - 32px)'}}></div>
+            <div className="absolute top-0 w-8 h-full bg-deep-patina hidden lg:block" style={{left: 'calc(50vw + 60% - 32px - 720px)'}}></div>
           </div>
         </div>
 
