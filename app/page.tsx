@@ -210,16 +210,16 @@ export default function Home() {
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 206px)'}}></div>
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 206px)', height: '170px'}}></div>
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-deep-patina hidden lg:block pointer-events-none" style={{top: 'calc(100% - 36px)', height: '36px'}}></div>
-        </div>
 
-        {/* Footer Bar - Full Width */}
-        <div className="w-full h-[36px] relative hidden lg:block">
-          {/* Left portion - #DADADA */}
-          <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{width: 'calc(60% - 32px)'}}></div>
-          {/* Right portion - #A1A69D */}
-          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(60%)', right: '0'}}></div>
-          {/* Dark green square at intersection */}
-          <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+          {/* Footer Bar - Extends full width */}
+          <div className="absolute left-0 right-0 w-screen h-[36px] hidden lg:block" style={{top: '100%', marginLeft: 'calc(-50vw + 50%)'}}>
+            {/* Left portion - #DADADA */}
+            <div className="absolute left-0 top-0 h-full bg-gallery-plaster hidden lg:block" style={{width: 'calc(60% - 32px)'}}></div>
+            {/* Right portion - #A1A69D */}
+            <div className="absolute top-0 h-full bg-ledger-stone hidden lg:block" style={{left: 'calc(60%)', right: '0'}}></div>
+            {/* Dark green square at intersection */}
+            <div className="absolute top-0 w-8 h-full bg-deep-patina hidden lg:block" style={{left: 'calc(60% - 32px)'}}></div>
+          </div>
         </div>
 
         {/* Featured Collection Section */}
