@@ -1101,6 +1101,7 @@ footer {
   cursor: pointer;
   transition: opacity 0.2s;
   white-space: nowrap;
+  text-decoration: none !important;
 }
 
 .footer-cta-primary:hover {
