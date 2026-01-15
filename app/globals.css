@@ -28,7 +28,7 @@ body {
   padding: 12px 8px;
   color: var(--archive-slate);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 24px;
   text-decoration: none;
   transition: opacity 0.2s;
@@ -38,23 +38,30 @@ body {
   opacity: 0.7;
 }
 
-.btn-primary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 28px;
-  background: var(--ledger-stone);
-  color: var(--paper-white);
+.nav-separator {
+  color: var(--archive-slate);
   font-size: 16px;
-  font-weight: 600;
   line-height: 24px;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  padding: 0 4px;
+}
+
+.btn-primary {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 12px 8px !important;
+  background: transparent !important;
+  color: var(--archive-slate) !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: opacity 0.2s !important;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
+  opacity: 0.7 !important;
 }
 
 .hero-title {
@@ -69,9 +76,9 @@ body {
 .hero-subtitle {
   color: var(--archive-slate);
   font-family: Georgia, serif;
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1.5;
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 30px;
   margin-bottom: 16px;
 }
 
@@ -175,12 +182,13 @@ body {
 .artwork-slider {
   display: flex;
   gap: 18px;
-  overflow-x: hidden;
-  overflow-y: hidden;
   margin: 0;
-  width: auto;
+  width: 100%;
+  max-width: 100%;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  overflow-x: visible;
+  overflow-y: hidden;
 }
 
 .artwork-card {
@@ -659,6 +667,28 @@ body {
 }
 
 /* Footer Section */
+footer {
+  background-color: var(--paper-white);
+}
+
+.footer-content-box {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 0;
+}
+
+@media (min-width: 640px) {
+  .footer-content-box {
+    padding: 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-content-box {
+    padding: 80px;
+  }
+}
+
 .footer-tagline {
   color: var(--archive-slate);
   font-family: Georgia, serif;

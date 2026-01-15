@@ -49,7 +49,7 @@ export default function Home() {
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
       <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] lg:pr-0 py-4">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-6 sm:py-8 lg:py-12">
           <div className="flex items-center gap-6">
             {/* Logo */}
             <div className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
@@ -69,6 +69,7 @@ export default function Home() {
               <a href="#offerings" className="nav-link">Offerings</a>
               <a href="#gallery" className="nav-link">Gallery</a>
               <a href="#stewardship" className="nav-link">Stewardship</a>
+              <span className="nav-separator">|</span>
               <button className="btn-primary">Request Access</button>
             </nav>
           </div>
@@ -83,19 +84,18 @@ export default function Home() {
             <div className="px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24 flex items-center">
               <div className="max-w-[637px]">
                 {/* Heading */}
-                <h1 className="hero-title">
-                  A Trust Structure for Cultural Assets.
+                <h1 className="hero-title" style={{marginBottom: '17px'}}>
+                  <div style={{fontSize: '41px', lineHeight: '45px'}}>
+                    The Art That Matters<br />The Stewardship It Deserves
+                  </div>
                 </h1>
 
                 {/* Subtitle */}
-                <p className="hero-subtitle">
-                  Art Trust operates an institutional system for acquisition, custody, and long-duration stewardship of museum-grade artworks.
-                </p>
-
-                {/* Description */}
-                <p className="hero-description">
-                  The platform is designed to protect the work, preserve provenance, and govern participation through clear authority, disciplined process, and controlled access.
-                </p>
+                <div className="hero-subtitle">
+                  <p>
+                    Art Investment Group Trust was established to acquire, hold, and steward artworks of cultural significance within a disciplined, governed framework.{" "}
+                  </p>
+                </div>
 
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-[18px] mt-6 sm:mt-8">
@@ -148,7 +148,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="overflow-hidden">
+          <div className="overflow-x-auto">
             <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
               <div
                 ref={sliderRef}
@@ -341,7 +341,7 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-[132px] flex items-center">
+              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 flex items-center justify-start h-full">
                 <div className="max-w-[579px]">
                   <h2 className="governance-title">
                     Governance is the product.
@@ -356,7 +356,7 @@ export default function Home() {
               </div>
 
               {/* Image Column */}
-              <div className="relative h-[400px] sm:h-[500px] lg:h-[892px] overflow-hidden">
+              <div className="relative w-full aspect-square overflow-hidden">
                 <div className="absolute inset-0">
                   <Image
                     src="https://api.builder.io/api/v1/image/assets/TEMP/e21bd6681b65794951201d363a4ebcc461feb16c?width=1355"
@@ -433,7 +433,7 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[128px] flex items-start">
+              <div className="px-4 sm:px-8 lg:px-[128px] flex items-center justify-start h-full">
                 <div className="max-w-[581px] pt-0">
                   <h2 className="stewardship-title">
                     Stewardship is enforced through process.
@@ -523,7 +523,7 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[128px] flex items-start">
+              <div className="px-4 sm:px-8 lg:px-[128px] flex items-center justify-start h-full">
                 <div className="max-w-[581px]">
                   <h2 className="transparency-title">
                     Transparency without exposure
@@ -554,9 +554,9 @@ export default function Home() {
         </section>
 
         {/* Footer Section */}
-        <footer className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[120px]">
-            <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
+        <footer className="w-full py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
+            <div className="footer-content-box flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
               {/* Logo */}
               <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
                 <Image
@@ -588,7 +588,7 @@ export default function Home() {
             <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px]">
               {/* Links */}
               <p className="footer-links">
-                Disclosures   |   Privacy   |   Terms   |   Contact
+                Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
               </p>
 
               {/* Copyright */}
@@ -607,4 +607,3 @@ export default function Home() {
     </div>
   );
 }
-
