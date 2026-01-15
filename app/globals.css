@@ -109,6 +109,7 @@ body {
   cursor: pointer;
   transition: opacity 0.2s;
   white-space: nowrap;
+  text-decoration: none !important;
 }
 
 .cta-primary:hover {
