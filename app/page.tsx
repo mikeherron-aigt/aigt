@@ -162,7 +162,7 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="w-full overflow-x-auto">
+          <div className="slider-container">
             <div
               ref={sliderRef}
               className="artwork-slider px-4 sm:px-8 lg:px-[80px]"
@@ -348,20 +348,24 @@ export default function Home() {
           </div>
 
           {/* Slider Navigation Arrows */}
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center items-center gap-4 mt-8">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center items-center gap-6 mt-12">
             <button
               onClick={() => scrollSlider('left')}
-              className="slider-nav-btn"
+              className="slider-nav-arrow slider-nav-arrow-left"
               aria-label="Scroll left"
             >
-              ←
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
             </button>
             <button
               onClick={() => scrollSlider('right')}
-              className="slider-nav-btn"
+              className="slider-nav-arrow slider-nav-arrow-right"
               aria-label="Scroll right"
             >
-              →
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
             </button>
           </div>
         </section>
