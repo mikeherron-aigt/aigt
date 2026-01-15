@@ -111,7 +111,7 @@ export default function RequestAccessPage() {
 
             {/* Navigation */}
             <nav className="flex items-center gap-8 ml-auto">
-              <Link href="/#about" className="nav-link">About</Link>
+              <Link href="/about" className="nav-link">About</Link>
               <Link href="/#investment-offerings" className="nav-link">Offerings</Link>
               <Link href="/#gallery" className="nav-link">Gallery</Link>
               <Link href="/#stewardship-in-practice" className="nav-link">Stewardship</Link>
@@ -384,7 +384,7 @@ export default function RequestAccessPage() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-12 sm:py-16 lg:py-[80px] mt-16">
+      <footer className="w-full py-2 sm:py-3 lg:py-4 mt-16">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
           <div className="footer-content-box flex flex-col items-center gap-10">
             {/* Logo */}

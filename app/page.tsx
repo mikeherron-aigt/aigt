@@ -150,7 +150,7 @@ export default function Home() {
 
             {/* Navigation */}
             <nav className="flex items-center gap-8 ml-auto">
-              <a href="#about" className="nav-link">About</a>
+              <Link href="/about" className="nav-link">About</Link>
               <a href="#investment-offerings" className="nav-link">Offerings</a>
               <a href="#gallery" className="nav-link">Gallery</a>
               <a href="#stewardship-in-practice" className="nav-link">Stewardship</a>
@@ -509,21 +509,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer Section */}
-        <footer className="w-full py-12 sm:py-16 lg:py-[80px]">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
-            <div className="footer-content-box flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
-              {/* Logo */}
-              <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
-                <Image
-                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
-                  alt="Art Investment Group Trust Logo"
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 640px) 180px, (max-width: 1024px) 200px, 205px"
-                />
-              </div>
-
+        {/* Private Conversations Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#ffffff'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
               {/* Tagline */}
               <h2 className="footer-tagline">
                 Governed platforms for the long-term stewardship of culturally significant art.
@@ -549,23 +538,41 @@ export default function Home() {
                 </Link>
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Footer Info */}
-            <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px]">
-              {/* Links */}
-              <p className="footer-links">
-                Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
-              </p>
+        {/* Footer Section */}
+        <footer className="w-full py-2 sm:py-3 lg:py-4">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
+            <div className="footer-content-box flex flex-col items-center gap-10">
+              {/* Logo */}
+              <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
+                <Image
+                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
+                  alt="Art Investment Group Trust Logo"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 640px) 180px, (max-width: 1024px) 200px, 205px"
+                />
+              </div>
 
-              {/* Copyright */}
-              <p className="footer-copyright">
-                COPYRIGHT ©2026. ALL RIGHTS RESERVED.
-              </p>
+              {/* Footer Info */}
+              <div className="flex flex-col items-center gap-3">
+                {/* Links */}
+                <p className="footer-links">
+                  Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
+                </p>
 
-              {/* Disclaimer */}
-              <p className="footer-disclaimer">
-                Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
-              </p>
+                {/* Copyright */}
+                <p className="footer-copyright">
+                  COPYRIGHT ©2026. ALL RIGHTS RESERVED.
+                </p>
+
+                {/* Disclaimer */}
+                <p className="footer-disclaimer">
+                  Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
+                </p>
+              </div>
             </div>
           </div>
         </footer>

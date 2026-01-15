@@ -1011,20 +1011,20 @@ footer {
 }
 
 .footer-content-box {
-  background-color: #ffffff;
-  padding: 40px;
+  background-color: var(--paper-white);
+  padding: 12px 40px;
   border-radius: 0;
 }
 
 @media (min-width: 640px) {
   .footer-content-box {
-    padding: 48px;
+    padding: 12px 48px;
   }
 }
 
 @media (min-width: 1024px) {
   .footer-content-box {
-    padding: 80px;
+    padding: 12px 80px;
   }
 }
 
@@ -1339,6 +1339,261 @@ footer {
   .image-modal-artist {
     font-size: 16px;
     line-height: 24px;
+  }
+}
+
+/* About Page */
+.about-hero-title {
+  color: var(--archive-slate);
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .about-hero-title {
+    font-size: 56px !important;
+    line-height: 64px !important;
+  }
+}
+
+.about-hero-description {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  line-height: 30px !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+@media (min-width: 1024px) {
+  .about-hero-description {
+    font-size: 22px !important;
+  }
+}
+
+.about-hero-description p {
+  margin: 0;
+}
+
+.about-john-title {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 32px !important;
+  font-weight: 400 !important;
+  line-height: 48px !important;
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+@media (min-width: 1024px) {
+  .about-john-title {
+    font-size: 40px !important;
+    text-align: left !important;
+  }
+}
+
+.about-john-subtitle {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  line-height: 30px !important;
+  margin: 0 !important;
+  text-align: center !important;
+}
+
+@media (min-width: 1024px) {
+  .about-john-subtitle {
+    font-size: 22px !important;
+    text-align: left !important;
+  }
+}
+
+.about-john-bio-card {
+  display: flex !important;
+  padding: 40px !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  background: var(--paper-white) !important;
+  backdrop-filter: blur(3.3px) !important;
+}
+
+.about-john-bio-card p {
+  color: var(--archive-slate) !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  margin: 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .about-john-bio-card p {
+    font-size: 16px !important;
+  }
+}
+
+.stewardship-ways-title {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 32px !important;
+  font-weight: 400 !important;
+  line-height: 48px !important;
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-ways-title {
+    font-size: 40px !important;
+  }
+}
+
+.stewardship-ways-subtitle {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  line-height: 30px !important;
+  text-align: center !important;
+  margin: 0 !important;
+  max-width: 593px !important;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-ways-subtitle {
+    font-size: 22px !important;
+  }
+}
+
+.stewardship-way-card {
+  display: flex !important;
+  width: 100% !important;
+  min-height: 350px !important;
+  padding: 60px 40px !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  background: #ffffff !important;
+  backdrop-filter: blur(3.3px) !important;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-way-card {
+    padding: 80px 40px !important;
+    min-height: 429px !important;
+  }
+}
+
+.stewardship-way-card-title {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 24px !important;
+  font-weight: 400 !important;
+  line-height: 36px !important;
+  margin: 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-way-card-title {
+    font-size: 28px !important;
+  }
+}
+
+.stewardship-way-card-description {
+  color: var(--archive-slate) !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  margin: 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .stewardship-way-card-description {
+    font-size: 16px !important;
+  }
+}
+
+.team-section-title {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 32px !important;
+  font-weight: 400 !important;
+  line-height: 48px !important;
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .team-section-title {
+    font-size: 40px !important;
+  }
+}
+
+.team-section-description {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  line-height: 30px !important;
+  text-align: center !important;
+  margin: 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .team-section-description {
+    font-size: 22px !important;
+  }
+}
+
+.team-member-name {
+  color: var(--archive-slate) !important;
+  font-family: Georgia, serif !important;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  line-height: normal !important;
+  margin: 0 0 8px 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .team-member-name {
+    font-size: 22px !important;
+  }
+}
+
+.team-member-title {
+  color: var(--archive-slate) !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  margin: 0 0 12px 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .team-member-title {
+    font-size: 16px !important;
+  }
+}
+
+.team-member-description {
+  color: var(--archive-slate) !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  margin: 0 !important;
+}
+
+@media (min-width: 1024px) {
+  .team-member-description {
+    font-size: 16px !important;
   }
 }
 
