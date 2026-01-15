@@ -353,9 +353,8 @@ export default function Home() {
                   <div className="fund-card">
                     <div className="fund-card-content">
                       <h3 className="fund-card-title">Ethereum Art Fund</h3>
-                      <h4 className="fund-card-subtitle">A unified catalog strategy governed as a single cultural asset.</h4>
                       <p className="fund-card-description">
-                        Acquires and governs a coherent body of contemporary work as a long-duration asset. Value creation is driven by provenance integrity, catalog consolidation, institutional placement, and disciplined stewardship.
+                        The Ethereum Art Fund extends the same stewardship philosophy to Ethereum native artworks. These works are approached not as speculative instruments, but as culturally relevant expressions native to a digital medium.<br /><br />Governance, custody, and long-term intent mirror those applied to traditional art, with optional structures introduced only where appropriate and permitted.
                       </p>
                     </div>
                   </div>
@@ -364,9 +363,8 @@ export default function Home() {
                   <div className="fund-card">
                     <div className="fund-card-content">
                       <h3 className="fund-card-title">Blue Chip Art Fund</h3>
-                      <h4 className="fund-card-subtitle">An independently capitalized anchor focused on established museum-grade works.</h4>
                       <p className="fund-card-description">
-                        Targets historically significant works with emphasis on integrity, preservation, and long-term positioning. Operates independently with separate assets and oversight.
+                        Focused on established works with deep cultural and historical significance, the Blue Chip Art Fund acquires and stewards museum-quality artworks through long-horizon ownership and institutional governance.<br /><br />The emphasis is on preservation, context, and disciplined acquisition rather than transaction frequency or short-term outcomes.
                       </p>
                     </div>
                   </div>
