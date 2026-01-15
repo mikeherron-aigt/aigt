@@ -53,6 +53,8 @@ export default function Home() {
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
+    // Don't start dragging if clicking on a button
+    if ((e.target as HTMLElement).closest('button')) return;
     setIsDragging(true);
     setStartX(e.pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -60,7 +62,6 @@ export default function Home() {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !sliderRef.current) return;
-    e.preventDefault();
     const x = e.pageX - sliderRef.current.offsetLeft;
     const walk = (x - startX) * 1.5;
     sliderRef.current.scrollLeft = scrollLeft - walk;
