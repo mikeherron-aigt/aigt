@@ -1011,7 +1011,7 @@ footer {
 }
 
 .footer-content-box {
-  background-color: #ffffff;
+  background-color: var(--paper-white);
   padding: 40px;
   border-radius: 0;
 }
