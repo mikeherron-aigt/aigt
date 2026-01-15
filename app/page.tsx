@@ -477,35 +477,35 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Transparency Section */}
-        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+        {/* Art and Artists Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
+            <div className="grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-[138px]">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[128px] flex items-center justify-start h-full">
-                <div className="max-w-[581px]">
-                  <h2 className="transparency-title">
-                    Transparency without exposure
+              <div className="px-4 sm:px-8 lg:pl-[115px] lg:pr-0 flex items-center">
+                <div className="max-w-[579px]">
+                  <h2 className="art-artists-title">
+                    Art and Artists
                   </h2>
-                  <p className="transparency-description">
-                    Transparency is presented as controlled documentation. Where appropriate, the platform provides read-only views designed for verification and clarity.
+                  <h3 className="art-artists-subtitle">
+                    The Works We Steward
+                  </h3>
+                  <p className="art-artists-description">
+                    AIGT stewards a curated collection of culturally significant works, selected for their artistic relevance, historical importance, and long-term cultural contribution.<br /><br />In addition to fund held works, we also support the placement and stewardship of select individual artworks through private acquisition. These works are approached with the same care, discretion, and contextual consideration.<br /><br />Art is never treated as inventory. Each work is considered within its broader cultural and curatorial narrative.
                   </p>
-                  <button className="transparency-cta">
-                    See the Stewardship Standard
-                  </button>
                 </div>
               </div>
 
-              {/* List Column */}
-              <div className="px-4 sm:px-8 lg:px-[80px] lg:pr-[116px]">
-                <div className="transparency-list-panel">
-                  <ul className="transparency-list">
-                    <li>Provenance documentation</li>
-                    <li>Custody and location status</li>
-                    <li>Catalog structure and holdings</li>
-                    <li>Governance and oversight framework</li>
-                    <li>Reporting and disclosures</li>
-                  </ul>
+              {/* Image Column */}
+              <div className="px-4 sm:px-8 lg:pr-[0px] lg:pl-0 flex items-center justify-center lg:justify-end">
+                <div className="relative w-full max-w-[613px] aspect-[613/692]">
+                  <Image
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fff3aa19c151b47828155d20afa25d3bf?format=webp&width=800"
+                    alt="Contemporary artwork representing artistic stewardship"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 613px"
+                  />
                 </div>
               </div>
             </div>
