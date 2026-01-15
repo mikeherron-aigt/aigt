@@ -216,7 +216,7 @@ export default function Home() {
           {/* Left portion - Gallery Plaster - Full Width */}
           <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
           {/* Right portion - Ledger Stone - Full Width */}
-          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 144px)', right: '0'}}></div>
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 112px + 32px)', right: '0'}}></div>
 
           {/* Centered container for dark green square */}
           <div className="h-full relative flex justify-center hidden lg:flex">
