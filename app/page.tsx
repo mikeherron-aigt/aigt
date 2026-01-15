@@ -299,7 +299,7 @@ export default function Home() {
         {/* Governance Section */}
         <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0 min-h-[600px]">
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 flex items-center justify-start h-full">
                 <div className="max-w-[579px]">
@@ -309,14 +309,11 @@ export default function Home() {
                   <p className="governance-description">
                     Art carries cultural weight long before it carries financial value. When important works are treated primarily as assets, their context, integrity, and long-term significance are often compromised.<br /><br />Art Investment Group Trust exists to address this imbalance. We provide structures designed to protect cultural importance, resist short-term pressures, and ensure that significant works are held with intention, care, and institutional discipline.<br /><br />This philosophy guides every acquisition, every governance decision, and every relationship we enter.
                   </p>
-                  <button className="governance-cta">
-                    Review Governance
-                  </button>
                 </div>
               </div>
 
               {/* Image Column */}
-              <div className="relative w-full aspect-square overflow-hidden">
+              <div className="relative w-full h-full overflow-hidden">
                 <div className="absolute inset-0">
                   <Image
                     src="https://api.builder.io/api/v1/image/assets/TEMP/e21bd6681b65794951201d363a4ebcc461feb16c?width=1355"
