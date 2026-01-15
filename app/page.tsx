@@ -457,13 +457,13 @@ export default function Home() {
 
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:pr-[0px] lg:pl-0 flex items-center justify-center lg:justify-end">
-                <div className="relative w-full max-w-[613px] aspect-[613/692]">
+                <div className="relative w-full max-w-[482px] aspect-[482/612]">
                   <Image
                     src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ff83106f5e3994ab9af93286339774321?format=webp&width=800"
                     alt="Contemporary artwork representing artistic stewardship"
                     fill
                     className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 613px"
+                    sizes="(max-width: 1024px) 100vw, 482px"
                   />
                 </div>
               </div>
