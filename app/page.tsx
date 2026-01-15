@@ -149,10 +149,9 @@ export default function Home() {
           </div>
 
           <div className="w-full overflow-x-auto">
-            <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-              <div
-                ref={sliderRef}
-                className="artwork-slider"
+            <div
+              ref={sliderRef}
+              className="artwork-slider px-4 sm:px-8 lg:px-[80px]"
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
@@ -330,7 +329,6 @@ export default function Home() {
                   <h3 className="artwork-title">Artwork Painting Title</h3>
                   <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
                 </div>
-              </div>
               </div>
             </div>
           </div>
