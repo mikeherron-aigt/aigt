@@ -187,23 +187,20 @@ section:has(.slider-wrapper) {
 .slider-wrapper {
   width: 100%;
   margin: 0;
-  padding-left: 1rem !important;
-  padding-right: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding: 0 0 0 1rem;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 @media (min-width: 640px) {
   .slider-wrapper {
-    padding-left: 2rem !important;
+    padding-left: 2rem;
   }
 }
 
 @media (min-width: 1024px) {
   .slider-wrapper {
-    padding-left: 5rem !important;
+    padding-left: 5rem;
   }
 }
 
