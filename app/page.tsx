@@ -346,6 +346,24 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Slider Navigation Arrows */}
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center items-center gap-4 mt-8">
+            <button
+              onClick={() => scrollSlider('left')}
+              className="slider-nav-btn"
+              aria-label="Scroll left"
+            >
+              ←
+            </button>
+            <button
+              onClick={() => scrollSlider('right')}
+              className="slider-nav-btn"
+              aria-label="Scroll right"
+            >
+              →
+            </button>
+          </div>
         </section>
 
         {/* Governance Section */}
