@@ -402,12 +402,12 @@ export default function Home() {
         </div>
 
         {/* One Standard Across Mediums Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-[169px]">
+        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[482px_1fr] gap-8 lg:gap-[80px]">
+            <div className="grid lg:grid-cols-[1fr_1fr] gap-0">
               {/* Image Column */}
-              <div className="px-4 sm:px-8 lg:pl-[125px] lg:pr-0">
-                <div className="relative w-full aspect-[482/612]">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
+                <div className="relative w-full max-w-[482px] aspect-[482/612]">
                   <Image
                     src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F1295f4f519534fd9bdd11dcbac77e37a?format=webp&width=800"
                     alt="Contemporary artwork representing cultural significance across mediums"
@@ -419,7 +419,7 @@ export default function Home() {
               </div>
 
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:pr-[125px] lg:pl-0 flex items-center">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
                 <div className="max-w-[579px]">
                   <h2 className="one-standard-title">
                     One Standard Across Mediums
