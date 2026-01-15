@@ -211,16 +211,19 @@ export default function Home() {
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
         </div>
 
-        {/* Footer Bar - Full Width with margin auto to center within viewport */}
-        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
-          {/* Centered container matching hero layout */}
-          <div className="w-full max-w-[1440px] h-[36px] relative">
-            {/* Left portion - Gallery Plaster */}
-            <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{width: 'calc(60% - 32px)'}}></div>
-            {/* Right portion - Ledger Stone */}
-            <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(60%)', right: '0'}}></div>
-            {/* Dark green square at intersection */}
-            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+        {/* Footer Bar - Full Width */}
+        <div className="w-full h-[36px] relative hidden lg:block">
+          {/* Left portion - Gallery Plaster - Full Width */}
+          <div className="absolute left-0 top-0 h-full bg-gallery-plaster" style={{width: 'calc(50% - 16px)'}}></div>
+          {/* Right portion - Ledger Stone - Full Width */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50% + 16px)', right: '0'}}></div>
+
+          {/* Centered container for dark green square */}
+          <div className="h-full relative flex justify-center hidden lg:flex">
+            <div className="w-full max-w-[1440px] h-[36px] relative">
+              {/* Dark green square at intersection */}
+              <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+            </div>
           </div>
         </div>
 
