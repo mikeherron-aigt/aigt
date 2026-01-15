@@ -749,6 +749,11 @@ footer {
   line-height: 26px;
   text-align: center;
   margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.footer-links::after {
+  letter-spacing: normal;
 }
 
 @media (min-width: 1024px) {
