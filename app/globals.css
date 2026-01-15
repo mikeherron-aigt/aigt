@@ -189,6 +189,12 @@ body {
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.artwork-slider::-webkit-scrollbar {
+  display: none;
 }
 
 .artwork-card {
