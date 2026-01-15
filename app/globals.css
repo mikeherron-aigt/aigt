@@ -183,15 +183,29 @@ body {
   width: 100vw;
   position: relative;
   left: 50%;
-  right: 50%;
   margin-left: -50vw;
-  margin-right: -50vw;
   box-sizing: border-box;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .slider-container {
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
+  padding-left: calc(var(--slider-padding, 1rem));
+  padding-right: calc(var(--slider-padding, 1rem));
+}
+
+@media (min-width: 640px) {
+  .slider-container {
+    --slider-padding: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .slider-container {
+    --slider-padding: 5rem;
+  }
 }
 
 .artwork-slider {
