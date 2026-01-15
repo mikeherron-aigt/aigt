@@ -90,9 +90,11 @@ export default function Home() {
                 </h1>
 
                 {/* Subtitle */}
-                <p className="hero-subtitle">
-                  Art Investment Group Trust was established to acquire, hold, and steward artworks of cultural significance within a disciplined, governed framework. We believe important art requires time, context, and responsible care. Our role is not to trade or promote, but to provide a long-term home for works that matter, supported by institutional standards of governance, custody, and stewardship across both traditional and Ethereum native mediums.
-                </p>
+                <div className="hero-subtitle">
+                  <p>
+                    Art Investment Group Trust was established to acquire, hold, and steward artworks of cultural significance within a disciplined, governed framework.{" "}
+                  </p>
+                </div>
 
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-[18px] mt-6 sm:mt-8">
