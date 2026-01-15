@@ -38,6 +38,13 @@ body {
   opacity: 0.7;
 }
 
+.nav-separator {
+  color: var(--archive-slate);
+  font-size: 16px;
+  line-height: 24px;
+  padding: 0 4px;
+}
+
 .btn-primary {
   display: flex !important;
   align-items: center !important;
