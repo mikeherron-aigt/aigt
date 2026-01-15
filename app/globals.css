@@ -182,17 +182,13 @@ body {
 .artwork-slider {
   display: flex;
   gap: 18px;
-  overflow-x: auto;
-  overflow-y: hidden;
   margin: 0;
-  width: auto;
+  width: 100%;
+  max-width: 100%;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.artwork-slider::-webkit-scrollbar {
-  display: none;
+  overflow-x: visible;
+  overflow-y: hidden;
 }
 
 .artwork-card {
