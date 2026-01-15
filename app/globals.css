@@ -179,17 +179,35 @@ body {
   }
 }
 
+/* Featured Collection Section Container */
+section:has(.slider-wrapper) {
+  overflow: visible !important;
+}
+
 .slider-wrapper {
   width: 100%;
-  max-width: 1440px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0;
+  padding-left: 1rem;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .slider-wrapper {
+    padding-left: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .slider-wrapper {
+    padding-left: 5rem;
+  }
 }
 
 .slider-container {
   width: 100%;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .artwork-slider {
