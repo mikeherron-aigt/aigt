@@ -538,6 +538,52 @@ section:has(.slider-wrapper) {
   }
 }
 
+/* One Standard Section */
+.one-standard-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .one-standard-title {
+    font-size: 40px;
+  }
+}
+
+.one-standard-subtitle {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .one-standard-subtitle {
+    font-size: 22px;
+  }
+}
+
+.one-standard-description {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .one-standard-description {
+    font-size: 16px;
+  }
+}
+
 /* Stewardship Section */
 .stewardship-title {
   color: var(--archive-slate);
