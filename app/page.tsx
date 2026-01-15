@@ -1,13 +1,55 @@
 'use client';
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+
+interface ArtworkItem {
+  src: string;
+  title: string;
+  artist: string;
+  year: string;
+}
+
+const artworkData: ArtworkItem[] = [
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/25ee69383552e9f873f3551083817292fb7fbc14?width=539",
+    title: "Artwork Painting Title",
+    artist: "Artist Name",
+    year: "1995"
+  },
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/313b3f436ad7a871d72459a182f82360d9123c0e?width=539",
+    title: "Artwork Painting Title",
+    artist: "Artist Name",
+    year: "1995"
+  },
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/8d3bcb814a5fd11404bd954a1295075a5be7f529?width=539",
+    title: "Artwork Painting Title",
+    artist: "Artist Name",
+    year: "1995"
+  },
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/d2c57baf20a78edb5c4e08b53ad5b7b52298bd73?width=539",
+    title: "Artwork Painting Title",
+    artist: "Artist Name",
+    year: "1995"
+  },
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/7fa7dcff6f05eaec42b8b896c2be111486030e46?width=539",
+    title: "Artwork Painting Title",
+    artist: "Artist Name",
+    year: "1995"
+  }
+];
 
 export default function Home() {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
