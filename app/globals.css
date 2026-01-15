@@ -212,23 +212,8 @@ section:has(.slider-wrapper) {
 .slider-container {
   width: 100%;
   overflow: hidden;
-  padding-left: 1rem;
-  padding-right: 0;
+  padding: 0 !important;
   box-sizing: border-box;
-}
-
-@media (min-width: 640px) {
-  .slider-container {
-    padding-left: 2rem;
-    padding-right: 0;
-  }
-}
-
-@media (min-width: 1024px) {
-  .slider-container {
-    padding-left: 5rem;
-    padding-right: 0;
-  }
 }
 
 .artwork-slider {
