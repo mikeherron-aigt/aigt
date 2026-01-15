@@ -386,21 +386,35 @@ export default function RequestAccessPage() {
       {/* Footer */}
       <footer className="w-full py-12 sm:py-16 lg:py-[80px] mt-16">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
-          <div className="footer-content-box flex flex-col items-center gap-3">
-            {/* Links */}
-            <p className="footer-links">
-              Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
-            </p>
+          <div className="footer-content-box flex flex-col items-center gap-10">
+            {/* Logo */}
+            <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
+              <Image
+                src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
+                alt="Art Investment Group Trust Logo"
+                fill
+                className="object-contain"
+                sizes="(max-width: 640px) 180px, (max-width: 1024px) 200px, 205px"
+              />
+            </div>
 
-            {/* Copyright */}
-            <p className="footer-copyright">
-              COPYRIGHT ©2026. ALL RIGHTS RESERVED.
-            </p>
+            {/* Footer Info */}
+            <div className="flex flex-col items-center gap-3">
+              {/* Links */}
+              <p className="footer-links">
+                Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
+              </p>
 
-            {/* Disclaimer */}
-            <p className="footer-disclaimer">
-              Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
-            </p>
+              {/* Copyright */}
+              <p className="footer-copyright">
+                COPYRIGHT ©2026. ALL RIGHTS RESERVED.
+              </p>
+
+              {/* Disclaimer */}
+              <p className="footer-disclaimer">
+                Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
+              </p>
+            </div>
           </div>
         </div>
       </footer>
