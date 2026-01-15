@@ -509,21 +509,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Footer Section */}
-        <footer className="w-full py-12 sm:py-16 lg:py-[80px]">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
-            <div className="footer-content-box flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
-              {/* Logo */}
-              <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
-                <Image
-                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
-                  alt="Art Investment Group Trust Logo"
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 640px) 180px, (max-width: 1024px) 200px, 205px"
-                />
-              </div>
-
+        {/* Private Conversations Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
               {/* Tagline */}
               <h2 className="footer-tagline">
                 Governed platforms for the long-term stewardship of culturally significant art.
@@ -548,9 +537,27 @@ export default function Home() {
                   Schedule a Discussion
                 </Link>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer Section */}
+        <footer className="w-full py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
+            <div className="footer-content-box flex flex-col items-center gap-10">
+              {/* Logo */}
+              <div className="relative w-[180px] sm:w-[200px] lg:w-[205px] h-[45px] sm:h-[50px] lg:h-[52px]">
+                <Image
+                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
+                  alt="Art Investment Group Trust Logo"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 640px) 180px, (max-width: 1024px) 200px, 205px"
+                />
+              </div>
 
               {/* Footer Info */}
-              <div className="flex flex-col items-center gap-3 mt-12 sm:mt-16 lg:mt-[55px]">
+              <div className="flex flex-col items-center gap-3">
                 {/* Links */}
                 <p className="footer-links">
                   Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
