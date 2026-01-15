@@ -907,6 +907,10 @@ footer {
   flex-direction: column;
   gap: 20px;
   animation: slideUp 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 @keyframes slideUp {
