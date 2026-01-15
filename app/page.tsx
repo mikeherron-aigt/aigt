@@ -313,6 +313,9 @@ export default function Home() {
                     </p>
                   </div>
 
+                  {/* Divider */}
+                  <div className="divider-line my-12 lg:my-16"></div>
+
                   {/* Our Approach */}
                   <div>
                     <h2 className="governance-title">
