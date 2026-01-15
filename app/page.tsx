@@ -316,11 +316,8 @@ export default function Home() {
                   {/* Our Approach */}
                   <div>
                     <h2 className="governance-title">
-                      Our Approach
-                    </h2>
-                    <h3 className="governance-subtitle">
                       Stewardship Before Everything
-                    </h3>
+                    </h2>
                     <p className="governance-description">
                       We approach art through the lens of stewardship rather than speculation. That means prioritizing long-horizon ownership, rigorous governance, and responsible custody over velocity or volume.<br /><br />Our structures are intentionally designed to slow the process, encourage patience, and align participants around preservation, context, and care. Liquidity is episodic. Cultural responsibility is continuous.<br /><br />This approach applies equally across all mediums.
                     </p>
