@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --ledger-stone: #a1a69d;
   --gallery-plaster: #dadada;
@@ -58,6 +62,7 @@ body {
   border: none !important;
   cursor: pointer !important;
   transition: opacity 0.2s !important;
+  text-decoration: none !important;
 }
 
 .btn-primary:hover {
@@ -104,6 +109,7 @@ body {
   cursor: pointer;
   transition: opacity 0.2s;
   white-space: nowrap;
+  text-decoration: none !important;
 }
 
 .cta-primary:hover {
@@ -1096,6 +1102,7 @@ footer {
   cursor: pointer;
   transition: opacity 0.2s;
   white-space: nowrap;
+  text-decoration: none !important;
 }
 
 .footer-cta-primary:hover {
@@ -1333,4 +1340,367 @@ footer {
     font-size: 16px;
     line-height: 24px;
   }
+}
+
+/* Request Access Page */
+.request-access-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .request-access-title {
+    font-size: 40px;
+  }
+}
+
+.request-access-description {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .request-access-description {
+    font-size: 16px;
+  }
+}
+
+/* Form Sections */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 0 0 16px 0;
+  padding-bottom: 0;
+  position: relative;
+}
+
+.form-section-title::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--archive-slate) 10%,
+    var(--archive-slate) 90%,
+    transparent 100%
+  );
+  opacity: 0.5;
+  margin-top: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.form-required {
+  color: var(--ledger-stone);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: #FFFFFF;
+  border: 1px solid #E0E0E0;
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--ledger-stone);
+  box-shadow: 0 2px 8px rgba(161, 166, 157, 0.15);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #999999;
+}
+
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.form-select:disabled {
+  background-color: var(--paper-white);
+}
+
+.form-textarea {
+  resize: vertical;
+}
+
+.form-helper-text {
+  color: var(--ledger-stone);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  margin-top: 4px;
+}
+
+/* Checkboxes */
+.form-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--ledger-stone);
+}
+
+.form-checkbox-label {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  cursor: pointer;
+}
+
+/* Submit Button */
+.request-submit-button {
+  display: inline-flex;
+  padding: 8px 32px;
+  justify-content: center;
+  align-items: center;
+  background: var(--ledger-stone);
+  border: 2px solid var(--ledger-stone);
+  color: var(--paper-white);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  text-decoration: none;
+}
+
+.request-submit-button:hover {
+  opacity: 0.9;
+}
+
+.request-submit-button:active {
+  opacity: 0.8;
+}
+
+/* Form Submit Divider */
+.form-submit-divider {
+  position: relative;
+  margin-top: 48px;
+  padding-top: 48px;
+}
+
+.form-submit-divider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--archive-slate) 10%,
+    var(--archive-slate) 90%,
+    transparent 100%
+  );
+  opacity: 0.5;
+}
+
+/* Disclaimer */
+.form-disclaimer {
+  color: var(--ledger-stone);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 16px 0 0 0;
+  max-width: 400px;
+}
+
+/* Success Acknowledgement */
+.success-acknowledgement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  text-align: center;
+  min-height: 50vh;
+  justify-content: center;
+}
+
+.success-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(161, 166, 157, 0.1);
+  margin: 0 auto;
+}
+
+.success-checkmark {
+  width: 36px;
+  height: 36px;
+  color: var(--ledger-stone);
+  stroke-width: 2;
+}
+
+.success-title {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .success-title {
+    font-size: 40px;
+  }
+}
+
+.success-description {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+  max-width: 600px;
+}
+
+@media (min-width: 1024px) {
+  .success-description {
+    font-size: 16px;
+  }
+}
+
+.success-detail {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0;
+  max-width: 600px;
+  opacity: 0.8;
+}
+
+@media (min-width: 1024px) {
+  .success-detail {
+    font-size: 16px;
+  }
+}
+
+.success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (min-width: 640px) {
+  .success-actions {
+    flex-direction: row;
+    gap: 16px;
+    justify-content: center;
+  }
+}
+
+.success-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 32px;
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.success-button-primary:hover {
+  opacity: 0.9;
+}
+
+.success-button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 32px;
+  background: transparent;
+  border: 2px solid var(--ledger-stone);
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.success-button-secondary:hover {
+  background: var(--ledger-stone);
+  color: var(--paper-white);
+}
+
+/* Utility Classes */
+.border-gallery-plaster {
+  border-color: var(--gallery-plaster) !important;
 }

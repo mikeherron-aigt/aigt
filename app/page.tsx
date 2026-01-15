@@ -1,6 +1,7 @@
 'use client';
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 
 interface ArtworkItem {
@@ -150,11 +151,11 @@ export default function Home() {
             {/* Navigation */}
             <nav className="flex items-center gap-8 ml-auto">
               <a href="#about" className="nav-link">About</a>
-              <a href="#offerings" className="nav-link">Offerings</a>
+              <a href="#investment-offerings" className="nav-link">Offerings</a>
               <a href="#gallery" className="nav-link">Gallery</a>
-              <a href="#stewardship" className="nav-link">Stewardship</a>
+              <a href="#stewardship-in-practice" className="nav-link">Stewardship</a>
               <span className="nav-separator">|</span>
-              <button className="btn-primary">Request Access</button>
+              <Link href="/request-access" className="btn-primary">Request Access</Link>
             </nav>
           </div>
         </div>
@@ -183,12 +184,9 @@ export default function Home() {
 
                 {/* CTA Buttons */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-[18px] mt-6 sm:mt-8">
-                  <button className="cta-primary">
+                  <Link href="/request-access" className="cta-primary" style={{textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     Request Access
-                  </button>
-                  <button className="cta-secondary">
-                    View System Overview
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -347,7 +345,7 @@ export default function Home() {
         </section>
 
         {/* Two Funds Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-[104px]">
+        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-[104px]">
           <div className="max-w-[1441px] mx-auto">
             <div className="flex flex-col items-center gap-20">
               {/* Top Content */}
@@ -472,7 +470,7 @@ export default function Home() {
         </section>
 
         {/* Stewardship in Practice Section */}
-        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+        <section id="stewardship-in-practice" className="w-full" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24">
             {/* Header */}
             <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20">
@@ -546,9 +544,9 @@ export default function Home() {
 
               {/* CTA Button */}
               <div className="flex justify-center">
-                <button className="footer-cta-primary">
+                <Link href="/request-access" className="footer-cta-primary" style={{textDecoration: 'none', display: 'inline-flex'}}>
                   Schedule a Discussion
-                </button>
+                </Link>
               </div>
             </div>
 
