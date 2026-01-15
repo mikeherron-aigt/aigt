@@ -15,7 +15,7 @@ const teamMembers: TeamMember[] = [
     name: "John Joseph Dowling Jr.",
     title: "Board Member; Chairman; Acting CEO",
     description: "Founder and artist steward overseeing catalog integrity and long-term cultural vision.",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F1bb81c38d8c4438cb138b60cca5170ac?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400"
   },
   {
     name: "Jose Bracho",
@@ -27,37 +27,37 @@ const teamMembers: TeamMember[] = [
     name: "Luis Cortes",
     title: "Board Member; Global Director of Art Acquisitions; Chief Revenue Officer",
     description: "Global art acquisitions leader with deep market access and institutional sourcing expertise.",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3f7bf280d1364cca9496c09717c580be?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fbed6d284517842c4b5dd155c3023e20f?format=webp&width=400"
   },
   {
     name: "Steve Duren",
     title: "Board Member; Chief Commercial Officer",
     description: "Commercial strategy leader focused on revenue architecture and domestic deal execution.",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fe4d71fd97d284c4bb4466c3f579aa365?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb25ae8084fb345bb8e78dd40e7afe448?format=webp&width=400"
   },
   {
     name: "Mike Herron",
     title: "Board Member; Chief Marketing Officer",
     description: "Marketing and brand strategist specializing in institutional positioning and narrative discipline.",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fdedaaaadb3924d14bc5b00152f9226ef?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400"
   },
   {
     name: "Jay O'Malley",
     title: "Board Member; Chief Investment Officer",
     description: "Chief Investment Officer with institutional capital markets and fiduciary governance experience.",
-    imageUrl: "https://api.builder.io/api/v1/image/assets/TEMP/0c5bc05f98621814b6dade69c1638cb94d1e4d52?width=205"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400"
   },
   {
     name: "Olivia Philips",
     title: "Board Member; Chief Operating Officer",
     description: "Operations, cybersecurity and governance leader focused on execution, compliance, and organizational discipline.",
-    imageUrl: "https://api.builder.io/api/v1/image/assets/TEMP/c2c9ccc6a8bad43885a32463ab30048dad452ec7?width=205"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400"
   },
   {
     name: "Daniel Sloan",
     title: "Board Member; Chief Technology Officer",
     description: "Technology and infrastructure executive overseeing platform architecture and systems integrity.",
-    imageUrl: "https://api.builder.io/api/v1/image/assets/TEMP/3bced2ec322112b53bc2cfd18111e45a2f2368d1?width=205"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400"
   }
 ];
 
