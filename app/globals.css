@@ -180,10 +180,12 @@ body {
 }
 
 .slider-wrapper {
-  width: 100%;
-  max-width: 1440px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   box-sizing: border-box;
 }
 
