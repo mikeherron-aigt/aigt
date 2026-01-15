@@ -185,23 +185,25 @@ section:has(.slider-wrapper) {
 }
 
 .slider-wrapper {
-  max-width: 1440px;
   width: 100%;
-  margin: 0 auto;
-  padding: 0 1rem !important;
+  margin: 0;
+  padding-left: 1rem !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 @media (min-width: 640px) {
   .slider-wrapper {
-    padding: 0 2rem !important;
+    padding-left: 2rem !important;
   }
 }
 
 @media (min-width: 1024px) {
   .slider-wrapper {
-    padding: 0 5rem !important;
+    padding-left: 5rem !important;
   }
 }
 
