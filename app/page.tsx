@@ -83,8 +83,10 @@ export default function Home() {
             <div className="px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24 flex items-center">
               <div className="max-w-[637px]">
                 {/* Heading */}
-                <h1 className="hero-title">
-                  The Art That Matters<br />The Stewardship It Deserves
+                <h1 className="hero-title" style={{marginBottom: '17px'}}>
+                  <div style={{fontSize: '41px', lineHeight: '45px'}}>
+                    The Art That Matters<br />The Stewardship It Deserves
+                  </div>
                 </h1>
 
                 {/* Subtitle */}
