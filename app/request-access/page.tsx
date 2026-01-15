@@ -125,18 +125,69 @@ export default function RequestAccessPage() {
       {/* Main Content */}
       <main className="w-full py-16 sm:py-20 lg:py-24">
         <div className="max-w-[900px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-          {/* Header */}
-          <div className="mb-12 lg:mb-16">
-            <h1 className="request-access-title mb-4">
-              Request Access
-            </h1>
-            <p className="request-access-description">
-              Access to Art Investment Group Trust, its platforms and conversations is considered and intentional. Requests are reviewed to ensure alignment with our stewardship philosophy and governance standards.
-            </p>
-          </div>
+          {isSubmitted ? (
+            // Success Acknowledgement
+            <div className="success-acknowledgement">
+              <div className="success-icon-wrapper">
+                <svg className="success-checkmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-12">
+              <h1 className="success-title">
+                Request Received
+              </h1>
+
+              <p className="success-description">
+                Thank you for your interest in Art Investment Group Trust. Your request has been received and will be reviewed carefully.
+              </p>
+
+              <p className="success-detail">
+                We will be in touch within the next two weeks to discuss your request and next steps. If you have any questions in the meantime, please feel free to reach out.
+              </p>
+
+              <div className="success-actions">
+                <Link href="/" className="success-button-primary">
+                  Return to Home
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsSubmitted(false);
+                    setFormData({
+                      fullName: '',
+                      email: '',
+                      organization: '',
+                      country: '',
+                      relationshipToArt: '',
+                      areasOfInterest: [],
+                      interestDescription: '',
+                      investmentHorizon: '',
+                      experience: '',
+                      followUpPreference: '',
+                      howYouHeard: ''
+                    });
+                    setCharCount(0);
+                  }}
+                  className="success-button-secondary"
+                >
+                  Submit Another Request
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Header */}
+              <div className="mb-12 lg:mb-16">
+                <h1 className="request-access-title mb-4">
+                  Request Access
+                </h1>
+                <p className="request-access-description">
+                  Access to Art Investment Group Trust, its platforms and conversations is considered and intentional. Requests are reviewed to ensure alignment with our stewardship philosophy and governance standards.
+                </p>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-12">
             {/* Section 1: Identity */}
             <div className="form-section">
               <h2 className="form-section-title">Identity</h2>
@@ -326,7 +377,9 @@ export default function RequestAccessPage() {
                 Submissions are reviewed confidentially. A request does not obligate participation or access.
               </p>
             </div>
-          </form>
+            </form>
+            </>
+          )}
         </div>
       </main>
 
