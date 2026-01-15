@@ -523,7 +523,7 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_584px] gap-0 py-12 sm:py-16 lg:py-[104px]">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[128px] flex items-start">
+              <div className="px-4 sm:px-8 lg:px-[128px] flex items-center justify-start h-full">
                 <div className="max-w-[581px]">
                   <h2 className="transparency-title">
                     Transparency without exposure
