@@ -343,17 +343,17 @@ section:has(.slider-wrapper) {
 .governance-subtitle {
   color: var(--archive-slate);
   font-family: Georgia, serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 26px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
   text-align: left;
   margin: 0 0 16px 0;
 }
 
 @media (min-width: 1024px) {
   .governance-subtitle {
-    font-size: 17px;
-    line-height: 28px;
+    font-size: 22px;
+    line-height: 30px;
   }
 }
 
@@ -414,17 +414,16 @@ section:has(.slider-wrapper) {
 .funds-subtitle {
   color: var(--archive-slate);
   font-family: Georgia, serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 26px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
   text-align: center;
   margin: 0;
 }
 
 @media (min-width: 1024px) {
   .funds-subtitle {
-    font-size: 17px;
-    line-height: 28px;
+    font-size: 22px;
   }
 }
 
@@ -566,6 +565,7 @@ section:has(.slider-wrapper) {
 @media (min-width: 1024px) {
   .one-standard-subtitle {
     font-size: 22px;
+    line-height: 30px;
   }
 }
 
@@ -911,17 +911,17 @@ footer {
 .private-conversations-title {
   color: var(--archive-slate);
   font-family: Georgia, serif;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 26px;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
   text-align: center;
   margin: 0 0 16px 0;
 }
 
 @media (min-width: 1024px) {
   .private-conversations-title {
-    font-size: 17px;
-    line-height: 28px;
+    font-size: 22px;
+    line-height: 30px;
   }
 }
 
