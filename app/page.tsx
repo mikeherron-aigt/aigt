@@ -345,7 +345,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
 
           {/* Slider Navigation Arrows */}
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center items-center gap-6 mt-12">
