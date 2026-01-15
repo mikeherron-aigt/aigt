@@ -1416,26 +1416,26 @@ footer {
 }
 
 .about-john-bio-card {
-  display: flex;
-  padding: 40px;
-  flex-direction: column;
-  gap: 16px;
-  background: var(--paper-white);
-  backdrop-filter: blur(3.3px);
+  display: flex !important;
+  padding: 40px !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  background: var(--paper-white) !important;
+  backdrop-filter: blur(3.3px) !important;
 }
 
 .about-john-bio-card p {
-  color: var(--archive-slate);
-  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 26px;
-  margin: 0;
+  color: var(--archive-slate) !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 26px !important;
+  margin: 0 !important;
 }
 
 @media (min-width: 1024px) {
   .about-john-bio-card p {
-    font-size: 16px;
+    font-size: 16px !important;
   }
 }
 
