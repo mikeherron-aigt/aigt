@@ -184,10 +184,9 @@ body {
   gap: 18px;
   margin: 0;
   width: 100%;
-  max-width: 100%;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  overflow-x: visible;
+  overflow-x: auto;
   overflow-y: hidden;
 }
 
