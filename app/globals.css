@@ -179,6 +179,11 @@ body {
   }
 }
 
+/* Featured Collection Section Container */
+section:has(.slider-wrapper) {
+  overflow: visible !important;
+}
+
 .slider-wrapper {
   padding-left: 0 !important;
   padding-right: 0 !important;
