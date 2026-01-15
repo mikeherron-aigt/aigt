@@ -563,6 +563,45 @@ export default function Home() {
           </div>
         </footer>
       </main>
+
+      {/* Image Modal */}
+      {isModalOpen && selectedImage && (
+        <div
+          className="image-modal-backdrop"
+          onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full-size image viewer"
+        >
+          <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="image-modal-close"
+              onClick={closeModal}
+              aria-label="Close image viewer"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
+            <div className="image-modal-image-container">
+              <Image
+                src={selectedImage.src}
+                alt={selectedImage.title}
+                fill
+                className="object-contain"
+                sizes="90vw"
+              />
+            </div>
+
+            <div className="image-modal-info">
+              <h2 className="image-modal-title">{selectedImage.title}</h2>
+              <p className="image-modal-artist">{selectedImage.artist}, {selectedImage.year}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
