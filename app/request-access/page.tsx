@@ -315,7 +315,7 @@ export default function RequestAccessPage() {
             </div>
 
             {/* Submit Button and Disclaimer */}
-            <div className="mt-16 pt-12 border-t border-gallery-plaster">
+            <div className="mt-16 pt-12 form-submit-divider">
               <button type="submit" className="request-submit-button">
                 Request Access
               </button>
