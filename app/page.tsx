@@ -510,7 +510,7 @@ export default function Home() {
         </section>
 
         {/* Private Conversations Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-[80px]">
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#ffffff'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
               {/* Tagline */}
