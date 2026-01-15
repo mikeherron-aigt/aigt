@@ -252,23 +252,18 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border: 2px solid var(--archive-slate);
   background: transparent;
+  border: none;
   color: var(--archive-slate);
   cursor: pointer;
   transition: all 0.3s ease;
-  border-radius: 50%;
-  padding: 0;
+  padding: 8px;
   flex-shrink: 0;
 }
 
 .slider-nav-arrow:hover {
-  background: var(--archive-slate);
-  color: var(--paper-white);
-  border-color: var(--archive-slate);
-  transform: scale(1.05);
+  color: var(--ledger-stone);
+  transform: scale(1.1);
 }
 
 .slider-nav-arrow:active {
