@@ -362,7 +362,7 @@ body {
 .funds-subtitle {
   color: var(--archive-slate);
   font-family: Georgia, serif;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 26px;
   text-align: center;
@@ -371,7 +371,7 @@ body {
 
 @media (min-width: 1024px) {
   .funds-subtitle {
-    font-size: 18px;
+    font-size: 17px;
     line-height: 28px;
   }
 }
