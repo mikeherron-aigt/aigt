@@ -69,6 +69,7 @@ export default function Home() {
               <a href="#offerings" className="nav-link">Offerings</a>
               <a href="#gallery" className="nav-link">Gallery</a>
               <a href="#stewardship" className="nav-link">Stewardship</a>
+              <span className="nav-separator">|</span>
               <button className="btn-primary">Request Access</button>
             </nav>
           </div>
