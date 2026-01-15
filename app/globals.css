@@ -182,7 +182,6 @@ body {
 .slider-container {
   width: 100%;
   overflow: hidden;
-  box-sizing: border-box;
 }
 
 .artwork-slider {
@@ -190,15 +189,12 @@ body {
   gap: 18px;
   margin: 0;
   width: 100%;
-  max-width: 100%;
-  min-width: min-content;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  box-sizing: border-box;
 }
 
 .artwork-slider::-webkit-scrollbar {
