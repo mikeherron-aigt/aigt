@@ -339,7 +339,7 @@ export default function Home() {
         {/* Governance Section */}
         <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[1fr_50%] gap-0">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-[132px] flex items-center">
                 <div className="max-w-[579px]">
@@ -356,7 +356,7 @@ export default function Home() {
               </div>
 
               {/* Image Column */}
-              <div className="relative h-[320px] sm:h-[400px] lg:h-[480px] overflow-hidden">
+              <div className="relative w-full aspect-square overflow-hidden">
                 <div className="absolute inset-0">
                   <Image
                     src="https://api.builder.io/api/v1/image/assets/TEMP/e21bd6681b65794951201d363a4ebcc461feb16c?width=1355"
