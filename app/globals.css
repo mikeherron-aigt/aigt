@@ -344,11 +344,11 @@ body {
   background: linear-gradient(
     to right,
     transparent 0%,
-    var(--archive-slate) 8%,
-    var(--archive-slate) 70%,
+    var(--archive-slate) 5%,
+    var(--archive-slate) 65%,
     transparent 100%
   );
-  opacity: 0.25;
+  opacity: 0.35;
   width: 100vw;
   position: relative;
   left: 50%;
