@@ -315,7 +315,7 @@ export default function Home() {
                 </div>
 
                 {/* Divider */}
-                <div className="divider-line my-12 lg:my-16 -mx-4 sm:-mx-8 lg:-mx-[124px]"></div>
+                <div className="divider-line my-12 lg:my-16"></div>
 
                 <div className="max-w-[579px]">
                   {/* Our Approach */}
