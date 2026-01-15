@@ -62,6 +62,7 @@ body {
   border: none !important;
   cursor: pointer !important;
   transition: opacity 0.2s !important;
+  text-decoration: none !important;
 }
 
 .btn-primary:hover {
