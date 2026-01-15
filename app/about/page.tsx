@@ -21,7 +21,7 @@ const teamMembers: TeamMember[] = [
     name: "Jose Bracho",
     title: "Board Member; Chief Business Development Officer",
     description: "International business development leader driving strategic partnerships and institutional growth initiatives.",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F06bd78a258c44a2d8c03063a8c33aa18?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400"
   },
   {
     name: "Luis Cortes",
