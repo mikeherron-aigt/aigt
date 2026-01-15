@@ -98,7 +98,7 @@ export default function AboutPage() {
         {/* Hero Section with Image Collage */}
         <section className="w-full relative" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[1fr_601px] gap-0">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24 flex items-center">
                 <div className="max-w-[711px]">
