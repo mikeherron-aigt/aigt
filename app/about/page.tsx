@@ -151,8 +151,8 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
-                  <h2 className="about-john-title">About John Dowling Jr.</h2>
-                  <h3 className="about-john-subtitle">A Legacy Being Stewarded in Real Time</h3>
+                  <h2 className="about-john-title" style={{fontFamily: 'Georgia, serif'}}>About John Dowling Jr.</h2>
+                  <h3 className="about-john-subtitle" style={{fontFamily: 'Georgia, serif'}}>A Legacy Being Stewarded in Real Time</h3>
                 </div>
               </div>
 
