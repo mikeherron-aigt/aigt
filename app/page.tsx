@@ -45,6 +45,20 @@ export default function Home() {
   const handleTouchEnd = () => {
     setIsDragging(false);
   };
+
+  const scrollSlider = (direction: 'left' | 'right') => {
+    if (!sliderRef.current) return;
+    const scrollAmount = 350; // Amount to scroll per click
+    const newScrollLeft = direction === 'left'
+      ? sliderRef.current.scrollLeft - scrollAmount
+      : sliderRef.current.scrollLeft + scrollAmount;
+
+    sliderRef.current.scrollTo({
+      left: newScrollLeft,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
