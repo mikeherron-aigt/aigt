@@ -356,7 +356,7 @@ export default function Home() {
               </div>
 
               {/* Image Column */}
-              <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] overflow-hidden">
+              <div className="relative h-[320px] sm:h-[400px] lg:h-[480px] overflow-hidden">
                 <div className="absolute inset-0">
                   <Image
                     src="https://api.builder.io/api/v1/image/assets/TEMP/e21bd6681b65794951201d363a4ebcc461feb16c?width=1355"
