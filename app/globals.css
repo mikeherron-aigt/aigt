@@ -1959,3 +1959,41 @@ footer {
 .border-gallery-plaster {
   border-color: var(--gallery-plaster) !important;
 }
+
+/* Cookie Consent Banner */
+.cookie-consent-banner {
+  background: var(--paper-white) !important;
+  border-top: 1px solid #e0e0e0 !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  z-index: 9998 !important;
+  padding: 20px 40px !important;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+.cookie-consent-banner p {
+  color: var(--archive-slate) !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  margin: 0 !important;
+}
+
+.cookie-consent-banner a {
+  color: var(--deep-patina) !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+}
+
+.cookie-consent-banner a:hover {
+  opacity: 0.8 !important;
+}
+
+.cookie-consent-banner button {
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+  transition: opacity 0.2s !important;
+}
+
+.cookie-consent-banner button:hover {
+  opacity: 0.8 !important;
+}
