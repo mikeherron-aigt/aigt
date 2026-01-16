@@ -13,7 +13,7 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: "John Joseph Dowling Jr.",
-    title: "Board Member; Chairman; Acting CEO",
+    title: "Board Member; Chairman; Chief Visionary Officer",
     description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400"
   },
