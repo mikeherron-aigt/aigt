@@ -213,10 +213,10 @@ export default function Home() {
 
         {/* Footer Bar - Full Width */}
         <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center" style={{boxSizing: 'border-box'}}>
-          {/* Left portion - Gallery Plaster - Full Width */}
-          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', width: '50vw'}}></div>
-          {/* Right portion - Ledger Stone - Full Width */}
-          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', width: '50vw'}}></div>
+          {/* Left portion - Gallery Plaster */}
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', right: 'calc(50% + 20px)'}}></div>
+          {/* Right portion - Ledger Stone */}
+          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', left: 'calc(50% + 20px)'}}></div>
 
           {/* Centered container - same as hero */}
           <div className="h-full relative max-w-[1440px] w-full" style={{boxSizing: 'border-box'}}>
