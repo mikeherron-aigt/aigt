@@ -215,6 +215,13 @@ export default function RequestAccessPage() {
                 </p>
               </div>
 
+              {/* Info Paragraph */}
+              <div className="mb-12 lg:mb-16 pb-8 lg:pb-12 border-b border-gallery-plaster">
+                <p className="governance-description">
+                  Access to Art Investment Group Trust platforms is limited to qualified purchasers, institutional participants, and approved cultural partners. Requests are reviewed to ensure alignment with our stewardship philosophy and regulatory requirements.
+                </p>
+              </div>
+
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-12">
             {/* Section 1: Identity */}
