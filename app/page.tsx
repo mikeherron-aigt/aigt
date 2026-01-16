@@ -417,7 +417,7 @@ export default function Home() {
               <div className="relative w-full h-full overflow-hidden min-h-[900px]">
                 <div className="absolute inset-0">
                   <Image
-                    src="https://api.builder.io/api/v1/image/assets/TEMP/e21bd6681b65794951201d363a4ebcc461feb16c?width=1355"
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F409e962a5a31455bac419bcb11ccf171?format=webp&width=800"
                     alt="Contemporary artwork representing governance structure"
                     fill
                     className="object-cover object-center"
