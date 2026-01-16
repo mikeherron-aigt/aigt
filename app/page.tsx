@@ -688,37 +688,48 @@ export default function Home() {
               </h2>
             </div>
 
-            {/* FAQ Items */}
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-8 lg:gap-12 max-w-[900px] mx-auto">
-              {/* FAQ Item 1 */}
-              <div className="bg-white p-8 lg:p-10">
-                <h3 className="governance-subtitle mb-4">
-                  What is an art investment fund?
-                </h3>
-                <p className="governance-description">
-                  An art investment fund is a structured vehicle that acquires and holds artworks as long term assets, typically emphasizing governance, custody, and preservation rather than short term buying and selling.
-                </p>
-              </div>
+            {/* FAQ Accordion Items */}
+            <div className="max-w-[900px] mx-auto space-y-4 lg:space-y-6">
+              {faqItems.map((item, index) => (
+                <div key={index} className="bg-white overflow-hidden">
+                  <button
+                    onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                    className="w-full text-left p-6 lg:p-8 flex items-start justify-between gap-4 hover:bg-gray-50 transition-colors duration-200"
+                    aria-expanded={expandedFAQ === index}
+                    aria-controls={`faq-answer-${index}`}
+                  >
+                    <h3 className="governance-subtitle m-0">
+                      {item.question}
+                    </h3>
+                    <svg
+                      className={`flex-shrink-0 w-6 h-6 text-archive-slate transition-transform duration-300 mt-1 ${
+                        expandedFAQ === index ? 'rotate-180' : ''
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                      />
+                    </svg>
+                  </button>
 
-              {/* FAQ Item 2 */}
-              <div className="bg-white p-8 lg:p-10">
-                <h3 className="governance-subtitle mb-4">
-                  How does institutional art investment work?
-                </h3>
-                <p className="governance-description">
-                  Institutional art investment applies governance frameworks, professional custody standards, and long horizon ownership principles to the acquisition and stewardship of fine art.
-                </p>
-              </div>
-
-              {/* FAQ Item 3 */}
-              <div className="bg-white p-8 lg:p-10">
-                <h3 className="governance-subtitle mb-4">
-                  Who can invest in art through Art Investment Group Trust?
-                </h3>
-                <p className="governance-description">
-                  Participation is limited to qualified purchasers, institutions, family offices, and approved partners through private conversations and governed access.
-                </p>
-              </div>
+                  {expandedFAQ === index && (
+                    <div
+                      id={`faq-answer-${index}`}
+                      className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-gallery-plaster"
+                    >
+                      <p className="governance-description">
+                        {item.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </section>
