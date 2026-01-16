@@ -212,19 +212,14 @@ export default function Home() {
         </div>
 
         {/* Footer Bar - Full Width */}
-        <div className="w-full h-[36px] relative hidden lg:block" style={{boxSizing: 'border-box'}}>
+        <div className="w-full h-[36px] relative hidden lg:block mx-auto" style={{boxSizing: 'border-box'}}>
           {/* Left portion - Gallery Plaster */}
-          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', width: 'calc((100vw - 1440px) / 2 + 832px)'}}></div>
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', width: '50%'}}></div>
           {/* Right portion - Ledger Stone */}
-          <div className="absolute top-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', left: 'calc((100vw - 1440px) / 2 + 864px)', right: '0'}}></div>
+          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', width: '50%'}}></div>
 
-          {/* Centered container - same as hero */}
-          <div className="h-full flex justify-center hidden lg:flex" style={{boxSizing: 'border-box'}}>
-            <div className="h-full relative max-w-[1440px] w-full" style={{boxSizing: 'border-box'}}>
-              {/* Dark green square - positioned exactly like vertical bar */}
-              <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{boxSizing: 'border-box', left: 'calc(60% - 32px)'}}></div>
-            </div>
-          </div>
+          {/* Dark green square positioned to align with the 60% mark */}
+          <div className="h-full absolute top-0 w-8 bg-deep-patina" style={{boxSizing: 'border-box', left: '50%', transform: 'translateX(calc(-50% + (20vw - 720px) - 16px))'}}></div>
         </div>
 
         {/* Featured Collection Section */}
