@@ -23,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
+        <GoogleTagManager />
         {children}
         <CookieConsent />
       </body>
