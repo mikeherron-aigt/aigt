@@ -42,15 +42,12 @@ export default function CookieConsentBanner() {
       }}
     >
       <div style={{ marginBottom: "12px" }}>
-        <p style={{ margin: "0 0 8px 0", color: "#252e3a", fontWeight: "500" }}>
-          Cookie & Privacy Notice
-        </p>
         <p style={{ margin: "0", color: "#252e3a", lineHeight: "1.6" }}>
-          We use cookies to understand how you use our site and to improve your experience. By accepting, you consent to our use of cookies in accordance with our{" "}
+          Art Investment Group Trust uses essential cookies to operate this website and optional cookies to understand how it is used. Optional cookies are only set with your consent. Learn more in our{" "}
           <Link href="/privacy" style={{ color: "#294344", textDecoration: "underline" }}>
             Privacy Policy
           </Link>
-          . You can withdraw your consent at any time.
+          .
         </p>
       </div>
       <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "12px" }}>
