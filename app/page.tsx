@@ -126,6 +126,22 @@ const governanceImage: ArtworkItem = {
   collection: "Cosmic Dreams Collection"
 };
 
+const mediumsImage: ArtworkItem = {
+  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800",
+  title: "One Standard Across Mediums",
+  artist: "John Dowling Jr.",
+  year: "Contemporary",
+  collection: "Cosmic Dreams Collection"
+};
+
+const artArtistsImage: ArtworkItem = {
+  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F191d1f3757b744a3bb4c98c59bd49eba?format=webp&width=800",
+  title: "Art and Artists",
+  artist: "John Dowling Jr.",
+  year: "Contemporary",
+  collection: "Cosmic Dreams Collection"
+};
+
 export default function Home() {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
