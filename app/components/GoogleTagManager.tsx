@@ -1,12 +1,25 @@
 'use client';
 
 import { useEffect } from 'react';
-import { getCookie } from 'react-cookie-consent';
+
+// Function to get cookie value
+const getCookieValue = (name: string): string | null => {
+  const nameEQ = name + '=';
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    cookie = cookie.trim();
+    if (cookie.indexOf(nameEQ) === 0) {
+      return cookie.substring(nameEQ.length);
+    }
+  }
+  return null;
+};
 
 export default function GoogleTagManager() {
   useEffect(() => {
     // Check if user has accepted cookies
-    const hasConsent = getCookie('aigt-cookie-consent') === 'true';
+    const consentCookie = getCookieValue('aigt-cookie-consent');
+    const hasConsent = consentCookie === 'true';
 
     if (hasConsent) {
       // Load GTM script
