@@ -640,7 +640,7 @@ export default function Home() {
               </div>
 
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center pt-8 sm:pt-12 lg:pt-0">
                 <div className="max-w-[579px]">
                   <h2 className="one-standard-title">
                     One Standard Across Mediums
