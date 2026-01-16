@@ -402,7 +402,13 @@ export default function RequestAccessPage() {
             <div className="flex flex-col items-center gap-3">
               {/* Links */}
               <p className="footer-links">
-                Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
+                <Link href="/disclosures" className="hover:opacity-70">Disclosures</Link>
+                <span className="px-2">|</span>
+                <Link href="/privacy" className="hover:opacity-70">Privacy</Link>
+                <span className="px-2">|</span>
+                <Link href="/terms" className="hover:opacity-70">Terms</Link>
+                <span className="px-2">|</span>
+                <Link href="/request-access" className="hover:opacity-70">Contact</Link>
               </p>
 
               {/* Copyright */}
