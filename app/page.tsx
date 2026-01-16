@@ -423,15 +423,21 @@ export default function Home() {
 
               {/* Image Column */}
               <div className="relative w-full h-full overflow-hidden min-h-[900px]">
-                <div className="absolute inset-0">
-                  <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F409e962a5a31455bac419bcb11ccf171?format=webp&width=800"
-                    alt="Contemporary artwork representing governance structure"
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                </div>
+                <button
+                  onClick={() => openModal(governanceImage)}
+                  className="governance-image-button"
+                  aria-label="View full-size image of Contemporary Governance artwork"
+                >
+                  <div className="absolute inset-0">
+                    <Image
+                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F409e962a5a31455bac419bcb11ccf171?format=webp&width=800"
+                      alt="Contemporary artwork representing governance structure"
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  </div>
+                </button>
               </div>
             </div>
           </div>
