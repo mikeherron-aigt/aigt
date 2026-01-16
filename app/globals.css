@@ -1642,6 +1642,7 @@ footer {
   flex-direction: column;
   gap: 0;
   margin-bottom: 0;
+  line-height: 1;
 }
 
 .team-member-title {
@@ -1649,8 +1650,14 @@ footer {
   font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
   font-size: 14px !important;
   font-weight: 400 !important;
-  line-height: 26px !important;
+  line-height: 1 !important;
   margin: 0 !important;
+  padding: 0 !important;
+}
+
+.team-member-title:first-child {
+  font-weight: bold !important;
+  margin-bottom: 4px !important;
 }
 
 .team-member-title:last-child {
