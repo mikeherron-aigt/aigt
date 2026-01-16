@@ -398,20 +398,8 @@ export default function Home() {
           </div>
 
           {/* Decorative Elements - Positioned at bottom of hero section */}
-          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
-
-          {/* Design Bar - Positioned absolutely at bottom of hero */}
-          <div className="absolute left-0 right-0 w-full h-[36px] hidden lg:flex lg:justify-center" style={{top: 'calc(100% - 278px)'}}>
-            {/* Left portion - Gallery Plaster */}
-            <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
-            {/* Right portion - Ledger Stone */}
-            <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 105px)', right: '0'}}></div>
-            {/* Centered max-width container with square */}
-            <div className="max-w-[1440px] w-full h-full relative">
-              {/* Dark green square */}
-              <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
-            </div>
-          </div>
+          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 36px)'}}></div>
+          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 36px)', height: '36px'}}></div>
         </div>
 
         {/* New Info Section */}
