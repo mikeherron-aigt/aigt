@@ -212,14 +212,17 @@ export default function Home() {
         </div>
 
         {/* Footer Bar - Full Width */}
-        <div className="w-full h-[36px] relative hidden lg:block mx-auto" style={{boxSizing: 'border-box'}}>
+        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
           {/* Left portion - Gallery Plaster */}
-          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', width: '50%'}}></div>
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: '50vw'}}></div>
           {/* Right portion - Ledger Stone */}
-          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', width: '50%'}}></div>
+          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{width: '50vw'}}></div>
 
-          {/* Dark green square positioned to align with the 60% mark */}
-          <div className="h-full absolute top-0 w-8 bg-deep-patina" style={{boxSizing: 'border-box', left: '50%', transform: 'translateX(calc(-50% + (20vw - 720px) - 16px))'}}></div>
+          {/* Centered max-width container with square */}
+          <div className="max-w-[1440px] w-full h-full relative">
+            {/* Dark green square - same positioning as vertical bar */}
+            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+          </div>
         </div>
 
         {/* Featured Collection Section */}
