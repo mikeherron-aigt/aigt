@@ -212,13 +212,17 @@ export default function Home() {
         </div>
 
         {/* Footer Bar - Full Width */}
-        <div className="w-full h-[36px] relative hidden lg:block" style={{boxSizing: 'border-box'}}>
+        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center" style={{boxSizing: 'border-box'}}>
           {/* Left portion - Gallery Plaster - Full Width */}
-          <div className="absolute top-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', left: '0', width: 'calc(50vw - 720px + 843px)'}}></div>
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', width: '50vw'}}></div>
           {/* Right portion - Ledger Stone - Full Width */}
-          <div className="absolute top-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', left: 'calc(50vw - 720px + 839px)', right: '0'}}></div>
-          {/* Dark green square at intersection */}
-          <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{boxSizing: 'border-box', left: 'calc(50vw - 720px + 825px)'}}></div>
+          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', width: '50vw'}}></div>
+
+          {/* Centered container - same as hero */}
+          <div className="h-full relative max-w-[1440px] w-full" style={{boxSizing: 'border-box'}}>
+            {/* Dark green square - positioned exactly like vertical bar */}
+            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{boxSizing: 'border-box', left: 'calc(60% - 32px)'}}></div>
+          </div>
         </div>
 
         {/* Featured Collection Section */}
