@@ -238,29 +238,35 @@ export default function AboutPage() {
 
             {/* Team Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-[51px] lg:gap-y-[95px]">
-              {teamMembers.map((member, index) => (
-                <div key={index} className="flex flex-col items-center text-center">
-                  {/* Photo */}
-                  <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6">
-                    <Image
-                      src={member.imageUrl}
-                      alt={member.name}
-                      fill
-                      className="object-cover"
-                      sizes="102px"
-                    />
+              {teamMembers.map((member, index) => {
+                const titleParts = member.title.split('; ');
+                const boardMember = titleParts[0];
+                const role = titleParts.slice(1).join('; ');
+
+                return (
+                  <div key={index} className="flex flex-col items-center text-center">
+                    {/* Photo */}
+                    <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6">
+                      <Image
+                        src={member.imageUrl}
+                        alt={member.name}
+                        fill
+                        className="object-cover"
+                        sizes="102px"
+                      />
+                    </div>
+
+                    {/* Name */}
+                    <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>
+
+                    {/* Title */}
+                    <div className="team-member-title-wrapper">
+                      <p className="team-member-title">{boardMember}</p>
+                      <p className="team-member-title">{role}</p>
+                    </div>
                   </div>
-
-                  {/* Name */}
-                  <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>
-
-                  {/* Title */}
-                  <p className="team-member-title">{member.title}</p>
-
-                  {/* Description */}
-                  <p className="team-member-description">{member.description}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
