@@ -36,6 +36,7 @@ export default function RequestAccessPage() {
 
   const [charCount, setCharCount] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
