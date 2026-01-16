@@ -337,7 +337,7 @@ export default function Home() {
                   <div className="border-t border-gallery-plaster pt-4">
                     <Link
                       href="/request-access"
-                      className="btn-primary inline-block w-full text-left"
+                      className="btn-primary mobile-menu-button inline-block w-full"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Request Access
