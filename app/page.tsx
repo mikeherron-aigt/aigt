@@ -143,6 +143,11 @@ export default function Home() {
     }
   }, [isModalOpen]);
 
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * heroImages.length);
+    setHeroImage(heroImages[randomIndex]);
+  }, []);
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
