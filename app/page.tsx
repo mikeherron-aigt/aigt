@@ -490,7 +490,7 @@ export default function Home() {
             <div className="grid lg:grid-cols-[1fr_1fr] gap-0">
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
-                <div className="relative w-full max-w-[482px] aspect-[482/612]">
+                <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
                   <Image
                     src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800"
                     alt="Contemporary artwork representing cultural significance across mediums"
