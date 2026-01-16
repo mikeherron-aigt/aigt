@@ -254,6 +254,7 @@ section:has(.slider-wrapper) {
   aspect-ratio: 247 / 206;
   overflow: hidden;
   background: var(--gallery-plaster);
+  contain: layout style paint;
 }
 
 .artwork-info {
