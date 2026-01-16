@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import CookieConsent from "./components/CookieConsent";
+import GoogleTagManager from "./components/GoogleTagManager";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
