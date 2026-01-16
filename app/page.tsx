@@ -9,6 +9,7 @@ interface ArtworkItem {
   title: string;
   artist: string;
   year: string;
+  collection?: string;
 }
 
 const heroImages = [
@@ -25,36 +26,121 @@ const heroImages = [
 
 const artworkData: ArtworkItem[] = [
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/25ee69383552e9f873f3551083817292fb7fbc14?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F270bfbf622d44bb58da3863d2d4a1416?format=webp&width=800",
+    title: "80s Series #2",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
   },
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/313b3f436ad7a871d72459a182f82360d9123c0e?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0b223e89165544369065645eb9e01981?format=webp&width=800",
+    title: "80s Series #25",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
   },
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/8d3bcb814a5fd11404bd954a1295075a5be7f529?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F412947b95d6b487f8e94d9db43269338?format=webp&width=800",
+    title: "80s Series #14",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
   },
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/d2c57baf20a78edb5c4e08b53ad5b7b52298bd73?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F41a3331c307447f9a770facf2b3f3f7b?format=webp&width=800",
+    title: "80s Series #53",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
   },
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/7fa7dcff6f05eaec42b8b896c2be111486030e46?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F08edb5409851472b964e3c762012ec12?format=webp&width=800",
+    title: "80s Series #38",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0758ca8fed06418c994a30eac779317f?format=webp&width=800",
+    title: "80s Series #68",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F99ae9a973978458da61eddb794151497?format=webp&width=800",
+    title: "80s Series #99",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2249d103ff824a26a277d0c413cf9c9c?format=webp&width=800",
+    title: "Cosmic Dreams #001451",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F5aecfbbcd4cf49d98bf9a1eb9b2b08e9?format=webp&width=800",
+    title: "80s Series #8",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F57017ec8c4284ef3897083c05ccb4a39?format=webp&width=800",
+    title: "80s Series #32",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4b0284b925464d1d9c172bd648f259e3?format=webp&width=800",
+    title: "80s Series #29",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fe0ebfc6ee0a247898c870f509e743ab0?format=webp&width=800",
+    title: "80s Series #43",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fa85281a076fa48b4b997fac1adf8470a?format=webp&width=800",
+    title: "80s Series #123",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
   }
 ];
+
+const governanceImage: ArtworkItem = {
+  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F409e962a5a31455bac419bcb11ccf171?format=webp&width=800",
+  title: "Contemporary Governance",
+  artist: "John Dowling Jr.",
+  year: "Contemporary",
+  collection: "Cosmic Dreams Collection"
+};
+
+const mediumsImage: ArtworkItem = {
+  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800",
+  title: "One Standard Across Mediums",
+  artist: "John Dowling Jr.",
+  year: "Contemporary",
+  collection: "Cosmic Dreams Collection"
+};
+
+const artArtistsImage: ArtworkItem = {
+  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F191d1f3757b744a3bb4c98c59bd49eba?format=webp&width=800",
+  title: "Art and Artists",
+  artist: "John Dowling Jr.",
+  year: "Contemporary",
+  collection: "Cosmic Dreams Collection"
+};
 
 export default function Home() {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -274,7 +360,7 @@ export default function Home() {
                       onClick={() => openModal(artwork)}
                       aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
                     >
-                      <div className="artwork-image-wrapper">
+                      <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
                         <Image
                           src={artwork.src}
                           alt={artwork.title}
@@ -286,7 +372,7 @@ export default function Home() {
                     </button>
                     <div className="artwork-info">
                       <h3 className="artwork-title">{artwork.title}</h3>
-                      <p className="artwork-details">{artwork.artist}, Year Painting<br />{artwork.year}</p>
+                      <p className="artwork-details">{artwork.artist}<br />{artwork.collection || 'Cosmic Dreams Collection'}</p>
                     </div>
                   </div>
                 ))}
@@ -353,15 +439,21 @@ export default function Home() {
 
               {/* Image Column */}
               <div className="relative w-full h-full overflow-hidden min-h-[900px]">
-                <div className="absolute inset-0">
-                  <Image
-                    src="https://api.builder.io/api/v1/image/assets/TEMP/e21bd6681b65794951201d363a4ebcc461feb16c?width=1355"
-                    alt="Contemporary artwork representing governance structure"
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                </div>
+                <button
+                  onClick={() => openModal(governanceImage)}
+                  className="governance-image-button"
+                  aria-label="View full-size image of Contemporary Governance artwork"
+                >
+                  <div className="absolute inset-0">
+                    <Image
+                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F409e962a5a31455bac419bcb11ccf171?format=webp&width=800"
+                      alt="Contemporary artwork representing governance structure"
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  </div>
+                </button>
               </div>
             </div>
           </div>
@@ -428,15 +520,21 @@ export default function Home() {
             <div className="grid lg:grid-cols-[1fr_1fr] gap-0">
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
-                <div className="relative w-full max-w-[482px] aspect-[482/612]">
-                  <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800"
-                    alt="Contemporary artwork representing cultural significance across mediums"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 482px"
-                  />
-                </div>
+                <button
+                  onClick={() => openModal(mediumsImage)}
+                  className="mediums-image-button"
+                  aria-label="View full-size image of One Standard Across Mediums artwork"
+                >
+                  <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
+                    <Image
+                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800"
+                      alt="Contemporary artwork representing cultural significance across mediums"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 482px"
+                    />
+                  </div>
+                </button>
               </div>
 
               {/* Content Column */}
@@ -478,15 +576,21 @@ export default function Home() {
 
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
-                <div className="relative w-full max-w-[482px] aspect-[482/612]">
-                  <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F191d1f3757b744a3bb4c98c59bd49eba?format=webp&width=800"
-                    alt="Contemporary artwork representing artistic stewardship"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 482px"
-                  />
-                </div>
+                <button
+                  onClick={() => openModal(artArtistsImage)}
+                  className="art-artists-image-button"
+                  aria-label="View full-size image of Art and Artists artwork"
+                >
+                  <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
+                    <Image
+                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F191d1f3757b744a3bb4c98c59bd49eba?format=webp&width=800"
+                      alt="Contemporary artwork representing artistic stewardship"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 482px"
+                    />
+                  </div>
+                </button>
               </div>
             </div>
           </div>
