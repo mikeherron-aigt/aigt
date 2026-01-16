@@ -150,6 +150,22 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [heroImage, setHeroImage] = useState<string>("");
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+
+  const faqItems = [
+    {
+      question: "What is an art investment fund?",
+      answer: "An art investment fund is a structured vehicle that acquires and holds artworks as long term assets, typically emphasizing governance, custody, and preservation rather than short term buying and selling."
+    },
+    {
+      question: "How does institutional art investment work?",
+      answer: "Institutional art investment applies governance frameworks, professional custody standards, and long horizon ownership principles to the acquisition and stewardship of fine art."
+    },
+    {
+      question: "Who can invest in art through Art Investment Group Trust?",
+      answer: "Participation is limited to qualified purchasers, institutions, family offices, and approved partners through private conversations and governed access."
+    }
+  ];
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
