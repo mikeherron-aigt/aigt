@@ -336,7 +336,7 @@ export default function Home() {
                       onClick={() => openModal(artwork)}
                       aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
                     >
-                      <div className="artwork-image-wrapper">
+                      <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
                         <Image
                           src={artwork.src}
                           alt={artwork.title}
