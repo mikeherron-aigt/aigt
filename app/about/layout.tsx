@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AboutPageSchema from "../components/AboutPageSchema";
 
 export const metadata: Metadata = {
   title: "Art Stewardship Framework | Art Investment Group Trust",
@@ -10,5 +11,10 @@ export default function AboutLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <AboutPageSchema />
+      {children}
+    </>
+  );
 }

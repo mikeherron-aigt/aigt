@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { useRef, useState, useEffect } from "react";
 
 interface ArtworkItem {
@@ -253,6 +254,25 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
+      {/* FAQ Schema */}
+      <Script
+        id="faq-page-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqItems.map((item) => ({
+              '@type': 'Question',
+              name: item.question,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: item.answer,
+              },
+            })),
+          }),
+        }}
+      />
       {/* Header */}
       <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-6 sm:py-8 lg:py-12">
