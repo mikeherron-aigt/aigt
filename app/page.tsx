@@ -317,6 +317,32 @@ export default function Home() {
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
         </div>
 
+        {/* Definition Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20 border-b border-gallery-plaster">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[711px]">
+              <h2 className="sr-only">Institutional Art Investment and Cultural Asset Stewardship</h2>
+              <p className="text-[16px] sm:text-[18px] lg:text-[16px] leading-[26px] text-archive-slate">
+                Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* New Info Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[711px]">
+              <h2 className="governance-title">
+                Art Investment, Structured for the Long Term
+              </h2>
+              <p className="governance-description">
+                Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Footer Bar - Full Width */}
         <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
           {/* Left portion - Gallery Plaster (extends to left edge of square) */}
