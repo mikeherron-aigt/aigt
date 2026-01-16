@@ -540,7 +540,7 @@ export default function Home() {
 
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
-                <div className="relative w-full max-w-[482px] aspect-[482/612]">
+                <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
                   <Image
                     src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F191d1f3757b744a3bb4c98c59bd49eba?format=webp&width=800"
                     alt="Contemporary artwork representing artistic stewardship"
