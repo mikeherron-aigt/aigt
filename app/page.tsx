@@ -212,16 +212,18 @@ export default function Home() {
         </div>
 
         {/* Footer Bar - Full Width */}
-        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center" style={{boxSizing: 'border-box'}}>
+        <div className="w-full h-[36px] relative hidden lg:block" style={{boxSizing: 'border-box'}}>
           {/* Left portion - Gallery Plaster */}
-          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', right: 'calc(50% + 20px)'}}></div>
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', right: 'calc((100vw - 1440px) / 2 + 864px)', width: 'auto'}}></div>
           {/* Right portion - Ledger Stone */}
-          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', left: 'calc(50% + 20px)'}}></div>
+          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', left: 'calc((100vw - 1440px) / 2 + 864px)', width: 'auto'}}></div>
 
           {/* Centered container - same as hero */}
-          <div className="h-full relative max-w-[1440px] w-full" style={{boxSizing: 'border-box'}}>
-            {/* Dark green square - positioned exactly like vertical bar */}
-            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{boxSizing: 'border-box', left: 'calc(60% - 32px)'}}></div>
+          <div className="h-full flex justify-center hidden lg:flex" style={{boxSizing: 'border-box'}}>
+            <div className="h-full relative max-w-[1440px] w-full" style={{boxSizing: 'border-box'}}>
+              {/* Dark green square - positioned exactly like vertical bar */}
+              <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{boxSizing: 'border-box', left: 'calc(60% - 32px)'}}></div>
+            </div>
           </div>
         </div>
 
