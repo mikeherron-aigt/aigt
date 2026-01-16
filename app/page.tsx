@@ -9,6 +9,7 @@ interface ArtworkItem {
   title: string;
   artist: string;
   year: string;
+  collection?: string;
 }
 
 const heroImages = [
