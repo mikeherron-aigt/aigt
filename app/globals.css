@@ -427,7 +427,10 @@ section:has(.slider-wrapper) {
   padding: 0;
   cursor: pointer;
   width: 100%;
-  display: block;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
