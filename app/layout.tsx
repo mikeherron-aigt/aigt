@@ -27,7 +27,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         type: "image/png",
-        alt: "Art Investment Group Trust - Institutional Art Investment & Stewardship",
+        alt: "Art Investment Group Trust",
       },
     ],
   },
