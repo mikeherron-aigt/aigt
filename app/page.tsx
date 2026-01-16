@@ -213,10 +213,10 @@ export default function Home() {
 
         {/* Footer Bar - Full Width */}
         <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
-          {/* Left portion - Gallery Plaster */}
-          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: '50vw'}}></div>
-          {/* Right portion - Ledger Stone */}
-          <div className="absolute top-0 right-0 h-full bg-ledger-stone" style={{width: '50vw'}}></div>
+          {/* Left portion - Gallery Plaster (extends to left edge of square) */}
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
+          {/* Right portion - Ledger Stone (starts at right edge of square) */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 144px)', right: '0'}}></div>
 
           {/* Centered max-width container with square */}
           <div className="max-w-[1440px] w-full h-full relative">
