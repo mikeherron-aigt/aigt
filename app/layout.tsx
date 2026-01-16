@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     images: [
       {
-        url: "/og.png",
+        url: "https://artinvestmentgrouptrust.com/og.png",
         width: 1200,
         height: 630,
         type: "image/png",
