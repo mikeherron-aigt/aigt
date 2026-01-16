@@ -402,6 +402,20 @@ export default function Home() {
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
         </div>
 
+        {/* Design Bar - Full Width */}
+        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
+          {/* Left portion - Gallery Plaster (extends to left edge of square) */}
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
+          {/* Right portion - Ledger Stone (starts at right edge of square) */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 105px)', right: '0'}}></div>
+
+          {/* Centered max-width container with square */}
+          <div className="max-w-[1440px] w-full h-full relative">
+            {/* Dark green square - same positioning as vertical bar */}
+            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+          </div>
+        </div>
+
         {/* New Info Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
@@ -418,20 +432,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* Footer Bar - Full Width */}
-        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
-          {/* Left portion - Gallery Plaster (extends to left edge of square) */}
-          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
-          {/* Right portion - Ledger Stone (starts at right edge of square) */}
-          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 105px)', right: '0'}}></div>
-
-          {/* Centered max-width container with square */}
-          <div className="max-w-[1440px] w-full h-full relative">
-            {/* Dark green square - same positioning as vertical bar */}
-            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
-          </div>
-        </div>
 
         {/* Featured Collection Section */}
         <section className="w-full bg-white py-16 sm:py-20 lg:py-[104px]">
@@ -739,7 +739,7 @@ export default function Home() {
         </section>
 
         {/* FAQ Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
+        <section className="w-full py-9 sm:py-12 lg:py-18" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             {/* Header */}
             <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20 max-w-[995px] mx-auto">
