@@ -239,7 +239,13 @@ section:has(.slider-wrapper) {
   flex-direction: column;
   gap: 4px;
   flex-shrink: 0;
-  width: 280px;
+  width: 210px;
+}
+
+@media (min-width: 1024px) {
+  .artwork-card {
+    width: 280px;
+  }
 }
 
 .artwork-card img {
