@@ -207,18 +207,21 @@ export default function Home() {
           </div>
 
           {/* Decorative Elements - Positioned at bottom of image, above footer */}
-          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 206px)'}}></div>
-          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 206px)', height: '170px'}}></div>
-          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-deep-patina hidden lg:block pointer-events-none" style={{top: 'calc(100% - 36px)', height: '36px'}}></div>
+          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
+          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
+        </div>
 
-          {/* Footer Bar */}
-          <div className="h-[36px] relative">
-            {/* Left portion - #DADADA */}
-            <div className="absolute left-0 top-0 h-full bg-gallery-plaster hidden lg:block" style={{width: 'calc(60% - 32px)'}}></div>
-            {/* Right portion - #A1A69D */}
-            <div className="absolute top-0 h-full bg-ledger-stone hidden lg:block" style={{left: 'calc(60%)', right: '0'}}></div>
-            {/* Dark green square at intersection */}
-            <div className="absolute top-0 w-8 h-full bg-deep-patina hidden lg:block" style={{left: 'calc(60% - 32px)'}}></div>
+        {/* Footer Bar - Full Width */}
+        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
+          {/* Left portion - Gallery Plaster (extends to left edge of square) */}
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
+          {/* Right portion - Ledger Stone (starts at right edge of square) */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 105px)', right: '0'}}></div>
+
+          {/* Centered max-width container with square */}
+          <div className="max-w-[1440px] w-full h-full relative">
+            {/* Dark green square - same positioning as vertical bar */}
+            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
           </div>
         </div>
 
@@ -542,7 +545,7 @@ export default function Home() {
         </section>
 
         {/* Footer Section */}
-        <footer className="w-full py-2 sm:py-3 lg:py-4">
+        <footer className="w-full py-4 sm:py-6 lg:py-8">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
             <div className="footer-content-box flex flex-col items-center gap-10">
               {/* Logo */}
@@ -560,7 +563,13 @@ export default function Home() {
               <div className="flex flex-col items-center gap-3">
                 {/* Links */}
                 <p className="footer-links">
-                  Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
+                  <Link href="/disclosures" className="hover:opacity-70">Disclosures</Link>
+                  <span className="px-2">|</span>
+                  <Link href="/privacy" className="hover:opacity-70">Privacy</Link>
+                  <span className="px-2">|</span>
+                  <Link href="/terms" className="hover:opacity-70">Terms</Link>
+                  <span className="px-2">|</span>
+                  <Link href="/request-access" className="hover:opacity-70">Contact</Link>
                 </p>
 
                 {/* Copyright */}

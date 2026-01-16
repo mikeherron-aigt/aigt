@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { trackFormSubmission } from "@/lib/gtm";
 
 interface FormData {
   fullName: string;
@@ -58,10 +59,33 @@ export default function RequestAccessPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    setIsSubmitted(true);
+    try {
+      // Track form submission to GTM
+      trackFormSubmission('access_request_form');
+
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log('Email sent successfully:', result);
+        setIsSubmitted(true);
+      } else {
+        console.error('Failed to send email:', result);
+        alert('There was an issue submitting your form. Please try again.');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      alert('There was an error submitting your form. Please try again.');
+    }
   };
 
   const relationshipOptions = [
@@ -384,7 +408,7 @@ export default function RequestAccessPage() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-2 sm:py-3 lg:py-4 mt-16">
+      <footer className="w-full py-4 sm:py-6 lg:py-8 mt-16">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
           <div className="footer-content-box flex flex-col items-center gap-10">
             {/* Logo */}
@@ -402,7 +426,13 @@ export default function RequestAccessPage() {
             <div className="flex flex-col items-center gap-3">
               {/* Links */}
               <p className="footer-links">
-                Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
+                <Link href="/disclosures" className="hover:opacity-70">Disclosures</Link>
+                <span className="px-2">|</span>
+                <Link href="/privacy" className="hover:opacity-70">Privacy</Link>
+                <span className="px-2">|</span>
+                <Link href="/terms" className="hover:opacity-70">Terms</Link>
+                <span className="px-2">|</span>
+                <Link href="/request-access" className="hover:opacity-70">Contact</Link>
               </p>
 
               {/* Copyright */}

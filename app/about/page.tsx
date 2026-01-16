@@ -21,7 +21,7 @@ const teamMembers: TeamMember[] = [
     name: "Jose Bracho",
     title: "Board Member; Chief Business Development Officer",
     description: "International business development leader driving strategic partnerships and institutional growth initiatives.",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F06bd78a258c44a2d8c03063a8c33aa18?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400"
   },
   {
     name: "Luis Cortes",
@@ -267,7 +267,7 @@ export default function AboutPage() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-2 sm:py-3 lg:py-4">
+      <footer className="w-full py-4 sm:py-6 lg:py-8">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-0">
           <div className="footer-content-box flex flex-col items-center gap-10">
             {/* Logo */}
@@ -285,7 +285,13 @@ export default function AboutPage() {
             <div className="flex flex-col items-center gap-3">
               {/* Links */}
               <p className="footer-links">
-                Disclosures <span className="px-2">|</span> Privacy <span className="px-2">|</span> Terms <span className="px-2">|</span> Contact
+                <Link href="/disclosures" className="hover:opacity-70">Disclosures</Link>
+                <span className="px-2">|</span>
+                <Link href="/privacy" className="hover:opacity-70">Privacy</Link>
+                <span className="px-2">|</span>
+                <Link href="/terms" className="hover:opacity-70">Terms</Link>
+                <span className="px-2">|</span>
+                <Link href="/request-access" className="hover:opacity-70">Contact</Link>
               </p>
 
               {/* Copyright */}
