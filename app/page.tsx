@@ -348,7 +348,7 @@ export default function Home() {
                     </button>
                     <div className="artwork-info">
                       <h3 className="artwork-title">{artwork.title}</h3>
-                      <p className="artwork-details">{artwork.artist}, Year Painting<br />{artwork.year}</p>
+                      <p className="artwork-details">{artwork.collection || 'Cosmic Dreams Collection'}</p>
                     </div>
                   </div>
                 ))}
