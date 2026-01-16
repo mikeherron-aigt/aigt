@@ -662,6 +662,51 @@ export default function Home() {
           </div>
         </section>
 
+        {/* FAQ Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            {/* Header */}
+            <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20 max-w-[995px] mx-auto">
+              <h2 className="section-heading text-center">
+                Art Investment and Stewardship FAQs
+              </h2>
+            </div>
+
+            {/* FAQ Items */}
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-8 lg:gap-12 max-w-[900px] mx-auto">
+              {/* FAQ Item 1 */}
+              <div className="bg-white p-8 lg:p-10">
+                <h3 className="governance-subtitle mb-4">
+                  What is an art investment fund?
+                </h3>
+                <p className="governance-description">
+                  An art investment fund is a structured vehicle that acquires and holds artworks as long term assets, typically emphasizing governance, custody, and preservation rather than short term buying and selling.
+                </p>
+              </div>
+
+              {/* FAQ Item 2 */}
+              <div className="bg-white p-8 lg:p-10">
+                <h3 className="governance-subtitle mb-4">
+                  How does institutional art investment work?
+                </h3>
+                <p className="governance-description">
+                  Institutional art investment applies governance frameworks, professional custody standards, and long horizon ownership principles to the acquisition and stewardship of fine art.
+                </p>
+              </div>
+
+              {/* FAQ Item 3 */}
+              <div className="bg-white p-8 lg:p-10">
+                <h3 className="governance-subtitle mb-4">
+                  Who can invest in art through Art Investment Group Trust?
+                </h3>
+                <p className="governance-description">
+                  Participation is limited to qualified purchasers, institutions, family offices, and approved partners through private conversations and governed access.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Private Conversations Section */}
         <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#ffffff'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
