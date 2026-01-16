@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
+import CookieConsent from "./components/CookieConsent";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
@@ -22,8 +23,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         {children}
+        <CookieConsent />
       </body>
     </html>
   );
 }
-
