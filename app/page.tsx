@@ -63,6 +63,7 @@ export default function Home() {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [heroImage, setHeroImage] = useState<string>("");
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
