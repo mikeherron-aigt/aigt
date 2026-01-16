@@ -739,7 +739,7 @@ export default function Home() {
         </section>
 
         {/* FAQ Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
+        <section className="w-full py-9 sm:py-12 lg:py-18" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             {/* Header */}
             <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20 max-w-[995px] mx-auto">
