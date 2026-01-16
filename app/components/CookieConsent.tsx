@@ -7,7 +7,6 @@ export default function CookieConsentBanner() {
   return (
     <CookieConsent
       location="bottom"
-      type="info"
       cookieName="aigt-cookie-consent"
       style={{
         background: "#f5f5f5",
