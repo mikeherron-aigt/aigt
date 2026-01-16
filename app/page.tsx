@@ -11,6 +11,18 @@ interface ArtworkItem {
   year: string;
 }
 
+const heroImages = [
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fffdf589de0bc4ea786d46b0d19e5477d?format=webp&width=800",
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fecd9bd97bdd94631b8bd359628504a86?format=webp&width=800",
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F78f0641dd09441d8940c7e4a70caaa37?format=webp&width=800",
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd55dfac4060d4f0eb36a87b0891cb969?format=webp&width=800",
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F1966a05cfb05418da8649eee471aebbb?format=webp&width=800",
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F25168eaaf54c432d92f9ef91b0c70273?format=webp&width=800",
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F8ea49871f2d147b9b748f6894c7520ad?format=webp&width=800",
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fdd0cfe564a194c7fb87c735f9d338e43?format=webp&width=800",
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fc0a258d5cae343aea89a7c36e3767fe2?format=webp&width=800"
+];
+
 const artworkData: ArtworkItem[] = [
   {
     src: "https://api.builder.io/api/v1/image/assets/TEMP/25ee69383552e9f873f3551083817292fb7fbc14?width=539",
@@ -51,6 +63,7 @@ export default function Home() {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [heroImage, setHeroImage] = useState<string>("");
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
@@ -130,6 +143,11 @@ export default function Home() {
     }
   }, [isModalOpen]);
 
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * heroImages.length);
+    setHeroImage(heroImages[randomIndex]);
+  }, []);
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
@@ -194,14 +212,16 @@ export default function Home() {
             {/* Image Column */}
             <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
               <div className="absolute inset-0">
-                <Image
-                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fffdf589de0bc4ea786d46b0d19e5477d?format=webp&width=800"
-                  alt="Cultural artwork representing the trust's collection"
-                  fill
-                  className="object-cover object-center"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
+                {heroImage && (
+                  <Image
+                    src={heroImage}
+                    alt="Cultural artwork representing the trust's collection"
+                    fill
+                    className="object-cover object-center"
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                )}
               </div>
             </div>
           </div>
