@@ -5,11 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { trackFormSubmission } from "../lib/gtm";
 
-export const metadata = {
-  title: "Request Access | Art Investment Group Trust",
-  description: "Request access to Art Investment Group Trust to begin a private conversation about participation in our governed art investment and stewardship platforms.",
-};
-
 interface FormData {
   fullName: string;
   email: string;
