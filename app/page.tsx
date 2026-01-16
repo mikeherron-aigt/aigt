@@ -214,7 +214,7 @@ export default function Home() {
         {/* Footer Bar - Full Width */}
         <div className="w-full h-[36px] relative hidden lg:block" style={{boxSizing: 'border-box'}}>
           {/* Left portion - Gallery Plaster */}
-          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', width: 'calc((100vw - 1440px) / 2 + 864px)'}}></div>
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{boxSizing: 'border-box', width: 'calc((100vw - 1440px) / 2 + 832px)'}}></div>
           {/* Right portion - Ledger Stone */}
           <div className="absolute top-0 h-full bg-ledger-stone" style={{boxSizing: 'border-box', left: 'calc((100vw - 1440px) / 2 + 864px)', right: '0'}}></div>
 
