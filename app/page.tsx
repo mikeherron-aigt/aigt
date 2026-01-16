@@ -118,6 +118,14 @@ const artworkData: ArtworkItem[] = [
   }
 ];
 
+const governanceImage: ArtworkItem = {
+  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F409e962a5a31455bac419bcb11ccf171?format=webp&width=800",
+  title: "Contemporary Governance",
+  artist: "John Dowling Jr.",
+  year: "Contemporary",
+  collection: "Cosmic Dreams Collection"
+};
+
 export default function Home() {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
