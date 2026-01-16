@@ -1,23 +1,15 @@
 /** @type {import('next-sitemap').IConfig} */
 const config = {
-  siteUrl: process.env.SITE_URL || 'https://artinvestmentgrouptrust.com',
-  generateRobotsTxt: false, // We're using a manual robots.txt
+  siteUrl: 'https://artinvestmentgrouptrust.com',
+  generateRobotsTxt: false,
   sitemapSize: 50000,
   changefreq: 'weekly',
   priority: 0.7,
   exclude: [
     '/api/*',
-    '/request-access/thank-you',
+    '/*.xml',
+    '/*.txt',
   ],
-  robotsTxtOptions: {
-    policies: [
-      {
-        userAgent: '*',
-        allow: '/',
-        disallow: '/api/',
-      },
-    ],
-  },
   additionalPaths: async (config) => {
     return [
       {
