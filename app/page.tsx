@@ -219,8 +219,8 @@ export default function Home() {
           <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc((100vw - 1440px) / 2 + 864px)', right: '0'}}></div>
 
           {/* Centered container for dark green square */}
-          <div className="h-full relative flex justify-center hidden lg:flex">
-            <div className="w-full max-w-[1440px] h-[36px] relative">
+          <div className="w-full h-full relative flex justify-center hidden lg:flex">
+            <div className="max-w-[1440px] h-[36px] relative" style={{width: '1440px'}}>
               {/* Dark green square at intersection */}
               <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
             </div>
