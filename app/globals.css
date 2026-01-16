@@ -2112,6 +2112,7 @@ footer {
 }
 
 /* Mobile Menu Button */
-.mobile-menu-button {
+.mobile-menu-button.btn-primary {
   justify-content: flex-start !important;
+  padding-left: 0 !important;
 }
