@@ -25,34 +25,82 @@ const heroImages = [
 
 const artworkData: ArtworkItem[] = [
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/25ee69383552e9f873f3551083817292fb7fbc14?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F270bfbf622d44bb58da3863d2d4a1416?format=webp&width=800",
+    title: "80s Series #2",
+    artist: "John Dowling",
+    year: "Contemporary"
   },
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/313b3f436ad7a871d72459a182f82360d9123c0e?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0b223e89165544369065645eb9e01981?format=webp&width=800",
+    title: "80s Series #25",
+    artist: "John Dowling",
+    year: "Contemporary"
   },
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/8d3bcb814a5fd11404bd954a1295075a5be7f529?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F412947b95d6b487f8e94d9db43269338?format=webp&width=800",
+    title: "80s Series #14",
+    artist: "John Dowling",
+    year: "Contemporary"
   },
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/d2c57baf20a78edb5c4e08b53ad5b7b52298bd73?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F41a3331c307447f9a770facf2b3f3f7b?format=webp&width=800",
+    title: "80s Series #53",
+    artist: "John Dowling",
+    year: "Contemporary"
   },
   {
-    src: "https://api.builder.io/api/v1/image/assets/TEMP/7fa7dcff6f05eaec42b8b896c2be111486030e46?width=539",
-    title: "Artwork Painting Title",
-    artist: "Artist Name",
-    year: "1995"
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F08edb5409851472b964e3c762012ec12?format=webp&width=800",
+    title: "80s Series #38",
+    artist: "John Dowling",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0758ca8fed06418c994a30eac779317f?format=webp&width=800",
+    title: "80s Series #68",
+    artist: "John Dowling",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F99ae9a973978458da61eddb794151497?format=webp&width=800",
+    title: "80s Series #99",
+    artist: "John Dowling",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2249d103ff824a26a277d0c413cf9c9c?format=webp&width=800",
+    title: "Cosmic Dreams #001451",
+    artist: "John Dowling",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F5aecfbbcd4cf49d98bf9a1eb9b2b08e9?format=webp&width=800",
+    title: "80s Series #8",
+    artist: "John Dowling",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F57017ec8c4284ef3897083c05ccb4a39?format=webp&width=800",
+    title: "80s Series #32",
+    artist: "John Dowling",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4b0284b925464d1d9c172bd648f259e3?format=webp&width=800",
+    title: "80s Series #29",
+    artist: "John Dowling",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fe0ebfc6ee0a247898c870f509e743ab0?format=webp&width=800",
+    title: "80s Series #43",
+    artist: "John Dowling",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fa85281a076fa48b4b997fac1adf8470a?format=webp&width=800",
+    title: "80s Series #123",
+    artist: "John Dowling",
+    year: "Contemporary"
   }
 ];
 
