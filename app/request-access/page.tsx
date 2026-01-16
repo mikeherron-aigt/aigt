@@ -62,6 +62,9 @@ export default function RequestAccessPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Track form submission to GTM
+      trackFormSubmission('access_request_form');
+
       const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
