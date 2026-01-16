@@ -150,6 +150,23 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [heroImage, setHeroImage] = useState<string>("");
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const faqItems = [
+    {
+      question: "What is an art investment fund?",
+      answer: "An art investment fund is a structured vehicle that acquires and holds artworks as long term assets, typically emphasizing governance, custody, and preservation rather than short term buying and selling."
+    },
+    {
+      question: "How does institutional art investment work?",
+      answer: "Institutional art investment applies governance frameworks, professional custody standards, and long horizon ownership principles to the acquisition and stewardship of fine art."
+    },
+    {
+      question: "Who can invest in art through Art Investment Group Trust?",
+      answer: "Participation is limited to qualified purchasers, institutions, family offices, and approved partners through private conversations and governed access."
+    }
+  ];
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
@@ -239,7 +256,7 @@ export default function Home() {
       {/* Header */}
       <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-6 sm:py-8 lg:py-12">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 relative">
             {/* Logo */}
             <div className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
               <Image
@@ -252,8 +269,8 @@ export default function Home() {
               />
             </div>
 
-            {/* Navigation */}
-            <nav className="flex items-center gap-8 ml-auto">
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8 ml-auto">
               <Link href="/about" className="nav-link">About</Link>
               <a href="#investment-offerings" className="nav-link">Offerings</a>
               <a href="#gallery" className="nav-link">Gallery</a>
@@ -261,6 +278,74 @@ export default function Home() {
               <span className="nav-separator">|</span>
               <Link href="/request-access" className="btn-primary">Request Access</Link>
             </nav>
+
+            {/* Mobile/Tablet Hamburger Menu */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden ml-auto p-2 text-archive-slate hover:opacity-70 transition-opacity"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMenuOpen}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+
+            {/* Mobile/Tablet Dropdown Menu */}
+            {isMenuOpen && (
+              <nav className="lg:hidden absolute top-full right-0 left-0 bg-white border-t border-gallery-plaster shadow-md mt-2 z-50">
+                <div className="flex flex-col p-4 sm:p-6 gap-6">
+                  <Link
+                    href="/about"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <a
+                    href="#investment-offerings"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Offerings
+                  </a>
+                  <a
+                    href="#gallery"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Gallery
+                  </a>
+                  <a
+                    href="#stewardship-in-practice"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Stewardship
+                  </a>
+                  <div className="border-t border-gallery-plaster pt-4">
+                    <Link
+                      href="/request-access"
+                      className="btn-primary mobile-menu-button w-full"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Request Access
+                    </Link>
+                  </div>
+                </div>
+              </nav>
+            )}
           </div>
         </div>
       </header>
@@ -316,6 +401,23 @@ export default function Home() {
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
           <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
         </div>
+
+        {/* New Info Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[711px]">
+              <h2 className="governance-title">
+                Art Investment, Structured for the Long Term
+              </h2>
+              <p className="governance-description">
+                Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
+              </p>
+              <p className="governance-description">
+                Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* Footer Bar - Full Width */}
         <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
@@ -538,7 +640,7 @@ export default function Home() {
               </div>
 
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center pt-8 sm:pt-12 lg:pt-0">
                 <div className="max-w-[579px]">
                   <h2 className="one-standard-title">
                     One Standard Across Mediums
@@ -632,6 +734,62 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            {/* Header */}
+            <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20 max-w-[995px] mx-auto">
+              <h2 className="section-heading text-center">
+                Art Investment and Stewardship FAQs
+              </h2>
+            </div>
+
+            {/* FAQ Accordion Items */}
+            <div className="max-w-[900px] mx-auto space-y-4 lg:space-y-6">
+              {faqItems.map((item, index) => (
+                <div key={index} className="bg-white overflow-hidden">
+                  <button
+                    onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                    className="w-full text-left p-6 lg:p-8 flex items-start justify-between gap-4 hover:bg-gray-50 transition-colors duration-200"
+                    aria-expanded={expandedFAQ === index}
+                    aria-controls={`faq-answer-${index}`}
+                  >
+                    <h3 className="governance-subtitle m-0">
+                      {item.question}
+                    </h3>
+                    <svg
+                      className={`flex-shrink-0 w-6 h-6 text-archive-slate transition-transform duration-300 mt-1 ${
+                        expandedFAQ === index ? 'rotate-180' : ''
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                      />
+                    </svg>
+                  </button>
+
+                  {expandedFAQ === index && (
+                    <div
+                      id={`faq-answer-${index}`}
+                      className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-gallery-plaster"
+                    >
+                      <p className="governance-description">
+                        {item.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </section>

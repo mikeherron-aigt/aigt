@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 interface TeamMember {
   name: string;
@@ -13,61 +14,63 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: "John Joseph Dowling Jr.",
-    title: "Board Member; Chairman; Acting CEO",
-    description: "Founder and artist steward overseeing catalog integrity and long-term cultural vision.",
+    title: "Board Member; Chairman; Chief Visionary Officer",
+    description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400"
   },
   {
     name: "Jose Bracho",
     title: "Board Member; Chief Business Development Officer",
-    description: "International business development leader driving strategic partnerships and institutional growth initiatives.",
+    description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400"
   },
   {
     name: "Luis Cortes",
     title: "Board Member; Global Director of Art Acquisitions; Chief Revenue Officer",
-    description: "Global art acquisitions leader with deep market access and institutional sourcing expertise.",
+    description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fbed6d284517842c4b5dd155c3023e20f?format=webp&width=400"
   },
   {
     name: "Steve Duren",
     title: "Board Member; Chief Commercial Officer",
-    description: "Commercial strategy leader focused on revenue architecture and domestic deal execution.",
+    description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb25ae8084fb345bb8e78dd40e7afe448?format=webp&width=400"
   },
   {
     name: "Mike Herron",
     title: "Board Member; Chief Marketing Officer",
-    description: "Marketing and brand strategist specializing in institutional positioning and narrative discipline.",
+    description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400"
   },
   {
     name: "Jay O'Malley",
     title: "Board Member; Chief Investment Officer",
-    description: "Chief Investment Officer with institutional capital markets and fiduciary governance experience.",
+    description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400"
   },
   {
     name: "Olivia Philips",
     title: "Board Member; Chief Operating Officer",
-    description: "Operations, cybersecurity and governance leader focused on execution, compliance, and organizational discipline.",
+    description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400"
   },
   {
     name: "Daniel Sloan",
     title: "Board Member; Chief Technology Officer",
-    description: "Technology and infrastructure executive overseeing platform architecture and systems integrity.",
+    description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400"
   }
 ];
 
 export default function AboutPage() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* Header */}
       <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-6 sm:py-8 lg:py-12">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 relative">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
               <Image
@@ -80,8 +83,8 @@ export default function AboutPage() {
               />
             </Link>
 
-            {/* Navigation */}
-            <nav className="flex items-center gap-8 ml-auto">
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8 ml-auto">
               <Link href="/about" className="nav-link">About</Link>
               <Link href="/#investment-offerings" className="nav-link">Offerings</Link>
               <Link href="/#gallery" className="nav-link">Gallery</Link>
@@ -89,6 +92,74 @@ export default function AboutPage() {
               <span className="nav-separator">|</span>
               <Link href="/request-access" className="btn-primary">Request Access</Link>
             </nav>
+
+            {/* Mobile/Tablet Hamburger Menu */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden ml-auto p-2 text-archive-slate hover:opacity-70 transition-opacity"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMenuOpen}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+
+            {/* Mobile/Tablet Dropdown Menu */}
+            {isMenuOpen && (
+              <nav className="lg:hidden absolute top-full right-0 left-0 bg-white border-t border-gallery-plaster shadow-md mt-2 z-50">
+                <div className="flex flex-col p-4 sm:p-6 gap-6">
+                  <Link
+                    href="/about"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <a
+                    href="/#investment-offerings"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Offerings
+                  </a>
+                  <a
+                    href="/#gallery"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Gallery
+                  </a>
+                  <a
+                    href="/#stewardship-in-practice"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Stewardship
+                  </a>
+                  <div className="border-t border-gallery-plaster pt-4">
+                    <Link
+                      href="/request-access"
+                      className="btn-primary mobile-menu-button w-full"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Request Access
+                    </Link>
+                  </div>
+                </div>
+              </nav>
+            )}
           </div>
         </div>
       </header>
@@ -129,6 +200,17 @@ export default function AboutPage() {
                   sizes="(max-width: 1024px) 100vw, 601px"
                 />
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Definition Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20 border-b border-gallery-plaster">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[711px]">
+              <p className="text-[16px] sm:text-[18px] lg:text-[16px] leading-[26px] text-archive-slate">
+                Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
+              </p>
             </div>
           </div>
         </section>
@@ -220,6 +302,34 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* What We Mean by Art Stewardship Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[711px]">
+              <h2 className="governance-title">
+                What We Mean by Art Stewardship
+              </h2>
+              <p className="governance-description">
+                Art stewardship at Art Investment Group Trust refers to the responsible acquisition, governance, custody, and long term ownership of culturally significant artworks. Stewardship prioritizes preservation, legitimacy, and continuity over liquidity or short term financial outcomes.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Art as a Long Term Alternative Investment Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[711px]">
+              <h2 className="governance-title">
+                Art as a Long Term Alternative Investment
+              </h2>
+              <p className="governance-description">
+                Art is increasingly recognized as an alternative investment asset class when approached with institutional discipline. Art Investment Group Trust structures art ownership to support long duration holding periods, museum quality standards, and responsible capital alignment.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Team Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[120px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
@@ -238,29 +348,35 @@ export default function AboutPage() {
 
             {/* Team Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-[51px] lg:gap-y-[95px]">
-              {teamMembers.map((member, index) => (
-                <div key={index} className="flex flex-col items-center text-center">
-                  {/* Photo */}
-                  <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6">
-                    <Image
-                      src={member.imageUrl}
-                      alt={member.name}
-                      fill
-                      className="object-cover"
-                      sizes="102px"
-                    />
+              {teamMembers.map((member, index) => {
+                const titleParts = member.title.split('; ');
+                const boardMember = titleParts[0];
+                const role = titleParts.slice(1).join('; ');
+
+                return (
+                  <div key={index} className="flex flex-col items-center text-center">
+                    {/* Photo */}
+                    <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6">
+                      <Image
+                        src={member.imageUrl}
+                        alt={member.name}
+                        fill
+                        className="object-cover"
+                        sizes="102px"
+                      />
+                    </div>
+
+                    {/* Name */}
+                    <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>
+
+                    {/* Title */}
+                    <div className="team-member-title-wrapper">
+                      <p className="team-member-title">{boardMember}</p>
+                      <p className="team-member-title">{role}</p>
+                    </div>
                   </div>
-
-                  {/* Name */}
-                  <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>
-
-                  {/* Title */}
-                  <p className="team-member-title">{member.title}</p>
-
-                  {/* Description */}
-                  <p className="team-member-description">{member.description}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>

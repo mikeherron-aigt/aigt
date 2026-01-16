@@ -36,6 +36,7 @@ export default function RequestAccessPage() {
 
   const [charCount, setCharCount] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -120,7 +121,7 @@ export default function RequestAccessPage() {
       {/* Header */}
       <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
         <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-6 sm:py-8 lg:py-12">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 relative">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
               <Image
@@ -133,8 +134,8 @@ export default function RequestAccessPage() {
               />
             </Link>
 
-            {/* Navigation */}
-            <nav className="flex items-center gap-8 ml-auto">
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-8 ml-auto">
               <Link href="/about" className="nav-link">About</Link>
               <Link href="/#investment-offerings" className="nav-link">Offerings</Link>
               <Link href="/#gallery" className="nav-link">Gallery</Link>
@@ -142,6 +143,74 @@ export default function RequestAccessPage() {
               <span className="nav-separator">|</span>
               <Link href="/" className="btn-primary">Back to Home</Link>
             </nav>
+
+            {/* Mobile/Tablet Hamburger Menu */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden ml-auto p-2 text-archive-slate hover:opacity-70 transition-opacity"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMenuOpen}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+
+            {/* Mobile/Tablet Dropdown Menu */}
+            {isMenuOpen && (
+              <nav className="lg:hidden absolute top-full right-0 left-0 bg-white border-t border-gallery-plaster shadow-md mt-2 z-50">
+                <div className="flex flex-col p-4 sm:p-6 gap-6">
+                  <Link
+                    href="/about"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    About
+                  </Link>
+                  <a
+                    href="/#investment-offerings"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Offerings
+                  </a>
+                  <a
+                    href="/#gallery"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Gallery
+                  </a>
+                  <a
+                    href="/#stewardship-in-practice"
+                    className="nav-link text-base"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Stewardship
+                  </a>
+                  <div className="border-t border-gallery-plaster pt-4">
+                    <Link
+                      href="/"
+                      className="btn-primary mobile-menu-button w-full"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Back to Home
+                    </Link>
+                  </div>
+                </div>
+              </nav>
+            )}
           </div>
         </div>
       </header>
@@ -207,6 +276,13 @@ export default function RequestAccessPage() {
                 </h1>
                 <p className="request-access-description">
                   Access to Art Investment Group Trust, its platforms and conversations is considered and intentional. Requests are reviewed to ensure alignment with our stewardship philosophy and governance standards.
+                </p>
+              </div>
+
+              {/* Info Paragraph */}
+              <div className="mb-12 lg:mb-16 pb-8 lg:pb-12 border-b border-gallery-plaster">
+                <p className="governance-description">
+                  Access to Art Investment Group Trust platforms is limited to qualified purchasers, institutional participants, and approved cultural partners. Requests are reviewed to ensure alignment with our stewardship philosophy and regulatory requirements.
                 </p>
               </div>
 
