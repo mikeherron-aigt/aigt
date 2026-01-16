@@ -138,6 +138,17 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* Definition Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20 border-b border-gallery-plaster">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[711px]">
+              <p className="text-[16px] sm:text-[18px] lg:text-[16px] leading-[26px] text-archive-slate">
+                Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* About John Dowling Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
