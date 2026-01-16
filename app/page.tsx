@@ -341,6 +341,9 @@ export default function Home() {
                 Art Investment, Structured for the Long Term
               </h2>
               <p className="governance-description">
+                Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
+              </p>
+              <p className="governance-description">
                 Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
               </p>
             </div>
