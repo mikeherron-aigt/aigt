@@ -1,8 +1,12 @@
 'use client';
 
-import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+
+export const metadata = {
+  title: "Art Stewardship Framework | Art Investment Group Trust",
+  description: "Learn how Art Investment Group Trust defines art stewardship through institutional governance, long term ownership, custody standards, and cultural preservation.",
+};
 
 interface TeamMember {
   name: string;
