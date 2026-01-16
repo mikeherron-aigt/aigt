@@ -202,7 +202,7 @@ export default function RequestAccessPage() {
                   <div className="border-t border-gallery-plaster pt-4">
                     <Link
                       href="/"
-                      className="btn-primary mobile-menu-button inline-block w-full"
+                      className="btn-primary mobile-menu-button w-full"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Back to Home
