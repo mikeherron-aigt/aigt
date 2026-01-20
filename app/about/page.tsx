@@ -45,7 +45,8 @@ const teamMembers: TeamMember[] = [
     name: "Olivia Philips",
     title: "Chief Operating Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/meetoliviaphillips/"
   },
   {
     name: "Mike Herron",
