@@ -384,7 +384,7 @@ export default function AboutPage() {
                     {/* Title */}
                     <div className="team-member-title-wrapper">
                       <p className="team-member-title">{boardMember}</p>
-                      <p className="team-member-title">{role}</p>
+                      {role && <p className="team-member-title">{role}</p>}
                     </div>
                   </div>
                 );
