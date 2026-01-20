@@ -9,6 +9,7 @@ interface TeamMember {
   title: string;
   description: string;
   imageUrl: string;
+  linkedinUrl?: string;
 }
 
 const teamMembers: TeamMember[] = [
