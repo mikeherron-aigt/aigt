@@ -17,25 +17,29 @@ const teamMembers: TeamMember[] = [
     name: "Justin Fien",
     title: "Chairman",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0a20bbeb53d14e0eb90701446fed69fc?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0a20bbeb53d14e0eb90701446fed69fc?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/justin-fien-9a8763107/"
   },
   {
     name: "John Joseph Dowling Jr.",
     title: "Chief Visionary Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/johndowlingjr/"
   },
   {
     name: "Jay O'Malley",
     title: "Chief Executive Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/jay-o-malley-8102761b0/"
   },
   {
     name: "Steve Duren",
     title: "Chief Commercial Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb25ae8084fb345bb8e78dd40e7afe448?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb25ae8084fb345bb8e78dd40e7afe448?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/steve-duren/"
   },
   {
     name: "Olivia Philips",
@@ -47,31 +51,36 @@ const teamMembers: TeamMember[] = [
     name: "Mike Herron",
     title: "Chief Marketing Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/mherron54/"
   },
   {
     name: "Jose Bracho",
     title: "Chief Business Development Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/jose-bracho-900557125/"
   },
   {
     name: "Daniel Sloan",
     title: "Chief Technology Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/sloandaniel/"
   },
   {
     name: "Abdur Nimeri",
     title: "Chief Investment Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F603a49449dd7440ba868f514734aaa6d?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F603a49449dd7440ba868f514734aaa6d?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/abdur-nimeri-52b11721/"
   },
   {
     name: "Dennis Epperson",
     title: "Chief Financial Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4e10a705bbf7443c852fffa71aa20159?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4e10a705bbf7443c852fffa71aa20159?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/dennisepperson/"
   }
 ];
 
