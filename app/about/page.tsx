@@ -392,6 +392,27 @@ export default function AboutPage() {
 
                     {/* Title */}
                     <p className="team-member-title">{member.title}</p>
+
+                    {/* LinkedIn Icon */}
+                    {member.linkedinUrl && (
+                      <a
+                        href={member.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center justify-center w-5 h-5 text-archive-slate hover:opacity-70 transition-opacity"
+                        aria-label={`Visit ${member.name}'s LinkedIn profile`}
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M18.4 0H1.6C0.72 0 0 0.72 0 1.6v16.8C0 19.28 0.72 20 1.6 20h16.8c0.88 0 1.6-0.72 1.6-1.6V1.6C20 0.72 19.28 0 18.4 0zM6 17H3V8h3v9zm-1.5-10.24c-0.96 0-1.74-0.78-1.74-1.74s0.78-1.74 1.74-1.74 1.74 0.78 1.74 1.74-0.78 1.74-1.74 1.74zM17 17h-3v-4.74c0-1.12-0.04-2.58-1.58-2.58-1.58 0-1.82 1.24-1.82 2.52V17h-3V8h2.88v1.24h0.04c0.4-0.76 1.38-1.56 2.86-1.56 3.06 0 3.62 2.02 3.62 4.64V17z" />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 );
               })}
