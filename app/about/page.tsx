@@ -400,7 +400,10 @@ export default function AboutPage() {
                         href={member.linkedinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center justify-center w-5 h-5 text-archive-slate hover:opacity-70 transition-opacity"
+                        className="mt-3 inline-flex items-center justify-center w-5 h-5 transition-colors"
+                        style={{color: 'var(--archive-slate, #555)'}}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = '#0A66C2')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--archive-slate, #555)')}
                         aria-label={`Visit ${member.name}'s LinkedIn profile`}
                       >
                         <svg
