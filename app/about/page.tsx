@@ -361,10 +361,6 @@ export default function AboutPage() {
             {/* Team Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-[51px] lg:gap-y-[95px]">
               {teamMembers.map((member, index) => {
-                const titleParts = member.title.split('; ');
-                const boardMember = titleParts[0];
-                const role = titleParts.slice(1).join('; ');
-
                 return (
                   <div key={index} className="flex flex-col items-center text-center">
                     {/* Photo */}
@@ -381,11 +377,11 @@ export default function AboutPage() {
                     {/* Name */}
                     <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>
 
+                    {/* Board Member Badge */}
+                    <p className="team-member-board-badge" style={{fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 'bold', fontSize: '14px', marginTop: '4px', marginBottom: '2px'}}>Board Member</p>
+
                     {/* Title */}
-                    <div className="team-member-title-wrapper">
-                      <p className="team-member-title">{boardMember}</p>
-                      {role && <p className="team-member-title">{role}</p>}
-                    </div>
+                    <p className="team-member-title">{member.title}</p>
                   </div>
                 );
               })}
