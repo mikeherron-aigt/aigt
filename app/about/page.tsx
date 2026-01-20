@@ -9,6 +9,7 @@ interface TeamMember {
   title: string;
   description: string;
   imageUrl: string;
+  linkedinUrl?: string;
 }
 
 const teamMembers: TeamMember[] = [
@@ -16,61 +17,71 @@ const teamMembers: TeamMember[] = [
     name: "Justin Fien",
     title: "Chairman",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0a20bbeb53d14e0eb90701446fed69fc?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0a20bbeb53d14e0eb90701446fed69fc?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/justin-fien-9a8763107/"
   },
   {
     name: "John Joseph Dowling Jr.",
     title: "Chief Visionary Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/johndowlingjr/"
   },
   {
     name: "Jay O'Malley",
     title: "Chief Executive Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/jay-o-malley-8102761b0/"
   },
   {
     name: "Steve Duren",
     title: "Chief Commercial Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb25ae8084fb345bb8e78dd40e7afe448?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb25ae8084fb345bb8e78dd40e7afe448?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/steve-duren/"
   },
   {
     name: "Olivia Philips",
     title: "Chief Operating Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/meetoliviaphillips/"
   },
   {
     name: "Mike Herron",
     title: "Chief Marketing Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/mherron54/"
   },
   {
     name: "Jose Bracho",
     title: "Chief Business Development Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/jose-bracho-900557125/"
   },
   {
     name: "Daniel Sloan",
     title: "Chief Technology Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/sloandaniel/"
   },
   {
     name: "Abdur Nimeri",
     title: "Chief Investment Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F603a49449dd7440ba868f514734aaa6d?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F603a49449dd7440ba868f514734aaa6d?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/abdur-nimeri-52b11721/"
   },
   {
     name: "Dennis Epperson",
     title: "Chief Financial Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4e10a705bbf7443c852fffa71aa20159?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4e10a705bbf7443c852fffa71aa20159?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/dennisepperson/"
   }
 ];
 
@@ -361,18 +372,33 @@ export default function AboutPage() {
             {/* Team Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-[51px] lg:gap-y-[95px]">
               {teamMembers.map((member, index) => {
+                const photoElement = (
+                  <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6 hover:opacity-80 transition-opacity cursor-pointer">
+                    <Image
+                      src={member.imageUrl}
+                      alt={member.name}
+                      fill
+                      className="object-cover"
+                      sizes="102px"
+                    />
+                  </div>
+                );
+
                 return (
                   <div key={index} className="flex flex-col items-center text-center">
                     {/* Photo */}
-                    <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6">
-                      <Image
-                        src={member.imageUrl}
-                        alt={member.name}
-                        fill
-                        className="object-cover"
-                        sizes="102px"
-                      />
-                    </div>
+                    {member.linkedinUrl ? (
+                      <a
+                        href={member.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Visit ${member.name}'s LinkedIn profile`}
+                      >
+                        {photoElement}
+                      </a>
+                    ) : (
+                      photoElement
+                    )}
 
                     {/* Name */}
                     <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>
@@ -382,6 +408,30 @@ export default function AboutPage() {
 
                     {/* Title */}
                     <p className="team-member-title">{member.title}</p>
+
+                    {/* LinkedIn Icon */}
+                    {member.linkedinUrl && (
+                      <a
+                        href={member.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center justify-center w-5 h-5 transition-colors"
+                        style={{color: 'var(--archive-slate, #555)'}}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = '#0A66C2')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--archive-slate, #555)')}
+                        aria-label={`Visit ${member.name}'s LinkedIn profile`}
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M18.4 0H1.6C0.72 0 0 0.72 0 1.6v16.8C0 19.28 0.72 20 1.6 20h16.8c0.88 0 1.6-0.72 1.6-1.6V1.6C20 0.72 19.28 0 18.4 0zM6 17H3V8h3v9zm-1.5-10.24c-0.96 0-1.74-0.78-1.74-1.74s0.78-1.74 1.74-1.74 1.74 0.78 1.74 1.74-0.78 1.74-1.74 1.74zM17 17h-3v-4.74c0-1.12-0.04-2.58-1.58-2.58-1.58 0-1.82 1.24-1.82 2.52V17h-3V8h2.88v1.24h0.04c0.4-0.76 1.38-1.56 2.86-1.56 3.06 0 3.62 2.02 3.62 4.64V17z" />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 );
               })}
