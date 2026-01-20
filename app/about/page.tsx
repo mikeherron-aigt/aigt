@@ -325,33 +325,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* What We Mean by Art Stewardship Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="max-w-[711px]">
-              <h2 className="governance-title">
-                What We Mean by Art Stewardship
-              </h2>
-              <p className="governance-description">
-                Art stewardship at Art Investment Group Trust refers to the responsible acquisition, governance, custody, and long term ownership of culturally significant artworks. Stewardship prioritizes preservation, legitimacy, and continuity over liquidity or short term financial outcomes.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Art as a Long Term Alternative Investment Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="max-w-[711px]">
-              <h2 className="governance-title">
-                Art as a Long Term Alternative Investment
-              </h2>
-              <p className="governance-description">
-                Art is increasingly recognized as an alternative investment asset class when approached with institutional discipline. Art Investment Group Trust structures art ownership to support long duration holding periods, museum quality standards, and responsible capital alignment.
-              </p>
-            </div>
-          </div>
-        </section>
 
         {/* Team Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[120px]">
