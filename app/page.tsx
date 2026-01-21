@@ -153,6 +153,9 @@ export default function Home() {
   const [heroImage, setHeroImage] = useState<string>("");
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
+  const [isVideoHovered, setIsVideoHovered] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const faqItems = [
     {
@@ -220,6 +223,21 @@ export default function Home() {
     });
   };
 
+  const toggleSubtitles = () => {
+    if (!videoRef.current) return;
+    const newState = !subtitlesEnabled;
+    const textTracks = videoRef.current.textTracks;
+
+    if (textTracks && textTracks.length > 0) {
+      for (let i = 0; i < textTracks.length; i++) {
+        if (textTracks[i].kind === 'subtitles' || textTracks[i].kind === 'captions') {
+          textTracks[i].mode = newState ? 'showing' : 'hidden';
+        }
+      }
+    }
+    setSubtitlesEnabled(newState);
+  };
+
   const openModal = (artwork: ArtworkItem) => {
     setSelectedImage(artwork);
     setIsModalOpen(true);
@@ -250,6 +268,44 @@ export default function Home() {
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * heroImages.length);
     setHeroImage(heroImages[randomIndex]);
+  }, []);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+
+    const handleLoadedMetadata = () => {
+      const textTracks = video.textTracks;
+      if (textTracks && textTracks.length > 0) {
+        for (let i = 0; i < textTracks.length; i++) {
+          const track = textTracks[i];
+          if (track.kind === 'subtitles' || track.kind === 'captions') {
+            // Explicitly set to showing mode
+            track.mode = 'showing';
+            setSubtitlesEnabled(true);
+          }
+        }
+      }
+    };
+
+    // Try to enable subtitles after a small delay to ensure tracks are loaded
+    const timeoutId = setTimeout(() => {
+      if (video.textTracks && video.textTracks.length > 0) {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          if (video.textTracks[i].kind === 'subtitles' || video.textTracks[i].kind === 'captions') {
+            video.textTracks[i].mode = 'showing';
+          }
+        }
+      }
+    }, 500);
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      clearTimeout(timeoutId);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
   }, []);
 
   return (
@@ -455,28 +511,53 @@ export default function Home() {
 
               {/* Video Embed */}
               <div
-                className="w-full relative video-container"
-                style={{ aspectRatio: '16 / 9' }}
+                className="video-container-wrapper"
                 onMouseEnter={(e) => {
                   const video = e.currentTarget.querySelector('video');
                   if (video) video.controls = true;
+                  setIsVideoHovered(true);
                 }}
                 onMouseLeave={(e) => {
                   const video = e.currentTarget.querySelector('video');
                   if (video) video.controls = false;
+                  setIsVideoHovered(false);
                 }}
               >
                 <video
+                  ref={videoRef}
+                  className="video-element"
                   width="100%"
                   height="100%"
                   autoPlay
                   muted
-                  style={{ border: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                  crossOrigin="anonymous"
                 >
                   <source src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ff3b28b352ad0461ba487be029ca85fa4?alt=media&token=96924fb3-b2c5-49c6-bb22-1ad36aba0d90&apiKey=5031849ff5814a4cae6f958ac9f10229" type="video/mp4" />
-                  <track kind="subtitles" src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2F977fb0a4bd104eb698dfaccf89d6fa68?alt=media&token=106ec448-76f2-4f2b-83bc-e9a41b40201e&apiKey=5031849ff5814a4cae6f958ac9f10229" srcLang="en" label="English" default />
+                  <track kind="subtitles" src="/aigt.vtt" srcLang="en" label="English" default />
                   Your browser does not support the video tag.
                 </video>
+                <button
+                  onClick={toggleSubtitles}
+                  className={`video-subtitles-button ${isVideoHovered ? 'video-subtitles-visible' : ''}`}
+                  aria-label={subtitlesEnabled ? 'Disable subtitles' : 'Enable subtitles'}
+                  title={subtitlesEnabled ? 'Disable subtitles' : 'Enable subtitles'}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <line x1="8" y1="10" x2="16" y2="10" />
+                    <line x1="8" y1="14" x2="13" y2="14" />
+                  </svg>
+                  <span className="video-subtitles-label">{subtitlesEnabled ? 'CC On' : 'CC Off'}</span>
+                </button>
               </div>
             </div>
           </div>

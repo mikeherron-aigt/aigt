@@ -1598,6 +1598,82 @@ footer {
   }
 }
 
+/* Video Container Styles */
+.video-container-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.video-element {
+  border: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.video-subtitles-button {
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 12px !important;
+  background: rgba(0, 0, 0, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: white !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
+  transition: opacity 0.2s ease !important;
+  z-index: 10000 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.video-container-wrapper:hover .video-subtitles-button {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.video-subtitles-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+.video-subtitles-button:hover {
+  background: rgba(0, 0, 0, 0.95);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.video-subtitles-button:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.video-subtitles-button svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+.video-subtitles-label {
+  white-space: nowrap;
+  font-size: 13px;
+}
+
 .team-section-title {
   color: var(--archive-slate) !important;
   font-family: Georgia, serif !important;
