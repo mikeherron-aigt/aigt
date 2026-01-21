@@ -471,7 +471,6 @@ export default function Home() {
                   height="100%"
                   autoPlay
                   muted
-                  loop
                   style={{ border: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                 >
                   <source src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ff3b28b352ad0461ba487be029ca85fa4?alt=media&token=96924fb3-b2c5-49c6-bb22-1ad36aba0d90&apiKey=5031849ff5814a4cae6f958ac9f10229" type="video/mp4" />
