@@ -711,7 +711,7 @@ export default function Home() {
               </div>
 
               {/* Fund Cards */}
-              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full mt-16">
                   {/* Ethereum Art Fund Card */}
                   <div className="fund-card">
                     <div className="fund-card-content">
