@@ -295,7 +295,6 @@ export default function Home() {
               <a href="#investment-offerings" className="nav-link">Offerings</a>
               <a href="#gallery" className="nav-link">Gallery</a>
               <a href="#stewardship-in-practice" className="nav-link">Stewardship</a>
-              <span className="nav-separator">|</span>
               <Link href="/request-access" className="btn-primary">Request Access</Link>
             </nav>
 
