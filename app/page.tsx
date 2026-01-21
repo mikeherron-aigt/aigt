@@ -224,16 +224,12 @@ export default function Home() {
 
   const toggleSubtitles = () => {
     if (!videoRef.current) return;
-    const tracks = videoRef.current.querySelectorAll('track');
-    tracks.forEach(track => {
-      if (subtitlesEnabled) {
-        track.removeAttribute('default');
-      } else {
-        if (track.kind === 'subtitles') {
-          track.setAttribute('default', '');
-        }
+    const textTracks = videoRef.current.textTracks;
+    for (let i = 0; i < textTracks.length; i++) {
+      if (textTracks[i].kind === 'subtitles') {
+        textTracks[i].mode = subtitlesEnabled ? 'hidden' : 'showing';
       }
-    });
+    }
     setSubtitlesEnabled(!subtitlesEnabled);
   };
 
