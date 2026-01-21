@@ -220,7 +220,7 @@ export default function BluChipArtFundPage() {
         </section>
 
         {/* Four Pillars Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#f5f5f5'}}>
+        <section className="w-full pt-0 pb-12 sm:pt-4 sm:pb-16 lg:pt-8 lg:pb-[80px]" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {/* Pillar 1 */}
