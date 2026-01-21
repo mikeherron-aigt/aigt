@@ -453,16 +453,17 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* YouTube Video Embed */}
+              {/* Video Embed */}
               <div className="w-full relative" style={{ aspectRatio: '16 / 9' }}>
-                <iframe
+                <video
                   width="100%"
                   height="100%"
-                  src="https://www.youtube.com/embed/RjhN9uAkz-A?controls=0&modestbranding=1&rel=0&showinfo=0&fs=0"
-                  title="Art Investment Group Trust"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  style={{ border: 'none', position: 'absolute', top: 0, left: 0 }}
-                />
+                  controls
+                  style={{ border: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                >
+                  <source src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ff3b28b352ad0461ba487be029ca85fa4?alt=media&token=96924fb3-b2c5-49c6-bb22-1ad36aba0d90&apiKey=5031849ff5814a4cae6f958ac9f10229" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </div>
           </div>
