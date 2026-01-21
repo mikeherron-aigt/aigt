@@ -458,10 +458,9 @@ export default function Home() {
                 <iframe
                   width="100%"
                   height="100%"
-                  src="https://www.youtube.com/embed/RjhN9uAkz-A?controls=0&modestbranding=1&rel=0&showinfo=0"
+                  src="https://www.youtube.com/embed/RjhN9uAkz-A?controls=0&modestbranding=1&rel=0&showinfo=0&fs=0"
                   title="Art Investment Group Trust"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
                   style={{ border: 'none', position: 'absolute', top: 0, left: 0 }}
                 />
               </div>
