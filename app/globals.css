@@ -86,6 +86,12 @@ body {
   background-color: var(--gallery-plaster);
 }
 
+/* Extend hover area for offerings dropdown wrapper */
+nav > div:has(.offerings-dropdown) {
+  padding-bottom: 200px;
+  margin-bottom: -200px;
+}
+
 .nav-separator {
   color: var(--archive-slate);
   font-size: 16px;
