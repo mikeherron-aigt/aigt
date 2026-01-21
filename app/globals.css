@@ -1634,8 +1634,9 @@ footer {
   font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif !important;
   transition: opacity 0.2s ease !important;
   z-index: 10000 !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 .video-container-wrapper:hover .video-subtitles-button {
