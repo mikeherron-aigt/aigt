@@ -224,29 +224,29 @@ export default function BluChipArtFundPage() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {/* Pillar 1 */}
-              <div className="stewardship-card flex items-center justify-center text-center">
-                <h3 className="stewardship-card-title">
+              <div className="stewardship-card flex items-center justify-center">
+                <h3 className="stewardship-card-title" style={{textAlign: 'left'}}>
                   Long-Horizon<br />Ownership
                 </h3>
               </div>
 
               {/* Pillar 2 */}
-              <div className="stewardship-card flex items-center justify-center text-center">
-                <h3 className="stewardship-card-title">
+              <div className="stewardship-card flex items-center justify-center">
+                <h3 className="stewardship-card-title" style={{textAlign: 'left'}}>
                   Preservation-First<br />Stewardship
                 </h3>
               </div>
 
               {/* Pillar 3 */}
-              <div className="stewardship-card flex items-center justify-center text-center">
-                <h3 className="stewardship-card-title">
+              <div className="stewardship-card flex items-center justify-center">
+                <h3 className="stewardship-card-title" style={{textAlign: 'left'}}>
                   Selective and<br />Infrequent<br />Acquisition
                 </h3>
               </div>
 
               {/* Pillar 4 */}
-              <div className="stewardship-card flex items-center justify-center text-center">
-                <h3 className="stewardship-card-title">
+              <div className="stewardship-card flex items-center justify-center">
+                <h3 className="stewardship-card-title" style={{textAlign: 'left'}}>
                   Institutional<br />Custody and<br />Care
                 </h3>
               </div>
