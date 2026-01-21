@@ -143,7 +143,7 @@ export default function EthereumArtFundPage() {
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
                   <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb1d42ab547d340aa9bf1856e02ad4961?format=webp&width=800&height=1200"
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F349e5ab13a9c47e395981fd33e7bb58e?format=webp&width=800&height=1200"
                     alt="Ethereum-native digital artwork"
                     fill
                     className="object-cover object-center"
