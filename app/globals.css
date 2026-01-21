@@ -622,6 +622,10 @@ section:has(.slider-wrapper) {
   }
 }
 
+.fund-card-content .cta-primary {
+  margin-top: auto !important;
+}
+
 /* One Standard Section */
 .one-standard-title {
   color: var(--archive-slate);
