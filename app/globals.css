@@ -38,6 +38,12 @@ body {
   transition: opacity 0.2s;
 }
 
+.nav-link {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 .nav-link:hover {
   opacity: 0.7;
 }
