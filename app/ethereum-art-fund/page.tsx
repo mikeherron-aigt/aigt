@@ -209,6 +209,9 @@ export default function EthereumArtFundPage() {
               <p className="governance-subtitle" style={{textAlign: 'center', marginBottom: '0'}}>
                 The Ethereum Art Fund is differentiated from other Art Investment Group Trust stewardship platforms by its mandate.
               </p>
+              <p className="governance-description" style={{textAlign: 'center', marginBottom: '0'}}>
+                The Ethereum Art Fund was established with a clearly defined mandate. It operates at the intersection of cultural stewardship and evolving ownership models, engaging selectively with tokenization and fractional participation while maintaining institutional governance. This flexibility introduces additional risk and shorter time horizons, which are acknowledged and managed through structure rather than avoided.
+              </p>
             </div>
 
             {/* Four Pillars Grid */}
