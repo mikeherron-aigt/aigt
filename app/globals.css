@@ -624,6 +624,8 @@ section:has(.slider-wrapper) {
 
 .fund-card-content .cta-primary {
   margin-top: auto !important;
+  padding-top: 24px !important;
+  border-top: 1px solid #e5e5e5;
 }
 
 /* One Standard Section */
