@@ -90,8 +90,6 @@ body {
 /* Extend hover area for offerings dropdown wrapper */
 .offerings-dropdown-wrapper {
   position: relative;
-  padding-bottom: 200px;
-  margin-bottom: -200px;
 }
 
 .nav-separator {
