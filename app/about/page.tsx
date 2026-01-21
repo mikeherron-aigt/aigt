@@ -225,7 +225,25 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
+
+          {/* Decorative Elements - Positioned at bottom of image */}
+          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
+          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
         </section>
+
+        {/* Design Bar - Full Width */}
+        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
+          {/* Left portion - Gallery Plaster (extends to left edge of square) */}
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
+          {/* Right portion - Ledger Stone (starts at right edge of square) */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 105px)', right: '0'}}></div>
+
+          {/* Centered max-width container with square */}
+          <div className="max-w-[1440px] w-full h-full relative">
+            {/* Dark green square - same positioning as vertical bar */}
+            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+          </div>
+        </div>
 
         {/* Definition Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20 border-b border-gallery-plaster">
