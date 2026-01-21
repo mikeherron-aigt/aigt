@@ -417,13 +417,39 @@ export default function Home() {
                   >
                     About
                   </Link>
-                  <a
-                    href="#investment-offerings"
-                    className="nav-link text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Offerings
-                  </a>
+                  <div>
+                    <button
+                      onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
+                      className="nav-link text-base w-full text-left"
+                      aria-expanded={isOfferingsDropdownOpen}
+                    >
+                      Offerings
+                    </button>
+                    {isOfferingsDropdownOpen && (
+                      <div className="flex flex-col pl-4 gap-3 mt-2">
+                        <Link
+                          href="/ethereum-art-fund"
+                          className="nav-link text-base"
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setIsOfferingsDropdownOpen(false);
+                          }}
+                        >
+                          Ethereum Art Fund
+                        </Link>
+                        <Link
+                          href="/blue-chip-art-fund"
+                          className="nav-link text-base"
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setIsOfferingsDropdownOpen(false);
+                          }}
+                        >
+                          Blue Chip Art Fund
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                   <a
                     href="#gallery"
                     className="nav-link text-base"
