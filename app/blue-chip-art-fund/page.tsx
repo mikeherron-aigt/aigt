@@ -129,11 +129,14 @@ export default function BluChipArtFundPage() {
                     </p>
                   </div>
 
-                  {/* CTA Buttons */}
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-[18px] mt-12 sm:mt-16">
-                    <Link href="/request-access" className="cta-primary" style={{textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                      Request Access
-                    </Link>
+                  {/* Body Copy */}
+                  <div className="hero-description" style={{textAlign: 'left', marginTop: '24px'}}>
+                    <p>
+                      The Blue Chip Art Fund is a governed platform established to acquire, hold, and steward culturally and historically significant artworks within a long-duration ownership framework.
+                    </p>
+                    <p style={{marginTop: '16px'}}>
+                      Operating within the Art Investment Group Trust structure, the fund prioritizes preservation, provenance integrity, and continuity over liquidity or short-term market dynamics.
+                    </p>
                   </div>
                 </div>
               </div>
