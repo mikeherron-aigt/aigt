@@ -160,10 +160,10 @@ export default function BluChipArtFundPage() {
 
         {/* Institutional Stewardship Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Left Column - Institutional Stewardship */}
-              <div className="flex flex-col gap-4">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col gap-4">
                 <h2 className="governance-title" style={{textAlign: 'left', marginBottom: '8px'}}>
                   Institutional Stewardship<br />for Established Art
                 </h2>
@@ -176,7 +176,7 @@ export default function BluChipArtFundPage() {
               </div>
 
               {/* Right Column - Preservation-First Stewardship */}
-              <div className="flex flex-col gap-4 bg-paper-white p-8 lg:p-10">
+              <div className="flex flex-col gap-4 bg-paper-white p-8 lg:p-10 relative">
                 <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '16px'}}>
                   Preservation-First Stewardship
                 </h3>
