@@ -155,6 +155,8 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
+  const [isOfferingsDropdownOpen, setIsOfferingsDropdownOpen] = useState(false);
+  const offeringsDropdownRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const faqItems = [
