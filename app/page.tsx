@@ -472,8 +472,7 @@ export default function Home() {
 
               {/* Video Embed */}
               <div
-                className="w-full relative video-container"
-                style={{ aspectRatio: '16 / 9' }}
+                className="video-container-wrapper"
                 onMouseEnter={(e) => {
                   const video = e.currentTarget.querySelector('video');
                   if (video) video.controls = true;
@@ -484,16 +483,39 @@ export default function Home() {
                 }}
               >
                 <video
+                  ref={videoRef}
+                  className="video-element"
                   width="100%"
                   height="100%"
                   autoPlay
                   muted
-                  style={{ border: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                 >
                   <source src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ff3b28b352ad0461ba487be029ca85fa4?alt=media&token=96924fb3-b2c5-49c6-bb22-1ad36aba0d90&apiKey=5031849ff5814a4cae6f958ac9f10229" type="video/mp4" />
                   <track kind="subtitles" src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2F977fb0a4bd104eb698dfaccf89d6fa68?alt=media&token=106ec448-76f2-4f2b-83bc-e9a41b40201e&apiKey=5031849ff5814a4cae6f958ac9f10229" srcLang="en" label="English" default />
                   Your browser does not support the video tag.
                 </video>
+                <button
+                  onClick={toggleSubtitles}
+                  className="video-subtitles-button"
+                  aria-label={subtitlesEnabled ? 'Disable subtitles' : 'Enable subtitles'}
+                  title={subtitlesEnabled ? 'Disable subtitles' : 'Enable subtitles'}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <line x1="8" y1="10" x2="16" y2="10" />
+                    <line x1="8" y1="14" x2="13" y2="14" />
+                  </svg>
+                  <span className="video-subtitles-label">{subtitlesEnabled ? 'CC On' : 'CC Off'}</span>
+                </button>
               </div>
             </div>
           </div>
