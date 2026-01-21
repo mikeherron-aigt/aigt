@@ -426,50 +426,65 @@ export default function EthereumArtFundPage() {
                 Featured Works
               </h3>
 
-              {/* Images Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6 mb-6">
-                {[
-                  {
-                    src: "https://api.builder.io/api/v1/image/assets/TEMP/bf1425734f332533a074c41067eab96904592547?width=539",
-                    alt: "Featured artwork 1"
-                  },
-                  {
-                    src: "https://api.builder.io/api/v1/image/assets/TEMP/c449ed6d6c50481da77fcd400331fe03b0bd186f?width=539",
-                    alt: "Featured artwork 2"
-                  },
-                  {
-                    src: "https://api.builder.io/api/v1/image/assets/TEMP/35d9e20b231328fe15361b6f6b89e3dc2744cfce?width=539",
-                    alt: "Featured artwork 3"
-                  },
-                  {
-                    src: "https://api.builder.io/api/v1/image/assets/TEMP/6054acc63d39b4b9f9397cb08da9efd2770dc874?width=539",
-                    alt: "Featured artwork 4"
-                  },
-                  {
-                    src: "https://api.builder.io/api/v1/image/assets/TEMP/e44fc8c56a4ca0c1eaae9adcf85aa3a3d8c7f4f3?width=539",
-                    alt: "Featured artwork 5"
-                  }
-                ].map((artwork, index) => (
-                  <div key={index} className="relative w-full aspect-[247/206] overflow-hidden bg-gallery-plaster">
-                    <Image
-                      src={artwork.src}
-                      alt={artwork.alt}
-                      fill
-                      className="object-cover object-center"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                    />
-                  </div>
-                ))}
+              <div className="slider-container">
+                <div
+                  ref={sliderRef}
+                  className="artwork-slider"
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  style={{ cursor: isDragging ? 'grabbing' : 'grab', userSelect: 'none' }}
+                >
+                  {[...featuredWorksData, ...featuredWorksData].map((artwork, index) => (
+                    <div key={index} className="artwork-card">
+                      <button
+                        className="artwork-card-button"
+                        onClick={() => openModal(artwork)}
+                        aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
+                      >
+                        <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
+                          <Image
+                            src={artwork.src}
+                            alt={artwork.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                          />
+                        </div>
+                      </button>
+                      <div className="artwork-info">
+                        <h3 className="artwork-title">{artwork.title}</h3>
+                        <p className="artwork-details">{artwork.artist}<br />{artwork.collection || 'Cosmic Dreams Collection'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Artwork Info Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <div key={item} className="flex flex-col gap-1">
-                    <p className="artwork-title">Artwork Painting Title</p>
-                    <p className="artwork-details">Artist Name, Year Painting<br />1995</p>
-                  </div>
-                ))}
+              {/* Slider Navigation Arrows */}
+              <div className="flex justify-center items-center gap-6 mt-8">
+                <button
+                  onClick={() => scrollSlider('left')}
+                  className="slider-nav-arrow slider-nav-arrow-left"
+                  aria-label="Scroll left"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+                <button
+                  onClick={() => scrollSlider('right')}
+                  className="slider-nav-arrow slider-nav-arrow-right"
+                  aria-label="Scroll right"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
