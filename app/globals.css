@@ -1647,6 +1647,7 @@ footer {
 .video-subtitles-visible {
   opacity: 1 !important;
   pointer-events: auto !important;
+  visibility: visible !important;
 }
 
 .video-subtitles-button:hover {
