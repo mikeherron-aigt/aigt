@@ -254,44 +254,161 @@ export default function BluChipArtFundPage() {
           </div>
         </section>
 
-        {/* Fund Philosophy Section */}
-        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
-          <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
+        {/* Curatorial and Acquisition Focus Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="grid lg:grid-cols-[481px_1fr] gap-8 lg:gap-12 items-center">
+              {/* Image Column */}
+              <div className="relative w-full aspect-square overflow-hidden bg-gallery-plaster">
+                <Image
+                  src="https://api.builder.io/api/v1/image/assets/TEMP/3fcc0a77588d6a3d3a1383895fef7fdd4208516f?width=962"
+                  alt="Refined interior space representing long-term art stewardship"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 481px"
+                />
+              </div>
+
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-24 flex flex-col">
-                <div className="max-w-[579px]">
-                  <h2 className="governance-title">
-                    Disciplined Acquisition
-                  </h2>
-                  <p className="governance-description">
-                    Every acquisition is made with intention. We evaluate works through the lens of cultural significance, provenance, condition, and alignment with our long-term stewardship philosophy.<br /><br />Selection is never driven by volume or velocity. Each work must meet rigorous standards and represent a genuine contribution to a coherent collection.
+              <div className="flex flex-col gap-6 max-w-[634px]">
+                <h2 className="governance-title" style={{marginBottom: '8px'}}>
+                  Curatorial and Acquisition Focus
+                </h2>
+                <div className="flex flex-col gap-4">
+                  <p className="governance-description" style={{marginBottom: '0'}}>
+                    The Blue Chip Art Fund is focused on the acquisition and long-term stewardship of artworks with established cultural, historical, and institutional significance.
                   </p>
+                  <p className="governance-description" style={{marginBottom: '0'}}>
+                    Works are selected based on enduring relevance, provenance integrity, and suitability for extended custodial care. The fund prioritizes pieces that have demonstrated lasting influence within art history rather than short-term market momentum.
+                  </p>
+                  <p className="governance-description" style={{marginBottom: '0'}}>
+                    Acquisition activity remains selective and deliberate, with an emphasis on quality, context, and preservation over volume.
+                  </p>
+                  <div className="governance-description" style={{marginBottom: '0'}}>
+                    <p style={{marginBottom: '8px'}}>Areas of focus to include:</p>
+                    <p style={{marginBottom: '4px'}}>Historically significant modern and contemporary works</p>
+                    <p style={{marginBottom: '4px'}}>Artists with sustained institutional recognition</p>
+                    <p style={{marginBottom: '4px'}}>Works with documented exhibition and publication history</p>
+                    <p>Pieces suitable for museum-quality custody and conservation</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How the Blue Chip Art Fund Operates Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center text-center gap-8 lg:gap-10">
+              {/* Header */}
+              <div className="flex flex-col items-center gap-4 max-w-[995px]">
+                <h2 className="governance-title" style={{textAlign: 'center', marginBottom: '0'}}>
+                  How the Blue Chip Art Fund Operates
+                </h2>
+                <p className="governance-subtitle" style={{textAlign: 'center', marginBottom: '0', maxWidth: '817px'}}>
+                  An overview of stewardship priorities, acquisition discipline, and long-term custodial care.
+                </p>
+              </div>
+
+              {/* Description */}
+              <p className="governance-description" style={{textAlign: 'center', marginBottom: '0', maxWidth: '1022px'}}>
+                The Blue Chip Art Fund operates through selective acquisition, long-duration ownership, institutional custody standards, and governance designed to minimize turnover while preserving cultural value.
+              </p>
+
+              {/* Grid of Cards - Row 1 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 w-full max-w-[1200px]">
+                {/* Long-Term Ownership */}
+                <div className="fund-card">
+                  <div className="fund-card-content">
+                    <h3 className="fund-card-title">Long-Term Ownership</h3>
+                    <p className="fund-card-description">
+                      The fund is designed for extended holding periods, with no expectation of short-term liquidity.
+                    </p>
+                  </div>
                 </div>
 
-                {/* Divider */}
-                <div className="divider-line my-12 lg:my-16"></div>
-
-                <div className="max-w-[579px]">
-                  <h2 className="governance-title">
-                    Institutional Stewardship
-                  </h2>
-                  <p className="governance-description">
-                    Art Investment Group Trust operates the Blue Chip Art Fund with institutional discipline. This includes professional custody standards, conservation protocols, comprehensive insurance, and clear governance structures.<br /><br />Our structures ensure that works are protected, properly maintained, and held for the long term—aligned with their cultural importance rather than market cycles.
-                  </p>
+                {/* Lower Risk Profile */}
+                <div className="fund-card">
+                  <div className="fund-card-content">
+                    <h3 className="fund-card-title">Lower Risk Profile</h3>
+                    <p className="fund-card-description">
+                      By focusing on historically established works, the fund emphasizes stability over market volatility.
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Image Column */}
-              <div className="relative w-full h-full overflow-hidden min-h-[900px]">
-                <div className="absolute inset-0">
-                  <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800"
-                    alt="Artwork representing institutional stewardship"
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
+              {/* Grid of Cards - Row 2 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 w-full max-w-[1200px]">
+                {/* Selective Acquisition */}
+                <div className="fund-card">
+                  <div className="fund-card-content">
+                    <h3 className="fund-card-title">Selective Acquisition</h3>
+                    <p className="fund-card-description">
+                      Growth occurs infrequently and only when works meet strict cultural and custodial criteria.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Institutional Custody */}
+                <div className="fund-card">
+                  <div className="fund-card-content">
+                    <h3 className="fund-card-title">Institutional Custody</h3>
+                    <p className="fund-card-description">
+                      Works are maintained under professional standards appropriate for museum-quality art.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Participation and Alignment Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col gap-8 lg:gap-12">
+              {/* Header */}
+              <div className="flex flex-col gap-4">
+                <h2 className="governance-title" style={{marginBottom: '0'}}>
+                  Participation and Alignment
+                </h2>
+                <p className="governance-description" style={{marginBottom: '0'}}>
+                  Participation in the Blue Chip Art Fund is designed for those aligned with long-term stewardship and preservation-first ownership.
+                </p>
+              </div>
+
+              {/* Three Cards */}
+              <div className="flex flex-col gap-6 lg:gap-8">
+                {/* Card 1 */}
+                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px'}}>
+                  <div className="flex flex-col gap-2">
+                    <h3 className="stewardship-card-title">For Long-Term Stewards</h3>
+                    <p className="stewardship-card-description">
+                      Participation in the Blue Chip Art Fund is designed for individuals and institutions aligned with long-duration ownership and cultural stewardship. The fund is intended for those who value continuity, preservation, and measured decision-making over short-term market responsiveness.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Card 2 */}
+                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px'}}>
+                  <div className="flex flex-col gap-2">
+                    <h3 className="stewardship-card-title">Preservation, Not Liquidity</h3>
+                    <p className="stewardship-card-description">
+                      The Blue Chip Art Fund is not structured to prioritize liquidity, frequent transactions, or short-term price discovery. Acquisitions are made with the expectation of extended holding periods, minimal turnover, and stewardship practices designed to preserve artistic, historical, and cultural integrity across generations.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Card 3 */}
+                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px'}}>
+                  <div className="flex flex-col gap-2">
+                    <h3 className="stewardship-card-title">Deliberate Engagement</h3>
+                    <p className="stewardship-card-description">
+                      Art Investment Group Trust engages prospective participants through direct, considered discussion. Participation begins with alignment around intent, stewardship philosophy, and long-term commitment rather than transaction-driven timelines.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
