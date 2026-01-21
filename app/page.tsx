@@ -153,6 +153,8 @@ export default function Home() {
   const [heroImage, setHeroImage] = useState<string>("");
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const faqItems = [
     {
