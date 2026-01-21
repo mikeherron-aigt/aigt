@@ -437,30 +437,32 @@ export default function Home() {
 
         {/* New Info Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-12 items-start">
-              <div className="max-w-[711px]">
-                <h2 className="governance-title">
-                  Art Investment, Structured for the Long Term
-                </h2>
-                <p className="governance-description">
-                  Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
-                </p>
-                <p className="governance-description">
-                  Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
-                </p>
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
+                <div className="max-w-[711px]">
+                  <h2 className="governance-title">
+                    Art Investment, Structured for the Long Term
+                  </h2>
+                  <p className="governance-description">
+                    Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
+                  </p>
+                  <p className="governance-description">
+                    Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
+                  </p>
+                </div>
               </div>
 
               {/* YouTube Video Embed */}
-              <div className="w-full h-full">
+              <div className="w-full relative" style={{ aspectRatio: '16 / 9' }}>
                 <iframe
                   width="100%"
-                  height="400"
+                  height="100%"
                   src="https://www.youtube.com/embed/RjhN9uAkz-A"
                   title="Art Investment Group Trust"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  style={{ border: 'none' }}
+                  style={{ border: 'none', position: 'absolute', top: 0, left: 0 }}
                 />
               </div>
             </div>
