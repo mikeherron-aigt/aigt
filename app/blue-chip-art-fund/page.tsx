@@ -257,7 +257,7 @@ export default function BluChipArtFundPage() {
         {/* Curatorial and Acquisition Focus Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="grid lg:grid-cols-[481px_1fr] gap-8 lg:gap-12 items-center">
+            <div className="grid lg:grid-cols-[481px_1fr] gap-8 lg:gap-12 items-start">
               {/* Image Column */}
               <div className="relative w-full aspect-square overflow-hidden bg-gallery-plaster">
                 <Image
@@ -286,10 +286,12 @@ export default function BluChipArtFundPage() {
                   </p>
                   <div className="governance-description" style={{marginBottom: '0'}}>
                     <p style={{marginBottom: '8px'}}>Areas of focus to include:</p>
-                    <p style={{marginBottom: '4px'}}>Historically significant modern and contemporary works</p>
-                    <p style={{marginBottom: '4px'}}>Artists with sustained institutional recognition</p>
-                    <p style={{marginBottom: '4px'}}>Works with documented exhibition and publication history</p>
-                    <p>Pieces suitable for museum-quality custody and conservation</p>
+                    <ul className="list-disc list-inside space-y-2" style={{marginLeft: '0', paddingLeft: '20px'}}>
+                      <li>Historically significant modern and contemporary works</li>
+                      <li>Artists with sustained institutional recognition</li>
+                      <li>Works with documented exhibition and publication history</li>
+                      <li>Pieces suitable for museum-quality custody and conservation</li>
+                    </ul>
                   </div>
                 </div>
               </div>
