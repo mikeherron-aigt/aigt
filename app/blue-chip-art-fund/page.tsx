@@ -109,11 +109,11 @@ export default function BluChipArtFundPage() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <section className="w-full relative" style={{backgroundColor: '#f5f5f5'}}>
+        <section className="w-full relative py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[80px] pt-0 pb-12 sm:pb-16 lg:pb-24 flex items-center justify-center">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
                 <div className="max-w-[637px] w-full">
                   {/* Heading */}
                   <h1 className="hero-title" style={{marginBottom: '17px', textAlign: 'left'}}>
@@ -220,7 +220,7 @@ export default function BluChipArtFundPage() {
         </section>
 
         {/* Four Pillars Section */}
-        <section className="w-full pt-0 pb-12 sm:pt-4 sm:pb-16 lg:pt-8 lg:pb-[80px]" style={{backgroundColor: '#f5f5f5'}}>
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {/* Pillar 1 */}
