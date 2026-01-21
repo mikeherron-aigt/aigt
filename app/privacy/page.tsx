@@ -31,7 +31,6 @@ export default function PrivacyPage() {
               <Link href="/#investment-offerings" className="nav-link">Offerings</Link>
               <Link href="/#gallery" className="nav-link">Gallery</Link>
               <Link href="/#stewardship-in-practice" className="nav-link">Stewardship</Link>
-              <span className="nav-separator">|</span>
               <Link href="/request-access" className="btn-primary">Request Access</Link>
             </nav>
 

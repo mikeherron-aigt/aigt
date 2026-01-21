@@ -295,7 +295,6 @@ export default function Home() {
               <a href="#investment-offerings" className="nav-link">Offerings</a>
               <a href="#gallery" className="nav-link">Gallery</a>
               <a href="#stewardship-in-practice" className="nav-link">Stewardship</a>
-              <span className="nav-separator">|</span>
               <Link href="/request-access" className="btn-primary">Request Access</Link>
             </nav>
 
@@ -438,23 +437,40 @@ export default function Home() {
 
         {/* New Info Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="max-w-[711px]">
-              <h2 className="governance-title">
-                Art Investment, Structured for the Long Term
-              </h2>
-              <p className="governance-description">
-                Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
-              </p>
-              <p className="governance-description">
-                Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
-              </p>
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
+                <div className="max-w-[711px]">
+                  <h2 className="governance-title">
+                    Art Investment, Structured for the Long Term
+                  </h2>
+                  <p className="governance-description">
+                    Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
+                  </p>
+                  <p className="governance-description">
+                    Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
+                  </p>
+                </div>
+              </div>
+
+              {/* YouTube Video Embed */}
+              <div className="w-full relative" style={{ aspectRatio: '16 / 9' }}>
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/RjhN9uAkz-A?controls=0&modestbranding=1&rel=0&showinfo=0"
+                  title="Art Investment Group Trust"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ border: 'none', position: 'absolute', top: 0, left: 0 }}
+                />
+              </div>
             </div>
           </div>
         </section>
 
         {/* Featured Collection Section */}
-        <section className="w-full bg-white py-16 sm:py-20 lg:py-[104px]">
+        <section className="w-full bg-white pt-0 pb-16 sm:pb-20 lg:pb-[104px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <h2 className="section-heading">
               Featured Collection
@@ -609,6 +625,9 @@ export default function Home() {
                       <p className="fund-card-description">
                         The Ethereum Art Fund extends the same stewardship philosophy to Ethereum native artworks. These works are approached not as speculative instruments, but as culturally relevant expressions native to a digital medium.<br /><br />Governance, custody, and long-term intent mirror those applied to traditional art, with optional structures introduced only where appropriate and permitted.
                       </p>
+                      <Link href="/ethereum-art-fund" className="cta-primary" style={{textDecoration: 'none', marginTop: '24px', width: 'fit-content', alignSelf: 'flex-start'}}>
+                        Learn More
+                      </Link>
                     </div>
                   </div>
 
@@ -619,6 +638,9 @@ export default function Home() {
                       <p className="fund-card-description">
                         Focused on established works with deep cultural and historical significance, the Blue Chip Art Fund acquires and stewards museum-quality artworks through long-horizon ownership and institutional governance.<br /><br />The emphasis is on preservation, context, and disciplined acquisition rather than transaction frequency or short-term outcomes.
                       </p>
+                      <Link href="/blue-chip-art-fund" className="cta-primary" style={{textDecoration: 'none', marginTop: '24px', width: 'fit-content', alignSelf: 'flex-start'}}>
+                        Learn More
+                      </Link>
                     </div>
                   </div>
                 </div>
