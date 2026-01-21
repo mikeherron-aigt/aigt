@@ -224,28 +224,28 @@ export default function BluChipArtFundPage() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {/* Pillar 1 */}
-              <div className="stewardship-card flex flex-col gap-4">
+              <div className="stewardship-card flex items-center justify-center text-center">
                 <h3 className="stewardship-card-title">
                   Long-Horizon<br />Ownership
                 </h3>
               </div>
 
               {/* Pillar 2 */}
-              <div className="stewardship-card flex flex-col gap-4">
+              <div className="stewardship-card flex items-center justify-center text-center">
                 <h3 className="stewardship-card-title">
                   Preservation-First<br />Stewardship
                 </h3>
               </div>
 
               {/* Pillar 3 */}
-              <div className="stewardship-card flex flex-col gap-4">
+              <div className="stewardship-card flex items-center justify-center text-center">
                 <h3 className="stewardship-card-title">
                   Selective and<br />Infrequent<br />Acquisition
                 </h3>
               </div>
 
               {/* Pillar 4 */}
-              <div className="stewardship-card flex flex-col gap-4">
+              <div className="stewardship-card flex items-center justify-center text-center">
                 <h3 className="stewardship-card-title">
                   Institutional<br />Custody and<br />Care
                 </h3>
