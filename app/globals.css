@@ -559,7 +559,6 @@ section:has(.slider-wrapper) {
   background: #ffffff;
   border: 1px solid #e5e5e5;
   backdrop-filter: blur(3.3px);
-  margin-top: 40px;
 }
 
 .fund-card-content {
