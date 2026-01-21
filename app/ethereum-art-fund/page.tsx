@@ -2,10 +2,139 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
+
+interface ArtworkItem {
+  src: string;
+  title: string;
+  artist: string;
+  year: string;
+  collection?: string;
+}
+
+const featuredWorksData: ArtworkItem[] = [
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/bf1425734f332533a074c41067eab96904592547?width=539",
+    title: "80s Series #2",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/c449ed6d6c50481da77fcd400331fe03b0bd186f?width=539",
+    title: "80s Series #25",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/35d9e20b231328fe15361b6f6b89e3dc2744cfce?width=539",
+    title: "80s Series #14",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/6054acc63d39b4b9f9397cb08da9efd2770dc874?width=539",
+    title: "80s Series #53",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  },
+  {
+    src: "https://api.builder.io/api/v1/image/assets/TEMP/e44fc8c56a4ca0c1eaae9adcf85aa3a3d8c7f4f3?width=539",
+    title: "80s Series #38",
+    artist: "John Dowling Jr.",
+    year: "Contemporary",
+    collection: "Cosmic Dreams Collection"
+  }
+];
 
 export default function EthereumArtFundPage() {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!sliderRef.current) return;
+    if ((e.target as HTMLElement).closest('button')) return;
+    setIsDragging(true);
+    setStartX(e.pageX - sliderRef.current.offsetLeft);
+    setScrollLeft(sliderRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !sliderRef.current) return;
+    const x = e.pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    sliderRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!sliderRef.current) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
+    setScrollLeft(sliderRef.current.scrollLeft);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !sliderRef.current) return;
+    const x = e.touches[0].pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    sliderRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  const scrollSlider = (direction: 'left' | 'right') => {
+    if (!sliderRef.current) return;
+    const scrollAmount = 350;
+    const newScrollLeft = direction === 'left'
+      ? sliderRef.current.scrollLeft - scrollAmount
+      : sliderRef.current.scrollLeft + scrollAmount;
+
+    sliderRef.current.scrollTo({
+      left: newScrollLeft,
+      behavior: 'smooth'
+    });
+  };
+
+  const openModal = (artwork: ArtworkItem) => {
+    setSelectedImage(artwork);
+    setIsModalOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+    document.body.style.overflow = 'unset';
+  };
+
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+      return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+      };
+    }
+  }, [isModalOpen]);
 
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
