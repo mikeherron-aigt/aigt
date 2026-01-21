@@ -155,6 +155,8 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
+  const [isOfferingsDropdownOpen, setIsOfferingsDropdownOpen] = useState(false);
+  const offeringsDropdownRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const faqItems = [
@@ -348,7 +350,34 @@ export default function Home() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8 ml-auto">
               <Link href="/about" className="nav-link">About</Link>
-              <a href="#investment-offerings" className="nav-link">Offerings</a>
+
+              {/* Offerings Dropdown */}
+              <div
+                ref={offeringsDropdownRef}
+                className="offerings-dropdown-wrapper"
+                onMouseEnter={() => setIsOfferingsDropdownOpen(true)}
+                onMouseLeave={() => setIsOfferingsDropdownOpen(false)}
+              >
+                <button
+                  className="nav-link"
+                  aria-expanded={isOfferingsDropdownOpen}
+                  aria-haspopup="true"
+                >
+                  Offerings
+                </button>
+
+                {isOfferingsDropdownOpen && (
+                  <div className="offerings-dropdown">
+                    <Link href="/ethereum-art-fund" className="offerings-dropdown-item">
+                      Ethereum Art Fund
+                    </Link>
+                    <Link href="/blue-chip-art-fund" className="offerings-dropdown-item">
+                      Blue Chip Art Fund
+                    </Link>
+                  </div>
+                )}
+              </div>
+
               <a href="#gallery" className="nav-link">Gallery</a>
               <a href="#stewardship-in-practice" className="nav-link">Stewardship</a>
               <Link href="/request-access" className="btn-primary">Request Access</Link>
@@ -388,13 +417,39 @@ export default function Home() {
                   >
                     About
                   </Link>
-                  <a
-                    href="#investment-offerings"
-                    className="nav-link text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Offerings
-                  </a>
+                  <div>
+                    <button
+                      onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
+                      className="nav-link text-base w-full text-left"
+                      aria-expanded={isOfferingsDropdownOpen}
+                    >
+                      Offerings
+                    </button>
+                    {isOfferingsDropdownOpen && (
+                      <div className="flex flex-col pl-4 gap-3 mt-2">
+                        <Link
+                          href="/ethereum-art-fund"
+                          className="nav-link text-base"
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setIsOfferingsDropdownOpen(false);
+                          }}
+                        >
+                          Ethereum Art Fund
+                        </Link>
+                        <Link
+                          href="/blue-chip-art-fund"
+                          className="nav-link text-base"
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setIsOfferingsDropdownOpen(false);
+                          }}
+                        >
+                          Blue Chip Art Fund
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                   <a
                     href="#gallery"
                     className="nav-link text-base"
@@ -692,9 +747,9 @@ export default function Home() {
         </section>
 
         {/* Two Funds Section */}
-        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-[104px]">
+        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1441px] mx-auto">
-            <div className="flex flex-col items-center gap-32">
+            <div className="flex flex-col items-center gap-12">
               {/* Top Content */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
                 <div className="flex flex-col items-center gap-4 max-w-[995px]">
@@ -711,7 +766,7 @@ export default function Home() {
               </div>
 
               {/* Fund Cards */}
-              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full mt-16">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full">
                   {/* Ethereum Art Fund Card */}
                   <div className="fund-card">
                     <div className="fund-card-content">

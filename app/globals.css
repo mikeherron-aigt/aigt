@@ -38,8 +38,58 @@ body {
   transition: opacity 0.2s;
 }
 
+.nav-link {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 .nav-link:hover {
   opacity: 0.7;
+}
+
+.offerings-dropdown {
+  position: absolute;
+  top: 100%;
+  left: -8px;
+  background: var(--paper-white);
+  border: 1px solid var(--gallery-plaster);
+  border-radius: 0;
+  min-width: 220px;
+  box-shadow: 0 4px 12px rgba(37, 46, 58, 0.1);
+  z-index: 50;
+  overflow: hidden;
+}
+
+.offerings-dropdown-item {
+  display: block;
+  padding: 12px 16px;
+  color: var(--archive-slate);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  text-decoration: none;
+  transition: background-color 0.15s;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid var(--gallery-plaster);
+  cursor: pointer;
+}
+
+.offerings-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.offerings-dropdown-item:hover {
+  background-color: var(--gallery-plaster);
+}
+
+/* Extend hover area for offerings dropdown wrapper */
+.offerings-dropdown-wrapper {
+  position: relative;
+  /* Create invisible area below button to keep hover active while moving to dropdown */
+  padding-bottom: 150px;
+  margin-bottom: -150px;
 }
 
 .nav-separator {
