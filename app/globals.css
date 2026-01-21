@@ -59,7 +59,7 @@ body {
   font-size: 16px !important;
   font-weight: 400 !important;
   line-height: 24px !important;
-  border: none !important;
+  border: 2px solid var(--ledger-stone) !important;
   cursor: pointer !important;
   transition: opacity 0.2s !important;
   text-decoration: none !important;
