@@ -1639,8 +1639,8 @@ footer {
 }
 
 .video-container-wrapper:hover .video-subtitles-button {
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .video-subtitles-button:hover {
