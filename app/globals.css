@@ -1598,6 +1598,65 @@ footer {
   }
 }
 
+/* Video Container Styles */
+.video-container-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.video-element {
+  border: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.video-subtitles-button {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  transition: all 0.2s ease;
+  z-index: 100;
+}
+
+.video-subtitles-button:hover {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.video-subtitles-button:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.video-subtitles-button svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+.video-subtitles-label {
+  white-space: nowrap;
+  font-size: 13px;
+}
+
 .team-section-title {
   color: var(--archive-slate) !important;
   font-family: Georgia, serif !important;
