@@ -272,22 +272,37 @@ export default function Home() {
   useEffect(() => {
     if (!videoRef.current) return;
 
+    const video = videoRef.current;
+
     const handleLoadedMetadata = () => {
-      // Ensure subtitles are visible on load
-      const textTracks = videoRef.current?.textTracks;
+      const textTracks = video.textTracks;
       if (textTracks && textTracks.length > 0) {
         for (let i = 0; i < textTracks.length; i++) {
-          if (textTracks[i].kind === 'subtitles' || textTracks[i].kind === 'captions') {
-            textTracks[i].mode = 'showing';
+          const track = textTracks[i];
+          if (track.kind === 'subtitles' || track.kind === 'captions') {
+            // Explicitly set to showing mode
+            track.mode = 'showing';
+            setSubtitlesEnabled(true);
           }
         }
       }
     };
 
-    const video = videoRef.current;
+    // Try to enable subtitles after a small delay to ensure tracks are loaded
+    const timeoutId = setTimeout(() => {
+      if (video.textTracks && video.textTracks.length > 0) {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          if (video.textTracks[i].kind === 'subtitles' || video.textTracks[i].kind === 'captions') {
+            video.textTracks[i].mode = 'showing';
+          }
+        }
+      }
+    }, 500);
+
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
     return () => {
+      clearTimeout(timeoutId);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
   }, []);
