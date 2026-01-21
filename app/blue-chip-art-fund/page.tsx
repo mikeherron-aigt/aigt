@@ -113,24 +113,24 @@ export default function BluChipArtFundPage() {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
-              <div className="px-4 sm:px-8 lg:px-[80px] pt-0 pb-12 sm:pb-16 lg:pb-24 flex items-center">
-                <div className="max-w-[637px]">
+              <div className="px-4 sm:px-8 lg:px-[80px] pt-0 pb-12 sm:pb-16 lg:pb-24 flex items-center justify-center">
+                <div className="max-w-[637px] w-full">
                   {/* Heading */}
-                  <h1 className="hero-title" style={{marginBottom: '17px'}}>
+                  <h1 className="hero-title" style={{marginBottom: '17px', textAlign: 'left'}}>
                     <div style={{fontSize: '41px', lineHeight: '45px'}}>
                       Blue Chip Art Fund
                     </div>
                   </h1>
 
                   {/* Subtitle */}
-                  <div className="hero-subtitle">
+                  <div className="hero-subtitle" style={{textAlign: 'left'}}>
                     <p>
                       Long-Term Stewardship of Historically Significant Works
                     </p>
                   </div>
 
                   {/* CTA Buttons */}
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-[18px] mt-6 sm:mt-8">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4 sm:gap-[18px] mt-12 sm:mt-16">
                     <Link href="/request-access" className="cta-primary" style={{textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                       Request Access
                     </Link>
