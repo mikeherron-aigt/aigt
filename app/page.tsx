@@ -470,7 +470,7 @@ export default function Home() {
         </section>
 
         {/* Featured Collection Section */}
-        <section className="w-full bg-white py-16 sm:py-20 lg:py-[104px]">
+        <section className="w-full bg-white pt-0 pb-16 sm:pb-20 lg:pb-[104px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <h2 className="section-heading">
               Featured Collection
