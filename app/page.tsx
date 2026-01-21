@@ -609,6 +609,9 @@ export default function Home() {
                       <p className="fund-card-description">
                         The Ethereum Art Fund extends the same stewardship philosophy to Ethereum native artworks. These works are approached not as speculative instruments, but as culturally relevant expressions native to a digital medium.<br /><br />Governance, custody, and long-term intent mirror those applied to traditional art, with optional structures introduced only where appropriate and permitted.
                       </p>
+                      <Link href="/ethereum-art-fund" className="cta-primary" style={{textDecoration: 'none', marginTop: '24px', width: 'fit-content', alignSelf: 'flex-start'}}>
+                        Learn More
+                      </Link>
                     </div>
                   </div>
 
