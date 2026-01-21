@@ -109,7 +109,7 @@ export default function EthereumArtFundPage() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <section className="w-full relative py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#f5f5f5'}}>
+        <section className="w-full relative" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
