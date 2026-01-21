@@ -118,14 +118,14 @@ export default function BluChipArtFundPage() {
                   {/* Heading */}
                   <h1 className="hero-title" style={{marginBottom: '17px'}}>
                     <div style={{fontSize: '41px', lineHeight: '45px'}}>
-                      Museum-Quality<br />Art of Enduring Value
+                      Blue Chip Art Fund
                     </div>
                   </h1>
 
                   {/* Subtitle */}
                   <div className="hero-subtitle">
                     <p>
-                      The Blue Chip Art Fund acquires and stewards established artworks of deep cultural and historical significance through disciplined, long-horizon ownership.
+                      Long-Term Stewardship of Historically Significant Works
                     </p>
                   </div>
 
@@ -160,13 +160,13 @@ export default function BluChipArtFundPage() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="max-w-[711px]">
               <h2 className="governance-title">
-                The Blue Chip Art Fund
+                About the Fund
               </h2>
               <p className="governance-description">
-                The Blue Chip Art Fund is designed for the acquisition and stewardship of established artworks with deep cultural and historical significance. We focus on museum-quality works that have demonstrated lasting value and enduring importance within the broader art historical narrative.
+                The Blue Chip Art Fund is a governed platform established to acquire, hold, and steward culturally and historically significant artworks within a long-duration ownership framework.
               </p>
               <p className="governance-description">
-                Our approach emphasizes preservation, context, and disciplined acquisition. We resist short-term trading mentalities in favor of long-horizon ownership that allows art to mature culturally and develop deeper significance over time.
+                Operating within the Art Investment Group Trust structure, the fund prioritizes preservation, provenance integrity, and continuity over liquidity or short-term market dynamics.
               </p>
             </div>
           </div>
