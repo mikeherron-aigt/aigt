@@ -350,7 +350,34 @@ export default function Home() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8 ml-auto">
               <Link href="/about" className="nav-link">About</Link>
-              <a href="#investment-offerings" className="nav-link">Offerings</a>
+
+              {/* Offerings Dropdown */}
+              <div
+                ref={offeringsDropdownRef}
+                className="relative"
+                onMouseEnter={() => setIsOfferingsDropdownOpen(true)}
+                onMouseLeave={() => setIsOfferingsDropdownOpen(false)}
+              >
+                <button
+                  className="nav-link"
+                  aria-expanded={isOfferingsDropdownOpen}
+                  aria-haspopup="true"
+                >
+                  Offerings
+                </button>
+
+                {isOfferingsDropdownOpen && (
+                  <div className="offerings-dropdown">
+                    <Link href="/ethereum-art-fund" className="offerings-dropdown-item">
+                      Ethereum Art Fund
+                    </Link>
+                    <Link href="/blue-chip-art-fund" className="offerings-dropdown-item">
+                      Blue Chip Art Fund
+                    </Link>
+                  </div>
+                )}
+              </div>
+
               <a href="#gallery" className="nav-link">Gallery</a>
               <a href="#stewardship-in-practice" className="nav-link">Stewardship</a>
               <Link href="/request-access" className="btn-primary">Request Access</Link>
