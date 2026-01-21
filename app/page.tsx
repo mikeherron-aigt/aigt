@@ -354,7 +354,7 @@ export default function Home() {
               {/* Offerings Dropdown */}
               <div
                 ref={offeringsDropdownRef}
-                className="relative"
+                className="offerings-dropdown-wrapper"
                 onMouseEnter={() => setIsOfferingsDropdownOpen(true)}
                 onMouseLeave={() => setIsOfferingsDropdownOpen(false)}
               >
