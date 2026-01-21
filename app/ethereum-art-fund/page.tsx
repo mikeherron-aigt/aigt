@@ -504,8 +504,13 @@ export default function EthereumArtFundPage() {
                 </p>
               </div>
 
+              {/* Description */}
+              <p className="governance-description" style={{textAlign: 'center', marginBottom: '0', maxWidth: '1022px'}}>
+                The Ethereum Art Fund operates through selective acquisition, experimental ownership structures, higher risk tolerance, and governance designed to explore emerging models while maintaining institutional discipline.
+              </p>
+
               {/* First Row of Cards */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 w-full max-w-[1200px]">
                 {/* Fractionalized Participation */}
                 <div className="fund-card">
                   <div className="fund-card-content">
