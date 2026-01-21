@@ -157,15 +157,15 @@ export default function BluChipArtFundPage() {
 
         {/* About the Fund Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="max-w-[711px]">
-              <h2 className="governance-title">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center">
+            <div className="max-w-[711px] w-full">
+              <h2 className="governance-title" style={{textAlign: 'left'}}>
                 About the Fund
               </h2>
-              <p className="governance-description">
+              <p className="governance-description" style={{textAlign: 'left'}}>
                 The Blue Chip Art Fund is a governed platform established to acquire, hold, and steward culturally and historically significant artworks within a long-duration ownership framework.
               </p>
-              <p className="governance-description">
+              <p className="governance-description" style={{textAlign: 'left'}}>
                 Operating within the Art Investment Group Trust structure, the fund prioritizes preservation, provenance integrity, and continuity over liquidity or short-term market dynamics.
               </p>
             </div>
