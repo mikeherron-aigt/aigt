@@ -823,7 +823,7 @@ export default function Home() {
                   {expandedFAQ === index && (
                     <div
                       id={`faq-answer-${index}`}
-                      className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-gallery-plaster"
+                      className="px-6 lg:px-8 pt-6 lg:pt-8 pb-6 lg:pb-8 border-t border-gallery-plaster"
                     >
                       <p className="governance-description">
                         {item.answer}
