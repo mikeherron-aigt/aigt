@@ -1618,12 +1618,12 @@ footer {
 
 .video-subtitles-button {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
+  top: 12px;
+  right: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 8px 12px;
   background: rgba(0, 0, 0, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.4);
   color: white;
@@ -1632,8 +1632,15 @@ footer {
   font-size: 13px;
   font-weight: 500;
   font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
   z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video-container-wrapper:hover .video-subtitles-button {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .video-subtitles-button:hover {
@@ -1644,6 +1651,8 @@ footer {
 .video-subtitles-button:focus {
   outline: 2px solid white;
   outline-offset: 2px;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .video-subtitles-button svg {
