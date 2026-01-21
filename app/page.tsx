@@ -732,7 +732,7 @@ export default function Home() {
                       <p className="fund-card-description">
                         Focused on established works with deep cultural and historical significance, the Blue Chip Art Fund acquires and stewards museum-quality artworks through long-horizon ownership and institutional governance.<br /><br />The emphasis is on preservation, context, and disciplined acquisition rather than transaction frequency or short-term outcomes.
                       </p>
-                      <Link href="/blue-chip-art-fund" className="cta-primary" style={{textDecoration: 'none', marginTop: '24px', width: 'fit-content', alignSelf: 'flex-start'}}>
+                      <Link href="/blue-chip-art-fund" className="cta-primary" style={{textDecoration: 'none', width: 'fit-content', alignSelf: 'flex-start'}}>
                         Learn More
                       </Link>
                     </div>
