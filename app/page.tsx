@@ -154,6 +154,7 @@ export default function Home() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
+  const [isVideoHovered, setIsVideoHovered] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const faqItems = [
