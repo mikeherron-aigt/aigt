@@ -489,6 +489,7 @@ export default function Home() {
                   height="100%"
                   autoPlay
                   muted
+                  crossOrigin="anonymous"
                 >
                   <source src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ff3b28b352ad0461ba487be029ca85fa4?alt=media&token=96924fb3-b2c5-49c6-bb22-1ad36aba0d90&apiKey=5031849ff5814a4cae6f958ac9f10229" type="video/mp4" />
                   <track kind="subtitles" src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2F977fb0a4bd104eb698dfaccf89d6fa68?alt=media&token=106ec448-76f2-4f2b-83bc-e9a41b40201e&apiKey=5031849ff5814a4cae6f958ac9f10229" srcLang="en" label="English" default />
