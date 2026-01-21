@@ -189,8 +189,8 @@ export default function AboutPage() {
       {/* Main Content */}
       <main>
         {/* Hero Section with Image Collage */}
-        <section className="w-full relative" style={{backgroundColor: '#f5f5f5'}}>
-          <div className="max-w-[1440px] mx-auto">
+        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto relative">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24 flex items-center">
@@ -223,11 +223,11 @@ export default function AboutPage() {
                 />
               </div>
             </div>
-          </div>
 
-          {/* Decorative Elements - Positioned at bottom of image */}
-          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
-          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
+            {/* Decorative Elements - Positioned at bottom of image */}
+            <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
+            <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
+          </div>
         </section>
 
         {/* Design Bar - Full Width */}
