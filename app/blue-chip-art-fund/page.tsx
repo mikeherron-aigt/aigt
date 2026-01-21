@@ -176,11 +176,11 @@ export default function BluChipArtFundPage() {
               </div>
 
               {/* Right Column - Preservation-First Stewardship */}
-              <div className="flex flex-col gap-4 bg-gallery-plaster p-8 lg:p-10">
+              <div className="flex flex-col gap-4 bg-paper-white p-8 lg:p-10">
                 <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '8px'}}>
                   Preservation-First Stewardship
                 </h3>
-                <ul className="list-none space-y-3 p-0 m-0">
+                <ul className="list-none space-y-6 p-0 m-0">
                   <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
                     Prioritizing long-duration ownership over liquidity
                   </li>
