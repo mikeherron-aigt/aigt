@@ -384,7 +384,7 @@ export default function BluChipArtFundPage() {
               {/* Three Cards */}
               <div className="flex flex-col gap-6 lg:gap-8">
                 {/* Card 1 */}
-                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px'}}>
+                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px', background: '#f5f5f5'}}>
                   <div className="flex flex-col gap-2">
                     <h3 className="stewardship-card-title">For Long-Term Stewards</h3>
                     <p className="stewardship-card-description">
@@ -394,7 +394,7 @@ export default function BluChipArtFundPage() {
                 </div>
 
                 {/* Card 2 */}
-                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px'}}>
+                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px', background: '#f5f5f5'}}>
                   <div className="flex flex-col gap-2">
                     <h3 className="stewardship-card-title">Preservation, Not Liquidity</h3>
                     <p className="stewardship-card-description">
@@ -404,7 +404,7 @@ export default function BluChipArtFundPage() {
                 </div>
 
                 {/* Card 3 */}
-                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px'}}>
+                <div className="stewardship-card" style={{height: 'auto', minHeight: '202px', background: '#f5f5f5'}}>
                   <div className="flex flex-col gap-2">
                     <h3 className="stewardship-card-title">Deliberate Engagement</h3>
                     <p className="stewardship-card-description">
