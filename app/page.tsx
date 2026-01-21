@@ -538,7 +538,7 @@ export default function Home() {
                 </video>
                 <button
                   onClick={toggleSubtitles}
-                  className="video-subtitles-button"
+                  className={`video-subtitles-button ${isVideoHovered ? 'video-subtitles-visible' : ''}`}
                   aria-label={subtitlesEnabled ? 'Disable subtitles' : 'Enable subtitles'}
                   title={subtitlesEnabled ? 'Disable subtitles' : 'Enable subtitles'}
                 >
