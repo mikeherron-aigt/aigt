@@ -225,28 +225,28 @@ export default function BluChipArtFundPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {/* Pillar 1 */}
               <div className="stewardship-card flex items-center justify-center">
-                <h3 className="stewardship-card-title" style={{textAlign: 'left'}}>
+                <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '0'}}>
                   Long-Horizon<br />Ownership
                 </h3>
               </div>
 
               {/* Pillar 2 */}
               <div className="stewardship-card flex items-center justify-center">
-                <h3 className="stewardship-card-title" style={{textAlign: 'left'}}>
+                <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '0'}}>
                   Preservation-First<br />Stewardship
                 </h3>
               </div>
 
               {/* Pillar 3 */}
               <div className="stewardship-card flex items-center justify-center">
-                <h3 className="stewardship-card-title" style={{textAlign: 'left'}}>
+                <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '0'}}>
                   Selective and<br />Infrequent<br />Acquisition
                 </h3>
               </div>
 
               {/* Pillar 4 */}
               <div className="stewardship-card flex items-center justify-center">
-                <h3 className="stewardship-card-title" style={{textAlign: 'left'}}>
+                <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '0'}}>
                   Institutional<br />Custody and<br />Care
                 </h3>
               </div>
