@@ -269,6 +269,29 @@ export default function Home() {
     setHeroImage(heroImages[randomIndex]);
   }, []);
 
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const handleLoadedMetadata = () => {
+      // Ensure subtitles are visible on load
+      const textTracks = videoRef.current?.textTracks;
+      if (textTracks && textTracks.length > 0) {
+        for (let i = 0; i < textTracks.length; i++) {
+          if (textTracks[i].kind === 'subtitles' || textTracks[i].kind === 'captions') {
+            textTracks[i].mode = 'showing';
+          }
+        }
+      }
+    };
+
+    const video = videoRef.current;
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       {/* FAQ Schema */}
