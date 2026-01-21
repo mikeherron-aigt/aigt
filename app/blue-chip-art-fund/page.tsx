@@ -158,19 +158,98 @@ export default function BluChipArtFundPage() {
           </div>
         </section>
 
-        {/* About the Fund Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center">
-            <div className="max-w-[711px] w-full">
-              <h2 className="governance-title" style={{textAlign: 'left'}}>
-                About the Fund
+        {/* Institutional Stewardship Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+              {/* Left Column - Institutional Stewardship */}
+              <div className="flex flex-col gap-4">
+                <h2 className="governance-title" style={{textAlign: 'left', marginBottom: '8px'}}>
+                  Institutional Stewardship<br />for Established Art
+                </h2>
+                <p className="governance-description" style={{textAlign: 'left', marginBottom: '8px'}}>
+                  The Blue Chip Art Fund is designed for artworks with established cultural significance and enduring historical relevance.
+                </p>
+                <p className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                  The fund applies institutional governance, professional custody standards, and long-horizon ownership to works that warrant preservation across generations rather than participation in evolving market structures.
+                </p>
+              </div>
+
+              {/* Right Column - Preservation-First Stewardship */}
+              <div className="flex flex-col gap-4 bg-gallery-plaster p-8 lg:p-10">
+                <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '8px'}}>
+                  Preservation-First Stewardship
+                </h3>
+                <ul className="list-none space-y-3 p-0 m-0">
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                    Prioritizing long-duration ownership over liquidity
+                  </li>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                    Maintaining museum-quality custody and care standards
+                  </li>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                    Preserving provenance, context, and historical integrity
+                  </li>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                    Minimizing turnover to support long-term cultural value
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* A Distinct Mandate Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center text-center max-w-[800px] mx-auto gap-6">
+              <h2 className="governance-title" style={{textAlign: 'center', marginBottom: '0'}}>
+                A Distinct Mandate
               </h2>
-              <p className="governance-description" style={{textAlign: 'left'}}>
-                The Blue Chip Art Fund is a governed platform established to acquire, hold, and steward culturally and historically significant artworks within a long-duration ownership framework.
+              <p className="governance-subtitle" style={{textAlign: 'center', marginBottom: '0'}}>
+                The Blue Chip Art Fund is differentiated by its preservation-first mandate and long-term ownership horizon.
               </p>
-              <p className="governance-description" style={{textAlign: 'left'}}>
-                Operating within the Art Investment Group Trust structure, the fund prioritizes preservation, provenance integrity, and continuity over liquidity or short-term market dynamics.
+              <p className="governance-description" style={{textAlign: 'center', marginBottom: '8px'}}>
+                The Blue Chip Art Fund operates with the explicit objective of long-term stewardship. It prioritizes permanence, stability, and cultural continuity over liquidity or market responsiveness.
               </p>
+              <p className="governance-description" style={{textAlign: 'center', marginBottom: '0'}}>
+                Acquisitions are made with the expectation of extended holding periods, limited turnover, and careful custodial management designed to preserve both physical condition and historical context.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Four Pillars Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+              {/* Pillar 1 */}
+              <div className="stewardship-card flex flex-col gap-4">
+                <h3 className="stewardship-card-title">
+                  Long-Horizon<br />Ownership
+                </h3>
+              </div>
+
+              {/* Pillar 2 */}
+              <div className="stewardship-card flex flex-col gap-4">
+                <h3 className="stewardship-card-title">
+                  Preservation-First<br />Stewardship
+                </h3>
+              </div>
+
+              {/* Pillar 3 */}
+              <div className="stewardship-card flex flex-col gap-4">
+                <h3 className="stewardship-card-title">
+                  Selective and<br />Infrequent<br />Acquisition
+                </h3>
+              </div>
+
+              {/* Pillar 4 */}
+              <div className="stewardship-card flex flex-col gap-4">
+                <h3 className="stewardship-card-title">
+                  Institutional<br />Custody and<br />Care
+                </h3>
+              </div>
             </div>
           </div>
         </section>
