@@ -222,6 +222,21 @@ export default function Home() {
     });
   };
 
+  const toggleSubtitles = () => {
+    if (!videoRef.current) return;
+    const tracks = videoRef.current.querySelectorAll('track');
+    tracks.forEach(track => {
+      if (subtitlesEnabled) {
+        track.removeAttribute('default');
+      } else {
+        if (track.kind === 'subtitles') {
+          track.setAttribute('default', '');
+        }
+      }
+    });
+    setSubtitlesEnabled(!subtitlesEnabled);
+  };
+
   const openModal = (artwork: ArtworkItem) => {
     setSelectedImage(artwork);
     setIsModalOpen(true);
