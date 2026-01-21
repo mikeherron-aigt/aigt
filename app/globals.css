@@ -557,6 +557,7 @@ section:has(.slider-wrapper) {
   align-items: flex-start;
   gap: 16px;
   background: #ffffff;
+  border: 1px solid #e5e5e5;
   backdrop-filter: blur(3.3px);
 }
 
