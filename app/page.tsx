@@ -454,14 +454,28 @@ export default function Home() {
               </div>
 
               {/* Video Embed */}
-              <div className="w-full relative" style={{ aspectRatio: '16 / 9' }}>
+              <div
+                className="w-full relative video-container"
+                style={{ aspectRatio: '16 / 9' }}
+                onMouseEnter={(e) => {
+                  const video = e.currentTarget.querySelector('video');
+                  if (video) video.controls = true;
+                }}
+                onMouseLeave={(e) => {
+                  const video = e.currentTarget.querySelector('video');
+                  if (video) video.controls = false;
+                }}
+              >
                 <video
                   width="100%"
                   height="100%"
-                  controls
+                  autoPlay
+                  muted
+                  loop
                   style={{ border: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                 >
                   <source src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ff3b28b352ad0461ba487be029ca85fa4?alt=media&token=96924fb3-b2c5-49c6-bb22-1ad36aba0d90&apiKey=5031849ff5814a4cae6f958ac9f10229" type="video/mp4" />
+                  <track kind="subtitles" src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2F977fb0a4bd104eb698dfaccf89d6fa68?alt=media&token=106ec448-76f2-4f2b-83bc-e9a41b40201e&apiKey=5031849ff5814a4cae6f958ac9f10229" srcLang="en" label="English" default />
                   Your browser does not support the video tag.
                 </video>
               </div>
