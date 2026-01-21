@@ -692,9 +692,9 @@ export default function Home() {
         </section>
 
         {/* Two Funds Section */}
-        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-[104px]">
+        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1441px] mx-auto">
-            <div className="flex flex-col items-center gap-32">
+            <div className="flex flex-col items-center gap-12">
               {/* Top Content */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
                 <div className="flex flex-col items-center gap-4 max-w-[995px]">
