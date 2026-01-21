@@ -42,6 +42,44 @@ body {
   opacity: 0.7;
 }
 
+.offerings-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--paper-white);
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  min-width: 200px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  margin-top: 8px;
+}
+
+.offerings-dropdown-item {
+  display: block;
+  padding: 12px 16px;
+  color: var(--archive-slate);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.offerings-dropdown-item:first-child {
+  border-radius: 4px 4px 0 0;
+}
+
+.offerings-dropdown-item:last-child {
+  border-radius: 0 0 4px 4px;
+}
+
+.offerings-dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
 .nav-separator {
   color: var(--archive-slate);
   font-size: 16px;
