@@ -87,7 +87,8 @@ body {
 }
 
 /* Extend hover area for offerings dropdown wrapper */
-nav > div:has(.offerings-dropdown) {
+.offerings-dropdown-wrapper {
+  position: relative;
   padding-bottom: 200px;
   margin-bottom: -200px;
 }
