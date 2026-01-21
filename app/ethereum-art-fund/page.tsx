@@ -238,8 +238,8 @@ export default function EthereumArtFundPage() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <section className="w-full relative" style={{backgroundColor: '#f5f5f5'}}>
-          <div className="max-w-[1440px] mx-auto">
+        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto relative">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
@@ -285,7 +285,25 @@ export default function EthereumArtFundPage() {
               </div>
             </div>
           </div>
+
+          {/* Decorative Elements - Positioned at bottom of image */}
+          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
+          <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
         </section>
+
+        {/* Design Bar - Full Width */}
+        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
+          {/* Left portion - Gallery Plaster (extends to left edge of square) */}
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
+          {/* Right portion - Ledger Stone (starts at right edge of square) */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 105px)', right: '0'}}></div>
+
+          {/* Centered max-width container with square */}
+          <div className="max-w-[1440px] w-full h-full relative">
+            {/* Dark green square - same positioning as vertical bar */}
+            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+          </div>
+        </div>
 
         {/* Institutional Discipline Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
