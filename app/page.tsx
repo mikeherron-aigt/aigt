@@ -224,13 +224,17 @@ export default function Home() {
 
   const toggleSubtitles = () => {
     if (!videoRef.current) return;
+    const newState = !subtitlesEnabled;
     const textTracks = videoRef.current.textTracks;
-    for (let i = 0; i < textTracks.length; i++) {
-      if (textTracks[i].kind === 'subtitles') {
-        textTracks[i].mode = subtitlesEnabled ? 'hidden' : 'showing';
+
+    if (textTracks && textTracks.length > 0) {
+      for (let i = 0; i < textTracks.length; i++) {
+        if (textTracks[i].kind === 'subtitles' || textTracks[i].kind === 'captions') {
+          textTracks[i].mode = newState ? 'showing' : 'hidden';
+        }
       }
     }
-    setSubtitlesEnabled(!subtitlesEnabled);
+    setSubtitlesEnabled(newState);
   };
 
   const openModal = (artwork: ArtworkItem) => {
