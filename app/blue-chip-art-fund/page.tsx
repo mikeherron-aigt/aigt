@@ -180,17 +180,17 @@ export default function BluChipArtFundPage() {
                 <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '8px'}}>
                   Preservation-First Stewardship
                 </h3>
-                <ul className="list-none space-y-12 p-0 m-0">
-                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                <ul className="list-none space-y-8 p-0 m-0">
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '0', paddingBottom: '24px', borderBottom: '1px solid transparent'}}>
                     Prioritizing long-duration ownership over liquidity
                   </li>
-                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '24px', paddingBottom: '24px', borderBottom: '1px solid transparent'}}>
                     Maintaining museum-quality custody and care standards
                   </li>
-                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '24px', paddingBottom: '24px', borderBottom: '1px solid transparent'}}>
                     Preserving provenance, context, and historical integrity
                   </li>
-                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0'}}>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '24px'}}>
                     Minimizing turnover to support long-term cultural value
                   </li>
                 </ul>
