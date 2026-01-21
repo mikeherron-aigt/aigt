@@ -515,10 +515,12 @@ export default function Home() {
                 onMouseEnter={(e) => {
                   const video = e.currentTarget.querySelector('video');
                   if (video) video.controls = true;
+                  setIsVideoHovered(true);
                 }}
                 onMouseLeave={(e) => {
                   const video = e.currentTarget.querySelector('video');
                   if (video) video.controls = false;
+                  setIsVideoHovered(false);
                 }}
               >
                 <video
