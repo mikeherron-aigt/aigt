@@ -87,7 +87,7 @@ const teamMembers: TeamMember[] = [
     name: "Ashley Murison",
     title: "Co-Director and Chief of Staff",
     description: "",
-    imageUrl: "https://media.licdn.com/dms/image/v2/D4E03AQF-YDY_G2XP2w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1705086903093?e=1741219200&v=beta&t=PLACEHOLDER",
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9294e8137f304e6aaeb4019b03c91a2a?format=webp&width=400",
     linkedinUrl: "https://www.linkedin.com/in/ashleymurison/"
   }
 ];
