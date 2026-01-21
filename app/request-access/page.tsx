@@ -140,7 +140,6 @@ export default function RequestAccessPage() {
               <Link href="/#investment-offerings" className="nav-link">Offerings</Link>
               <Link href="/#gallery" className="nav-link">Gallery</Link>
               <Link href="/#stewardship-in-practice" className="nav-link">Stewardship</Link>
-              <span className="nav-separator">|</span>
               <Link href="/" className="btn-primary">Back to Home</Link>
             </nav>
 
