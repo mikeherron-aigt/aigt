@@ -213,9 +213,13 @@ export default function EthereumArtFundPage() {
                 The Ethereum Art Fund was established with a clearly defined mandate. It operates at the intersection of cultural stewardship and evolving ownership models, engaging selectively with tokenization and fractional participation while maintaining institutional governance. This flexibility introduces additional risk and shorter time horizons, which are acknowledged and managed through structure rather than avoided.
               </p>
             </div>
+          </div>
+        </section>
 
-            {/* Four Pillars Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mt-10">
+        {/* Four Pillars Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {/* Pillar 1 */}
               <div className="stewardship-card flex items-center justify-center">
                 <h3 className="governance-subtitle" style={{textAlign: 'center', marginBottom: '0'}}>
