@@ -177,20 +177,20 @@ export default function BluChipArtFundPage() {
 
               {/* Right Column - Preservation-First Stewardship */}
               <div className="flex flex-col gap-4 bg-paper-white p-8 lg:p-10">
-                <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '8px'}}>
+                <h3 className="governance-subtitle" style={{textAlign: 'left', marginBottom: '16px'}}>
                   Preservation-First Stewardship
                 </h3>
-                <ul className="list-none space-y-8 p-0 m-0">
-                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '0', paddingBottom: '24px', borderBottom: '1px solid transparent'}}>
+                <ul className="list-none space-y-0 p-0 m-0">
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '0'}}>
                     Prioritizing long-duration ownership over liquidity
                   </li>
-                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '24px', paddingBottom: '24px', borderBottom: '1px solid transparent'}}>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '16px'}}>
                     Maintaining museum-quality custody and care standards
                   </li>
-                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '24px', paddingBottom: '24px', borderBottom: '1px solid transparent'}}>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '16px'}}>
                     Preserving provenance, context, and historical integrity
                   </li>
-                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '24px'}}>
+                  <li className="governance-description" style={{textAlign: 'left', marginBottom: '0', marginTop: '16px'}}>
                     Minimizing turnover to support long-term cultural value
                   </li>
                 </ul>
