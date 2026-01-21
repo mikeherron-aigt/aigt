@@ -115,20 +115,22 @@ export default function EthereumArtFundPage() {
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
                 <div className="max-w-[637px] w-full">
-                  {/* Subtitle at top */}
-                  <div className="governance-subtitle" style={{textAlign: 'center', marginBottom: '24px'}}>
-                    <p>Tokenized Access to Ethereum-Native Cultural Assets</p>
-                  </div>
-
                   {/* Heading */}
-                  <h1 className="hero-title" style={{marginBottom: '17px', textAlign: 'left'}}>
+                  <h1 className="hero-title" style={{marginBottom: '8px', textAlign: 'left'}}>
                     <div style={{fontSize: '41px', lineHeight: '45px'}}>
                       Ethereum Art Fund
                     </div>
                   </h1>
 
+                  {/* Subtitle */}
+                  <div className="hero-subtitle" style={{textAlign: 'left', marginBottom: '16px'}}>
+                    <p>
+                      Tokenized Access to Ethereum-Native Cultural Assets
+                    </p>
+                  </div>
+
                   {/* Body Copy */}
-                  <div className="hero-description" style={{textAlign: 'left', marginTop: '24px'}}>
+                  <div className="hero-description" style={{textAlign: 'left', marginTop: '0'}}>
                     <p>
                       The Ethereum Art Fund is a governed platform designed to explore structured ownership, fractionalization, and tokenized access to culturally significant, Ethereum-native artworks.
                     </p>
