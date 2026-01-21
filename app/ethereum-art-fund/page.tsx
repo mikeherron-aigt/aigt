@@ -558,7 +558,7 @@ export default function EthereumArtFundPage() {
               </div>
 
               {/* Second Row of Cards */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 w-full max-w-[1200px]">
                 {/* Selective and Disciplined Growth */}
                 <div className="fund-card">
                   <div className="fund-card-content">
