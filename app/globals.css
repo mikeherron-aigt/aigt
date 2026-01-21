@@ -566,6 +566,7 @@ section:has(.slider-wrapper) {
   flex-direction: column;
   gap: 8px;
   width: 100%;
+  flex: 1;
 }
 
 .fund-card-title {
