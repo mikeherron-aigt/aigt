@@ -694,7 +694,7 @@ export default function Home() {
         {/* Two Funds Section */}
         <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-[104px]">
           <div className="max-w-[1441px] mx-auto">
-            <div className="flex flex-col items-center gap-20">
+            <div className="flex flex-col items-center gap-32">
               {/* Top Content */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
                 <div className="flex flex-col items-center gap-4 max-w-[995px]">
@@ -711,7 +711,7 @@ export default function Home() {
               </div>
 
               {/* Fund Cards */}
-              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:gap-[34px] w-full mt-16">
                   {/* Ethereum Art Fund Card */}
                   <div className="fund-card">
                     <div className="fund-card-content">
@@ -719,7 +719,7 @@ export default function Home() {
                       <p className="fund-card-description">
                         The Ethereum Art Fund extends the same stewardship philosophy to Ethereum native artworks. These works are approached not as speculative instruments, but as culturally relevant expressions native to a digital medium.<br /><br />Governance, custody, and long-term intent mirror those applied to traditional art, with optional structures introduced only where appropriate and permitted.
                       </p>
-                      <Link href="/ethereum-art-fund" className="cta-primary" style={{textDecoration: 'none', marginTop: '24px', width: 'fit-content', alignSelf: 'flex-start'}}>
+                      <Link href="/ethereum-art-fund" className="cta-primary" style={{textDecoration: 'none', width: 'fit-content', alignSelf: 'flex-start'}}>
                         Learn More
                       </Link>
                     </div>
@@ -732,7 +732,7 @@ export default function Home() {
                       <p className="fund-card-description">
                         Focused on established works with deep cultural and historical significance, the Blue Chip Art Fund acquires and stewards museum-quality artworks through long-horizon ownership and institutional governance.<br /><br />The emphasis is on preservation, context, and disciplined acquisition rather than transaction frequency or short-term outcomes.
                       </p>
-                      <Link href="/blue-chip-art-fund" className="cta-primary" style={{textDecoration: 'none', marginTop: '24px', width: 'fit-content', alignSelf: 'flex-start'}}>
+                      <Link href="/blue-chip-art-fund" className="cta-primary" style={{textDecoration: 'none', width: 'fit-content', alignSelf: 'flex-start'}}>
                         Learn More
                       </Link>
                     </div>
