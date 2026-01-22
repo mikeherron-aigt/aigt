@@ -10,56 +10,86 @@ interface TeamMember {
   title: string;
   description: string;
   imageUrl: string;
+  linkedinUrl?: string;
 }
 
 const teamMembers: TeamMember[] = [
   {
+    name: "Justin Fien",
+    title: "Chairman",
+    description: "",
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0a20bbeb53d14e0eb90701446fed69fc?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/justin-fien-9a8763107/"
+  },
+  {
     name: "John Joseph Dowling Jr.",
-    title: "Board Member; Chairman; Chief Visionary Officer",
+    title: "Chief Visionary Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400"
-  },
-  {
-    name: "Jose Bracho",
-    title: "Board Member; Chief Business Development Officer",
-    description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400"
-  },
-  {
-    name: "Luis Cortes",
-    title: "Board Member; Global Director of Art Acquisitions; Chief Revenue Officer",
-    description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fbed6d284517842c4b5dd155c3023e20f?format=webp&width=400"
-  },
-  {
-    name: "Steve Duren",
-    title: "Board Member; Chief Commercial Officer",
-    description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb25ae8084fb345bb8e78dd40e7afe448?format=webp&width=400"
-  },
-  {
-    name: "Mike Herron",
-    title: "Board Member; Chief Marketing Officer",
-    description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/johndowlingjr/"
   },
   {
     name: "Jay O'Malley",
-    title: "Board Member; Chief Investment Officer",
+    title: "Chief Executive Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/jay-o-malley-8102761b0/"
+  },
+  {
+    name: "Steve Duren",
+    title: "Chief Commercial Officer",
+    description: "",
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fb25ae8084fb345bb8e78dd40e7afe448?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/steve-duren/"
   },
   {
     name: "Olivia Philips",
-    title: "Board Member; Chief Operating Officer",
+    title: "Chief Operating Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/meetoliviaphillips/"
+  },
+  {
+    name: "Mike Herron",
+    title: "Chief Marketing Officer",
+    description: "",
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/mherron54/"
+  },
+  {
+    name: "Jose Bracho",
+    title: "Chief Business Development Officer",
+    description: "",
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2163c773e4894f2095d0df4caddae544?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/jose-bracho-900557125/"
   },
   {
     name: "Daniel Sloan",
-    title: "Board Member; Chief Technology Officer",
+    title: "Chief Technology Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/sloandaniel/"
+  },
+  {
+    name: "Abdur Nimeri",
+    title: "Chief Investment Officer",
+    description: "",
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F603a49449dd7440ba868f514734aaa6d?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/abdur-nimeri-52b11721/"
+  },
+  {
+    name: "Dennis Epperson",
+    title: "Chief Financial Officer",
+    description: "",
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4e10a705bbf7443c852fffa71aa20159?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/dennisepperson/"
+  },
+  {
+    name: "Ashley Murison",
+    title: "Co-Director and Chief of Staff",
+    description: "",
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9294e8137f304e6aaeb4019b03c91a2a?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/ashleymurison/"
   }
 ];
 
@@ -71,8 +101,8 @@ export default function AboutPage() {
       {/* Main Content */}
       <main>
         {/* Hero Section with Image Collage */}
-        <section className="w-full relative" style={{backgroundColor: '#f5f5f5'}}>
-          <div className="max-w-[1440px] mx-auto">
+        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+          <div className="max-w-[1440px] mx-auto relative">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24 flex items-center">
@@ -105,8 +135,26 @@ export default function AboutPage() {
                 />
               </div>
             </div>
+
+            {/* Decorative Elements - Positioned at bottom of image */}
+            <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
+            <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
           </div>
         </section>
+
+        {/* Design Bar - Full Width */}
+        <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
+          {/* Left portion - Gallery Plaster (extends to left edge of square) */}
+          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
+          {/* Right portion - Ledger Stone (starts at right edge of square) */}
+          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 105px)', right: '0'}}></div>
+
+          {/* Centered max-width container with square */}
+          <div className="max-w-[1440px] w-full h-full relative">
+            {/* Dark green square - same positioning as vertical bar */}
+            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+          </div>
+        </div>
 
         {/* Definition Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20 border-b border-gallery-plaster">
@@ -206,33 +254,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* What We Mean by Art Stewardship Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="max-w-[711px]">
-              <h2 className="governance-title">
-                What We Mean by Art Stewardship
-              </h2>
-              <p className="governance-description">
-                Art stewardship at Art Investment Group Trust refers to the responsible acquisition, governance, custody, and long term ownership of culturally significant artworks. Stewardship prioritizes preservation, legitimacy, and continuity over liquidity or short term financial outcomes.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Art as a Long Term Alternative Investment Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-24" style={{backgroundColor: '#f5f5f5'}}>
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="max-w-[711px]">
-              <h2 className="governance-title">
-                Art as a Long Term Alternative Investment
-              </h2>
-              <p className="governance-description">
-                Art is increasingly recognized as an alternative investment asset class when approached with institutional discipline. Art Investment Group Trust structures art ownership to support long duration holding periods, museum quality standards, and responsible capital alignment.
-              </p>
-            </div>
-          </div>
-        </section>
 
         {/* Team Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[120px]">
@@ -253,31 +274,66 @@ export default function AboutPage() {
             {/* Team Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-[51px] lg:gap-y-[95px]">
               {teamMembers.map((member, index) => {
-                const titleParts = member.title.split('; ');
-                const boardMember = titleParts[0];
-                const role = titleParts.slice(1).join('; ');
+                const photoElement = (
+                  <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6 hover:opacity-80 transition-opacity cursor-pointer">
+                    <Image
+                      src={member.imageUrl}
+                      alt={member.name}
+                      fill
+                      className="object-cover"
+                      sizes="102px"
+                    />
+                  </div>
+                );
 
                 return (
                   <div key={index} className="flex flex-col items-center text-center">
                     {/* Photo */}
-                    <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6">
-                      <Image
-                        src={member.imageUrl}
-                        alt={member.name}
-                        fill
-                        className="object-cover"
-                        sizes="102px"
-                      />
-                    </div>
+                    {member.linkedinUrl ? (
+                      <a
+                        href={member.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Visit ${member.name}'s LinkedIn profile`}
+                      >
+                        {photoElement}
+                      </a>
+                    ) : (
+                      photoElement
+                    )}
 
                     {/* Name */}
                     <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>
 
+                    {/* Board Member Badge */}
+                    <p className="team-member-board-badge" style={{fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 'bold', fontSize: '14px', marginTop: '4px', marginBottom: '2px'}}>Board Member</p>
+
                     {/* Title */}
-                    <div className="team-member-title-wrapper">
-                      <p className="team-member-title">{boardMember}</p>
-                      <p className="team-member-title">{role}</p>
-                    </div>
+                    <p className="team-member-title">{member.title}</p>
+
+                    {/* LinkedIn Icon */}
+                    {member.linkedinUrl && (
+                      <a
+                        href={member.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center justify-center w-5 h-5 transition-colors"
+                        style={{color: 'var(--archive-slate, #555)'}}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = '#0A66C2')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--archive-slate, #555)')}
+                        aria-label={`Visit ${member.name}'s LinkedIn profile`}
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M18.4 0H1.6C0.72 0 0 0.72 0 1.6v16.8C0 19.28 0.72 20 1.6 20h16.8c0.88 0 1.6-0.72 1.6-1.6V1.6C20 0.72 19.28 0 18.4 0zM6 17H3V8h3v9zm-1.5-10.24c-0.96 0-1.74-0.78-1.74-1.74s0.78-1.74 1.74-1.74 1.74 0.78 1.74 1.74-0.78 1.74-1.74 1.74zM17 17h-3v-4.74c0-1.12-0.04-2.58-1.58-2.58-1.58 0-1.82 1.24-1.82 2.52V17h-3V8h2.88v1.24h0.04c0.4-0.76 1.38-1.56 2.86-1.56 3.06 0 3.62 2.02 3.62 4.64V17z" />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 );
               })}

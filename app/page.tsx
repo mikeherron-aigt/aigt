@@ -220,6 +220,21 @@ export default function Home() {
     });
   };
 
+  const toggleSubtitles = () => {
+    if (!videoRef.current) return;
+    const newState = !subtitlesEnabled;
+    const textTracks = videoRef.current.textTracks;
+
+    if (textTracks && textTracks.length > 0) {
+      for (let i = 0; i < textTracks.length; i++) {
+        if (textTracks[i].kind === 'subtitles' || textTracks[i].kind === 'captions') {
+          textTracks[i].mode = newState ? 'showing' : 'hidden';
+        }
+      }
+    }
+    setSubtitlesEnabled(newState);
+  };
+
   const openModal = (artwork: ArtworkItem) => {
     setSelectedImage(artwork);
     setIsModalOpen(true);
@@ -250,6 +265,44 @@ export default function Home() {
   useEffect(() => {
     const randomIndex = Math.floor(Math.random() * heroImages.length);
     setHeroImage(heroImages[randomIndex]);
+  }, []);
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+
+    const handleLoadedMetadata = () => {
+      const textTracks = video.textTracks;
+      if (textTracks && textTracks.length > 0) {
+        for (let i = 0; i < textTracks.length; i++) {
+          const track = textTracks[i];
+          if (track.kind === 'subtitles' || track.kind === 'captions') {
+            // Explicitly set to showing mode
+            track.mode = 'showing';
+            setSubtitlesEnabled(true);
+          }
+        }
+      }
+    };
+
+    // Try to enable subtitles after a small delay to ensure tracks are loaded
+    const timeoutId = setTimeout(() => {
+      if (video.textTracks && video.textTracks.length > 0) {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          if (video.textTracks[i].kind === 'subtitles' || video.textTracks[i].kind === 'captions') {
+            video.textTracks[i].mode = 'showing';
+          }
+        }
+      }
+    }, 500);
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      clearTimeout(timeoutId);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
   }, []);
 
   return (
@@ -343,23 +396,78 @@ export default function Home() {
 
         {/* New Info Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="max-w-[711px]">
-              <h2 className="governance-title">
-                Art Investment, Structured for the Long Term
-              </h2>
-              <p className="governance-description">
-                Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
-              </p>
-              <p className="governance-description">
-                Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
-              </p>
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
+                <div className="max-w-[711px]">
+                  <h2 className="governance-title">
+                    Art Investment, Structured for the Long Term
+                  </h2>
+                  <p className="governance-description">
+                    Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
+                  </p>
+                  <p className="governance-description">
+                    Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
+                  </p>
+                </div>
+              </div>
+
+              {/* Video Embed */}
+              <div
+                className="video-container-wrapper"
+                onMouseEnter={(e) => {
+                  const video = e.currentTarget.querySelector('video');
+                  if (video) video.controls = true;
+                  setIsVideoHovered(true);
+                }}
+                onMouseLeave={(e) => {
+                  const video = e.currentTarget.querySelector('video');
+                  if (video) video.controls = false;
+                  setIsVideoHovered(false);
+                }}
+              >
+                <video
+                  ref={videoRef}
+                  className="video-element"
+                  width="100%"
+                  height="100%"
+                  autoPlay
+                  muted
+                  crossOrigin="anonymous"
+                >
+                  <source src="https://cdn.builder.io/o/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ff3b28b352ad0461ba487be029ca85fa4?alt=media&token=96924fb3-b2c5-49c6-bb22-1ad36aba0d90&apiKey=5031849ff5814a4cae6f958ac9f10229" type="video/mp4" />
+                  <track kind="subtitles" src="/aigt.vtt" srcLang="en" label="English" default />
+                  Your browser does not support the video tag.
+                </video>
+                <button
+                  onClick={toggleSubtitles}
+                  className={`video-subtitles-button ${isVideoHovered ? 'video-subtitles-visible' : ''}`}
+                  aria-label={subtitlesEnabled ? 'Disable subtitles' : 'Enable subtitles'}
+                  title={subtitlesEnabled ? 'Disable subtitles' : 'Enable subtitles'}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4v-4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <line x1="8" y1="10" x2="16" y2="10" />
+                    <line x1="8" y1="14" x2="13" y2="14" />
+                  </svg>
+                  <span className="video-subtitles-label">{subtitlesEnabled ? 'CC On' : 'CC Off'}</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Featured Collection Section */}
-        <section className="w-full bg-white py-16 sm:py-20 lg:py-[104px]">
+        <section className="w-full bg-white pt-0 pb-16 sm:pb-20 lg:pb-[104px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <h2 className="section-heading">
               Featured Collection
@@ -487,9 +595,9 @@ export default function Home() {
         </section>
 
         {/* Two Funds Section */}
-        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-[104px]">
+        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1441px] mx-auto">
-            <div className="flex flex-col items-center gap-20">
+            <div className="flex flex-col items-center gap-12">
               {/* Top Content */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
                 <div className="flex flex-col items-center gap-4 max-w-[995px]">
@@ -514,6 +622,9 @@ export default function Home() {
                       <p className="fund-card-description">
                         The Ethereum Art Fund extends the same stewardship philosophy to Ethereum native artworks. These works are approached not as speculative instruments, but as culturally relevant expressions native to a digital medium.<br /><br />Governance, custody, and long-term intent mirror those applied to traditional art, with optional structures introduced only where appropriate and permitted.
                       </p>
+                      <Link href="/ethereum-art-fund" className="cta-primary" style={{textDecoration: 'none', width: 'fit-content', alignSelf: 'flex-start'}}>
+                        Learn More
+                      </Link>
                     </div>
                   </div>
 
@@ -524,6 +635,9 @@ export default function Home() {
                       <p className="fund-card-description">
                         Focused on established works with deep cultural and historical significance, the Blue Chip Art Fund acquires and stewards museum-quality artworks through long-horizon ownership and institutional governance.<br /><br />The emphasis is on preservation, context, and disciplined acquisition rather than transaction frequency or short-term outcomes.
                       </p>
+                      <Link href="/blue-chip-art-fund" className="cta-primary" style={{textDecoration: 'none', width: 'fit-content', alignSelf: 'flex-start'}}>
+                        Learn More
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -706,7 +820,7 @@ export default function Home() {
                   {expandedFAQ === index && (
                     <div
                       id={`faq-answer-${index}`}
-                      className="px-6 lg:px-8 pb-6 lg:pb-8 border-t border-gallery-plaster"
+                      className="px-6 lg:px-8 pt-6 lg:pt-8 pb-6 lg:pb-8 border-t border-gallery-plaster"
                     >
                       <p className="governance-description">
                         {item.answer}
