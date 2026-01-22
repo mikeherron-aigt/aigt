@@ -3,11 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isOfferingsDropdownOpen, setIsOfferingsDropdownOpen] = useState(false);
+  const [focusedDropdownItem, setFocusedDropdownItem] = useState<number | null>(null);
   const offeringsRef = useRef<HTMLDivElement>(null);
+  const offeringsButtonRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname();
+
+  const offerings = [
+    { label: 'Ethereum Art Fund', href: '/eaf' },
+    { label: 'Blue Chip Art Fund', href: '/bcaf' },
+  ];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -17,11 +26,48 @@ export default function Header() {
       }
     };
 
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOfferingsDropdownOpen(false);
+        offeringsButtonRef.current?.focus();
+      }
+    };
+
     if (isOfferingsDropdownOpen) {
       document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+      return () => {
+        document.removeEventListener('click', handleClickOutside);
+        document.removeEventListener('keydown', handleEscape);
+      };
     }
   }, [isOfferingsDropdownOpen]);
+
+  const handleOfferingsKeyDown = (e: React.KeyboardEvent) => {
+    if (!isOfferingsDropdownOpen) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setIsOfferingsDropdownOpen(true);
+        setFocusedDropdownItem(0);
+      }
+    } else {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedDropdownItem(prev =>
+          prev === null ? 0 : Math.min(prev + 1, offerings.length - 1)
+        );
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedDropdownItem(prev =>
+          prev === null ? offerings.length - 1 : Math.max(prev - 1, 0)
+        );
+      }
+    }
+  };
+
+  const isOfferingActive = (href: string) => {
+    return pathname === href || pathname === href.replace('/eaf', '/ethereum-art-fund').replace('/bcaf', '/blue-chip-art-fund');
+  };
 
   return (
     <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
@@ -44,11 +90,14 @@ export default function Header() {
             <Link href="/about" className="nav-link">About</Link>
             
             {/* Offerings Dropdown - Desktop */}
-            <div className="relative" ref={offeringsRef}>
+            <div className="offerings-dropdown-wrapper" ref={offeringsRef}>
               <button
+                ref={offeringsButtonRef}
                 onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
+                onKeyDown={handleOfferingsKeyDown}
                 className="nav-link flex items-center gap-1"
                 aria-expanded={isOfferingsDropdownOpen}
+                aria-haspopup="menu"
               >
                 Offerings
                 <svg
@@ -60,28 +109,39 @@ export default function Header() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className={`transition-transform ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
+                  className={`transition-transform duration-200 ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
                 >
                   <polyline points="1 1 6 6 11 1"></polyline>
                 </svg>
               </button>
 
               {isOfferingsDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 bg-white border border-gallery-plaster shadow-lg rounded-sm z-50 min-w-[200px]">
-                  <Link
-                    href="/ethereum-art-fund"
-                    className="block px-4 py-3 nav-link hover:bg-gallery-plaster transition-colors"
-                    onClick={() => setIsOfferingsDropdownOpen(false)}
-                  >
-                    Ethereum Art Fund
-                  </Link>
-                  <Link
-                    href="/blue-chip-art-fund"
-                    className="block px-4 py-3 nav-link hover:bg-gallery-plaster transition-colors border-t border-gallery-plaster"
-                    onClick={() => setIsOfferingsDropdownOpen(false)}
-                  >
-                    Blue Chip Art Fund
-                  </Link>
+                <div className="offerings-dropdown" role="menu">
+                  {offerings.map((item, index) => {
+                    const isActive = isOfferingActive(item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`offerings-dropdown-item ${isActive ? 'offerings-dropdown-item-active' : ''}`}
+                        onClick={() => setIsOfferingsDropdownOpen(false)}
+                        role="menuitem"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            setIsOfferingsDropdownOpen(false);
+                          }
+                        }}
+                        tabIndex={focusedDropdownItem === index ? 0 : -1}
+                      >
+                        <span className={`${isActive ? 'font-semibold' : 'font-normal'}`}>
+                          {item.label}
+                        </span>
+                        {isActive && (
+                          <span className="offerings-dropdown-indicator"></span>
+                        )}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -133,6 +193,7 @@ export default function Header() {
                     onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
                     className="nav-link text-base w-full text-left flex items-center justify-between"
                     aria-expanded={isOfferingsDropdownOpen}
+                    aria-haspopup="menu"
                   >
                     Offerings
                     <svg
@@ -144,33 +205,30 @@ export default function Header() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className={`transition-transform ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
+                      className={`transition-transform duration-200 ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
                     >
                       <polyline points="1 1 6 6 11 1"></polyline>
                     </svg>
                   </button>
                   {isOfferingsDropdownOpen && (
-                    <div className="flex flex-col pl-4 gap-3 mt-2">
-                      <Link
-                        href="/ethereum-art-fund"
-                        className="nav-link text-base"
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          setIsOfferingsDropdownOpen(false);
-                        }}
-                      >
-                        Ethereum Art Fund
-                      </Link>
-                      <Link
-                        href="/blue-chip-art-fund"
-                        className="nav-link text-base"
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          setIsOfferingsDropdownOpen(false);
-                        }}
-                      >
-                        Blue Chip Art Fund
-                      </Link>
+                    <div className="flex flex-col pl-4 gap-3 mt-2" role="menu">
+                      {offerings.map((item) => {
+                        const isActive = isOfferingActive(item.href);
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`nav-link text-base ${isActive ? 'font-semibold' : 'font-normal'}`}
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              setIsOfferingsDropdownOpen(false);
+                            }}
+                            role="menuitem"
+                          >
+                            {item.label}
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </div>

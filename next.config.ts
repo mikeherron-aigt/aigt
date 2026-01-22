@@ -17,6 +17,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  redirects: async () => [
+    {
+      source: '/eaf',
+      destination: '/ethereum-art-fund',
+      permanent: false,
+    },
+    {
+      source: '/bcaf',
+      destination: '/blue-chip-art-fund',
+      permanent: false,
+    },
+  ],
 };
 
 export default nextConfig;
