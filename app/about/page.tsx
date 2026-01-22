@@ -99,9 +99,6 @@ export default function AboutPage() {
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       <Header />
 
-      {/* TEMP: deploy verification */}
-      <div style={{ display: "none" }}>about-deploy-check-20260122a</div>
-
       {/* Main Content */}
       <main>
         {/* Hero Section with Image Collage */}
