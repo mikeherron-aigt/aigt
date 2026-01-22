@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { useRef, useState, useEffect } from "react";
+import Header from "./components/Header";
 
 interface ArtworkItem {
   src: string;
