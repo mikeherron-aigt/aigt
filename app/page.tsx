@@ -146,6 +146,7 @@ const artArtistsImage: ArtworkItem = {
 
 export default function Home() {
   const sliderRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -153,6 +154,8 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [heroImage, setHeroImage] = useState<string>("");
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+  const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
+  const [isVideoHovered, setIsVideoHovered] = useState(false);
 
   const faqItems = [
     {
