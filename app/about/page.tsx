@@ -1,8 +1,3 @@
-{/* TEMP: deploy verification */}
-<div style={{ display: "none" }}>about-deploy-check-20260122a</div>
-
-
-
 'use client';
 
 import Image from "next/image";
@@ -103,6 +98,9 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       <Header />
+
+      {/* TEMP: deploy verification */}
+      <div style={{ display: "none" }}>about-deploy-check-20260122a</div>
 
       {/* Main Content */}
       <main>
