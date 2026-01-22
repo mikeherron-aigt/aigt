@@ -90,11 +90,14 @@ export default function Header() {
             <Link href="/about" className="nav-link">About</Link>
             
             {/* Offerings Dropdown - Desktop */}
-            <div className="relative" ref={offeringsRef}>
+            <div className="offerings-dropdown-wrapper" ref={offeringsRef}>
               <button
+                ref={offeringsButtonRef}
                 onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
+                onKeyDown={handleOfferingsKeyDown}
                 className="nav-link flex items-center gap-1"
                 aria-expanded={isOfferingsDropdownOpen}
+                aria-haspopup="menu"
               >
                 Offerings
                 <svg
@@ -106,28 +109,39 @@ export default function Header() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className={`transition-transform ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
+                  className={`transition-transform duration-200 ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
                 >
                   <polyline points="1 1 6 6 11 1"></polyline>
                 </svg>
               </button>
 
               {isOfferingsDropdownOpen && (
-                <div className="absolute top-full left-0 mt-2 bg-white border border-gallery-plaster shadow-lg rounded-sm z-50 min-w-[200px]">
-                  <Link
-                    href="/ethereum-art-fund"
-                    className="block px-4 py-3 nav-link hover:bg-gallery-plaster transition-colors"
-                    onClick={() => setIsOfferingsDropdownOpen(false)}
-                  >
-                    Ethereum Art Fund
-                  </Link>
-                  <Link
-                    href="/blue-chip-art-fund"
-                    className="block px-4 py-3 nav-link hover:bg-gallery-plaster transition-colors border-t border-gallery-plaster"
-                    onClick={() => setIsOfferingsDropdownOpen(false)}
-                  >
-                    Blue Chip Art Fund
-                  </Link>
+                <div className="offerings-dropdown" role="menu">
+                  {offerings.map((item, index) => {
+                    const isActive = isOfferingActive(item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`offerings-dropdown-item ${isActive ? 'offerings-dropdown-item-active' : ''}`}
+                        onClick={() => setIsOfferingsDropdownOpen(false)}
+                        role="menuitem"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            setIsOfferingsDropdownOpen(false);
+                          }
+                        }}
+                        tabIndex={focusedDropdownItem === index ? 0 : -1}
+                      >
+                        <span className={`${isActive ? 'font-semibold' : 'font-normal'}`}>
+                          {item.label}
+                        </span>
+                        {isActive && (
+                          <span className="offerings-dropdown-indicator"></span>
+                        )}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
