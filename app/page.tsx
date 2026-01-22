@@ -153,7 +153,6 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [heroImage, setHeroImage] = useState<string>("");
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const faqItems = [
     {
