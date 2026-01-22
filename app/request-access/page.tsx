@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { trackFormSubmission } from "../lib/gtm";
+import Header from "../components/Header";
 
 interface FormData {
   fullName: string;
