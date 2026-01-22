@@ -1,3 +1,8 @@
+{/* TEMP: deploy verification */}
+<div style={{ display: "none" }}>about-deploy-check-20260122a</div>
+
+
+
 'use client';
 
 import Image from "next/image";
