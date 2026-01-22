@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { useRef, useState, useEffect } from "react";
+import Header from "./components/Header";
 
 interface ArtworkItem {
   src: string;
@@ -152,12 +153,6 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [heroImage, setHeroImage] = useState<string>("");
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [subtitlesEnabled, setSubtitlesEnabled] = useState(true);
-  const [isVideoHovered, setIsVideoHovered] = useState(false);
-  const [isOfferingsDropdownOpen, setIsOfferingsDropdownOpen] = useState(false);
-  const offeringsDropdownRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const faqItems = [
     {
@@ -331,154 +326,7 @@ export default function Home() {
           }),
         }}
       />
-      {/* Header */}
-      <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-6 sm:py-8 lg:py-12">
-          <div className="flex items-center gap-6 relative">
-            {/* Logo */}
-            <div className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
-              <Image
-                src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
-                alt="Art Investment Group Trust Logo"
-                fill
-                className="object-contain object-left"
-                priority
-                sizes="(max-width: 640px) 119px, (max-width: 1024px) 170px, 238px"
-              />
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8 ml-auto">
-              <Link href="/about" className="nav-link">About</Link>
-
-              {/* Offerings Dropdown */}
-              <div
-                ref={offeringsDropdownRef}
-                className="offerings-dropdown-wrapper"
-                onMouseEnter={() => setIsOfferingsDropdownOpen(true)}
-                onMouseLeave={() => setIsOfferingsDropdownOpen(false)}
-              >
-                <button
-                  className="nav-link"
-                  aria-expanded={isOfferingsDropdownOpen}
-                  aria-haspopup="true"
-                >
-                  Offerings
-                </button>
-
-                {isOfferingsDropdownOpen && (
-                  <div className="offerings-dropdown">
-                    <Link href="/ethereum-art-fund" className="offerings-dropdown-item">
-                      Ethereum Art Fund
-                    </Link>
-                    <Link href="/blue-chip-art-fund" className="offerings-dropdown-item">
-                      Blue Chip Art Fund
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              <a href="#gallery" className="nav-link">Gallery</a>
-              <a href="#stewardship-in-practice" className="nav-link">Stewardship</a>
-              <Link href="/request-access" className="btn-primary">Request Access</Link>
-            </nav>
-
-            {/* Mobile/Tablet Hamburger Menu */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden ml-auto p-2 text-archive-slate hover:opacity-70 transition-opacity"
-              aria-label="Toggle navigation menu"
-              aria-expanded={isMenuOpen}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-            </button>
-
-            {/* Mobile/Tablet Dropdown Menu */}
-            {isMenuOpen && (
-              <nav className="lg:hidden absolute top-full right-0 left-0 bg-white border-t border-gallery-plaster shadow-md mt-2 z-50">
-                <div className="flex flex-col p-4 sm:p-6 gap-6">
-                  <Link
-                    href="/about"
-                    className="nav-link text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    About
-                  </Link>
-                  <div>
-                    <button
-                      onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
-                      className="nav-link text-base w-full text-left"
-                      aria-expanded={isOfferingsDropdownOpen}
-                    >
-                      Offerings
-                    </button>
-                    {isOfferingsDropdownOpen && (
-                      <div className="flex flex-col pl-4 gap-3 mt-2">
-                        <Link
-                          href="/ethereum-art-fund"
-                          className="nav-link text-base"
-                          onClick={() => {
-                            setIsMenuOpen(false);
-                            setIsOfferingsDropdownOpen(false);
-                          }}
-                        >
-                          Ethereum Art Fund
-                        </Link>
-                        <Link
-                          href="/blue-chip-art-fund"
-                          className="nav-link text-base"
-                          onClick={() => {
-                            setIsMenuOpen(false);
-                            setIsOfferingsDropdownOpen(false);
-                          }}
-                        >
-                          Blue Chip Art Fund
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                  <a
-                    href="#gallery"
-                    className="nav-link text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Gallery
-                  </a>
-                  <a
-                    href="#stewardship-in-practice"
-                    className="nav-link text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Stewardship
-                  </a>
-                  <div className="border-t border-gallery-plaster pt-4">
-                    <Link
-                      href="/request-access"
-                      className="btn-primary mobile-menu-button w-full"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Request Access
-                    </Link>
-                  </div>
-                </div>
-              </nav>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <main>
