@@ -193,6 +193,7 @@ export default function Header() {
                     onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
                     className="nav-link text-base w-full text-left flex items-center justify-between"
                     aria-expanded={isOfferingsDropdownOpen}
+                    aria-haspopup="menu"
                   >
                     Offerings
                     <svg
@@ -204,33 +205,30 @@ export default function Header() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className={`transition-transform ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
+                      className={`transition-transform duration-200 ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
                     >
                       <polyline points="1 1 6 6 11 1"></polyline>
                     </svg>
                   </button>
                   {isOfferingsDropdownOpen && (
-                    <div className="flex flex-col pl-4 gap-3 mt-2">
-                      <Link
-                        href="/ethereum-art-fund"
-                        className="nav-link text-base"
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          setIsOfferingsDropdownOpen(false);
-                        }}
-                      >
-                        Ethereum Art Fund
-                      </Link>
-                      <Link
-                        href="/blue-chip-art-fund"
-                        className="nav-link text-base"
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          setIsOfferingsDropdownOpen(false);
-                        }}
-                      >
-                        Blue Chip Art Fund
-                      </Link>
+                    <div className="flex flex-col pl-4 gap-3 mt-2" role="menu">
+                      {offerings.map((item) => {
+                        const isActive = isOfferingActive(item.href);
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`nav-link text-base ${isActive ? 'font-semibold' : 'font-normal'}`}
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              setIsOfferingsDropdownOpen(false);
+                            }}
+                            role="menuitem"
+                          >
+                            {item.label}
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
