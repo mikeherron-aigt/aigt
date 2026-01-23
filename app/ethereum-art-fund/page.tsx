@@ -525,12 +525,6 @@ export default function EthereumArtFundPage() {
               </div>
             </div>
 
-            {/* Bottom Text */}
-            <div className="max-w-[1022px] mx-auto mt-16 text-center">
-              <p className="governance-description">
-                The Ethereum Art Fund operates through defined ownership structures, measured engagement with risk, selective and committee-driven growth, and institutional governance applied consistently across participation and custody.
-              </p>
-            </div>
           </div>
         </section>
 
