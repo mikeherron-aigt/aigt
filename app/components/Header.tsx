@@ -29,7 +29,13 @@ export default function Header() {
             <Link href="/about" className="nav-link">About</Link>
 
             {/* Offerings Dropdown */}
-            <div className="offerings-dropdown-wrapper" onMouseEnter={() => setIsOfferingsOpen(true)} onMouseLeave={() => setIsOfferingsOpen(false)}>
+            <div
+              className="offerings-dropdown-wrapper"
+              onMouseEnter={() => setIsOfferingsOpen(true)}
+              onMouseLeave={() => {
+                setTimeout(() => setIsOfferingsOpen(false), 150);
+              }}
+            >
               <button
                 onClick={() => setIsOfferingsOpen(!isOfferingsOpen)}
                 className="nav-link flex items-center gap-2"
