@@ -2,8 +2,133 @@
 
 import Image from "next/image";
 import Header from "../components/Header";
+import { useState, useRef, useEffect } from "react";
+
+interface ArtworkItem {
+  src: string;
+  title: string;
+  artist: string;
+  year: string;
+}
+
+const featuredWorks: ArtworkItem[] = [
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F270bfbf622d44bb58da3863d2d4a1416?format=webp&width=800",
+    title: "80s Series #2",
+    artist: "John Dowling Jr.",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0b223e89165544369065645eb9e01981?format=webp&width=800",
+    title: "80s Series #25",
+    artist: "John Dowling Jr.",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F412947b95d6b487f8e94d9db43269338?format=webp&width=800",
+    title: "80s Series #14",
+    artist: "John Dowling Jr.",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F41a3331c307447f9a770facf2b3f3f7b?format=webp&width=800",
+    title: "80s Series #53",
+    artist: "John Dowling Jr.",
+    year: "Contemporary"
+  },
+  {
+    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F08edb5409851472b964e3c762012ec12?format=webp&width=800",
+    title: "80s Series #38",
+    artist: "John Dowling Jr.",
+    year: "Contemporary"
+  }
+];
 
 export default function EthereumArtFundPage() {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!sliderRef.current) return;
+    if ((e.target as HTMLElement).closest('button')) return;
+    setIsDragging(true);
+    setStartX(e.pageX - sliderRef.current.offsetLeft);
+    setScrollLeft(sliderRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !sliderRef.current) return;
+    const x = e.pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    sliderRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!sliderRef.current) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
+    setScrollLeft(sliderRef.current.scrollLeft);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !sliderRef.current) return;
+    const x = e.touches[0].pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    sliderRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  const scrollSlider = (direction: 'left' | 'right') => {
+    if (!sliderRef.current) return;
+    const scrollAmount = 350;
+    const newScrollLeft = direction === 'left'
+      ? sliderRef.current.scrollLeft - scrollAmount
+      : sliderRef.current.scrollLeft + scrollAmount;
+
+    sliderRef.current.scrollTo({
+      left: newScrollLeft,
+      behavior: 'smooth'
+    });
+  };
+
+  const openModal = (artwork: ArtworkItem) => {
+    setSelectedImage(artwork);
+    setIsModalOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedImage(null);
+    document.body.style.overflow = 'unset';
+  };
+
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+
+    if (isModalOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+      return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+      };
+    }
+  }, [isModalOpen]);
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
       <Header />
@@ -195,57 +320,74 @@ export default function EthereumArtFundPage() {
               </div>
             </div>
 
-            {/* Featured Works */}
+            {/* Featured Works Slider */}
             <div className="mt-16">
               <h3 className="governance-title" style={{marginBottom: '32px', fontSize: '28px'}}>
                 Featured Works
               </h3>
               
-              {/* Artwork Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-                {[
-                  {
-                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/bf1425734f332533a074c41067eab96904592547?width=539',
-                    title: 'Artwork Painting Title',
-                    artist: 'Artist Name, Year Painting 1995'
-                  },
-                  {
-                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/c449ed6d6c50481da77fcd400331fe03b0bd186f?width=539',
-                    title: 'Artwork Painting Title',
-                    artist: 'Artist Name, Year Painting 1995'
-                  },
-                  {
-                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/35d9e20b231328fe15361b6f6b89e3dc2744cfce?width=539',
-                    title: 'Artwork Painting Title',
-                    artist: 'Artist Name, Year Painting 1995'
-                  },
-                  {
-                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/6054acc63d39b4b9f9397cb08da9efd2770dc874?width=539',
-                    title: 'Artwork Painting Title',
-                    artist: 'Artist Name, Year Painting 1995'
-                  },
-                  {
-                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/e44fc8c56a4ca0c1eaae9adcf85aa3a3d8c7f4f3?width=539',
-                    title: 'Artwork Painting Title',
-                    artist: 'Artist Name, Year Painting 1995'
-                  },
-                ].map((artwork, index) => (
-                  <div key={index} className="flex flex-col gap-2">
-                    <div className="relative w-full aspect-[247/206] overflow-hidden bg-gallery-plaster">
-                      <Image
-                        src={artwork.src}
-                        alt={artwork.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                      />
-                    </div>
-                    <div>
-                      <p className="artwork-title">{artwork.title}</p>
-                      <p className="artwork-details">{artwork.artist}</p>
-                    </div>
+              {/* Slider Container */}
+              <div className="slider-wrapper">
+                <div className="slider-container">
+                  <div
+                    ref={sliderRef}
+                    className="artwork-slider"
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    style={{ cursor: isDragging ? 'grabbing' : 'grab', userSelect: 'none' }}
+                  >
+                    {[...featuredWorks, ...featuredWorks].map((artwork, index) => (
+                      <div key={index} className="artwork-card">
+                        <button
+                          className="artwork-card-button"
+                          onClick={() => openModal(artwork)}
+                          aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
+                        >
+                          <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
+                            <Image
+                              src={artwork.src}
+                              alt={artwork.title}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                            />
+                          </div>
+                        </button>
+                        <div className="artwork-info">
+                          <h3 className="artwork-title">{artwork.title}</h3>
+                          <p className="artwork-details">{artwork.artist}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+              </div>
+
+              {/* Slider Navigation Arrows */}
+              <div className="flex justify-center items-center gap-6 mt-12">
+                <button
+                  onClick={() => scrollSlider('left')}
+                  className="slider-nav-arrow slider-nav-arrow-left"
+                  aria-label="Scroll left"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+                <button
+                  onClick={() => scrollSlider('right')}
+                  className="slider-nav-arrow slider-nav-arrow-right"
+                  aria-label="Scroll right"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -357,9 +499,9 @@ export default function EthereumArtFundPage() {
 
             {/* Three Grey Boxes */}
             <div className="flex flex-col gap-6">
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px'}}>
+              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto'}}>
                 <h3 className="stewardship-card-title">For Informed and Qualified Participants</h3>
-                <p className="stewardship-card-description">
+                <p className="stewardship-card-description" style={{marginTop: '16px'}}>
                   Participation in the Ethereum Art Fund is offered through private placement to qualified participants who understand the experimental nature of tokenized art structures.
                 </p>
                 <p className="stewardship-card-description">
@@ -367,16 +509,16 @@ export default function EthereumArtFundPage() {
                 </p>
               </div>
 
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px'}}>
+              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto'}}>
                 <h3 className="stewardship-card-title">Complementary, Not Substitutable</h3>
-                <p className="stewardship-card-description">
+                <p className="stewardship-card-description" style={{marginTop: '16px'}}>
                   Ethereum Art Fund operates alongside Art Investment Group Trust's long-horizon, lower-risk stewardship Blue Chip Art Fund platform. Participants seeking permanent ownership, minimal turnover, and preservation-first mandates may find those platforms more appropriate. Participants seeking structured exposure to tokenized art ownership and emerging market dynamics may find alignment with Ethereum Art Fund.
                 </p>
               </div>
 
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px'}}>
+              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto'}}>
                 <h3 className="stewardship-card-title">Informed Dialogue Required</h3>
-                <p className="stewardship-card-description">
+                <p className="stewardship-card-description" style={{marginTop: '16px'}}>
                   Art Investment Group Trust engages prospective participants through direct, considered discussion. Understanding intent, risk tolerance, and time horizon is essential before participation. Request access to begin a private conversation about the Ethereum Art Fund.
                 </p>
               </div>
@@ -391,6 +533,45 @@ export default function EthereumArtFundPage() {
           </div>
         </section>
       </main>
+
+      {/* Image Modal - Same as home page */}
+      {isModalOpen && selectedImage && (
+        <div
+          className="image-modal-backdrop"
+          onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full-size image viewer"
+        >
+          <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="image-modal-close"
+              onClick={closeModal}
+              aria-label="Close image viewer"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
+            <div className="image-modal-image-container">
+              <Image
+                src={selectedImage.src}
+                alt={selectedImage.title}
+                fill
+                className="object-contain"
+                sizes="90vw"
+              />
+            </div>
+
+            <div className="image-modal-info">
+              <h2 className="image-modal-title">{selectedImage.title}</h2>
+              <p className="image-modal-artist">{selectedImage.artist}, {selectedImage.year}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
