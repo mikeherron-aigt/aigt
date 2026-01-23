@@ -10,8 +10,10 @@ export default function Header() {
 
   return (
     <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-6 sm:py-8 lg:py-12">
-        <div className="flex items-center gap-6 relative">
+      <div className="max-w-[1440px] mx-auto py-6 sm:py-8 lg:py-12">
+        <div className="grid lg:grid-cols-[1fr_40%] gap-0">
+          {/* Left column - Logo and Nav */}
+          <div className="px-4 sm:px-8 lg:px-[80px] flex items-center gap-6 relative">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
             <Image
@@ -180,6 +182,9 @@ export default function Header() {
               </div>
             </nav>
           )}
+        </div>
+          {/* Right column - Empty for alignment */}
+          <div className="hidden lg:block"></div>
         </div>
       </div>
     </header>
