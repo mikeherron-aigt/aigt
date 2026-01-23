@@ -221,13 +221,13 @@ export default function BlueChipArtFundPage() {
                   Preservation-First Stewardship
                 </h3>
                 <p className="governance-description" style={{marginBottom: '16px'}}>
-                  Maintaining the historical integrity of established works
+                  Prioritizing long-duration ownership over liquidity
                 </p>
                 <p className="governance-description" style={{marginBottom: '16px'}}>
-                  Preserving provenance continuity and historical integrity
+                  Maintaining museum-quality custody and care standards
                 </p>
                 <p className="governance-description" style={{marginBottom: '16px'}}>
-                  Protecting the physical condition of culturally significant pieces
+                  Preserving provenance, context, and historical integrity
                 </p>
                 <p className="governance-description">
                   Minimizing turnover to support long-term cultural value
