@@ -73,16 +73,18 @@ export default function Header() {
 
             <a href="/#gallery" className="nav-link">Gallery</a>
             <a href="/#stewardship-in-practice" className="nav-link">Stewardship</a>
-            <Link href="/request-access" className="btn-primary">Request Access</Link>
-          </nav>
+              <Link href="/request-access" className="btn-primary">Request Access</Link>
+            </nav>
+          </div>
 
           {/* Mobile/Tablet Hamburger Menu */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden ml-auto p-2 text-archive-slate hover:opacity-70 transition-opacity"
-            aria-label="Toggle navigation menu"
-            aria-expanded={isMenuOpen}
-          >
+          <div className="lg:hidden flex items-center justify-end px-4 sm:px-8">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 text-archive-slate hover:opacity-70 transition-opacity"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMenuOpen}
+            >
             <svg
               width="24"
               height="24"
