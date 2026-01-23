@@ -1055,13 +1055,14 @@ section:has(.slider-wrapper) {
   padding: 0 !important;
 }
 
-.practice-card-description ul {
-  list-style: disc;
+ul.practice-card-description {
+  list-style: disc !important;
   padding-left: 24px !important;
   margin: 8px 0 0 0 !important;
+  padding: 0 0 0 24px !important;
 }
 
-.practice-card-description li {
+ul.practice-card-description li {
   margin-bottom: 8px;
   margin-left: 0;
 }
