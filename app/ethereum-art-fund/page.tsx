@@ -247,6 +247,9 @@ export default function EthereumArtFundPage() {
               <p className="governance-subtitle text-center max-w-[735px]">
                 The Ethereum Art Fund is differentiated from other Art Investment Group Trust stewardship platforms by its mandate.
               </p>
+              <p className="governance-description text-center max-w-[995px]">
+                The Ethereum Art Fund was established with a clearly defined mandate. It operates at the intersection of cultural stewardship and evolving ownership models, engaging selectively with tokenization and fractional participation while maintaining institutional governance. This flexibility introduces additional risk and shorter time horizons, which are acknowledged and managed through structure rather than avoided.
+              </p>
             </div>
 
             {/* Four Boxes */}
@@ -271,13 +274,6 @@ export default function EthereumArtFundPage() {
                   Measured Engagement with Liquidity Dynamics
                 </h3>
               </div>
-            </div>
-
-            {/* Bottom Text */}
-            <div className="max-w-[1022px] mx-auto mt-16 text-center">
-              <p className="governance-description">
-                The Ethereum Art Fund was established with a clearly defined mandate. It operates at the intersection of cultural stewardship and evolving ownership models, engaging selectively with tokenization and fractional participation while maintaining institutional governance. This flexibility introduces additional risk and shorter time horizons, which are acknowledged and managed through structure rather than avoided.
-              </p>
             </div>
           </div>
         </section>
