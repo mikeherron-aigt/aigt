@@ -120,7 +120,7 @@ export default function Header() {
 
       {/* Mobile/Tablet Dropdown Menu */}
       {isMenuOpen && (
-        <nav className="lg:hidden fixed left-0 right-0 bg-white border-b border-gallery-plaster shadow-md z-50" style={{top: 'calc(30px + 24px + 24px)', width: '100%'}} className="sm:top-[106px]">
+        <nav className="lg:hidden fixed left-0 right-0 bg-white border-b border-gallery-plaster shadow-md z-50" style={{top: 'calc(30px + 24px + 24px)', width: '100%'}}>
           <div className="flex flex-col p-4 sm:p-6 gap-6">
             <Link
               href="/about"
