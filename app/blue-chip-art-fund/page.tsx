@@ -207,10 +207,10 @@ export default function BlueChipArtFundPage() {
                     Institutional Stewardship for Established Art
                   </h2>
                   <p className="governance-description">
-                    The Blue Chip Art Fund is structured around culturally established art, emphasizing long-duration stewardship and institutional-level custodial care.
+                    The Blue Chip Art Fund is designed for artworks with established cultural significance and enduring historical relevance.
                   </p>
                   <p className="governance-description">
-                    The fund operates with measured, committee-based governance designed to prioritize preservation and continuity over short-term participation or liquidity concerns.
+                    The fund applies institutional governance, professional custody standards, and long-horizon ownership to works that warrant preservation across generations rather than participation in evolving market structures.
                   </p>
                 </div>
               </div>
