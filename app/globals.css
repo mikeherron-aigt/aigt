@@ -126,6 +126,18 @@ body {
   flex-direction: column;
 }
 
+/* Create invisible hover bridge between button and dropdown */
+.offerings-dropdown-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 150px;
+  pointer-events: auto;
+  z-index: 49;
+}
+
 .nav-separator {
   color: var(--archive-slate);
   font-size: 16px;
