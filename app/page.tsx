@@ -340,9 +340,7 @@ export default function Home() {
               <div className="max-w-[637px]">
                 {/* Heading */}
                 <h1 className="hero-title" style={{marginBottom: '17px'}}>
-                  <div style={{fontSize: '41px', lineHeight: '45px'}}>
-                    The Art That Matters<br />The Stewardship It Deserves
-                  </div>
+                  The Art That Matters<br />The Stewardship It Deserves
                 </h1>
 
                 {/* Subtitle */}
