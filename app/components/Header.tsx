@@ -2,72 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isOfferingsDropdownOpen, setIsOfferingsDropdownOpen] = useState(false);
-  const [focusedDropdownItem, setFocusedDropdownItem] = useState<number | null>(null);
-  const offeringsRef = useRef<HTMLDivElement>(null);
-  const offeringsButtonRef = useRef<HTMLButtonElement>(null);
-  const pathname = usePathname();
-
-  const offerings = [
-    { label: 'Ethereum Art Fund', href: '/eaf' },
-    { label: 'Blue Chip Art Fund', href: '/bcaf' },
-  ];
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (offeringsRef.current && !offeringsRef.current.contains(e.target as Node)) {
-        setIsOfferingsDropdownOpen(false);
-      }
-    };
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsOfferingsDropdownOpen(false);
-        offeringsButtonRef.current?.focus();
-      }
-    };
-
-    if (isOfferingsDropdownOpen) {
-      document.addEventListener('click', handleClickOutside);
-      document.addEventListener('keydown', handleEscape);
-      return () => {
-        document.removeEventListener('click', handleClickOutside);
-        document.removeEventListener('keydown', handleEscape);
-      };
-    }
-  }, [isOfferingsDropdownOpen]);
-
-  const handleOfferingsKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOfferingsDropdownOpen) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setIsOfferingsDropdownOpen(true);
-        setFocusedDropdownItem(0);
-      }
-    } else {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setFocusedDropdownItem(prev =>
-          prev === null ? 0 : Math.min(prev + 1, offerings.length - 1)
-        );
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setFocusedDropdownItem(prev =>
-          prev === null ? offerings.length - 1 : Math.max(prev - 1, 0)
-        );
-      }
-    }
-  };
-
-  const isOfferingActive = (href: string) => {
-    return pathname === href || pathname === href.replace('/eaf', '/ethereum-art-fund').replace('/bcaf', '/blue-chip-art-fund');
-  };
 
   return (
     <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
