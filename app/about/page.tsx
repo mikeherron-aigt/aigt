@@ -309,7 +309,9 @@ export default function AboutPage() {
                     <p className="team-member-board-badge" style={{fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 'bold', fontSize: '14px', marginTop: '4px', marginBottom: '2px'}}>Board Member</p>
 
                     {/* Title */}
-                    <p className="team-member-title">{member.title}</p>
+                    <p className="team-member-title" style={{whiteSpace: 'pre-line'}}>
+                      {member.title}
+                    </p>
 
                     {/* LinkedIn Icon */}
                     {member.linkedinUrl && (
