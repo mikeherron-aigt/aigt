@@ -471,7 +471,7 @@ export default function EthereumArtFundPage() {
                 <div className="practice-card-content">
                   <h3 className="practice-card-title">Governance in a Digital Context</h3>
                   <p className="practice-card-description">
-                    Despite its experimental mandate, EAF maintains institutional custody and control standards, including:
+                    Despite its experimental mandate, Ethereum Art Fund maintains institutional custody and control standards, including:
                   </p>
                   <ul className="practice-card-description" style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
                     <li>Secure digital asset custody</li>
