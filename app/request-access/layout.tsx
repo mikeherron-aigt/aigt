@@ -31,5 +31,10 @@ export default function RequestAccessLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <RequestAccessSchema />
+      {children}
+    </>
+  );
 }
