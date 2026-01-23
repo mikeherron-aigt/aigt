@@ -500,8 +500,8 @@ export default function EthereumArtFundPage() {
 
             {/* Three Grey Boxes */}
             <div className="flex flex-col gap-6">
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto'}}>
-                <h3 className="stewardship-card-title">For Informed and Qualified Participants</h3>
+              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto', backgroundColor: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: '0'}}>
+                <h3 className="stewardship-card-title" style={{textAlign: 'left', width: '100%'}}>For Informed and Qualified Participants</h3>
                 <p className="stewardship-card-description" style={{marginTop: '16px'}}>
                   Participation in the Ethereum Art Fund is offered through private placement to qualified participants who understand the experimental nature of tokenized art structures.
                 </p>
@@ -510,15 +510,15 @@ export default function EthereumArtFundPage() {
                 </p>
               </div>
 
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto'}}>
-                <h3 className="stewardship-card-title">Complementary, Not Substitutable</h3>
+              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto', backgroundColor: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: '0'}}>
+                <h3 className="stewardship-card-title" style={{textAlign: 'left', width: '100%'}}>Complementary, Not Substitutable</h3>
                 <p className="stewardship-card-description" style={{marginTop: '16px'}}>
                   Ethereum Art Fund operates alongside Art Investment Group Trust's long-horizon, lower-risk stewardship Blue Chip Art Fund platform. Participants seeking permanent ownership, minimal turnover, and preservation-first mandates may find those platforms more appropriate. Participants seeking structured exposure to tokenized art ownership and emerging market dynamics may find alignment with Ethereum Art Fund.
                 </p>
               </div>
 
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto'}}>
-                <h3 className="stewardship-card-title">Informed Dialogue Required</h3>
+              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto', backgroundColor: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: '0'}}>
+                <h3 className="stewardship-card-title" style={{textAlign: 'left', width: '100%'}}>Informed Dialogue Required</h3>
                 <p className="stewardship-card-description" style={{marginTop: '16px'}}>
                   Art Investment Group Trust engages prospective participants through direct, considered discussion. Understanding intent, risk tolerance, and time horizon is essential before participation. Request access to begin a private conversation about the Ethereum Art Fund.
                 </p>
