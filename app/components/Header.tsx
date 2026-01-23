@@ -12,22 +12,23 @@ export default function Header() {
     <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
       <div className="max-w-[1440px] mx-auto py-6 sm:py-8 lg:py-12">
         <div className="grid lg:grid-cols-[1fr_40%] gap-0">
-          {/* Left column - Logo and Nav */}
-          <div className="px-4 sm:px-8 lg:px-[80px] flex items-center gap-6 relative">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
-            <Image
-              src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
-              alt="Art Investment Group Trust Logo"
-              fill
-              className="object-contain object-left"
-              priority
-              sizes="(max-width: 640px) 119px, (max-width: 1024px) 170px, 238px"
-            />
-          </Link>
+          {/* Left column - Logo */}
+          <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
+            <Link href="/" className="flex-shrink-0 relative w-[119px] sm:w-[170px] lg:w-[238px] h-[30px] sm:h-[42px] lg:h-[60px]">
+              <Image
+                src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd28207d51f894871ab0aee911d45e221?format=webp&width=800"
+                alt="Art Investment Group Trust Logo"
+                fill
+                className="object-contain object-left"
+                priority
+                sizes="(max-width: 640px) 119px, (max-width: 1024px) 170px, 238px"
+              />
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-8 ml-auto">
+          {/* Right column - Navigation */}
+          <div className="hidden lg:flex items-center justify-end px-[80px]">
+            <nav className="flex items-center gap-8">
             <Link href="/about" className="nav-link">About</Link>
 
             {/* Offerings Dropdown */}
