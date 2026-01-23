@@ -99,11 +99,12 @@ export default function Header() {
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
-          </button>
+            </button>
+          </div>
 
           {/* Mobile/Tablet Dropdown Menu */}
           {isMenuOpen && (
-            <nav className="lg:hidden absolute top-full right-0 left-0 bg-white border-t border-gallery-plaster shadow-md mt-2 z-50">
+            <nav className="lg:hidden absolute top-full right-0 left-0 bg-white border-t border-gallery-plaster shadow-md mt-2 z-50 col-span-full">
               <div className="flex flex-col p-4 sm:p-6 gap-6">
                 <Link
                   href="/about"
@@ -185,9 +186,6 @@ export default function Header() {
               </div>
             </nav>
           )}
-        </div>
-          {/* Right column - Empty for alignment */}
-          <div className="hidden lg:block"></div>
         </div>
       </div>
     </header>
