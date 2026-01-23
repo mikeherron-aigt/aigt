@@ -26,51 +26,7 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8 ml-auto">
             <Link href="/about" className="nav-link">About</Link>
-            
-            {/* Offerings Dropdown - Desktop */}
-            <div className="offerings-dropdown-wrapper" ref={offeringsRef}>
-              <button
-                ref={offeringsButtonRef}
-                onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
-                onKeyDown={handleOfferingsKeyDown}
-                className="nav-link"
-                aria-expanded={isOfferingsDropdownOpen}
-                aria-haspopup="menu"
-              >
-                Offerings
-              </button>
-
-              {isOfferingsDropdownOpen && (
-                <div className="offerings-dropdown" role="menu">
-                  {offerings.map((item, index) => {
-                    const isActive = isOfferingActive(item.href);
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`offerings-dropdown-item ${isActive ? 'offerings-dropdown-item-active' : ''}`}
-                        onClick={() => setIsOfferingsDropdownOpen(false)}
-                        role="menuitem"
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            setIsOfferingsDropdownOpen(false);
-                          }
-                        }}
-                        tabIndex={focusedDropdownItem === index ? 0 : -1}
-                      >
-                        <span className={`${isActive ? 'font-semibold' : 'font-normal'}`}>
-                          {item.label}
-                        </span>
-                        {isActive && (
-                          <span className="offerings-dropdown-indicator"></span>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
+            <Link href="/ethereum-art-fund" className="nav-link">Offerings</Link>
             <a href="/#gallery" className="nav-link">Gallery</a>
             <a href="/#stewardship-in-practice" className="nav-link">Stewardship</a>
             <Link href="/request-access" className="btn-primary">Request Access</Link>
