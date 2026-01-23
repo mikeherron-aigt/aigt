@@ -533,7 +533,73 @@ export default function EthereumArtFundPage() {
             </div>
           </div>
         </section>
+
+        {/* Governed Platforms Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center gap-8">
+              <div className="text-center max-w-[995px]">
+                <h2 className="governance-title" style={{marginBottom: '24px'}}>
+                  Governed platforms for the long-term stewardship<br />of culturally significant art.
+                </h2>
+              </div>
+
+              <div className="max-w-[789px] text-center">
+                <h3 className="governance-subtitle" style={{marginBottom: '16px'}}>
+                  Private Conversations
+                </h3>
+                <p className="governance-description" style={{marginBottom: '16px'}}>
+                  Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not transactions.
+                </p>
+                <p className="governance-description">
+                  These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
+                </p>
+              </div>
+
+              <button className="btn-primary">
+                Schedule a Discussion
+              </button>
+            </div>
+          </div>
+        </section>
       </main>
+
+      {/* Footer */}
+      <footer>
+        <div className="footer-content-box">
+          <div className="max-w-[1440px] mx-auto text-center">
+            <div className="mb-8">
+              <svg width="40" height="40" viewBox="0 0 64 64" className="mx-auto mb-4">
+                <rect x="8" y="8" width="10" height="10" fill="currentColor"/>
+                <rect x="23" y="8" width="10" height="10" fill="currentColor"/>
+                <rect x="8" y="23" width="10" height="10" fill="currentColor"/>
+                <rect x="23" y="23" width="10" height="10" fill="currentColor"/>
+                <rect x="38" y="8" width="10" height="10" fill="currentColor"/>
+                <rect x="38" y="23" width="10" height="10" fill="currentColor"/>
+              </svg>
+              <h3 style={{margin: '0', fontSize: '16px', fontWeight: '400'}}>Art Investment<br />Group Trust</h3>
+            </div>
+
+            <p className="footer-links" style={{marginBottom: '24px'}}>
+              <a href="#" style={{marginRight: '16px', textDecoration: 'none', color: 'inherit'}}>Disclosures</a>
+              <span>|</span>
+              <a href="#" style={{margin: '0 16px', textDecoration: 'none', color: 'inherit'}}>Privacy</a>
+              <span>|</span>
+              <a href="#" style={{margin: '0 16px', textDecoration: 'none', color: 'inherit'}}>Terms</a>
+              <span>|</span>
+              <a href="#" style={{marginLeft: '16px', textDecoration: 'none', color: 'inherit'}}>Contact</a>
+            </p>
+
+            <p className="footer-copyright" style={{marginBottom: '12px'}}>
+              COPYRIGHT ©2026. ALL RIGHTS RESERVED.
+            </p>
+
+            <p className="footer-disclaimer">
+              Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
+            </p>
+          </div>
+        </div>
+      </footer>
 
       {/* Image Modal - Same as home page */}
       {isModalOpen && selectedImage && (
