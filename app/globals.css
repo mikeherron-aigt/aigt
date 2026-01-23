@@ -124,9 +124,7 @@ body {
 /* Extend hover area for offerings dropdown wrapper */
 .offerings-dropdown-wrapper {
   position: relative;
-  /* Create invisible area below button to keep hover active while moving to dropdown */
-  padding-bottom: 150px;
-  margin-bottom: -150px;
+  display: inline-block;
 }
 
 .nav-separator {
