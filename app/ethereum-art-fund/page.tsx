@@ -74,7 +74,7 @@ export default function EthereumArtFundPage() {
         {/* Two Column Content Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="grid lg:grid-cols-2 gap-12 lg:gap-[80px]">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-12 lg:gap-[80px]">
               {/* Left Column */}
               <div className="max-w-[579px]">
                 <h2 className="governance-title" style={{marginBottom: '24px'}}>
