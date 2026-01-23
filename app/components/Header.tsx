@@ -89,13 +89,51 @@ export default function Header() {
                   About
                 </Link>
 
-                <a
-                  href="/#investment-offerings"
-                  className="nav-link text-base"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Offerings
-                </a>
+                {/* Mobile Offerings Dropdown */}
+                <div>
+                  <button
+                    onClick={() => setIsOfferingsOpen(!isOfferingsOpen)}
+                    className="nav-link text-base w-full text-left flex items-center justify-between"
+                  >
+                    Offerings
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className={`transition-transform ${isOfferingsOpen ? 'rotate-180' : ''}`}
+                    >
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </button>
+
+                  {isOfferingsOpen && (
+                    <div className="flex flex-col gap-2 mt-2 pl-4 border-l border-gallery-plaster">
+                      <Link
+                        href="/ethereum-art-fund"
+                        className="nav-link text-base"
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setIsOfferingsOpen(false);
+                        }}
+                      >
+                        Ethereum Art Fund
+                      </Link>
+                      <Link
+                        href="/blue-chip-art-fund"
+                        className="nav-link text-base"
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          setIsOfferingsOpen(false);
+                        }}
+                      >
+                        Blue Chip Art Fund
+                      </Link>
+                    </div>
+                  )}
+                </div>
 
                 <a
                   href="/#gallery"
