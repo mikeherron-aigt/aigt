@@ -67,13 +67,13 @@ export default function Header() {
                   About
                 </Link>
 
-                <Link
-                  href="/ethereum-art-fund"
+                <a
+                  href="/#investment-offerings"
                   className="nav-link text-base"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Offerings
-                </Link>
+                </a>
 
                 <a
                   href="/#gallery"
