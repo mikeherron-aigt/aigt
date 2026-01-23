@@ -331,7 +331,7 @@ export default function BlueChipArtFundPage() {
         <section className="w-full py-12 sm:py-16 lg:py-20" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
-              <h2 className="governance-title text-center">
+              <h2 className="governance-title text-center" style={{fontSize: '24px', lineHeight: '32px'}}>
                 How the Blue Chip Art Fund Operates
               </h2>
               <p className="governance-subtitle text-center max-w-[817px]">
