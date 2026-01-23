@@ -3,10 +3,12 @@ import AboutPageSchema from "../components/AboutPageSchema";
 
 export const metadata: Metadata = {
   title: "Art Stewardship Framework | Art Investment Group Trust",
-  description: "Learn how Art Investment Group Trust defines art stewardship through institutional governance, long term ownership, custody standards, and cultural preservation.",
+  description:
+    "Learn how Art Investment Group Trust defines art stewardship through institutional governance, long term ownership, custody standards, and cultural preservation.",
   openGraph: {
     title: "Art Stewardship Framework | Art Investment Group Trust",
-    description: "Discover how institutional governance and long-horizon ownership structure create sustainable stewardship models for culturally significant artworks.",
+    description:
+      "Discover how institutional governance and long-horizon ownership structure create sustainable stewardship models for culturally significant artworks.",
     url: "https://artinvestmentgrouptrust.com/about",
     type: "website",
     images: [
@@ -21,9 +23,12 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Art Stewardship Framework | Art Investment Group Trust",
-    description: "Learn how institutional governance creates sustainable stewardship models for culturally significant artworks.",
+    description:
+      "Learn how institutional governance creates sustainable stewardship models for culturally significant artworks.",
   },
-  canonical: "https://artinvestmentgrouptrust.com/about",
+  alternates: {
+    canonical: "https://artinvestmentgrouptrust.com/about",
+  },
 };
 
 export default function AboutLayout({
