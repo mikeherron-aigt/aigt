@@ -284,7 +284,7 @@ export default function BlueChipArtFundPage() {
         {/* Curatorial and Acquisition Focus Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="grid lg:grid-cols-[278px_1fr] gap-12 lg:gap-[120px] items-start">
+            <div className="grid lg:grid-cols-[417px_1fr] gap-12 lg:gap-[120px] items-start">
               {/* Left: Image */}
               <div className="flex justify-center lg:justify-start">
                 <div className="relative w-[417px] h-[417px] overflow-hidden">
