@@ -598,7 +598,7 @@ export default function Home() {
         </section>
 
         {/* Two Funds Section */}
-        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-24">
+        <section id="investment-offerings" className="w-full bg-white py-12 sm:py-16 lg:py-24" style={{scrollMarginTop: '-100px'}}>
           <div className="max-w-[1441px] mx-auto">
             <div className="flex flex-col items-center gap-12">
               {/* Top Content */}

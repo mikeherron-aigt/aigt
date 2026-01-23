@@ -79,19 +79,18 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "Ashley Murison",
-   title: "Museum Director\nChief of Staff",
+    title: "Museum Director\nChief of Staff",
     description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9294e8137f304e6aaeb4019b03c91a2a?format=webp&width=400",
     linkedinUrl: "https://www.linkedin.com/in/ashleymurison/"
   },
-{
-    name: "John Joseph Dowling Jr.",
+  {
+    name: "John Dowling Jr.",
     title: "VR Museum Director\nChief Visionary Officer",
     description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=400",
     linkedinUrl: "https://www.linkedin.com/in/johndowlingjr/"
-  },
-  
+  }
 ];
 
 export default function AboutPage() {
@@ -310,10 +309,9 @@ export default function AboutPage() {
                     <p className="team-member-board-badge" style={{fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 'bold', fontSize: '14px', marginTop: '4px', marginBottom: '2px'}}>Board Member</p>
 
                     {/* Title */}
-               <p className="team-member-title" style={{ whiteSpace: 'pre-line' }}>
-  {member.title}
-</p>
-
+                    <p className="team-member-title" style={{whiteSpace: 'pre-line'}}>
+                      {member.title}
+                    </p>
 
                     {/* LinkedIn Icon */}
                     {member.linkedinUrl && (
