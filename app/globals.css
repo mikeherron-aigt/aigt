@@ -1299,6 +1299,19 @@ footer {
   text-decoration: none !important;
 }
 
+/* Mobile/Tablet Menu Positioning */
+@media (max-width: 1023px) {
+  header + nav {
+    top: calc(30px + 24px + 24px) !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  header + nav {
+    top: calc(42px + 32px + 32px) !important;
+  }
+}
+
 .footer-cta-primary:hover {
   opacity: 0.9;
 }
