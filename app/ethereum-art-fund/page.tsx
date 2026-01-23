@@ -89,7 +89,7 @@ export default function EthereumArtFundPage() {
               </div>
 
               {/* Right Column */}
-              <div className="max-w-[502px] bg-paper-white p-10 lg:p-[80px_40px]">
+              <div className="max-w-[502px] bg-white p-10 lg:p-[80px_40px]">
                 <h3 className="governance-title" style={{marginBottom: '24px', fontSize: '28px', lineHeight: '36px'}}>
                   Structured Exposure to Innovation
                 </h3>
@@ -111,7 +111,7 @@ export default function EthereumArtFundPage() {
         </section>
 
         {/* A Distinct Mandate Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
+        <section className="w-full py-12 sm:py-16 lg:py-20" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
               <h2 className="governance-title text-center">
