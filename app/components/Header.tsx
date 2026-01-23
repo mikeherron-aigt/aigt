@@ -6,6 +6,7 @@ import { useState } from "react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isOfferingsOpen, setIsOfferingsOpen] = useState(false);
 
   return (
     <header className="w-full" style={{backgroundColor: '#f5f5f5'}}>
