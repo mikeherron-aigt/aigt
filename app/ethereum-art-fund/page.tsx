@@ -396,7 +396,7 @@ export default function EthereumArtFundPage() {
         </section>
 
         {/* How the Ethereum Art Fund Operates */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
+        <section className="w-full py-12 sm:py-16 lg:py-20" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
               <h2 className="governance-title text-center">
