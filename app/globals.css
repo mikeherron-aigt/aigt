@@ -812,12 +812,12 @@ section:has(.slider-wrapper) {
 
 .stewardship-card {
   display: flex;
-  min-height: 180px;
-  padding: 40px;
+  min-height: 110px;
+  padding: 24px 40px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 8px;
   background: var(--gallery-plaster);
   backdrop-filter: blur(3.3px);
 }
