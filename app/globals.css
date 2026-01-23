@@ -51,8 +51,7 @@ body {
 .offerings-dropdown {
   position: absolute;
   top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   background: white;
   border: 1px solid var(--gallery-plaster);
   border-radius: 8px;
@@ -61,7 +60,6 @@ body {
   z-index: 50;
   overflow: hidden;
   animation: fadeIn 0.15s ease-out;
-  white-space: nowrap;
 }
 
 @keyframes fadeIn {
