@@ -758,8 +758,8 @@ export default function Home() {
               {/* Governance and Care Card */}
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Governance and Care</h3>
-                  <h4 className="practice-card-subtitle">Responsibility Requires Structure</h4>
+                  <h2 className="practice-card-title">Governance and Care</h2>
+                  <h3 className="practice-card-subtitle">Responsibility Requires Structure</h3>
                   <p className="practice-card-description">
                     Stewardship without governance is fragile. Art Investment Trust Group operates with centralized oversight, clear separation between economic participation and control, and institutional standards for custody, insurance, conservation, and compliance.<br /><br />The governance framework exists to protect the artwork first, ensuring decisions are made with long term cultural responsibility rather than short term incentives.
                   </p>
@@ -769,8 +769,8 @@ export default function Home() {
               {/* Perspective Card */}
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Perspective</h3>
-                  <h4 className="practice-card-subtitle">Art Requires Time</h4>
+                  <h2 className="practice-card-title">Perspective</h2>
+                  <h3 className="practice-card-subtitle">Art Requires Time</h3>
                   <p className="practice-card-description">
                     The value of important art unfolds over years, not quarters. Cultural relevance is shaped through context, exhibition, scholarship, and preservation.<br /><br />The structures are designed to reflect this reality. Outcomes are not rushed, liquidity is not forced, and art is not framed through performance metrics. Time is allowed to do its work.
                   </p>
