@@ -458,7 +458,7 @@ export default function EthereumArtFundPage() {
                 <div className="practice-card-content">
                   <h3 className="practice-card-title">Selective and Disciplined Growth</h3>
                   <p className="practice-card-description">
-                    While the Dowling catalog serves as the foundation, EAF may expand to include additional Ethereum-native works that meet the fund's acquisition and governance criteria.
+                    While the Dowling catalog serves as the foundation, Ethereum Art Fund may expand to include additional Ethereum-native works that meet the fund's acquisition and governance criteria.
                   </p>
                   <p className="practice-card-description">
                     Expansion remains selective and committee-driven, with a focus on cultural relevance and suitability for tokenized participation models.
