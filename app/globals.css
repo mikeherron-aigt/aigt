@@ -815,7 +815,8 @@ section:has(.slider-wrapper) {
   height: 202px;
   padding: 40px;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: 16px;
   background: var(--gallery-plaster);
   backdrop-filter: blur(3.3px);
@@ -824,16 +825,17 @@ section:has(.slider-wrapper) {
 .stewardship-card-title {
   color: var(--archive-slate);
   font-family: Georgia, serif;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 400;
-  line-height: 36px;
+  line-height: 30px;
   margin: 0;
   width: 100%;
+  text-align: center;
 }
 
 @media (min-width: 1024px) {
   .stewardship-card-title {
-    font-size: 28px;
+    font-size: 22px;
   }
 }
 
