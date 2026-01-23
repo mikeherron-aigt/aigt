@@ -405,6 +405,9 @@ export default function EthereumArtFundPage() {
               <p className="governance-subtitle text-center max-w-[817px]">
                 An overview of participation mechanics, risk profile, and operating discipline.
               </p>
+              <p className="governance-description text-center max-w-[995px]">
+                The Ethereum Art Fund operates through selective acquisition, experimental ownership structures, higher risk tolerance, and governance designed to explore emerging models while maintaining institutional discipline.
+              </p>
             </div>
 
             {/* Two Column Grid */}
