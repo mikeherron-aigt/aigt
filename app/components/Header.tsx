@@ -193,7 +193,7 @@ export default function Header() {
             <div className="border-t border-gallery-plaster pt-4">
               <Link
                 href="/request-access"
-                className="btn-primary mobile-menu-button w-full"
+                className="btn-primary"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Request Access
