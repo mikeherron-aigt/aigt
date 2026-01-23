@@ -67,51 +67,13 @@ export default function Header() {
                   About
                 </Link>
 
-                {/* Offerings Dropdown - Mobile */}
-                <div>
-                  <button
-                    onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
-                    className="nav-link text-base w-full text-left flex items-center justify-between"
-                    aria-expanded={isOfferingsDropdownOpen}
-                    aria-haspopup="menu"
-                  >
-                    Offerings
-                    <svg
-                      width="12"
-                      height="8"
-                      viewBox="0 0 12 8"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className={`transition-transform duration-200 ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
-                    >
-                      <polyline points="1 1 6 6 11 1"></polyline>
-                    </svg>
-                  </button>
-                  {isOfferingsDropdownOpen && (
-                    <div className="flex flex-col pl-4 gap-3 mt-2" role="menu">
-                      {offerings.map((item) => {
-                        const isActive = isOfferingActive(item.href);
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`nav-link text-base ${isActive ? 'font-semibold' : 'font-normal'}`}
-                            onClick={() => {
-                              setIsMenuOpen(false);
-                              setIsOfferingsDropdownOpen(false);
-                            }}
-                            role="menuitem"
-                          >
-                            {item.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                <Link
+                  href="/ethereum-art-fund"
+                  className="nav-link text-base"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Offerings
+                </Link>
 
                 <a
                   href="/#gallery"
