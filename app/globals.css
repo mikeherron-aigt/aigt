@@ -1300,14 +1300,12 @@ footer {
 }
 
 /* Mobile/Tablet Menu Positioning */
-@media (max-width: 1023px) {
-  header + nav {
-    top: calc(30px + 24px + 24px) !important;
-  }
+.mobile-menu {
+  top: calc(30px + 24px + 24px) !important;
 }
 
-@media (min-width: 640px) and (max-width: 1023px) {
-  header + nav {
+@media (min-width: 640px) {
+  .mobile-menu {
     top: calc(42px + 32px + 32px) !important;
   }
 }
