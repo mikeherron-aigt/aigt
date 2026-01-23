@@ -26,7 +26,7 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8 ml-auto">
             <Link href="/about" className="nav-link">About</Link>
-            <Link href="/ethereum-art-fund" className="nav-link">Offerings</Link>
+            <a href="/#investment-offerings" className="nav-link">Offerings</a>
             <a href="/#gallery" className="nav-link">Gallery</a>
             <a href="/#stewardship-in-practice" className="nav-link">Stewardship</a>
             <Link href="/request-access" className="btn-primary">Request Access</Link>
