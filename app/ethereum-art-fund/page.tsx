@@ -198,23 +198,25 @@ export default function EthereumArtFundPage() {
 
         {/* Two Column Content Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="grid lg:grid-cols-[1fr_40%] gap-12 lg:gap-[80px]">
+          <div className="max-w-[1440px] mx-auto relative">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Left Column */}
-              <div className="max-w-[579px]">
-                <h2 className="governance-title" style={{marginBottom: '24px'}}>
-                  Institutional Discipline for an Experimental Medium
-                </h2>
-                <p className="governance-description">
-                  Ethereum-native art represents one of the most important cultural developments of the digital era. It also introduces new forms of ownership, liquidity, and risk.
-                </p>
-                <p className="governance-description">
-                  Ethereum Art Fund is intentionally designed to operate with a higher risk profile and a shorter expected time horizon than other AIGT platforms.
-                </p>
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
+                <div className="max-w-[579px]">
+                  <h2 className="governance-title" style={{marginBottom: '24px'}}>
+                    Institutional Discipline for an Experimental Medium
+                  </h2>
+                  <p className="governance-description">
+                    Ethereum-native art represents one of the most important cultural developments of the digital era. It also introduces new forms of ownership, liquidity, and risk.
+                  </p>
+                  <p className="governance-description">
+                    Ethereum Art Fund is intentionally designed to operate with a higher risk profile and a shorter expected time horizon than other AIGT platforms.
+                  </p>
+                </div>
               </div>
 
               {/* Right Column */}
-              <div className="max-w-[502px] p-10 lg:p-[80px_40px]" style={{backgroundColor: '#f5f5f5'}}>
+              <div className="px-4 sm:px-8 lg:p-[80px_40px]" style={{backgroundColor: '#f5f5f5'}}>
                 <h3 className="governance-title" style={{marginBottom: '24px', fontSize: '28px', lineHeight: '36px'}}>
                   Structured Exposure to Innovation
                 </h3>
