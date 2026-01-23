@@ -95,24 +95,11 @@ export default function Header() {
                 ref={offeringsButtonRef}
                 onClick={() => setIsOfferingsDropdownOpen(!isOfferingsDropdownOpen)}
                 onKeyDown={handleOfferingsKeyDown}
-                className="nav-link flex items-center gap-1"
+                className="nav-link"
                 aria-expanded={isOfferingsDropdownOpen}
                 aria-haspopup="menu"
               >
                 Offerings
-                <svg
-                  width="12"
-                  height="8"
-                  viewBox="0 0 12 8"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className={`transition-transform duration-200 ${isOfferingsDropdownOpen ? 'rotate-180' : ''}`}
-                >
-                  <polyline points="1 1 6 6 11 1"></polyline>
-                </svg>
               </button>
 
               {isOfferingsDropdownOpen && (
@@ -148,7 +135,6 @@ export default function Header() {
 
             <a href="/#gallery" className="nav-link">Gallery</a>
             <a href="/#stewardship-in-practice" className="nav-link">Stewardship</a>
-            <span className="nav-separator">|</span>
             <Link href="/request-access" className="btn-primary">Request Access</Link>
           </nav>
 
