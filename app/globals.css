@@ -1057,9 +1057,9 @@ section:has(.slider-wrapper) {
 
 ul.practice-card-description {
   list-style: disc !important;
-  padding-left: 24px !important;
+  padding-left: 40px !important;
   margin: 8px 0 0 0 !important;
-  padding: 0 0 0 24px !important;
+  padding: 0 0 0 40px !important;
 }
 
 ul.practice-card-description li {
