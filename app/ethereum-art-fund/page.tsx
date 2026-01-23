@@ -595,7 +595,7 @@ export default function EthereumArtFundPage() {
               </p>
 
               {/* Disclaimer */}
-              <p className="footer-disclaimer">
+              <p className="footer-disclaimer" style={{fontSize: '10px'}}>
                 Regulatory disclosures and offering materials are provided separately and only to eligible parties. This website is presented for informational purposes and does not constitute an offer or solicitation.
               </p>
             </div>
