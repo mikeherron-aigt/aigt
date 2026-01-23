@@ -41,6 +41,19 @@ export default function Header() {
                 className="nav-link flex items-center gap-2"
               >
                 Offerings
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`transition-transform ${isOfferingsOpen ? 'rotate-180' : ''}`}
+                >
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
               </button>
 
               {isOfferingsOpen && (
