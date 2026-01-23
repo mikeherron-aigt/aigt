@@ -204,25 +204,45 @@ export default function EthereumArtFundPage() {
               {/* Artwork Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
                 {[
-                  'https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fbf1425734f332533a074c41067eab96904592547?format=webp&width=540',
-                  'https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fc449ed6d6c50481da77fcd400331fe03b0bd186f?format=webp&width=540',
-                  'https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F35d9e20b231328fe15361b6f6b89e3dc2744cfce?format=webp&width=540',
-                  'https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F6054acc63d39b4b9f9397cb08da9efd2770dc874?format=webp&width=540',
-                  'https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fe44fc8c56a4ca0c1eaae9adcf85aa3a3d8c7f4f3?format=webp&width=540',
-                ].map((src, index) => (
+                  {
+                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/bf1425734f332533a074c41067eab96904592547?width=539',
+                    title: 'Artwork Painting Title',
+                    artist: 'Artist Name, Year Painting 1995'
+                  },
+                  {
+                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/c449ed6d6c50481da77fcd400331fe03b0bd186f?width=539',
+                    title: 'Artwork Painting Title',
+                    artist: 'Artist Name, Year Painting 1995'
+                  },
+                  {
+                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/35d9e20b231328fe15361b6f6b89e3dc2744cfce?width=539',
+                    title: 'Artwork Painting Title',
+                    artist: 'Artist Name, Year Painting 1995'
+                  },
+                  {
+                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/6054acc63d39b4b9f9397cb08da9efd2770dc874?width=539',
+                    title: 'Artwork Painting Title',
+                    artist: 'Artist Name, Year Painting 1995'
+                  },
+                  {
+                    src: 'https://api.builder.io/api/v1/image/assets/TEMP/e44fc8c56a4ca0c1eaae9adcf85aa3a3d8c7f4f3?width=539',
+                    title: 'Artwork Painting Title',
+                    artist: 'Artist Name, Year Painting 1995'
+                  },
+                ].map((artwork, index) => (
                   <div key={index} className="flex flex-col gap-2">
                     <div className="relative w-full aspect-[247/206] overflow-hidden bg-gallery-plaster">
                       <Image
-                        src={src}
-                        alt="Artwork Painting Title"
+                        src={artwork.src}
+                        alt={artwork.title}
                         fill
                         className="object-cover"
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                       />
                     </div>
                     <div>
-                      <p className="artwork-title">Artwork Painting Title</p>
-                      <p className="artwork-details">Artist Name, Year Painting 1995</p>
+                      <p className="artwork-title">{artwork.title}</p>
+                      <p className="artwork-details">{artwork.artist}</p>
                     </div>
                   </div>
                 ))}
