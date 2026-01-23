@@ -27,8 +27,8 @@ export default function Header() {
           </div>
 
           {/* Right column - Navigation */}
-          <div className="hidden lg:flex items-center justify-end pr-[80px]">
-            <nav className="flex items-center gap-5 whitespace-nowrap">
+          <div className="hidden lg:flex items-center justify-end">
+            <nav className="flex items-center gap-5 whitespace-nowrap pr-[80px]">
             <Link href="/about" className="nav-link">About</Link>
 
             {/* Offerings Dropdown */}
