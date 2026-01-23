@@ -170,7 +170,7 @@ export default function BlueChipArtFundPage() {
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
                   <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3483b76ebfdd44ddbe59a25e217610ef?format=webp&width=800"
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F97494ca48242488c963375b90301c8d2?format=webp&width=800&height=1200"
                     alt="Quiet, refined interior space evoking long-term art stewardship"
                     fill
                     className="object-cover object-center"
