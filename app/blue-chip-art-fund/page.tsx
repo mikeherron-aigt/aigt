@@ -245,10 +245,13 @@ export default function BlueChipArtFundPage() {
                 A Distinct Mandate
               </h2>
               <p className="governance-subtitle text-center max-w-[735px]">
-                The Blue Chip Art Fund operates with a distinct, preservation-first mandate well-suited to historically significant works.
+                The Blue Chip Art Fund is differentiated by its preservation-first mandate and long-term ownership horizon.
               </p>
               <p className="governance-description text-center max-w-[995px]">
-                The Blue Chip Art Fund operates with a curated approach designed to minimize turnover, preserve provenance, protect the physical condition of historically significant works, and apply measured, committee-driven decision-making designed to prevent short-term market pressures from influencing long-term stewardship and institutional custody.
+                The Blue Chip Art Fund operates with the explicit objective of long-term stewardship. It prioritizes permanence, stability, and cultural continuity over liquidity or market responsiveness.
+              </p>
+              <p className="governance-description text-center max-w-[995px]">
+                Acquisitions are made with the expectation of extended holding periods, limited turnover, and careful custodial management designed to preserve both physical condition and historical context.
               </p>
             </div>
 
