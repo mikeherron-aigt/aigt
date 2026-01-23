@@ -122,18 +122,8 @@ body {
 /* Extend hover area for offerings dropdown wrapper */
 .offerings-dropdown-wrapper {
   position: relative;
-  display: inline-block;
-}
-
-/* Create invisible hover area below button */
-.offerings-dropdown-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  height: 100px;
-  pointer-events: auto;
+  display: inline-flex;
+  flex-direction: column;
 }
 
 .nav-separator {
