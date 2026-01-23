@@ -27,7 +27,28 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-8 ml-auto">
             <Link href="/about" className="nav-link">About</Link>
-            <a href="/#investment-offerings" className="nav-link">Offerings</a>
+
+            {/* Offerings Dropdown */}
+            <div className="offerings-dropdown-wrapper" onMouseEnter={() => setIsOfferingsOpen(true)} onMouseLeave={() => setIsOfferingsOpen(false)}>
+              <button
+                onClick={() => setIsOfferingsOpen(!isOfferingsOpen)}
+                className="nav-link flex items-center gap-2"
+              >
+                Offerings
+              </button>
+
+              {isOfferingsOpen && (
+                <div className="offerings-dropdown" style={{marginTop: '10px'}}>
+                  <Link href="/ethereum-art-fund" className="offerings-dropdown-item">
+                    Ethereum Art Fund
+                  </Link>
+                  <Link href="/blue-chip-art-fund" className="offerings-dropdown-item">
+                    Blue Chip Art Fund
+                  </Link>
+                </div>
+              )}
+            </div>
+
             <a href="/#gallery" className="nav-link">Gallery</a>
             <a href="/#stewardship-in-practice" className="nav-link">Stewardship</a>
             <Link href="/request-access" className="btn-primary">Request Access</Link>
