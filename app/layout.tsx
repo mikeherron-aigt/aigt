@@ -12,15 +12,21 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://artinvestmentgrouptrust.com"),
   title: {
     template: "%s | Art Investment Group Trust",
     default: "Art Investment Group Trust | Institutional Art Investment & Stewardship",
   },
   description: "Art Investment Group Trust is a governed platform for art investment and cultural asset stewardship, focused on museum quality works, institutional governance, and long horizon ownership.",
+  keywords: "art investment, art fund, institutional governance, art stewardship, fine art, cultural preservation, art collector, art ownership",
   icons: {
     icon: "/favicon.png",
   },
   openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://artinvestmentgrouptrust.com",
+    siteName: "Art Investment Group Trust",
     images: [
       {
         url: "https://artinvestmentgrouptrust.com/og.png",
@@ -30,6 +36,23 @@ export const metadata: Metadata = {
         alt: "Art Investment Group Trust",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Art Investment Group Trust | Institutional Art Investment & Stewardship",
+    description: "A governed platform for art investment and cultural asset stewardship, focused on museum quality works and long horizon ownership.",
+    images: ["https://artinvestmentgrouptrust.com/og.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
   },
 };
 
