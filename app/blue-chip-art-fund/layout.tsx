@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import BlueChi pFundSchema from "../components/BlueChipFundSchema";
+import BlueChipFundSchema from "../components/BlueChipFundSchema";
 
 export const metadata: Metadata = {
   title: "Blue Chip Art Fund | Museum Quality Art Investment | Art Investment Group Trust",
