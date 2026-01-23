@@ -216,7 +216,7 @@ export default function EthereumArtFundPage() {
               </div>
 
               {/* Right Column */}
-              <div className="px-4 sm:px-8 lg:p-[80px_40px]" style={{backgroundColor: '#f5f5f5'}}>
+              <div className="px-4 sm:px-8 lg:p-[80px_40px] pt-12 sm:pt-16 lg:pt-0" style={{backgroundColor: '#f5f5f5'}}>
                 <h3 className="governance-title" style={{marginBottom: '24px', fontSize: '28px', lineHeight: '36px'}}>
                   Structured Exposure to Innovation
                 </h3>
