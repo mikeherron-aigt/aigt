@@ -1057,12 +1057,13 @@ section:has(.slider-wrapper) {
 
 .practice-card-description ul {
   list-style: disc;
-  padding-left: 20px !important;
-  margin-top: 8px !important;
+  padding-left: 24px !important;
+  margin: 8px 0 0 0 !important;
 }
 
 .practice-card-description li {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  margin-left: 0;
 }
 
 @media (min-width: 1024px) {
