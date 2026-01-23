@@ -50,7 +50,7 @@ body {
 
 .offerings-dropdown {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 2px);
   left: 0;
   background: white;
   border: 1px solid var(--gallery-plaster);
