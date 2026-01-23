@@ -299,7 +299,7 @@ export default function BlueChipArtFundPage() {
               </div>
 
               {/* Right: Content */}
-              <div className="max-w-[579px]" style={{paddingLeft: '0'}}>
+              <div className="max-w-[579px]" style={{marginLeft: '-30px'}}>
                 <h2 className="governance-title" style={{marginBottom: '24px'}}>
                   Curatorial and Acquisition Focus
                 </h2>
