@@ -27,17 +27,17 @@ export default function EthereumArtFundPage() {
                   {/* Subtitle */}
                   <div className="hero-subtitle" style={{textAlign: 'left'}}>
                     <p>
-                      Digital Art Stewardship for the Blockchain Era
+                      Tokenized Access to Ethereum-Native Cultural Assets
                     </p>
                   </div>
 
                   {/* Body Copy */}
                   <div className="hero-description" style={{textAlign: 'left', marginTop: '24px'}}>
                     <p>
-                      The Ethereum Art Fund is a specialized platform dedicated to acquiring, stewarding, and preserving digital and blockchain-native artworks within a governed framework.
+                      The Ethereum Art Fund is a governed platform designed to explore structured ownership, fractionalization, and tokenized access to culturally significant, Ethereum-native artworks.
                     </p>
                     <p style={{marginTop: '16px'}}>
-                      Operating within the Art Investment Group Trust structure, the fund applies institutional standards of custody, provenance verification, and long-term stewardship to digital art and NFTs with cultural significance and artistic merit.
+                      Operating within the Art Investment Group Trust framework, EAF applies institutional governance to an emerging asset model that blends art stewardship with evolving blockchain-based ownership structures.
                     </p>
                   </div>
                 </div>
@@ -47,8 +47,8 @@ export default function EthereumArtFundPage() {
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
                   <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Feafb8bb91b0e4cb4a3e057a625a6d313?format=webp&width=800"
-                    alt="Digital gallery space representing the Ethereum Art Fund collection"
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4d26843c35db4d8b9045503586fe91bd?format=webp&width=800"
+                    alt="Abstract colorful digital art representing Ethereum-native cultural assets"
                     fill
                     className="object-cover object-center"
                     priority
@@ -73,53 +73,42 @@ export default function EthereumArtFundPage() {
           </div>
         </div>
 
-        {/* Digital Stewardship Section */}
+        {/* Two Column Content Section */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="max-w-[711px]">
-              <h2 className="governance-title">
-                Institutional Standards for Digital Art
-              </h2>
-              <p className="governance-description">
-                The Ethereum Art Fund brings institutional governance and stewardship to the digital art space. We focus on artworks with lasting cultural relevance and technological integrity.
-              </p>
-              <p className="governance-description">
-                Our approach prioritizes authenticity verification, secure custody of digital assets, provenance documentation, and preservation standards for blockchain-native artworks—ensuring that digital creativity receives the same rigorous stewardship as traditional fine art.
-              </p>
-            </div>
-          </div>
-        </section>
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-[80px]">
+              {/* Left Column */}
+              <div className="max-w-[711px]">
+                <h2 className="governance-title" style={{marginBottom: '24px'}}>
+                  Institutional Discipline for an Experimental Medium
+                </h2>
+                <p className="governance-description">
+                  Ethereum-native art represents one of the most important cultural developments of the digital era. It also introduces new forms of ownership, liquidity, and risk.
+                </p>
+                <p className="governance-description">
+                  Ethereum Art Fund is specifically designed to absorb a higher risk profile and a shorter expected time horizon than other ART platforms.
+                </p>
+              </div>
 
-        {/* Key Principles Section */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <h2 className="governance-title" style={{marginBottom: '48px'}}>
-              Fund Principles
-            </h2>
-            <div className="grid md:grid-cols-2 gap-12">
-              <div>
-                <h3 className="font-semibold text-lg mb-4">Provenance & Authenticity</h3>
-                <p className="governance-description">
-                  Rigorous verification of artwork origin, creator identity, and blockchain history for all acquisitions.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-4">Secure Custody</h3>
-                <p className="governance-description">
-                  Professional asset management and storage solutions that protect digital ownership and access.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-4">Long-Term Preservation</h3>
-                <p className="governance-description">
-                  Commitment to maintaining digital art in perpetuity through institutional stewardship.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-4">Cultural Impact</h3>
-                <p className="governance-description">
-                  Focus on artworks that contribute meaningfully to digital culture and artistic discourse.
-                </p>
+              {/* Right Column */}
+              <div className="max-w-[600px]">
+                <h3 className="governance-title" style={{marginBottom: '24px', fontSize: '24px', lineHeight: '36px'}}>
+                  Structured Exposure to Innovation
+                </h3>
+                <ul style={{margin: '0', paddingLeft: '20px', listStyle: 'disc'}}>
+                  <li className="governance-description" style={{marginBottom: '16px'}}>
+                    Applying governance to tokenized art ownership
+                  </li>
+                  <li className="governance-description" style={{marginBottom: '16px'}}>
+                    Exploring fractional participation structures
+                  </li>
+                  <li className="governance-description" style={{marginBottom: '16px'}}>
+                    Establishing standards for custody, documentation, and access
+                  </li>
+                  <li className="governance-description">
+                    Creating controlled exposure to an evolving market
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
