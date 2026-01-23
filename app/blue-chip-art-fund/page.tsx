@@ -287,13 +287,13 @@ export default function BlueChipArtFundPage() {
             <div className="grid lg:grid-cols-[278px_1fr] gap-12 lg:gap-[120px] items-start">
               {/* Left: Image */}
               <div className="flex justify-center lg:justify-start">
-                <div className="relative w-[278px] h-[278px] overflow-hidden">
+                <div className="relative w-[417px] h-[417px] overflow-hidden">
                   <Image
                     src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F46a1b818e6284590a3a3c7f7dc300464?format=webp&width=800&height=1200"
                     alt="Quiet, refined interior space evoking long-term art stewardship"
                     fill
                     className="object-cover"
-                    sizes="278px"
+                    sizes="417px"
                   />
                 </div>
               </div>
