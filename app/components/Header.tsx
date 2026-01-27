@@ -41,7 +41,8 @@ export default function Header() {
 
   return (
     <header className="w-full sticky top-0 z-[9999]" style={{ backgroundColor: "#f5f5f5" }}>
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-6 sm:py-8 lg:py-12">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:pl-[80px] lg:pr-0 py-6 sm:py-8 lg:py-12">
+
         {/* Full-width row so nav can truly align to the right edge */}
         <div className="flex items-center w-full">
           {/* Logo */}
