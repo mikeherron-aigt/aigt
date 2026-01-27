@@ -2306,3 +2306,66 @@ footer {
   justify-content: flex-start !important;
   padding-left: 0 !important;
 }
+
+/* Museum page typography */
+body:has(main a[href="/museum"]),
+body:has(main h1):has(main h2) {
+}
+
+body:has(main h1) main h2 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 40px 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  body:has(main h1) main h2 {
+    font-size: 40px;
+    line-height: 48px;
+  }
+}
+
+body:has(main h1) main h3 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 24px 0 12px 0;
+}
+
+@media (min-width: 1024px) {
+  body:has(main h1) main h3 {
+    font-size: 22px;
+    line-height: 30px;
+  }
+}
+
+body:has(main h1) main h4 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 16px 0 8px 0;
+}
+
+body:has(main h1) main p,
+body:has(main h1) main li {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  body:has(main h1) main p,
+  body:has(main h1) main li {
+    font-size: 16px;
+  }
+}
