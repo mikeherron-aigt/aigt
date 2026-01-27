@@ -125,7 +125,7 @@ export default function Header() {
             <a href="/#gallery" className="nav-link">
               Gallery
             </a>
-            <a href="/#stewardship-in-practice" className="nav-link">
+            <a href="/museum" className="nav-link">
               Stewardship
             </a>
             <Link href="/request-access" className="btn-primary">
@@ -206,7 +206,7 @@ export default function Header() {
                   </a>
 
                   <a
-                    href="/#stewardship-in-practice"
+                    href="/museum"
                     className="nav-link text-base"
                     onClick={() => setIsMenuOpen(false)}
                   >
