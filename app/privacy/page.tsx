@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import Header from "../components/Header";
+
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
-      <Header />
+ 
 
       {/* Main Content */}
       <main className="w-full py-16 sm:py-20 lg:py-24">
