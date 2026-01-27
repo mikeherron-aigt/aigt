@@ -10,55 +10,59 @@ export const metadata: Metadata = {
 export default function MuseumPage() {
   return (
     <div className="museum-page">
+      {/* Hero Section - Full Width - Outside main tag */}
+      <section className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px]">
+        <Image
+          src="/museum_hero.jpg"
+          alt="John Dowling Jr. Museum of Contemporary Art exterior at dusk"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+        />
+        
+        {/* Hero Content */}
+        <div className="absolute inset-0 flex items-center justify-end">
+          <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-20 flex justify-end">
+            {/* Right side - White box with title and subtitle */}
+            <div className="bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px]">
+              <h1 
+                className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal leading-tight mb-6"
+                style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}
+              >
+                A Public Institution for Long-Horizon Art Stewardship
+              </h1>
+              <p className="text-base lg:text-lg leading-relaxed" style={{ color: "#252e3a" }}>
+                The John Dowling Jr. Museum of Contemporary Art is a planned contemporary art museum conceived as a living cultural institution rooted on Long Island.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <main>
-        {/* Hero Section - Full Width Image with Text Overlay */}
-        <section className="relative w-screen h-[500px] sm:h-[600px] lg:h-[700px] -mx-[50vw] left-[50%] right-[50%]">
-          <Image
-            src="/museum_hero.jpg"
-            alt="John Dowling Jr. Museum of Contemporary Art exterior at dusk"
-            fill
-            className="object-cover"
-            priority
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-transparent" />
-          
-          {/* Hero Content */}
-          <div className="absolute inset-0 flex items-center justify-end">
-            <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-20 flex justify-end">
-              {/* Right side - White box with title and subtitle */}
-              <div className="bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px]">
-                <h1 
-                  className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal leading-tight mb-6"
-                  style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}
-                >
-                  A Public Institution for Long-Horizon Art Stewardship
-                </h1>
-                <p className="text-base lg:text-lg leading-relaxed" style={{ color: "#252e3a" }}>
-                  The John Dowling Jr. Museum of Contemporary Art is a planned contemporary art museum conceived as a living cultural institution rooted on Long Island.
+
+        {/* Museum Leadership Section with John's bio - Full width background */}
+        <section className="py-12 lg:py-20 bg-white w-full">
+          <div className="w-full flex justify-center px-6 sm:px-8">
+            <div className="w-full max-w-[1440px]">
+              <div className="max-w-[720px] mx-auto text-center">
+                {/* First paragraph - larger serif font */}
+                <p className="text-xl lg:text-2xl leading-relaxed mb-8" style={{ fontFamily: "Georgia, serif", color: "#252e3a", fontWeight: 400 }}>
+                  John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
+                </p>
+                
+                {/* Stylized horizontal rule */}
+                <div className="relative my-12">
+                  <div className="w-full border-t" style={{ borderColor: "#dadada" }}></div>
+                </div>
+                
+                {/* Second paragraph - regular serif font */}
+                <p className="text-lg lg:text-xl leading-relaxed" style={{ fontFamily: "Georgia, serif", color: "#252e3a", fontWeight: 400 }}>
+                  The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust's collections to a human narrative and a specific place while holding them to a standard designed to endure.
                 </p>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Museum Leadership Section with John's bio */}
-        <section className="py-12 lg:py-20 bg-white">
-          <div className="max-w-[1000px] mx-auto px-6 sm:px-8 text-center">
-            {/* First paragraph - larger serif font */}
-            <p className="text-xl lg:text-2xl leading-relaxed mb-8" style={{ fontFamily: "Georgia, serif", color: "#252e3a", fontWeight: 400 }}>
-              John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
-            </p>
-            
-            {/* Stylized horizontal rule */}
-            <div className="relative my-12">
-              <div className="w-full border-t" style={{ borderColor: "#dadada" }}></div>
-            </div>
-            
-            {/* Second paragraph - regular serif font */}
-            <p className="text-lg lg:text-xl leading-relaxed" style={{ fontFamily: "Georgia, serif", color: "#252e3a", fontWeight: 400 }}>
-              The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust's collections to a human narrative and a specific place while holding them to a standard designed to endure.
-            </p>
           </div>
         </section>
 
