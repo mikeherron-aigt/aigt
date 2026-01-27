@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function MuseumPage() {
   return (
     <div className="museum-page">
-      {/* Hero Section - Full Width - Outside main tag */}
+      {/* Hero Section - Full Width */}
       <section className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px]">
         <Image
           src="/museum_hero.jpg"
@@ -40,31 +40,29 @@ export default function MuseumPage() {
         </div>
       </section>
 
-      <main>
-
-        {/* Museum Leadership Section with John's bio - Full width background */}
-        <section className="py-12 lg:py-20 bg-white w-full">
-          <div className="w-full flex justify-center px-6 sm:px-8">
-            <div className="w-full max-w-[1440px]">
-              <div className="max-w-[720px] mx-auto text-center">
-                {/* First paragraph - h2 - larger serif font */}
-                <h2 className="text-xl lg:text-2xl leading-relaxed mb-8 font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
-                  John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
-                </h2>
-                
-                {/* Stylized horizontal rule */}
-                <div className="relative my-12">
-                  <div className="w-full border-t" style={{ borderColor: "#dadada" }}></div>
-                </div>
-                
-                {/* Second paragraph - h3 - regular serif font */}
-                <h3 className="text-lg lg:text-xl leading-relaxed font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
-                  The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust's collections to a human narrative and a specific place while holding them to a standard designed to endure.
-                </h3>
+      {/* Museum Leadership Section with John's bio - Full width background */}
+      <section className="py-12 lg:py-20 bg-white w-full">
+        <div className="w-full flex justify-center px-6 sm:px-8">
+          <div className="w-full max-w-[1440px]">
+            <div className="max-w-[720px] mx-auto text-center">
+              {/* First paragraph - h2 - larger serif font */}
+              <h2 className="text-xl lg:text-2xl leading-relaxed mb-8 font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
+                John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
+              </h2>
+              
+              {/* Stylized horizontal rule */}
+              <div className="relative my-12">
+                <div className="w-full border-t" style={{ borderColor: "#dadada" }}></div>
               </div>
+              
+              {/* Second paragraph - h3 - regular serif font */}
+              <h3 className="text-lg lg:text-xl leading-relaxed font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
+                The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust's collections to a human narrative and a specific place while holding them to a standard designed to endure.
+              </h3>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
         {/* A Physical Expression of Stewardship */}
         <section className="py-12 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
@@ -149,7 +147,7 @@ export default function MuseumPage() {
           {/* Full-width top image */}
           <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">
             <Image
-              src="/museum_artist.jpg"
+              src="/museum_artists.jpg"
               alt="Museum living studio with artists working and visitors viewing"
               fill
               className="object-cover"
@@ -308,7 +306,6 @@ export default function MuseumPage() {
             </Link>
           </div>
         </section>
-      </main>
     </div>
   );
 }
