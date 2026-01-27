@@ -2307,3 +2307,91 @@ footer {
   padding-left: 0 !important;
 }
 
+/* Museum page typography and layout, scoped to /museum only */
+.museum-page main {
+  width: 100%;
+}
+
+/* Constrain all top-level sections on museum page */
+.museum-page main > * {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* Typography for plain tags that come from Builder */
+.museum-page main h2 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 40px 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .museum-page main h2 {
+    font-size: 40px;
+    line-height: 48px;
+  }
+}
+
+.museum-page main h3 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 24px 0 12px 0;
+}
+
+@media (min-width: 1024px) {
+  .museum-page main h3 {
+    font-size: 22px;
+    line-height: 30px;
+  }
+}
+
+.museum-page main h4 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 16px 0 8px 0;
+}
+
+.museum-page main p,
+.museum-page main li {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  .museum-page main p,
+  .museum-page main li {
+    font-size: 16px;
+  }
+}
+
+/* Hero full bleed (first section only) */
+.museum-page main > *:first-child {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Keep hero inner content aligned */
+.museum-page main > *:first-child > * {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
