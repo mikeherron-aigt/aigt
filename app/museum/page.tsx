@@ -47,20 +47,20 @@ export default function MuseumPage() {
           <div className="w-full flex justify-center px-6 sm:px-8">
             <div className="w-full max-w-[1440px]">
               <div className="max-w-[720px] mx-auto text-center">
-                {/* First paragraph - larger serif font */}
-                <p className="text-xl lg:text-2xl leading-relaxed mb-8" style={{ fontFamily: "Georgia, serif", color: "#252e3a", fontWeight: 400 }}>
+                {/* First paragraph - h2 - larger serif font */}
+                <h2 className="text-xl lg:text-2xl leading-relaxed mb-8 font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
                   John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
-                </p>
+                </h2>
                 
                 {/* Stylized horizontal rule */}
                 <div className="relative my-12">
                   <div className="w-full border-t" style={{ borderColor: "#dadada" }}></div>
                 </div>
                 
-                {/* Second paragraph - regular serif font */}
-                <p className="text-lg lg:text-xl leading-relaxed" style={{ fontFamily: "Georgia, serif", color: "#252e3a", fontWeight: 400 }}>
+                {/* Second paragraph - h3 - regular serif font */}
+                <h3 className="text-lg lg:text-xl leading-relaxed font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
                   The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust's collections to a human narrative and a specific place while holding them to a standard designed to endure.
-                </p>
+                </h3>
               </div>
             </div>
           </div>
@@ -97,8 +97,8 @@ export default function MuseumPage() {
           </div>
         </section>
 
-        {/* Why This Museum Matters */}
-        <section className="py-12 lg:py-20 bg-white">
+        {/* Why This Museum Matters - Full width background */}
+        <section className="py-12 lg:py-20 bg-white w-full">
           <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center mb-12">
               <h2 className="mb-6">Why This Museum Matters</h2>
@@ -144,12 +144,12 @@ export default function MuseumPage() {
           </div>
         </section>
 
-        {/* A Living Studio - Full width image then content */}
-        <section className="py-0">
+        {/* A Living Studio - Full width image then full width content section */}
+        <section className="w-full">
           {/* Full-width top image */}
           <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">
             <Image
-              src="/museum_artists.jpg"
+              src="/museum_artist.jpg"
               alt="Museum living studio with artists working and visitors viewing"
               fill
               className="object-cover"
@@ -157,8 +157,8 @@ export default function MuseumPage() {
             />
           </div>
 
-          {/* Content section */}
-          <div className="bg-white py-12 lg:py-20">
+          {/* Content section - Full width background */}
+          <div className="bg-white py-12 lg:py-20 w-full">
             <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-12">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                 {/* Left: Text Content */}
@@ -206,8 +206,8 @@ export default function MuseumPage() {
           />
         </section>
 
-        {/* Museum Leadership - Ashley */}
-        <section className="py-12 lg:py-20 bg-white">
+        {/* Museum Leadership - Full width background */}
+        <section className="py-12 lg:py-20 bg-white w-full">
           <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
               {/* Left: Circular Photo */}
@@ -280,8 +280,8 @@ export default function MuseumPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-16 lg:py-24 bg-white">
+        {/* CTA Section - Full width background */}
+        <section className="py-16 lg:py-24 bg-white w-full">
           <div className="text-center max-w-[900px] mx-auto px-6 sm:px-8">
             <h2 className="mb-8 text-3xl sm:text-4xl lg:text-5xl" style={{ fontFamily: "Georgia, serif" }}>
               Governed platforms for the long-term stewardship of culturally significant art.
