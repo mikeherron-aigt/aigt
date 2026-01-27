@@ -149,7 +149,7 @@ export default function MuseumPage() {
           {/* Full-width top image */}
           <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">
             <Image
-              src="/museum_artist.jpg"
+              src="/museum_artists.jpg"
               alt="Museum living studio with artists working and visitors viewing"
               fill
               className="object-cover"
