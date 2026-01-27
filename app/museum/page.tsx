@@ -58,6 +58,35 @@ export default function MuseumPage() {
           </div>
         </div>
       </section>
+{/* PERSONAL HISTORY */}
+<section className="w-full py-12 sm:py-16 lg:py-20 bg-[#f5f5f5]">
+  <div className="max-w-[800px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+    <div className="bg-white p-8 sm:p-12 lg:p-16 flex flex-col gap-8">
+      <h3 className="museum-card-title text-center">
+        John Dowling Jr’s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
+      </h3>
+
+      <hr
+        style={{
+          height: "1px",
+          background:
+            "linear-gradient(to right, transparent 0%, #334155 10%, #334155 90%, transparent 100%)",
+          opacity: "0.5",
+          width: "100%",
+          maxWidth: "500px",
+          border: "none",
+          margin: "0 auto",
+        }}
+      />
+
+      <p className="museum-intro-text">
+        The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust’s collections to a human narrative and a specific place while holding them to a standard designed to endure.
+      </p>
+    </div>
+  </div>
+</section>
+
+      
     </main>
   );
 }
