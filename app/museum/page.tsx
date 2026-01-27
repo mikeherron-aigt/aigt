@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import Footer from "../components/Footer";
 
 export const metadata: Metadata = {
   title: "The John Dowling Jr. Museum of Contemporary Art",
@@ -228,7 +227,7 @@ export default function MuseumPage() {
         </section>
       </main>
 
-      <Footer />
+   
     </div>
   );
 }
