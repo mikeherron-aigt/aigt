@@ -2381,3 +2381,33 @@ body:has(main h1) main > * {
   padding-left: 24px;
   padding-right: 24px;
 }
+/* Museum page: allow first section (hero) to be full bleed */
+body:has(main h1) main > *:first-child {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Keep hero inner content aligned */
+body:has(main h1) main > *:first-child > * {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+/* Museum page: Physical Expression section full bleed */
+body:has(main h1) main h2 + * {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Constrain inner content again */
+body:has(main h1) main h2 + * > * {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
