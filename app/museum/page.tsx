@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Header from "../components/Header";
+
 
 export default function MuseumPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+
 
       <main className="mx-auto max-w-[1440px] w-full">
         {/* Hero Section */}
