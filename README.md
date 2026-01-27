@@ -28,7 +28,7 @@ Copy the contents of `page.tsx` to this location.
 Move the uploaded images to your `public` folder:
 - `museum_hero.jpg` → `/public/museum_hero.jpg`
 - `museum_render.jpg` → `/public/museum_render.jpg`
-- `museum_artist.jpg` → `/public/museum_artist.jpg`
+- `museum_artists.jpg` → `/public/museum_artists.jpg`
 - `john_working.png` → `/public/john_working.png`
 - `john_working2.png` → `/public/john_working2.png`
 - `ashley.png` → `/public/ashley.png`
