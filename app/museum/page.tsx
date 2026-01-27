@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function MuseumPage() {
   return (
-    <>
+    <div className="museum-page">
       {/* Hero Section - Full Width */}
       <section className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px]">
         <Image
@@ -40,8 +40,9 @@ export default function MuseumPage() {
         </div>
       </section>
 
-      <main className="museum-page">
-      <section className="py-12 lg:py-20 bg-white w-full">
+      <main>
+      {/* Override max-width constraint for full-width background */}
+      <section className="py-12 lg:py-20 bg-white !max-w-none w-full !mx-0 !px-0">
         <div className="w-full flex justify-center px-6 sm:px-8">
           <div className="w-full max-w-[1440px]">
             <div className="max-w-[720px] mx-auto text-center">
@@ -96,7 +97,7 @@ export default function MuseumPage() {
         </section>
 
         {/* Why This Museum Matters - Full width background */}
-        <section className="py-12 lg:py-20 bg-white w-full">
+        <section className="py-12 lg:py-20 bg-white !max-w-none w-full !mx-0 !px-0">
           <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-12">
             <div className="text-center mb-12">
               <h2 className="mb-6">Why This Museum Matters</h2>
@@ -143,7 +144,7 @@ export default function MuseumPage() {
         </section>
 
         {/* A Living Studio - Full width image then full width content section */}
-        <section className="w-full">
+        <section className="!max-w-none w-full !mx-0 !px-0">
           {/* Full-width top image */}
           <div className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px]">
             <Image
@@ -205,7 +206,7 @@ export default function MuseumPage() {
         </section>
 
         {/* Museum Leadership - Full width background */}
-        <section className="py-12 lg:py-20 bg-white w-full">
+        <section className="py-12 lg:py-20 bg-white !max-w-none w-full !mx-0 !px-0">
           <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
               {/* Left: Circular Photo */}
@@ -279,7 +280,7 @@ export default function MuseumPage() {
         </section>
 
         {/* CTA Section - Full width background */}
-        <section className="py-16 lg:py-24 bg-white w-full">
+        <section className="py-16 lg:py-24 bg-white !max-w-none w-full !mx-0 !px-0">
           <div className="text-center max-w-[900px] mx-auto px-6 sm:px-8">
             <h2 className="mb-8 text-3xl sm:text-4xl lg:text-5xl" style={{ fontFamily: "Georgia, serif" }}>
               Governed platforms for the long-term stewardship of culturally significant art.
@@ -307,6 +308,6 @@ export default function MuseumPage() {
           </div>
         </section>
       </main>
-    </>
+    </div>
   );
 }
