@@ -113,6 +113,50 @@ export default function MuseumPage() {
     </div>
   </div>
 </section>
+{/* WHY THIS MUSEUM MATTERS */}
+<section className="w-full py-12 sm:py-16 lg:py-20 bg-[#f5f5f5]">
+  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+    <div className="max-w-[1022px] mx-auto mb-12 sm:mb-16 lg:mb-20">
+      <h2 className="museum-section-title">Why This Museum Matters</h2>
+      <p className="museum-intro-text">
+        Art Investment Group Trust was established to steward culturally significant art within a disciplined, governed framework. The Dowling gives that framework physical form.
+      </p>
+      <p className="museum-intro-text">
+        By creating a permanent public institution, the Trust extends its responsibility beyond ownership and into preservation, access, and continuity. The museum exists to ensure that important contemporary works are not fragmented, hidden, or lost to time, but cared for as part of a coherent cultural record.
+      </p>
+    </div>
+
+    <div className="grid sm:grid-cols-2 gap-6 lg:gap-8 max-w-[1200px] mx-auto">
+      <div className="museum-info-card">
+        <h3 className="museum-card-title">Long-Term Stewardship</h3>
+        <p className="museum-card-description">
+          The museum is conceived as a permanent home for contemporary works, allowing art to be cared for, studied, and experienced over time rather than treated as a rotating display.
+        </p>
+      </div>
+
+      <div className="museum-info-card">
+        <h3 className="museum-card-title">Permanent Public Access</h3>
+        <p className="museum-card-description">
+          By establishing a physical institution, the museum provides sustained public access to significant works and artistic practice within a stable, welcoming cultural setting.
+        </p>
+      </div>
+
+      <div className="museum-info-card">
+        <h3 className="museum-card-title">Living Artistic Practice</h3>
+        <p className="museum-card-description">
+          Through a visible working studio, the museum places artistic creation at the center of the visitor experience, allowing process and finished work to exist side by side.
+        </p>
+      </div>
+
+      <div className="museum-info-card">
+        <h3 className="museum-card-title">Cultural and Human Impact</h3>
+        <p className="museum-card-description">
+          Beyond exhibition, the museum supports art therapy and community oriented programs, recognizing art’s capacity to contribute to care, reflection, and public well being.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
       
     </main>
