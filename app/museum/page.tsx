@@ -85,6 +85,34 @@ export default function MuseumPage() {
     </div>
   </div>
 </section>
+{/* A PHYSICAL EXPRESSION OF STEWARDSHIP */}
+<section className="w-full bg-white py-12 sm:py-16 lg:py-20">
+  <div className="grid lg:grid-cols-[1fr_0.59fr] gap-0 items-center">
+    <div className="px-4 sm:px-8 lg:px-[80px]">
+      <div className="max-w-[633px]">
+        <h2 className="museum-section-heading">A Physical Expression of Stewardship</h2>
+
+        <p className="museum-body-text mt-6">
+          The museum is more than an exhibition space. It is a physical manifestation of the principles that govern Art Investment Group Trust, a commitment to preserving cultural significance, supporting artistic creation, and ensuring public access to important works of art.
+        </p>
+
+        <p className="museum-body-text mt-6">
+          The Dowling represents a deliberate choice to move beyond abstract stewardship and create an institution with roots in place, community, and long-term vision. Every aspect of the museum’s design and operations reflects a philosophy that art deserves more than acquisition and storage. It deserves care, context, and continued cultural relevance.
+        </p>
+      </div>
+    </div>
+
+    <div className="relative w-full aspect-video">
+      <Image
+        src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0ae93150a1c34f6d9a2c26642853c1b8?format=webp&width=1200"
+        alt="Artist working on painting in studio"
+        fill
+        className="object-cover"
+        sizes="(max-width: 1024px) 100vw, 60vw"
+      />
+    </div>
+  </div>
+</section>
 
       
     </main>
