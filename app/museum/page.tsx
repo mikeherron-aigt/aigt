@@ -258,9 +258,11 @@ export default function MuseumPage() {
                   When realized, the Dowling will stand as a lasting cultural presence on Long Island, designed to house significant contemporary works, support ongoing artistic creation, and serve the public across generations. The renderings shown here reflect not an idea in abstraction, but a clear and considered vision for an institution built to endure.
                 </p>
                 
-                <p className="font-serif text-base lg:text-lg" style={{ fontFamily: "Georgia, serif" }}>
-                  This is not a promise of immediacy. It is a commitment to permanence.
-                </p>
+               <p className="text-base lg:text-lg leading-relaxed">
+  <span className="block">This is not a promise of immediacy.</span>
+  <span className="block">It is a commitment to permanence.</span>
+</p>
+
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
