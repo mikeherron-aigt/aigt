@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Museum Page Implementation Guide
 
-## Getting Started
+## Files Created
 
-First, run the development server:
+1. **Footer.tsx** - Reusable footer component
+2. **page.tsx** - Complete museum page
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Installation Steps
+
+### 1. Add the Footer Component
+
+Copy `Footer.tsx` to your project:
+```
+app/components/Footer.tsx
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result
+### 2. Add the Museum Page
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file
+Create a new directory and add the page:
+```
+app/museum/page.tsx
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy the contents of `page.tsx` to this location.
 
-## Learn More
+### 3. Add Images to Public Directory
 
-To learn more about Next.js, take a look at the following resources:
+Move the uploaded images to your `public` folder:
+- `museum_hero.jpg` → `/public/museum_hero.jpg`
+- `museum_render.jpg` → `/public/museum_render.jpg`
+- `museum_artist.jpg` → `/public/museum_artist.jpg`
+- `john_working.png` → `/public/john_working.png`
+- `john_working2.png` → `/public/john_working2.png`
+- `ashley.png` → `/public/ashley.png`
+- `museum_mock.png` → `/public/museum_mock.png`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. Update Your Layout (Optional)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+If you want to use the Footer component globally, update `app/layout.tsx`:
 
-## Deploy on Vercel
+```tsx
+import Footer from "./components/Footer";
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <Header />
+        {children}
+        <Footer />  {/* Add this */}
+      </body>
+    </html>
+  );
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Or keep it page-specific as shown in the museum page.
+
+### 5. Update Your Navigation
+
+Add the museum link to your Header component:
+
+In `app/components/Header.tsx`, add a navigation link:
+```tsx
+<Link href="/museum" className="nav-link">
+  Museum
+</Link>
+```
+
+## Features Included
+
+✅ Full museum page with all content from PDF design
+✅ Responsive layout (mobile, tablet, desktop)
+✅ Optimized images with Next.js Image component
+✅ Proper typography using your existing CSS classes
+✅ Reusable Footer component
+✅ SEO metadata
+✅ Matches your brand styling
+
+## Color Variables Used
+
+The page uses your existing CSS variables:
+- `--archive-slate` (#252e3a) - Main text
+- `--ledger-stone` (#a1a69d) - Accent text/borders
+- `--paper-white` (#f5f5f5) - Background
+- `--gallery-plaster` (#dadada) - Borders
+- `--deep-patina` (#294344) - Links
+
+## Typography
+
+- Headings: Georgia serif (matching your site)
+- Body: Open Sans (your existing font)
+- All sizing matches your global CSS
+
+## Testing Checklist
+
+- [ ] Images load correctly
+- [ ] Links work (Request Access, footer links)
+- [ ] Mobile responsive
+- [ ] Footer displays properly
+- [ ] Matches brand styling
+- [ ] Typography is consistent
+
+## URL Structure
+
+Once deployed, the page will be available at:
+```
+https://artinvestmentgrouptrust.com/museum
+```
+
+## Next Steps
+
+1. Copy files to your project
+2. Move images to public folder
+3. Test locally: `npm run dev`
+4. Commit to GitHub
+5. Deploy
+
+No Builder.io involvement = No more sync issues! 🎉
