@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import Header from "../components/Header";
+
 
 interface TeamMember {
   name: string;
@@ -96,7 +96,7 @@ const teamMembers: TeamMember[] = [
 export default function AboutPage() {
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
-      <Header />
+
 
       {/* Main Content */}
       <main>
