@@ -2380,9 +2380,12 @@ footer {
   }
 }
 
-/* Hero full bleed (first section only) */
+/* Museum page hero full bleed */
 .museum-page main > *:first-child {
-  max-width: none;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   padding-left: 0;
   padding-right: 0;
 }
@@ -2395,3 +2398,5 @@ footer {
   padding-left: 24px;
   padding-right: 24px;
 }
+
+
