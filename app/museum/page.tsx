@@ -15,7 +15,7 @@ export default function MuseumPage() {
           <div className="relative w-full aspect-[1440/691] min-h-[400px] sm:min-h-[500px] lg:min-h-[691px]">
             {/* Background Image */}
             <Image
-              src="https://api.builder.io/api/v1/image/assets/TEMP/6ed250fee4ad058d3aacac1ceeeab310ef8e0527?width=2880"
+              src="/museum_hero.png"
               alt="Museum exterior with landscaping and signage"
               fill
               className="object-cover"
