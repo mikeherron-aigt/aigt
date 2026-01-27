@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import CookieConsent from "./components/CookieConsent";
 import GoogleTagManager from "./components/GoogleTagManager";
 import GlobalSchema from "./components/GlobalSchema";
@@ -79,6 +80,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
         <Header />
         {children}
+        <Footer />
 
         <CookieConsent />
       </body>
