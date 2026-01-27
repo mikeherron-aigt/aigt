@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function MuseumPage() {
   return (
-    <div className="museum-page">
+    <>
       {/* Hero Section - Full Width */}
       <section className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px]">
         <Image
@@ -40,7 +40,7 @@ export default function MuseumPage() {
         </div>
       </section>
 
-      {/* Museum Leadership Section with John's bio - Full width background */}
+      <main className="museum-page">
       <section className="py-12 lg:py-20 bg-white w-full">
         <div className="w-full flex justify-center px-6 sm:px-8">
           <div className="w-full max-w-[1440px]">
@@ -306,6 +306,7 @@ export default function MuseumPage() {
             </Link>
           </div>
         </section>
-    </div>
+      </main>
+    </>
   );
 }
