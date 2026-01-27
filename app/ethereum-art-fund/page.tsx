@@ -1,7 +1,7 @@
 'use client';
 
 import Image from "next/image";
-import Header from "../components/Header";
+
 import { useState, useRef, useEffect } from "react";
 
 interface ArtworkItem {
@@ -131,7 +131,7 @@ export default function EthereumArtFundPage() {
 
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
-      <Header />
+
 
       {/* Main Content */}
       <main>
