@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
+import Header from "./components/Header";
 import CookieConsent from "./components/CookieConsent";
 import GoogleTagManager from "./components/GoogleTagManager";
 import GlobalSchema from "./components/GlobalSchema";
@@ -16,7 +17,8 @@ export const metadata: Metadata = {
     template: "%s | Art Investment Group Trust",
     default: "Art Investment Group Trust | Institutional Art Investment & Stewardship",
   },
-  description: "Art Investment Group Trust is a governed platform for art investment and cultural asset stewardship, focused on museum quality works, institutional governance, and long horizon ownership.",
+  description:
+    "Art Investment Group Trust is a governed platform for art investment and cultural asset stewardship, focused on museum quality works, institutional governance, and long horizon ownership.",
   icons: {
     icon: "/favicon.png",
   },
@@ -39,7 +41,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={openSans.variable}
+    >
       <head>
         {/* Google Tag Manager */}
         <script
@@ -60,13 +66,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             src="https://www.googletagmanager.com/ns.html?id=GTM-W6C9KT9N"
             height="0"
             width="0"
-            style={{ display: 'none', visibility: 'hidden' }}
-          ></iframe>
+            style={{ display: "none", visibility: "hidden" }}
+          />
         </noscript>
         {/* End Google Tag Manager (noscript) */}
+
         <GlobalSchema />
         <GoogleTagManager />
+
+        <Header />
         {children}
+
         <CookieConsent />
       </body>
     </html>
