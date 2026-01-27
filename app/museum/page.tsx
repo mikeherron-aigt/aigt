@@ -45,7 +45,8 @@ export default function MuseumPage() {
       <section className="py-12 lg:py-20 bg-white !max-w-none w-full !mx-0 !px-0">
         <div className="w-full flex justify-center px-6 sm:px-8">
           <div className="w-full max-w-[1440px]">
-            <div className="max-w-[720px] mx-auto text-center">
+            <div className="max-w-[720px] mx-auto text-center pb-8 lg:pb-12">
+
               {/* First paragraph - h2 - larger serif font */}
               <h2 className="text-xl lg:text-2xl leading-relaxed mb-8 font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
                 John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
