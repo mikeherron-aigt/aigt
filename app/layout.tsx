@@ -59,7 +59,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         />
         {/* End Google Tag Manager */}
       </head>
-      <body suppressHydrationWarning>
+      <body
+        suppressHydrationWarning
+        className={`${openSans.className} ${openSans.variable}`}
+      >
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
