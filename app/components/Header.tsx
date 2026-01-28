@@ -6,20 +6,31 @@ import { useEffect, useRef, useState } from "react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const [isOfferingsOpen, setIsOfferingsOpen] = useState(false);
   const offeringsRef = useRef<HTMLDivElement | null>(null);
 
+  // NEW: Stewardship dropdown state + ref
+  const [isStewardshipOpen, setIsStewardshipOpen] = useState(false);
+  const stewardshipRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
-      if (!offeringsRef.current) return;
-      if (!offeringsRef.current.contains(e.target as Node)) {
+      // Close Offerings if click outside
+      if (offeringsRef.current && !offeringsRef.current.contains(e.target as Node)) {
         setIsOfferingsOpen(false);
+      }
+
+      // NEW: Close Stewardship if click outside
+      if (stewardshipRef.current && !stewardshipRef.current.contains(e.target as Node)) {
+        setIsStewardshipOpen(false);
       }
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsOfferingsOpen(false);
+        setIsStewardshipOpen(false); // NEW
         setIsMenuOpen(false);
       }
     };
@@ -42,8 +53,6 @@ export default function Header() {
   return (
     <header className="w-full sticky top-0 z-[9999]" style={{ backgroundColor: "#f5f5f5" }}>
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:pl-[80px] lg:pr-0 py-6 sm:py-8 lg:py-12">
-
-        {/* Full-width row so nav can truly align to the right edge */}
         <div className="flex items-center w-full">
           {/* Logo */}
           <Link
@@ -68,18 +77,20 @@ export default function Header() {
             </Link>
 
             {/* Offerings Dropdown */}
-            <div 
-              className="relative" 
-              ref={offeringsRef}
-              onMouseEnter={() => setIsOfferingsOpen(true)}
-              onMouseLeave={() => setIsOfferingsOpen(false)}
-            >
+            <div className="relative" ref={offeringsRef}>
               <button
                 type="button"
                 className="nav-link flex items-center gap-2"
                 aria-haspopup="menu"
                 aria-expanded={isOfferingsOpen}
-                onClick={() => setIsOfferingsOpen((v) => !v)}
+                onClick={() => {
+                  setIsOfferingsOpen((v) => !v);
+                  setIsStewardshipOpen(false); // NEW: keep only one dropdown open
+                }}
+                onMouseEnter={() => {
+                  setIsOfferingsOpen(true);
+                  setIsStewardshipOpen(false); // NEW
+                }}
               >
                 Offerings
                 <svg
@@ -101,6 +112,7 @@ export default function Header() {
                 <div
                   className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
                   role="menu"
+                  onMouseLeave={() => setIsOfferingsOpen(false)}
                 >
                   <div className="p-4 flex flex-col gap-2">
                     <Link
@@ -128,9 +140,59 @@ export default function Header() {
             <a href="/#gallery" className="nav-link">
               Gallery
             </a>
-            <a href="/museum" className="nav-link">
-              Stewardship
-            </a>
+
+            {/* NEW: Stewardship Dropdown */}
+            <div className="relative" ref={stewardshipRef}>
+              <button
+                type="button"
+                className="nav-link flex items-center gap-2"
+                aria-haspopup="menu"
+                aria-expanded={isStewardshipOpen}
+                onClick={() => {
+                  setIsStewardshipOpen((v) => !v);
+                  setIsOfferingsOpen(false); // keep only one open
+                }}
+                onMouseEnter={() => {
+                  setIsStewardshipOpen(true);
+                  setIsOfferingsOpen(false);
+                }}
+              >
+                Stewardship
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`${isStewardshipOpen ? "rotate-180" : ""} transition-transform duration-200`}
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+
+              {isStewardshipOpen && (
+                <div
+                  className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
+                  role="menu"
+                  onMouseLeave={() => setIsStewardshipOpen(false)}
+                >
+                  <div className="p-4 flex flex-col gap-2">
+                    <Link
+                      href="/museum"
+                      className="nav-link text-base"
+                      role="menuitem"
+                      onClick={() => setIsStewardshipOpen(false)}
+                    >
+                      Museum
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <Link href="/request-access" className="btn-primary">
               Request Access
             </Link>
@@ -208,6 +270,7 @@ export default function Header() {
                     Gallery
                   </a>
 
+                  {/* Mobile Stewardship stays simple as requested */}
                   <a
                     href="/museum"
                     className="nav-link text-base"
