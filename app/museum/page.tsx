@@ -18,25 +18,25 @@ export default function MuseumPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw"/>
+          sizes="100vw"
+        />
         
-
-  {/* Hero Content */} 
-<div className="absolute inset-0 flex items-center justify-center">
-  <div className="w-full max-w-[1440px] mx-auto relative h-full">
-    <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px] mr-6 sm:mr-8 lg:mr-0">
-      <h1 
-        className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal leading-tight mb-6"
-        style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}
-      >
-        A Public Institution for Long-Horizon Art Stewardship
-      </h1>
-      <p className="text-base lg:text-lg leading-relaxed" style={{ color: "#252e3a" }}>
-        The John Dowling Jr. Museum of Contemporary Art is a planned contemporary art museum conceived as a living cultural institution rooted on Long Island.
-      </p>
-    </div>
-  </div>
-</div>
+        {/* Hero Content */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-full max-w-[1440px] mx-auto relative h-full">
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px] mr-6 sm:mr-8 lg:mr-0">
+              <h1 
+                className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal leading-tight mb-6"
+                style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}
+              >
+                A Public Institution for Long-Horizon Art Stewardship
+              </h1>
+              <p className="text-base lg:text-lg leading-relaxed" style={{ color: "#252e3a" }}>
+                The John Dowling Jr. Museum of Contemporary Art is a planned contemporary art museum conceived as a living cultural institution rooted on Long Island.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       <main>
@@ -67,8 +67,8 @@ export default function MuseumPage() {
 
         {/* A Physical Expression of Stewardship */}
         <section className="py-12 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
-          <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-[80px]">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:pl-[80px] lg:pr-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
               {/* Left: Text Content */}
               <div>
                 <h2 className="mb-8">A Physical Expression of Stewardship</h2>
@@ -81,7 +81,7 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end">
+              <div className="relative lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2">
                 <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/john_working.png"
@@ -158,8 +158,8 @@ export default function MuseumPage() {
 
           {/* Content section - Full width background */}
           <div className="bg-white py-12 lg:py-20 w-full">
-            <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-[80px]">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:pl-[80px] lg:pr-0">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
                 {/* Left: Text Content */}
                 <div>
                   <h2 className="mb-8">A Living Studio</h2>
@@ -178,7 +178,7 @@ export default function MuseumPage() {
                 </div>
                 
                 {/* Right: Image - Fixed size, right-aligned */}
-                <div className="flex justify-end">
+                <div className="relative lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2">
                   <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                     <Image
                       src="/john_working2.png"
@@ -240,8 +240,8 @@ export default function MuseumPage() {
 
         {/* Looking Ahead */}
         <section className="py-12 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
-          <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-[80px]">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:pl-[80px] lg:pr-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
               {/* Left: Text Content */}
               <div>
                 <h2 className="mb-8">Looking Ahead</h2>
@@ -266,7 +266,7 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end">
+              <div className="relative lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2">
                 <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/museum_mock.png"
