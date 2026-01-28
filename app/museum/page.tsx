@@ -18,8 +18,7 @@ export default function MuseumPage() {
           fill
           className="object-cover"
           priority
-          sizes="100vw"
-        />
+          sizes="100vw"/>
         
 
   {/* Hero Content */} 
