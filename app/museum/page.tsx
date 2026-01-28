@@ -81,7 +81,7 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end lg:justify-start">
+              <div className="flex justify-end">
                 <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/john_working.png"
@@ -266,7 +266,7 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end lg:justify-start">
+              <div className="flex justify-end">
                 <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/museum_mock.png"
