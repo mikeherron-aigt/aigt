@@ -21,10 +21,10 @@ export default function MuseumPage() {
           sizes="100vw"
         />
         
-        {/* Hero Content */}
-        {/* Hero Content */}
+
+      {/* Hero Content */}
 <div className="absolute inset-0 flex items-center justify-center">
-  <div className="w-full max-w-[1440px] px-6 sm:px-8 lg:px-[80px] flex items-center justify-end">
+  <div className="w-full max-w-[1920px] px-6 sm:px-8 lg:px-[80px] flex items-center justify-end">
     {/* Right side - White box with title and subtitle */}
     <div className="bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px] w-full sm:w-auto">
       <h1 
