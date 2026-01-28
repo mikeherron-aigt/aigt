@@ -2400,3 +2400,37 @@ footer {
 }
 
 
+/* Museum page - Right-align images to match header button position */
+.museum-page main .flex.justify-end {
+  padding-right: 80px; /* Match the header padding-right */
+}
+
+@media (max-width: 1023px) {
+  .museum-page main .flex.justify-end {
+    padding-right: 48px; /* Match tablet header padding */
+  }
+}
+
+@media (max-width: 639px) {
+  .museum-page main .flex.justify-end {
+    padding-right: 32px; /* Match mobile header padding */
+    justify-content: center; /* Center on mobile for better display */
+  }
+}
+
+/* Also align the hero text box to the same position */
+.museum-page section .max-w-\[1440px\] {
+  padding-right: 80px !important;
+}
+
+@media (max-width: 1023px) {
+  .museum-page section .max-w-\[1440px\] {
+    padding-right: 48px !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .museum-page section .max-w-\[1440px\] {
+    padding-right: 32px !important;
+  }
+}
