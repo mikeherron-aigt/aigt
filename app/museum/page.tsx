@@ -81,15 +81,14 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-<div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden ml-auto">
-                  <Image
-                    src="/john_working.png"
-                    alt="John Dowling Jr. working in his studio"
-                    fill
-                    className="object-cover"
-                    sizes="450px"
-                  />
-                </div>
+              <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden ml-auto">
+                <Image
+                  src="/john_working.png"
+                  alt="John Dowling Jr. working in his studio"
+                  fill
+                  className="object-cover"
+                  sizes="450px"
+                />
               </div>
             </div>
           </div>
@@ -264,16 +263,15 @@ export default function MuseumPage() {
 
               </div>
               
-             {/* Right: Image - Fixed size, right-aligned */}
-<div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden ml-auto">
-                  <Image
-                    src="/museum_mock.png"
-                    alt="Interior rendering of museum entrance lobby"
-                    fill
-                    className="object-cover"
-                    sizes="450px"
-                  />
-                </div>
+              {/* Right: Image - Fixed size, right-aligned */}
+              <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden ml-auto">
+                <Image
+                  src="/museum_mock.png"
+                  alt="Interior rendering of museum entrance lobby"
+                  fill
+                  className="object-cover"
+                  sizes="450px"
+                />
               </div>
             </div>
           </div>
