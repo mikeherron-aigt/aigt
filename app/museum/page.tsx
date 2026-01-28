@@ -35,7 +35,6 @@ export default function MuseumPage() {
       The John Dowling Jr. Museum of Contemporary Art is a planned contemporary art museum conceived as a living cultural institution rooted on Long Island.
     </p>
   </div>
-</div>
 
       <main>
         {/* Override max-width constraint for full-width background */}
