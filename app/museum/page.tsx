@@ -22,8 +22,8 @@ export default function MuseumPage() {
         />
         
         {/* Hero Content */}
-      <div className="absolute inset-0 flex items-center justify-end">
-  <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-[80px] flex justify-end">
+        <div className="absolute inset-0 flex items-center justify-end">
+          <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-[80px] flex justify-end">
             {/* Right side - White box with title and subtitle */}
             <div className="bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px]">
               <h1 
@@ -41,34 +41,34 @@ export default function MuseumPage() {
       </section>
 
       <main>
-      {/* Override max-width constraint for full-width background */}
-      <section className="py-12 lg:py-20 bg-white !max-w-none w-full !mx-0 !px-0">
-        <div className="w-full flex justify-center px-6 sm:px-8">
-          <div className="w-full max-w-[1440px]">
-            <div className="max-w-[720px] mx-auto text-center pb-8 lg:pb-12">
+        {/* Override max-width constraint for full-width background */}
+        <section className="py-12 lg:py-20 bg-white !max-w-none w-full !mx-0 !px-0">
+          <div className="w-full flex justify-center px-6 sm:px-8">
+            <div className="w-full max-w-[1440px]">
+              <div className="max-w-[720px] mx-auto text-center pb-8 lg:pb-12">
 
-              {/* First paragraph - h2 - larger serif font */}
-              <h2 className="text-xl lg:text-2xl leading-relaxed mb-8 font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
-                John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
-              </h2>
-              
-              {/* Stylized horizontal rule */}
-              <div className="relative my-12">
-                <div className="w-full border-t" style={{ borderColor: "#dadada" }}></div>
+                {/* First paragraph - h2 - larger serif font */}
+                <h2 className="text-xl lg:text-2xl leading-relaxed mb-8 font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
+                  John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
+                </h2>
+                
+                {/* Stylized horizontal rule */}
+                <div className="relative my-12">
+                  <div className="w-full border-t" style={{ borderColor: "#dadada" }}></div>
+                </div>
+                
+                {/* Second paragraph - h3 - regular serif font */}
+                <h3 className="text-lg lg:text-xl leading-relaxed font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
+                  The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust's collections to a human narrative and a specific place while holding them to a standard designed to endure.
+                </h3>
               </div>
-              
-              {/* Second paragraph - h3 - regular serif font */}
-              <h3 className="text-lg lg:text-xl leading-relaxed font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
-                The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust's collections to a human narrative and a specific place while holding them to a standard designed to endure.
-              </h3>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
         {/* A Physical Expression of Stewardship */}
         <section className="py-12 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
-          <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-[80px]">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               {/* Left: Text Content */}
               <div>
@@ -82,8 +82,8 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end lg:pr-[80px] sm:pr-[48px] pr-[24px]">
-  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+              <div className="flex justify-end">
+                <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/john_working.png"
                     alt="John Dowling Jr. working in his studio"
@@ -159,7 +159,7 @@ export default function MuseumPage() {
 
           {/* Content section - Full width background */}
           <div className="bg-white py-12 lg:py-20 w-full">
-            <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-12">
+            <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-[80px]">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                 {/* Left: Text Content */}
                 <div>
@@ -179,8 +179,8 @@ export default function MuseumPage() {
                 </div>
                 
                 {/* Right: Image - Fixed size, right-aligned */}
-                <div className="flex justify-end lg:pr-[80px] sm:pr-[48px] pr-[24px]">
-  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+                <div className="flex justify-end">
+                  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                     <Image
                       src="/john_working2.png"
                       alt="Artist working on detailed artwork in studio"
@@ -241,7 +241,7 @@ export default function MuseumPage() {
 
         {/* Looking Ahead */}
         <section className="py-12 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
-          <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="max-w-[1120px] mx-auto px-6 sm:px-8 lg:px-[80px]">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
               {/* Left: Text Content */}
               <div>
@@ -259,16 +259,16 @@ export default function MuseumPage() {
                   When realized, the Dowling will stand as a lasting cultural presence on Long Island, designed to house significant contemporary works, support ongoing artistic creation, and serve the public across generations. The renderings shown here reflect not an idea in abstraction, but a clear and considered vision for an institution built to endure.
                 </p>
                 
-               <p className="text-base lg:text-lg leading-relaxed">
-  <span className="block">This is not a promise of immediacy.</span>
-  <span className="block">It is a commitment to permanence.</span>
-</p>
+                <p className="text-base lg:text-lg leading-relaxed">
+                  <span className="block">This is not a promise of immediacy.</span>
+                  <span className="block">It is a commitment to permanence.</span>
+                </p>
 
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end lg:pr-[80px] sm:pr-[48px] pr-[24px]">
-  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+              <div className="flex justify-end">
+                <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/museum_mock.png"
                     alt="Interior rendering of museum entrance lobby"
