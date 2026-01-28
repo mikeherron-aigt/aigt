@@ -2434,3 +2434,47 @@ footer {
     padding-right: 32px !important;
   }
 }
+
+/* Museum Hero - Align white text box to match Request Access button */
+.museum-page section.relative > .absolute .max-w-\[1440px\] {
+  padding-right: 80px !important;
+}
+
+.museum-page section.relative > .absolute .max-w-\[550px\] {
+  margin-right: 0 !important;
+}
+
+/* Museum page - Right-align images in content sections */
+.museum-page main .grid .flex.justify-end {
+  padding-right: 0;
+  margin-right: -24px; /* Offset the parent padding */
+}
+
+.museum-page main .max-w-\[1120px\] {
+  padding-right: 80px !important;
+}
+
+@media (max-width: 1279px) {
+  .museum-page section.relative > .absolute .max-w-\[1440px\] {
+    padding-right: 48px !important;
+  }
+  
+  .museum-page main .max-w-\[1120px\] {
+    padding-right: 48px !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .museum-page section.relative > .absolute .max-w-\[1440px\] {
+    padding-right: 32px !important;
+  }
+  
+  .museum-page main .max-w-\[1120px\] {
+    padding-right: 32px !important;
+  }
+  
+  .museum-page main .grid .flex.justify-end {
+    margin-right: 0;
+    justify-content: center;
+  }
+}
