@@ -41,7 +41,7 @@ export default function Header() {
 
   return (
     <header className="w-full sticky top-0 z-[9999]" style={{ backgroundColor: "#f5f5f5" }}>
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:pl-[80px] lg:pr-0 py-6 sm:py-8 lg:py-12">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:pl-[80px] lg:pr-0 py-6 sm:py-8 lg:py-12">
 
         {/* Full-width row so nav can truly align to the right edge */}
         <div className="flex items-center w-full">
@@ -68,14 +68,18 @@ export default function Header() {
             </Link>
 
             {/* Offerings Dropdown */}
-            <div className="relative" ref={offeringsRef}>
+            <div 
+              className="relative" 
+              ref={offeringsRef}
+              onMouseEnter={() => setIsOfferingsOpen(true)}
+              onMouseLeave={() => setIsOfferingsOpen(false)}
+            >
               <button
                 type="button"
                 className="nav-link flex items-center gap-2"
                 aria-haspopup="menu"
                 aria-expanded={isOfferingsOpen}
                 onClick={() => setIsOfferingsOpen((v) => !v)}
-                onMouseEnter={() => setIsOfferingsOpen(true)}
               >
                 Offerings
                 <svg
@@ -97,7 +101,6 @@ export default function Header() {
                 <div
                   className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
                   role="menu"
-                  onMouseLeave={() => setIsOfferingsOpen(false)}
                 >
                   <div className="p-4 flex flex-col gap-2">
                     <Link
