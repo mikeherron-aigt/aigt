@@ -22,7 +22,7 @@ export default function MuseumPage() {
         />
         
 
-  {/* Hero Content */}
+  {/* Hero Content */} 
 <div className="absolute inset-0 flex items-center justify-center">
   <div className="w-full max-w-[1440px] mx-auto relative h-full">
     <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px] mr-6 sm:mr-8 lg:mr-0">
