@@ -22,8 +22,8 @@ export default function MuseumPage() {
         />
         
         {/* Hero Content */}
-        <div className="absolute inset-0 flex items-center justify-end">
-          <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-20 flex justify-end">
+      <div className="absolute inset-0 flex items-center justify-end">
+  <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-[80px] flex justify-end">
             {/* Right side - White box with title and subtitle */}
             <div className="bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px]">
               <h1 
@@ -82,8 +82,8 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end">
-                <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+              <div className="flex justify-end lg:pr-[80px] sm:pr-[48px] pr-[24px]">
+  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/john_working.png"
                     alt="John Dowling Jr. working in his studio"
@@ -179,8 +179,8 @@ export default function MuseumPage() {
                 </div>
                 
                 {/* Right: Image - Fixed size, right-aligned */}
-                <div className="flex justify-end">
-                  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+                <div className="flex justify-end lg:pr-[80px] sm:pr-[48px] pr-[24px]">
+  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                     <Image
                       src="/john_working2.png"
                       alt="Artist working on detailed artwork in studio"
@@ -267,8 +267,8 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end">
-                <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+              <div className="flex justify-end lg:pr-[80px] sm:pr-[48px] pr-[24px]">
+  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/museum_mock.png"
                     alt="Interior rendering of museum entrance lobby"
