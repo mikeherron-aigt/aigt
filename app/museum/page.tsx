@@ -81,8 +81,7 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end">
-                <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+<div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden ml-auto">
                   <Image
                     src="/john_working.png"
                     alt="John Dowling Jr. working in his studio"
@@ -265,9 +264,8 @@ export default function MuseumPage() {
 
               </div>
               
-              {/* Right: Image - Fixed size, right-aligned */}
-              <div className="flex justify-end">
-                <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+             {/* Right: Image - Fixed size, right-aligned */}
+<div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden ml-auto">
                   <Image
                     src="/museum_mock.png"
                     alt="Interior rendering of museum entrance lobby"
