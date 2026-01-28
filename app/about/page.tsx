@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-
+// fix deploy
 interface TeamMember {
   name: string;
   title: string;
