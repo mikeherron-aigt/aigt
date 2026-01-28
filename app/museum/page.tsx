@@ -23,20 +23,18 @@ export default function MuseumPage() {
         
 
       {/* Hero Content */}
-<div className="absolute inset-0 flex items-center justify-center">
-  <div className="w-full max-w-[1920px] px-6 sm:px-8 lg:px-[80px] flex items-center justify-end">
-    {/* Right side - White box with title and subtitle */}
-    <div className="bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px] w-full sm:w-auto">
-      <h1 
-        className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal leading-tight mb-6"
-        style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}
-      >
-        A Public Institution for Long-Horizon Art Stewardship
-      </h1>
-      <p className="text-base lg:text-lg leading-relaxed" style={{ color: "#252e3a" }}>
-        The John Dowling Jr. Museum of Contemporary Art is a planned contemporary art museum conceived as a living cultural institution rooted on Long Island.
-      </p>
-    </div>
+<div className="absolute inset-0 flex items-center justify-end pr-6 sm:pr-8 lg:pr-[80px]">
+  {/* Right side - White box with title and subtitle */}
+  <div className="bg-white p-8 sm:p-10 lg:p-12 shadow-lg w-full max-w-[550px] sm:w-auto">
+    <h1 
+      className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal leading-tight mb-6"
+      style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}
+    >
+      A Public Institution for Long-Horizon Art Stewardship
+    </h1>
+    <p className="text-base lg:text-lg leading-relaxed" style={{ color: "#252e3a" }}>
+      The John Dowling Jr. Museum of Contemporary Art is a planned contemporary art museum conceived as a living cultural institution rooted on Long Island.
+    </p>
   </div>
 </div>
       </section>
