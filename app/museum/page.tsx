@@ -68,7 +68,7 @@ export default function MuseumPage() {
         {/* A Physical Expression of Stewardship */}
         <section className="py-12 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
           <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:pl-[80px] lg:pr-0">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-12 lg:gap-16 items-center">
               {/* Left: Text Content */}
               <div>
                 <h2 className="mb-8">A Physical Expression of Stewardship</h2>
@@ -81,7 +81,7 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="relative lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2">
+              <div className="flex justify-end lg:justify-start">
                 <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/john_working.png"
@@ -159,7 +159,7 @@ export default function MuseumPage() {
           {/* Content section - Full width background */}
           <div className="bg-white py-12 lg:py-20 w-full">
             <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:pl-[80px] lg:pr-0">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-12 lg:gap-16 items-center">
                 {/* Left: Text Content */}
                 <div>
                   <h2 className="mb-8">A Living Studio</h2>
@@ -178,7 +178,7 @@ export default function MuseumPage() {
                 </div>
                 
                 {/* Right: Image - Fixed size, right-aligned */}
-                <div className="relative lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2">
+                <div className="flex justify-end lg:justify-start">
                   <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                     <Image
                       src="/john_working2.png"
@@ -241,7 +241,7 @@ export default function MuseumPage() {
         {/* Looking Ahead */}
         <section className="py-12 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
           <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:pl-[80px] lg:pr-0">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-12 lg:gap-16 items-center">
               {/* Left: Text Content */}
               <div>
                 <h2 className="mb-8">Looking Ahead</h2>
@@ -266,7 +266,7 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="relative lg:absolute lg:right-0 lg:top-1/2 lg:-translate-y-1/2">
+              <div className="flex justify-end lg:justify-start">
                 <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
                   <Image
                     src="/museum_mock.png"
