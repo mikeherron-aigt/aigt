@@ -80,18 +80,19 @@ export default function MuseumPage() {
                 </p>
               </div>
               
-             {/* Right: Image - Fixed size, right-aligned */}
-<div className="w-full lg:w-[450px]">
-  <div className="relative w-full aspect-square rounded-sm overflow-hidden">
-    <Image
-      src="/john_working.png"
-      alt="John Dowling Jr. working in his studio"
-      fill
-      className="object-cover"
-      sizes="450px"
-    />
-  </div>
-</div>
+              {/* Right: Image - Fixed size, right-aligned */}
+              <div className="w-full lg:w-[450px]">
+                <div className="relative w-full aspect-square rounded-sm overflow-hidden">
+                  <Image
+                    src="/john_working.png"
+                    alt="John Dowling Jr. working in his studio"
+                    fill
+                    className="object-cover"
+                    sizes="450px"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -176,18 +177,21 @@ export default function MuseumPage() {
                   </p>
                 </div>
                 
-               {/* Right: Image - Fixed size, right-aligned */}
-<div className="w-full lg:w-[450px]">
-  <div className="relative w-full aspect-square rounded-sm overflow-hidden">
-    <Image
-      src="/museum_mock.png"
-      alt="Interior rendering of museum entrance lobby"
-      fill
-      className="object-cover"
-      sizes="450px"
-    />
-  </div>
-</div>
+                {/* Right: Image - Fixed size, right-aligned */}
+                <div className="flex justify-end lg:justify-start">
+                  <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden">
+                    <Image
+                      src="/john_working2.png"
+                      alt="Artist working on detailed artwork in studio"
+                      fill
+                      className="object-cover"
+                      sizes="450px"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Full-width Museum Render */}
@@ -262,14 +266,16 @@ export default function MuseumPage() {
               </div>
               
               {/* Right: Image - Fixed size, right-aligned */}
-              <div className="relative w-full max-w-[450px] aspect-square rounded-sm overflow-hidden ml-auto">
-                <Image
-                  src="/museum_mock.png"
-                  alt="Interior rendering of museum entrance lobby"
-                  fill
-                  className="object-cover"
-                  sizes="450px"
-                />
+              <div className="w-full lg:w-[450px]">
+                <div className="relative w-full aspect-square rounded-sm overflow-hidden">
+                  <Image
+                    src="/museum_mock.png"
+                    alt="Interior rendering of museum entrance lobby"
+                    fill
+                    className="object-cover"
+                    sizes="450px"
+                  />
+                </div>
               </div>
             </div>
           </div>
