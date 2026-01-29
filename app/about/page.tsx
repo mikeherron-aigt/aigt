@@ -342,6 +342,38 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
+ {/* Private Conversations Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{ backgroundColor: "#ffffff" }}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
+              <h2 className="footer-tagline">Governed platforms for the long-term stewardship of culturally significant art.</h2>
+
+              <div className="private-conversations text-center flex flex-col items-center">
+                <h3 className="private-conversations-title">Private Conversations</h3>
+                <p className="private-conversations-text max-w-[789px]">
+                  Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct,
+                  considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not
+                  transactions.
+                </p>
+                <p className="private-conversations-text max-w-[789px]">
+                  These conversations are exploratory by design. They allow space to discuss long-term intent, governance
+                  alignment, and the role each participant seeks to play in preserving cultural value across generations.
+                </p>
+              </div>
+
+              <div className="flex justify-center">
+                <a
+                  href="/request-access"
+                  className="footer-cta-primary"
+                  style={{ textDecoration: "none", display: "inline-flex" }}
+                >
+                  Schedule a Discussion
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+        
       </main>
 
      
