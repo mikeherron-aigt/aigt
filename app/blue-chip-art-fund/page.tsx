@@ -202,7 +202,7 @@ export default function BlueChipArtFundPage() {
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Left Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
-                <div className="max-w-[579px]">
+              
                   <h2 className="governance-title" style={{marginBottom: '24px'}}>
                     Institutional Stewardship for Established Art
                   </h2>
