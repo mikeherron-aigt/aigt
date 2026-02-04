@@ -65,9 +65,9 @@ function buildQueryString(filters?: ArtworkFilters): string {
   if (filters.version) params.append("version", filters.version);
   if (filters.collection) params.append("collection", filters.collection);
   if (filters.year) params.append("year", filters.year.toString());
-  if (filters.limit) params.append("limit", filters.limit.toString());
-  if (filters.offset) params.append("offset", filters.offset.toString());
   if (filters.sku) params.append("sku", filters.sku);
+  // Note: limit and offset are not supported by the upstream API
+  // They are applied after fetching in getArtworks()
 
   const queryString = params.toString();
   return queryString ? `?${queryString}` : "";
@@ -75,7 +75,19 @@ function buildQueryString(filters?: ArtworkFilters): string {
 
 export async function getArtworks(filters?: ArtworkFilters): Promise<Artwork[]> {
   const queryString = buildQueryString(filters);
-  return fetchServer<Artwork[]>(`/artworks${queryString}`);
+  let data = await fetchServer<Artwork[]>(`/artworks${queryString}`);
+
+  // Apply limit/offset on the application side since the upstream API doesn't support them
+  if (filters) {
+    const start = filters.offset ?? 0;
+    if (filters.limit != null) {
+      data = data.slice(start, start + filters.limit);
+    } else if (start > 0) {
+      data = data.slice(start);
+    }
+  }
+
+  return data;
 }
 
 export async function getArtwork(id: number): Promise<Artwork> {
