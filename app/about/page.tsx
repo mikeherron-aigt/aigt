@@ -50,11 +50,11 @@ const teamMembers: TeamMember[] = [
     linkedinUrl: "https://www.linkedin.com/in/jose-bracho-900557125/"
   },
   {
-    name: "Daniel Sloan",
+    name: "Amir Niliaram",
     title: "Chief Technology Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Ffbd3492989774d5ca255f0bc3da9dd91?format=webp&width=400",
-    linkedinUrl: "https://www.linkedin.com/in/sloandaniel/"
+    imageUrl: "/amir.jpg?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/amir-niliaram-4430535/"
   },
   {
     name: "Abdur Nimeri",
