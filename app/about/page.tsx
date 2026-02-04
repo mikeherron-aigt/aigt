@@ -21,12 +21,12 @@ const teamMembers: TeamMember[] = [
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0a20bbeb53d14e0eb90701446fed69fc?format=webp&width=400",
     linkedinUrl: "https://www.linkedin.com/in/justin-fien-9a8763107/"
   },
-  {
-    name: "Jay O'Malley",
-    title: "Chief Executive Officer",
+   {
+    name: "Olivia Philips",
+    title: "Chief Operating Officer",
     description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F81b60738a3c446deaa56835ff0ed693e?format=webp&width=400",
-    linkedinUrl: "https://www.linkedin.com/in/jay-o-malley-8102761b0/"
+    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400",
+    linkedinUrl: "https://www.linkedin.com/in/meetoliviaphillips/"
   },
   {
     name: "Steve Duren",
@@ -36,15 +36,8 @@ const teamMembers: TeamMember[] = [
     linkedinUrl: "https://www.linkedin.com/in/steve-duren/"
   },
   {
-    name: "Olivia Philips",
-    title: "Chief Operating Officer",
-    description: "",
-    imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F477bf0701dcd412f829a0d8561369b90?format=webp&width=400",
-    linkedinUrl: "https://www.linkedin.com/in/meetoliviaphillips/"
-  },
-  {
     name: "Mike Herron",
-    title: "Chief Marketing Officer",
+    title: "Senior Vice President\nand Chief Marketing Officer",
     description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9c772ecc1e27493abb2617aac7506cc6?format=webp&width=400",
     linkedinUrl: "https://www.linkedin.com/in/mherron54/"
@@ -79,7 +72,7 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "Ashley Murison",
-    title: "Museum Director\nChief of Staff",
+    title: "Museum Executive Director\nChief of Staff",
     description: "",
     imageUrl: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F9294e8137f304e6aaeb4019b03c91a2a?format=webp&width=400",
     linkedinUrl: "https://www.linkedin.com/in/ashleymurison/"
