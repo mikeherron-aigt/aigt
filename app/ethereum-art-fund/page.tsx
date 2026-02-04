@@ -3,6 +3,9 @@
 import Image from "next/image";
 
 import { useState, useRef, useEffect } from "react";
+import { useArtworks } from "@/app/hooks/useArtworks";
+import type { Artwork } from "@/app/lib/api";
+import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 
 interface ArtworkItem {
   src: string;
@@ -11,38 +14,12 @@ interface ArtworkItem {
   year: string;
 }
 
-const featuredWorks: ArtworkItem[] = [
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F270bfbf622d44bb58da3863d2d4a1416?format=webp&width=800",
-    title: "80s Series #2",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0b223e89165544369065645eb9e01981?format=webp&width=800",
-    title: "80s Series #25",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F412947b95d6b487f8e94d9db43269338?format=webp&width=800",
-    title: "80s Series #14",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F41a3331c307447f9a770facf2b3f3f7b?format=webp&width=800",
-    title: "80s Series #53",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F08edb5409851472b964e3c762012ec12?format=webp&width=800",
-    title: "80s Series #38",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  }
-];
+const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  src: artwork.image_url,
+  title: artwork.title,
+  artist: artwork.artist,
+  year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
+});
 
 export default function EthereumArtFundPage() {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -51,6 +28,12 @@ export default function EthereumArtFundPage() {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { artworks } = useArtworks({ version: "v02" });
+  const featuredWorks = artworks
+    .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
+    .map(mapArtworkToItem);
+  const heroArtwork = featuredWorks[0];
+  const catalogArtwork = featuredWorks[1] || featuredWorks[0];
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
@@ -169,14 +152,28 @@ export default function EthereumArtFundPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
-                  <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F5a13615e39cb4a898e26aab1d64089af?format=webp&width=800"
-                    alt="Abstract colorful digital art representing Ethereum-native cultural assets"
-                    fill
-                    className="object-cover object-center"
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
+                  {heroArtwork?.src ? (
+                    <button
+                      type="button"
+                      className="w-full h-full"
+                      onClick={() => openModal(heroArtwork)}
+                      aria-label={`View full-size image of ${heroArtwork.title}`}
+                    >
+                      <ProgressiveImage
+                        src={heroArtwork.src}
+                        alt={heroArtwork.title}
+                        fill
+                        eager
+                        className="object-cover object-center"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                      />
+                    </button>
+                  ) : (
+                    <div
+                      className="w-full h-full"
+                      style={{ backgroundColor: "var(--gallery-plaster)" }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -285,13 +282,27 @@ export default function EthereumArtFundPage() {
               {/* Left: Image */}
               <div className="flex justify-center lg:justify-start">
                 <div className="relative w-[278px] h-[278px] rounded-full overflow-hidden">
-                  <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620"
-                    alt="John Dowling Jr."
-                    fill
-                    className="object-cover"
-                    sizes="278px"
-                  />
+                  {catalogArtwork?.src ? (
+                    <button
+                      type="button"
+                      className="w-full h-full"
+                      onClick={() => openModal(catalogArtwork)}
+                      aria-label={`View full-size image of ${catalogArtwork.title}`}
+                    >
+                      <ProgressiveImage
+                        src={catalogArtwork.src}
+                        alt={catalogArtwork.title}
+                        fill
+                        className="object-cover"
+                        sizes="278px"
+                      />
+                    </button>
+                  ) : (
+                    <div
+                      className="w-full h-full"
+                      style={{ backgroundColor: "var(--gallery-plaster)" }}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -347,7 +358,7 @@ export default function EthereumArtFundPage() {
                           aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
                         >
                           <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
-                            <Image
+                            <ProgressiveImage
                               src={artwork.src}
                               alt={artwork.title}
                               fill

@@ -137,9 +137,9 @@ export default function Header() {
               )}
             </div>
 
-            <a href="/#gallery" className="nav-link">
-              Gallery
-            </a>
+            <Link href="/collections" className="nav-link">
+              Collections
+            </Link>
 
             {/* NEW: Stewardship Dropdown */}
             <div className="relative" ref={stewardshipRef}>
@@ -262,13 +262,13 @@ export default function Header() {
                     </div>
                   </div>
 
-                  <a
-                    href="/#gallery"
+                  <Link
+                    href="/collections"
                     className="nav-link text-base"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Gallery
-                  </a>
+                    Collections
+                  </Link>
 
                   {/* Mobile Stewardship stays simple as requested */}
                   <a

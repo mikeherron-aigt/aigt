@@ -3,7 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { useArtworks } from "@/app/hooks/useArtworks";
+import { getArtworkBySku, type Artwork } from "@/app/lib/api";
+import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 
 
 interface ArtworkItem {
@@ -14,135 +17,25 @@ interface ArtworkItem {
   collection?: string;
 }
 
-const heroImages = [
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fffdf589de0bc4ea786d46b0d19e5477d?format=webp&width=800",
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fecd9bd97bdd94631b8bd359628504a86?format=webp&width=800",
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F78f0641dd09441d8940c7e4a70caaa37?format=webp&width=800",
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fd55dfac4060d4f0eb36a87b0891cb969?format=webp&width=800",
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F1966a05cfb05418da8649eee471aebbb?format=webp&width=800",
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F25168eaaf54c432d92f9ef91b0c70273?format=webp&width=800",
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F8ea49871f2d147b9b748f6894c7520ad?format=webp&width=800",
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fdd0cfe564a194c7fb87c735f9d338e43?format=webp&width=800",
-  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fc0a258d5cae343aea89a7c36e3767fe2?format=webp&width=800"
+const HERO_SKUS = [
+  "2024-JD-AG-0020",
+  "2025-JD-CD-0155",
+  "2025-JD-DW-0007",
+  "2025-JD-DW-0008",
+  "2024-JD-MM-0009",
+  "2025-JD-CD-0019",
 ];
+const GOVERNANCE_SKU = "2025-JD-DW-0019";
+const MEDIUMS_SKU = "2024-JD-AG-0025";
+const ART_ARTISTS_SKU = "2025-JD-CD-0361";
 
-const artworkData: ArtworkItem[] = [
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F270bfbf622d44bb58da3863d2d4a1416?format=webp&width=800",
-    title: "80s Series #2",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0b223e89165544369065645eb9e01981?format=webp&width=800",
-    title: "80s Series #25",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F412947b95d6b487f8e94d9db43269338?format=webp&width=800",
-    title: "80s Series #14",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F41a3331c307447f9a770facf2b3f3f7b?format=webp&width=800",
-    title: "80s Series #53",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F08edb5409851472b964e3c762012ec12?format=webp&width=800",
-    title: "80s Series #38",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0758ca8fed06418c994a30eac779317f?format=webp&width=800",
-    title: "80s Series #68",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F99ae9a973978458da61eddb794151497?format=webp&width=800",
-    title: "80s Series #99",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2249d103ff824a26a277d0c413cf9c9c?format=webp&width=800",
-    title: "Cosmic Dreams #001451",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F5aecfbbcd4cf49d98bf9a1eb9b2b08e9?format=webp&width=800",
-    title: "80s Series #8",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F57017ec8c4284ef3897083c05ccb4a39?format=webp&width=800",
-    title: "80s Series #32",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F4b0284b925464d1d9c172bd648f259e3?format=webp&width=800",
-    title: "80s Series #29",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fe0ebfc6ee0a247898c870f509e743ab0?format=webp&width=800",
-    title: "80s Series #43",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2Fa85281a076fa48b4b997fac1adf8470a?format=webp&width=800",
-    title: "80s Series #123",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-    collection: "Cosmic Dreams Collection"
-  }
-];
-
-const governanceImage: ArtworkItem = {
-  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F409e962a5a31455bac419bcb11ccf171?format=webp&width=800",
-  title: "Contemporary Governance",
-  artist: "John Dowling Jr.",
-  year: "Contemporary",
-  collection: "Cosmic Dreams Collection"
-};
-
-const mediumsImage: ArtworkItem = {
-  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800",
-  title: "One Standard Across Mediums",
-  artist: "John Dowling Jr.",
-  year: "Contemporary",
-  collection: "Cosmic Dreams Collection"
-};
-
-const artArtistsImage: ArtworkItem = {
-  src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F191d1f3757b744a3bb4c98c59bd49eba?format=webp&width=800",
-  title: "Art and Artists",
-  artist: "John Dowling Jr.",
-  year: "Contemporary",
-  collection: "Cosmic Dreams Collection"
-};
+const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  src: artwork.image_url,
+  title: artwork.title,
+  artist: artwork.artist,
+  year: artwork.year_created ? artwork.year_created.toString() : "",
+  collection: artwork.collection_name,
+});
 
 export default function Home() {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -153,9 +46,82 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [heroImage, setHeroImage] = useState<string>("");
+  const [previousHeroImage, setPreviousHeroImage] = useState<string>("");
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
+  const { artworks, loading: artworksLoading, error: artworksError, refetch: refetchArtworks } = useArtworks({
+    version: "v02",
+    limit: 12,
+  });
+  const [backupArtworks, setBackupArtworks] = useState<Artwork[]>([]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const cached = window.localStorage.getItem("aigt_artwork_backup_v02");
+      if (cached) {
+        setBackupArtworks(JSON.parse(cached));
+      }
+    } catch {
+      setBackupArtworks([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (artworks.length > 0) {
+      try {
+        window.localStorage.setItem(
+          "aigt_artwork_backup_v02",
+          JSON.stringify(artworks)
+        );
+      } catch {
+        // Ignore storage failures.
+      }
+    }
+  }, [artworks]);
+
+  const isValidTitle = (title: string) =>
+    !title.toLowerCase().includes("untitled");
+  const validArtworks = artworks.filter((artwork) => isValidTitle(artwork.title));
+  const backupFiltered = backupArtworks.filter((artwork) =>
+    isValidTitle(artwork.title)
+  );
+  const sourceArtworks = validArtworks.length > 0 ? validArtworks : backupFiltered;
+
+  const collectionMap = new Map<string, Artwork>();
+  sourceArtworks.forEach((artwork) => {
+    if (!collectionMap.has(artwork.collection_name)) {
+      collectionMap.set(artwork.collection_name, artwork);
+    }
+  });
+
+  const uniqueByCollection = Array.from(collectionMap.values());
+  const remaining = sourceArtworks.filter((artwork) => {
+    const firstForCollection = collectionMap.get(artwork.collection_name);
+    return firstForCollection && firstForCollection.artwork_id !== artwork.artwork_id;
+  });
+  const combined = [...uniqueByCollection, ...remaining];
+  const derivedItems = combined.map(mapArtworkToItem);
+  const featuredArtworks = derivedItems.slice(0, 12);
+
+  const [heroArtworks, setHeroArtworks] = useState<Artwork[]>([]);
+  const [governanceArtwork, setGovernanceArtwork] = useState<Artwork | null>(null);
+  const [mediumsArtwork, setMediumsArtwork] = useState<Artwork | null>(null);
+  const [artArtistsArtwork, setArtArtistsArtwork] = useState<Artwork | null>(null);
+
+  const modalArtworks = derivedItems.length > 0 ? derivedItems : featuredArtworks;
+  const governanceImage = governanceArtwork
+    ? mapArtworkToItem(governanceArtwork)
+    : undefined;
+  const mediumsImage = mediumsArtwork
+    ? mapArtworkToItem(mediumsArtwork)
+    : undefined;
+  const artArtistsImage = artArtistsArtwork
+    ? mapArtworkToItem(artArtistsArtwork)
+    : undefined;
 
   const faqItems = [
     {
@@ -239,6 +205,7 @@ export default function Home() {
   };
 
   const openModal = (artwork: ArtworkItem) => {
+    if (!artwork.src) return;
     setSelectedImage(artwork);
     setIsModalOpen(true);
     document.body.style.overflow = 'hidden';
@@ -266,9 +233,59 @@ export default function Home() {
   }, [isModalOpen]);
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * heroImages.length);
-    setHeroImage(heroImages[randomIndex]);
+    const resolveSkus = async () => {
+      try {
+        const [heroList, governance, mediums, artArtists] = await Promise.all([
+          HERO_SKUS.length > 0
+            ? Promise.all(HERO_SKUS.map((sku) => getArtworkBySku(sku)))
+            : Promise.resolve([]),
+          GOVERNANCE_SKU ? getArtworkBySku(GOVERNANCE_SKU) : Promise.resolve(null),
+          MEDIUMS_SKU ? getArtworkBySku(MEDIUMS_SKU) : Promise.resolve(null),
+          ART_ARTISTS_SKU ? getArtworkBySku(ART_ARTISTS_SKU) : Promise.resolve(null),
+        ]);
+
+        setHeroArtworks(
+          heroList.filter((item): item is Artwork => Boolean(item))
+        );
+        setGovernanceArtwork(governance);
+        setMediumsArtwork(mediums);
+        setArtArtistsArtwork(artArtists);
+      } catch {
+        setHeroArtworks([]);
+        setGovernanceArtwork(null);
+        setMediumsArtwork(null);
+        setArtArtistsArtwork(null);
+      }
+    };
+
+    resolveSkus();
   }, []);
+
+  useEffect(() => {
+    const fallbackHero = modalArtworks[0]?.src || "";
+    const heroSources = heroArtworks.map((artwork) => artwork.image_url);
+    const list = heroSources.length > 0 ? heroSources : [fallbackHero].filter(Boolean);
+    if (list.length === 0) return;
+
+    let index = 0;
+    setHeroImage(list[index]);
+    setPreviousHeroImage("");
+
+    const interval = setInterval(() => {
+      index = (index + 1) % list.length;
+      setIsTransitioning(true);
+      setPreviousHeroImage(list[(index - 1 + list.length) % list.length]);
+      setHeroImage(list[index]);
+
+      // Reset transition state after animation completes
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setPreviousHeroImage("");
+      }, 1000);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [heroArtworks, modalArtworks]);
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -364,12 +381,25 @@ export default function Home() {
             {/* Image Column */}
             <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
               <div className="absolute inset-0">
+                {/* Previous image - fades out */}
+                {previousHeroImage && isTransitioning && (
+                  <Image
+                    src={previousHeroImage}
+                    alt="Cultural artwork representing the trust's collection"
+                    fill
+                    className="object-cover object-center transition-opacity duration-1000"
+                    style={{ opacity: 0 }}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                )}
+                {/* Current image - fades in */}
                 {heroImage && (
                   <Image
                     src={heroImage}
                     alt="Cultural artwork representing the trust's collection"
                     fill
-                    className="object-cover object-center"
+                    className="object-cover object-center transition-opacity duration-1000"
+                    style={{ opacity: isTransitioning ? 1 : 1 }}
                     priority
                     sizes="(max-width: 1024px) 100vw, 50vw"
                   />
@@ -477,68 +507,100 @@ export default function Home() {
             </h2>
           </div>
 
-          <div className="slider-wrapper">
-            <div className="slider-container">
-              <div
-                ref={sliderRef}
-                className="artwork-slider"
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                style={{ cursor: isDragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-              >
-                {[...artworkData, ...artworkData].map((artwork, index) => (
-                  <div key={index} className="artwork-card">
-                    <button
-                      className="artwork-card-button"
-                      onClick={() => openModal(artwork)}
-                      aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
-                    >
-                      <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
-                        <Image
-                          src={artwork.src}
-                          alt={artwork.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                        />
-                      </div>
-                    </button>
-                    <div className="artwork-info">
-                      <h3 className="artwork-title">{artwork.title}</h3>
-                      <p className="artwork-details">{artwork.artist}<br />{artwork.collection || 'Cosmic Dreams Collection'}</p>
-                    </div>
-                  </div>
-                ))}
+          {artworksLoading ? (
+            <div className="slider-wrapper">
+              <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+                <p className="governance-description">Loading artworks...</p>
               </div>
             </div>
-          </div>
+          ) : artworksError ? (
+            <div className="slider-wrapper">
+              <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+                <p className="governance-description">{artworksError}</p>
+                <button className="cta-secondary" type="button" onClick={refetchArtworks}>
+                  Try Again
+                </button>
+              </div>
+            </div>
+          ) : featuredArtworks.length === 0 ? (
+            <div className="slider-wrapper">
+              <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+                <p className="governance-description">No artworks available at this time.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="slider-wrapper">
+              <div className="slider-container">
+                <div
+                  ref={sliderRef}
+                  className="artwork-slider"
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  style={{ cursor: isDragging ? 'grabbing' : 'grab', userSelect: 'none' }}
+                >
+                  {[...featuredArtworks, ...featuredArtworks].map((artwork, index) => (
+                    <div key={`${artwork.title}-${index}`} className="artwork-card">
+                      <button
+                        className="artwork-card-button"
+                        onClick={() => openModal(artwork)}
+                        aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
+                      >
+                        <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
+                          {artwork.src ? (
+                            <ProgressiveImage
+                              src={artwork.src}
+                              alt={artwork.title}
+                              fill
+                              eager={index < 3}
+                              className="object-cover"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                            />
+                          ) : (
+                            <div
+                              className="w-full h-full"
+                              style={{ backgroundColor: "var(--gallery-plaster)" }}
+                            />
+                          )}
+                        </div>
+                      </button>
+                      <div className="artwork-info">
+                        <h3 className="artwork-title">{artwork.title}</h3>
+                        <p className="artwork-details">{artwork.artist}<br />{artwork.collection || 'Cosmic Dreams Collection'}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
-          {/* Slider Navigation Arrows */}
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center items-center gap-6 mt-12">
-            <button
-              onClick={() => scrollSlider('left')}
-              className="slider-nav-arrow slider-nav-arrow-left"
-              aria-label="Scroll left"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6"></polyline>
-              </svg>
-            </button>
-            <button
-              onClick={() => scrollSlider('right')}
-              className="slider-nav-arrow slider-nav-arrow-right"
-              aria-label="Scroll right"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </button>
-          </div>
+          {!artworksLoading && !artworksError && featuredArtworks.length > 0 && (
+            <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] flex justify-center items-center gap-6 mt-12">
+              <button
+                onClick={() => scrollSlider('left')}
+                className="slider-nav-arrow slider-nav-arrow-left"
+                aria-label="Scroll left"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button
+                onClick={() => scrollSlider('right')}
+                className="slider-nav-arrow slider-nav-arrow-right"
+                aria-label="Scroll right"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Governance Section */}
@@ -578,18 +640,29 @@ export default function Home() {
               {/* Image Column */}
               <div className="relative w-full h-full overflow-hidden min-h-[900px]">
                 <button
-                  onClick={() => openModal(governanceImage)}
+                  onClick={() => {
+                    if (governanceImage) {
+                      openModal(governanceImage);
+                    }
+                  }}
                   className="governance-image-button"
                   aria-label="View full-size image of Contemporary Governance artwork"
                 >
                   <div className="absolute inset-0">
-                    <Image
-                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F409e962a5a31455bac419bcb11ccf171?format=webp&width=800"
-                      alt="Contemporary artwork representing governance structure"
-                      fill
-                      className="object-cover object-center"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                    />
+                    {governanceImage?.src ? (
+                      <Image
+                        src={governanceImage.src}
+                        alt={governanceImage.title}
+                        fill
+                        className="object-cover object-center"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                      />
+                    ) : (
+                      <div
+                        className="w-full h-full"
+                        style={{ backgroundColor: "var(--gallery-plaster)" }}
+                      />
+                    )}
                   </div>
                 </button>
               </div>
@@ -665,18 +738,29 @@ export default function Home() {
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
                 <button
-                  onClick={() => openModal(mediumsImage)}
+                  onClick={() => {
+                    if (mediumsImage) {
+                      openModal(mediumsImage);
+                    }
+                  }}
                   className="mediums-image-button"
                   aria-label="View full-size image of One Standard Across Mediums artwork"
                 >
                   <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
-                    <Image
-                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F3005d3c962884059afa2392e3cdd27a7?format=webp&width=800"
-                      alt="Contemporary artwork representing cultural significance across mediums"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 482px"
-                    />
+                    {mediumsImage?.src ? (
+                      <Image
+                        src={mediumsImage.src}
+                        alt={mediumsImage.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 482px"
+                      />
+                    ) : (
+                      <div
+                        className="w-full h-full"
+                        style={{ backgroundColor: "var(--gallery-plaster)" }}
+                      />
+                    )}
                   </div>
                 </button>
               </div>
@@ -721,18 +805,29 @@ export default function Home() {
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
                 <button
-                  onClick={() => openModal(artArtistsImage)}
+                  onClick={() => {
+                    if (artArtistsImage) {
+                      openModal(artArtistsImage);
+                    }
+                  }}
                   className="art-artists-image-button"
                   aria-label="View full-size image of Art and Artists artwork"
                 >
                   <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
-                    <Image
-                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F191d1f3757b744a3bb4c98c59bd49eba?format=webp&width=800"
-                      alt="Contemporary artwork representing artistic stewardship"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 482px"
-                    />
+                    {artArtistsImage?.src ? (
+                      <Image
+                        src={artArtistsImage.src}
+                        alt={artArtistsImage.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 482px"
+                      />
+                    ) : (
+                      <div
+                        className="w-full h-full"
+                        style={{ backgroundColor: "var(--gallery-plaster)" }}
+                      />
+                    )}
                   </div>
                 </button>
               </div>
