@@ -191,15 +191,15 @@ export default function PhilanthropyPage() {
               </div>
             </div>
 
-      {/* Right: Interactive Globe */}
+      {/* Right: Interactive Globe - CENTER AT RIGHT EDGE */}
 <div className="relative w-full h-[600px] lg:h-auto overflow-hidden" style={{ backgroundColor: "#f5f5f5" }}>
   <div style={{ 
     position: "absolute",
-    left: "0",
+    right: "-50%",
     top: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "900px",
-    height: "900px"
+    transform: "translateY(-50%)",
+    width: "1200px",
+    height: "1200px"
   }}>
     <InteractiveGlobe />
   </div>
