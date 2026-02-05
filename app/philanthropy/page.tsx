@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import InteractiveGlobe from "@/components/InteractiveGlobe";
+import InteractiveGlobe from "../components/InteractiveGlobe";
 
 export const metadata: Metadata = {
   title: "Art in Service of People - Philanthropy",
