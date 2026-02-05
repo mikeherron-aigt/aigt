@@ -70,47 +70,75 @@ export default function InteractiveGlobe() {
         return new THREE.Vector3(x, y, z);
       };
 
-      // Define continents with lat/lon ranges
-      const continents = [
+      // Function to check if a point is on land (simplified continent shapes)
+      const isLand = (lat, lon) => {
         // North America
-        { latRange: [15, 70], lonRange: [-170, -50], density: 2 },
-        // South America
-        { latRange: [-55, 15], lonRange: [-80, -35], density: 2 },
-        // Europe
-        { latRange: [36, 71], lonRange: [-10, 40], density: 2 },
-        // Africa
-        { latRange: [-35, 37], lonRange: [-18, 52], density: 1.5 },
-        // Asia
-        { latRange: [0, 75], lonRange: [40, 180], density: 2.5 },
-        // Australia
-        { latRange: [-45, -10], lonRange: [110, 155], density: 2 },
-      ];
-
-      continents.forEach((continent) => {
-        for (let lat = continent.latRange[0]; lat < continent.latRange[1]; lat += continent.density) {
-          const radius = Math.cos(Math.abs(lat) * (Math.PI / 180)) * dotSphereRadius;
-          const circumference = radius * Math.PI * 2;
-          const numDots = Math.floor(circumference * 2);
-
-          for (let i = 0; i < numDots; i++) {
-            const lon = continent.lonRange[0] + 
-              (Math.random() * (continent.lonRange[1] - continent.lonRange[0]));
-            
-            const vector = calcPosFromLatLonRad(lon, lat);
-            const dotGeometry = new THREE.CircleGeometry(0.12, 8);
-            const material = new THREE.MeshBasicMaterial({
-              color: 0xa1a69d,
-              side: THREE.DoubleSide,
-            });
-
-            const mesh = new THREE.Mesh(dotGeometry, material);
-            mesh.position.copy(vector);
-            mesh.lookAt(new THREE.Vector3(0, 0, 0));
-            particles.add(mesh);
-            allDotMeshes.push(mesh);
-          }
+        if (lat >= 15 && lat <= 70 && lon >= -170 && lon <= -50) {
+          if (lat < 25 && lon > -90) return false; // Gulf of Mexico
+          return true;
         }
-      });
+        
+        // South America
+        if (lat >= -55 && lat <= 12 && lon >= -81 && lon <= -34) {
+          return true;
+        }
+        
+        // Europe
+        if (lat >= 36 && lat <= 71 && lon >= -10 && lon <= 40) {
+          return true;
+        }
+        
+        // Africa
+        if (lat >= -35 && lat <= 37 && lon >= -18 && lon <= 52) {
+          if (lat > 30 && lon < 0) return false; // Mediterranean
+          return true;
+        }
+        
+        // Asia (main body)
+        if (lat >= 10 && lat <= 75 && lon >= 40 && lon <= 180) {
+          return true;
+        }
+        
+        // Southeast Asia
+        if (lat >= -10 && lat <= 25 && lon >= 95 && lon <= 140) {
+          return true;
+        }
+        
+        // Australia
+        if (lat >= -44 && lat <= -10 && lon >= 110 && lon <= 155) {
+          return true;
+        }
+        
+        return false;
+      };
+
+      // Create dots with proper spacing
+      for (let lat = 90; lat >= -90; lat -= 1.2) {
+        const radius = Math.cos(Math.abs(lat) * (Math.PI / 180)) * dotSphereRadius;
+        const circumference = radius * Math.PI * 2;
+        const numDotsAtLat = Math.max(3, Math.floor(circumference * 3));
+
+        for (let i = 0; i < numDotsAtLat; i++) {
+          const lon = -180 + (i / numDotsAtLat) * 360;
+
+          if (!isLand(lat, lon)) continue;
+
+          const vector = calcPosFromLatLonRad(lon, lat);
+          const dotGeometry = new THREE.CircleGeometry(0.12, 8);
+          const material = new THREE.MeshBasicMaterial({
+            color: 0xa1a69d,
+            side: THREE.DoubleSide,
+          });
+
+          const mesh = new THREE.Mesh(dotGeometry, material);
+          mesh.position.copy(vector);
+          mesh.lookAt(new THREE.Vector3(0, 0, 0));
+          particles.add(mesh);
+          allDotMeshes.push(mesh);
+        }
+      }
+
+      console.log(`Created ${allDotMeshes.length} dots`);
 
       initGlowSystem(allDotMeshes, calcPosFromLatLonRad);
 
