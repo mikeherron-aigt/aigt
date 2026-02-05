@@ -108,13 +108,13 @@ export default function PhilanthropyPage() {
         </div>
       </section>
 
-      {/* Sharing Art With the World Section - Globe */}
-    <section className="w-full !max-w-none overflow-x-hidden" style={{ backgroundColor: "#f5f5f5" }}>
-        <div className="max-w-[1440px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh]">
+     {/* Sharing Art With the World Section - Globe */}
+      <section className="w-full !max-w-none overflow-x-hidden" style={{ backgroundColor: "#f5f5f5" }}>
+        <div className="max-w-[1440px] mx-auto relative">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr,50vw] min-h-[90vh]">
             {/* Left: Text Content */}
-            <div className="flex flex-col justify-start px-6 sm:px-8 lg:px-16 xl:px-24 py-12 lg:py-16 space-y-12">
-              {/* Sharing Art With the World */}
+            <div className="flex flex-col justify-start px-6 sm:px-8 lg:px-16 xl:px-24 py-12 lg:py-16 space-y-12 relative z-10">
+              {/* All your text content stays exactly the same */}
               <div>
                 <h2>Sharing Art With the World</h2>
                 <h3 className="hero-subtitle" style={{ marginBottom: 24 }}>
@@ -135,7 +135,6 @@ export default function PhilanthropyPage() {
                 </div>
               </div>
 
-              {/* Art as Education */}
               <div>
                 <h2>Art as Education</h2>
                 <h3 className="hero-subtitle" style={{ marginBottom: 24 }}>
@@ -158,7 +157,6 @@ export default function PhilanthropyPage() {
                 </div>
               </div>
 
-              {/* Philanthropy as Cultural Infrastructure */}
               <div>
                 <h2>Philanthropy as Cultural Infrastructure</h2>
                 <h3 className="hero-subtitle" style={{ marginBottom: 24 }}>
@@ -191,22 +189,20 @@ export default function PhilanthropyPage() {
               </div>
             </div>
 
-      {/* Right: Interactive Globe */}
-<div className="relative w-full h-[600px] lg:h-auto" style={{ backgroundColor: "#f5f5f5" }}>
-  <div style={{ 
-    position: "absolute",
-    right: "0",
-    top: "50%",
-    transform: "translate(50%, -50%)",
-    width: "1200px",
-    height: "1200px"
-  }}>
-    <InteractiveGlobe />
-  </div>
-</div>
-        </div>
+            {/* Right: Interactive Globe - POSITIONED TO VIEWPORT EDGE */}
+            <div className="relative w-full h-[600px] lg:h-auto" style={{ backgroundColor: "#f5f5f5" }}>
+              <div style={{ 
+                position: "fixed",
+                right: "0",
+                top: "50%",
+                transform: "translate(50%, -50%)",
+                width: "1400px",
+                height: "1400px",
+                pointerEvents: "none"
+              }}>
+                <InteractiveGlobe />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-    </main>
-  );
-}
