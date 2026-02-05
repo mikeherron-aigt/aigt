@@ -80,9 +80,14 @@ export default function InteractiveGlobe() {
           const green = imageData[i + 1];
           const blue = imageData[i + 2];
 
-          // Detect teal/cyan continents (high green and blue, lower red)
-          if (green > 120 && blue > 120 && red < 120)
+          // Detect teal continents specifically (teal has low red, high green/blue)
+          // Teal is approximately RGB(70-100, 125-145, 115-135)
+          // Beige background is approximately RGB(220-230, 210-220, 180-195)
+          const isTeal = red < 150 && green > 110 && blue > 110 && (green + blue) > (red * 2);
+          
+          if (isTeal) {
             activeLatLon[lat].push(lon);
+          }
 
           if (lon === 180) {
             lon = -180;
@@ -206,20 +211,34 @@ export default function InteractiveGlobe() {
       const image = new Image();
       image.crossOrigin = 'anonymous';
       
+      image.onerror = () => {
+        console.error('Failed to load world map image');
+      };
+      
       image.onload = () => {
+        console.log('World map loaded, size:', image.width, 'x', image.height);
         const imageCanvas = document.createElement('canvas');
         imageCanvas.width = image.width;
         imageCanvas.height = image.height;
 
         const context = imageCanvas.getContext('2d');
-        if (!context) return;
+        if (!context) {
+          console.error('Failed to get canvas context');
+          return;
+        }
 
         context.drawImage(image, 0, 0);
 
         const imageData = context.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
+        console.log('Processing image data...');
         readImageData(imageData.data);
 
+        const latCount = Object.keys(activeLatLon).length;
+        const totalCoords = Object.values(activeLatLon).reduce((sum, arr) => sum + arr.length, 0);
+        console.log(`Found ${totalCoords} land coordinates across ${latCount} latitude lines`);
+
         setDots();
+        console.log(`Created ${allDotMeshes.length} dots`);
         initGlowSystem(calcPosFromLatLonRad);
       };
 
