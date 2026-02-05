@@ -191,20 +191,19 @@ export default function PhilanthropyPage() {
               </div>
             </div>
 
-            {/* Right: Interactive Globe */}
-        <div className="relative w-full h-[600px] lg:h-auto flex items-center justify-start overflow-hidden" style={{ backgroundColor: "#f5f5f5" }}>
+          {/* Right: Interactive Globe - Overflows Right */}
+<div className="relative w-full h-[600px] lg:h-auto overflow-visible" style={{ backgroundColor: "#f5f5f5" }}>
   <div style={{ 
-    width: "120%", 
-    height: "120%",
-    marginLeft: "-10%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
+    position: "absolute",
+    left: "-100px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    width: "1000px",
+    height: "1000px"
   }}>
     <InteractiveGlobe />
   </div>
 </div>
-          </div>
         </div>
       </section>
     </main>
