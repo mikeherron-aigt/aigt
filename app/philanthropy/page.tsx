@@ -59,7 +59,7 @@ export default function PhilanthropyPage() {
           {/* Right: Image */}
           <div className="relative w-full h-[400px] lg:h-auto">
             <Image
-             src="/philanthropy_hero.jpg"
+             src="/girl_viewing_art.png"
               alt="Young girl in yellow dress viewing art in museum"
               fill
               className="object-cover"
