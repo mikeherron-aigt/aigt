@@ -109,7 +109,7 @@ export default function PhilanthropyPage() {
       </section>
 
       {/* Sharing Art With the World Section - Globe */}
-      <section className="w-full !max-w-none" style={{ backgroundColor: "#f5f5f5" }}>
+    <section className="w-full !max-w-none overflow-x-hidden" style={{ backgroundColor: "#f5f5f5" }}>
         <div className="max-w-[1440px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh]">
             {/* Left: Text Content */}
@@ -191,15 +191,15 @@ export default function PhilanthropyPage() {
               </div>
             </div>
 
-       {/* Right: Interactive Globe - CENTER at red line */}
-<div className="relative w-full h-[600px] lg:h-auto" style={{ backgroundColor: "#f5f5f5" }}>
+      {/* Right: Interactive Globe */}
+<div className="relative w-full h-[600px] lg:h-auto overflow-hidden" style={{ backgroundColor: "#f5f5f5" }}>
   <div style={{ 
     position: "absolute",
-    left: "-500px",  // Shifts globe so its CENTER is at the left edge
+    left: "0",
     top: "50%",
-    transform: "translateY(-50%)",
-    width: "1000px",
-    height: "1000px"
+    transform: "translate(-50%, -50%)",
+    width: "900px",
+    height: "900px"
   }}>
     <InteractiveGlobe />
   </div>
