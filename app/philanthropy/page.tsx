@@ -205,6 +205,7 @@ export default function PhilanthropyPage() {
   </div>
 </div>
         </div>
+        </div>
       </section>
     </main>
   );
