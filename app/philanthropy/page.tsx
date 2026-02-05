@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import InteractiveGlobe from "@/components/InteractiveGlobe";
 
 export const metadata: Metadata = {
   title: "Art in Service of People - Philanthropy",
@@ -20,16 +21,12 @@ export default function PhilanthropyPage() {
               className="flex flex-col justify-center px-6 sm:px-8 lg:px-16 xl:px-24 py-12 lg:py-16"
               style={{ backgroundColor: "#f8f8f8" }}
             >
-              {/* Use global H1 */}
               <h1>Art in Service of People</h1>
 
-              {/* Use semantic H3 as the hero subhead.
-                  Keep hero-subtitle class because you already defined it as a "special case" utility. */}
               <h3 className="hero-subtitle" style={{ marginBottom: 32 }}>
                 Sharing art through stewardship, education and healing
               </h3>
 
-              {/* Use global P */}
               <div className="max-w-2xl">
                 <p>
                   Art has the power to do more than be admired. When stewarded with care and shared with
@@ -43,19 +40,6 @@ export default function PhilanthropyPage() {
 
                 <p style={{ fontStyle: "italic" }}>This is not about recognition. It is about responsibility.</p>
               </div>
-
-              {/* Optional CTA placeholder (kept since Link is already imported)
-                  If you do not want a CTA yet, delete this block. */}
-              {/* 
-              <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <Link href="/request-access" className="cta-primary">
-                  Start a Conversation
-                </Link>
-                <Link href="/museum" className="cta-secondary">
-                  See the Collection
-                </Link>
-              </div>
-              */}
             </div>
 
             {/* Right: Image */}
@@ -79,15 +63,12 @@ export default function PhilanthropyPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[70vh] relative">
             {/* Left: Text Content */}
             <div className="flex flex-col justify-center px-6 sm:px-8 lg:px-16 xl:px-24 py-12 lg:py-16 bg-white">
-              {/* Use global H2 */}
               <h2>Stewardship Beyond Ownership</h2>
 
-              {/* Use semantic H3 (subsection title) */}
               <h3 className="hero-subtitle" style={{ marginBottom: 32 }}>
                 Responsibility beyond the collection
               </h3>
 
-              {/* Use global P */}
               <div className="max-w-2xl">
                 <p>Art holds responsibility beyond possession.</p>
 
@@ -127,7 +108,96 @@ export default function PhilanthropyPage() {
         </div>
       </section>
 
-      {/* Globe section will go here next */}
+      {/* Sharing Art With the World Section - Globe */}
+      <section className="w-full !max-w-none" style={{ backgroundColor: "#f5f5f5" }}>
+        <div className="max-w-[1440px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh]">
+            {/* Left: Text Content */}
+            <div className="flex flex-col justify-start px-6 sm:px-8 lg:px-16 xl:px-24 py-12 lg:py-16 space-y-12">
+              {/* Sharing Art With the World */}
+              <div>
+                <h2>Sharing Art With the World</h2>
+                <h3 className="hero-subtitle" style={{ marginBottom: 24 }}>
+                  Access as a Core Principle
+                </h3>
+                <div className="max-w-2xl space-y-4">
+                  <p>
+                    We believe art should be experienced, not hidden. When appropriate, works under our
+                    stewardship are shared through exhibitions, institutional loans, and public-facing
+                    placements that expand access while maintaining curatorial and conservation standards.
+                  </p>
+                  <p>
+                    These efforts are undertaken thoughtfully and responsibly, and reflect how museums and
+                    cultural institutions around the world are sustained. Public access, education, and
+                    stewardship are core components of modern philanthropy, and sharing art through
+                    institutional and community contexts is a proven way to preserve cultural value over time.
+                  </p>
+                </div>
+              </div>
+
+              {/* Art as Education */}
+              <div>
+                <h2>Art as Education</h2>
+                <h3 className="hero-subtitle" style={{ marginBottom: 24 }}>
+                  Teaching the Next Generation to See
+                </h3>
+                <div className="max-w-2xl space-y-4">
+                  <p>Art shapes curiosity long before it shapes taste.</p>
+                  <p>
+                    Introducing children and young people to art builds visual literacy, emotional awareness,
+                    and creative confidence. Learning how to look, ask questions, and make something tangible
+                    helps develop perspective, empathy, and problem-solving skills that extend well beyond the
+                    classroom.
+                  </p>
+                  <p>
+                    Our educational initiatives support programs that bring art into learning environments in
+                    ways that are accessible, thoughtful, and age-appropriate. Educational access, particularly
+                    for young people, is consistently recognized as one of the most enduring public benefits of
+                    cultural institutions.
+                  </p>
+                </div>
+              </div>
+
+              {/* Philanthropy as Cultural Infrastructure */}
+              <div>
+                <h2>Philanthropy as Cultural Infrastructure</h2>
+                <h3 className="hero-subtitle" style={{ marginBottom: 24 }}>
+                  How art institutions are sustained over time
+                </h3>
+                <div className="max-w-2xl space-y-4">
+                  <p>
+                    Philanthropy plays a foundational role in sustaining cultural institutions. Around the
+                    world, museums, educational programs, and public art initiatives rely on philanthropy to
+                    support the work that cannot be reduced to admissions, transactions, or short-term metrics.
+                  </p>
+                  <p>
+                    As public funding becomes more constrained and operational demands increase, philanthropy
+                    increasingly underwrites the public-facing responsibilities of cultural institutions.
+                    Education, access, preservation, research, and community engagement are not peripheral
+                    activities. They are core infrastructure, and philanthropy is what allows them to endure.
+                  </p>
+                  <p>
+                    Our philanthropic approach reflects this reality. We focus on the elements of stewardship
+                    that ensure art remains part of civic and cultural life over time. Supporting education
+                    programs, enabling public access, and sustaining environments where art can be experienced
+                    thoughtfully are not add-ons to stewardship. They are what make stewardship meaningful.
+                  </p>
+                  <p>
+                    By treating philanthropy as infrastructure rather than charity, we align our work with the
+                    long-term needs of cultural institutions and the communities they serve. The goal is
+                    durability. Not momentary impact, but lasting presence.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Interactive Globe */}
+            <div className="relative w-full h-[600px] lg:h-auto flex items-center justify-center" style={{ backgroundColor: "#f5f5f5" }}>
+              <InteractiveGlobe />
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
