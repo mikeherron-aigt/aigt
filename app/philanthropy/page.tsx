@@ -108,7 +108,7 @@ export default function PhilanthropyPage() {
         </div>
       </section>
 
-     {/* Sharing Art With the World Section - Globe */}
+      {/* Sharing Art With the World Section - Globe */}
       <section className="w-full !max-w-none overflow-x-hidden relative" style={{ backgroundColor: "#f5f5f5" }}>
         <div className="max-w-[1440px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh]">
@@ -211,3 +211,6 @@ export default function PhilanthropyPage() {
           <InteractiveGlobe />
         </div>
       </section>
+    </main>
+  );
+}
