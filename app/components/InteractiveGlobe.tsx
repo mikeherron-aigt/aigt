@@ -64,10 +64,9 @@ export default function InteractiveGlobe() {
 
     const createGlobe = () => {
       const dotSphereRadius = 20;
-      const allDotMeshes: THREE.Mesh[] = [];
-      const materials: THREE.Material[] = [];
+      const allDotMeshes: THREE.Mesh<THREE.CircleGeometry, THREE.MeshBasicMaterial>[] = [];
 
-      const calcPosFromLatLonRad = (lon: number, lat: number) => {
+      const calcPosFromLatLonRad = (lon: number, lat: number): THREE.Vector3 => {
         const phi = (90 - lat) * (Math.PI / 180);
         const theta = (lon + 180) * (Math.PI / 180);
 
@@ -136,7 +135,6 @@ export default function InteractiveGlobe() {
                 side: THREE.DoubleSide,
               });
 
-              materials.push(material);
               const mesh = new THREE.Mesh(dotGeometry, material);
               mesh.position.copy(vector);
               mesh.lookAt(new THREE.Vector3(0, 0, 0));
@@ -181,7 +179,6 @@ export default function InteractiveGlobe() {
                   side: THREE.DoubleSide,
                 });
 
-                materials.push(material);
                 const mesh = new THREE.Mesh(dotGeometry, material);
                 mesh.position.copy(vector);
                 mesh.lookAt(new THREE.Vector3(0, 0, 0));
@@ -212,11 +209,11 @@ export default function InteractiveGlobe() {
     };
 
     const initGlowSystem = (
-      allDotMeshes: THREE.Mesh[],
+      allDotMeshes: THREE.Mesh<THREE.CircleGeometry, THREE.MeshBasicMaterial>[],
       calcPosFromLatLonRad: (lon: number, lat: number) => THREE.Vector3
     ) => {
       let currentGlowIndex = 0;
-      let currentGlowDot: THREE.Mesh | null = null;
+      let currentGlowDot: THREE.Mesh<THREE.CircleGeometry, THREE.MeshBasicMaterial> | null = null;
       let glowState: "idle" | "fading_in" | "holding" | "fading_out" = "idle";
       let glowPhaseStart = 0;
       const GLOW_FADE_IN = 1500;
@@ -238,12 +235,12 @@ export default function InteractiveGlobe() {
       ];
 
       const originalDotProperties = new Map<
-        THREE.Mesh,
+        THREE.Mesh<THREE.CircleGeometry, THREE.MeshBasicMaterial>,
         { color: number; scale: number }
       >();
 
       const findClosestDot = (targetLat: number, targetLon: number) => {
-        let closestDot: THREE.Mesh | null = null;
+        let closestDot: THREE.Mesh<THREE.CircleGeometry, THREE.MeshBasicMaterial> | null = null;
         let minDistance = Infinity;
 
         allDotMeshes.forEach((dotMesh) => {
@@ -271,7 +268,7 @@ export default function InteractiveGlobe() {
 
         if (!originalDotProperties.has(dotMesh)) {
           originalDotProperties.set(dotMesh, {
-            color: (dotMesh.material as THREE.MeshBasicMaterial).color.getHex(),
+            color: dotMesh.material.color.getHex(),
             scale: dotMesh.scale.x,
           });
         }
@@ -299,11 +296,7 @@ export default function InteractiveGlobe() {
 
           const startColor = new THREE.Color(original.color);
           const endColor = new THREE.Color(0x2d5016);
-          (currentGlowDot.material as THREE.MeshBasicMaterial).color.lerpColors(
-            startColor,
-            endColor,
-            progress
-          );
+          currentGlowDot.material.color.lerpColors(startColor, endColor, progress);
 
           const targetScale = original.scale * 3;
           currentGlowDot.scale.setScalar(
@@ -326,11 +319,7 @@ export default function InteractiveGlobe() {
 
           const startColor = new THREE.Color(0x2d5016);
           const endColor = new THREE.Color(original.color);
-          (currentGlowDot.material as THREE.MeshBasicMaterial).color.lerpColors(
-            startColor,
-            endColor,
-            progress
-          );
+          currentGlowDot.material.color.lerpColors(startColor, endColor, progress);
 
           const startScale = original.scale * 3;
           currentGlowDot.scale.setScalar(
@@ -338,9 +327,7 @@ export default function InteractiveGlobe() {
           );
 
           if (elapsed >= GLOW_FADE_OUT) {
-            (currentGlowDot.material as THREE.MeshBasicMaterial).color.setHex(
-              original.color
-            );
+            currentGlowDot.material.color.setHex(original.color);
             currentGlowDot.scale.setScalar(original.scale);
             currentGlowDot = null;
             moveToNextCity();
