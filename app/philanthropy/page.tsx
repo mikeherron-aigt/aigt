@@ -60,7 +60,7 @@ export default function PhilanthropyPage() {
             {/* Right: Image */}
             <div className="relative w-full h-[400px] lg:h-auto">
               <Image
-                src="/philanthropy_hero.jpg"
+                src="/girl_viewing_art.png"
                 alt="Young girl in yellow dress viewing art in museum"
                 fill
                 className="object-cover"
@@ -120,7 +120,7 @@ export default function PhilanthropyPage() {
             <div className="relative bg-white flex items-center justify-center px-6 sm:px-8 lg:px-16 py-12 lg:py-16">
               {/* Floating Quote Card */}
               <div 
-                className="max-w-md p-8 lg:p-12 shadow-lg"
+                className="max-w-md p-8 lg:p-12"
                 style={{ backgroundColor: "#f8f8f8" }}
               >
                 <blockquote>
