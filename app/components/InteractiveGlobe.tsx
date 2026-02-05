@@ -80,7 +80,8 @@ export default function InteractiveGlobe() {
           const green = imageData[i + 1];
           const blue = imageData[i + 2];
 
-          if (red < 80 && green < 80 && blue < 80)
+          // Detect teal/cyan continents (high green and blue, lower red)
+          if (green > 120 && blue > 120 && red < 120)
             activeLatLon[lat].push(lon);
 
           if (lon === 180) {
