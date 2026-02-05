@@ -132,7 +132,7 @@ export default function BlueChipArtFundPage() {
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center py-12 lg:py-0">
                 <div className="max-w-[711px] w-full">
-                  <h1 className="hero-title" style={{ marginBottom: "17px", textAlign: "left" }}>
+                  <h1 style={{ marginBottom: "17px", textAlign: "left" }}>
                     Blue Chip Art Fund
                   </h1>
 
@@ -140,7 +140,7 @@ export default function BlueChipArtFundPage() {
                     <p>Long-Term Stewardship of Historically Significant Works</p>
                   </div>
 
-                  <div className="hero-description" style={{ textAlign: "left", marginTop: "24px" }}>
+                  <div style={{ textAlign: "left", marginTop: "24px" }}>
                     <p>
                       The Blue Chip Art Fund is a governed platform established to acquire, hold, and steward culturally and
                       historically significant artworks within a long-duration ownership framework.
@@ -196,14 +196,14 @@ export default function BlueChipArtFundPage() {
               {/* Left Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
                 <div className="max-w-[579px]">
-                  <h2 className="governance-title" style={{ marginBottom: "24px" }}>
+                  <h2 style={{ marginBottom: "24px" }}>
                     Institutional Stewardship for Established Art
                   </h2>
-                  <p className="governance-description">
+                  <p>
                     The Blue Chip Art Fund is designed for artworks with established cultural significance and enduring historical
                     relevance.
                   </p>
-                  <p className="governance-description">
+                  <p>
                     The fund applies institutional governance, professional custody standards, and long-horizon ownership to works
                     that warrant preservation across generations rather than participation in evolving market structures.
                   </p>
@@ -212,19 +212,19 @@ export default function BlueChipArtFundPage() {
 
               {/* Right Column */}
               <div className="px-4 sm:px-8 lg:p-[80px_40px]" style={{ backgroundColor: "#f5f5f5" }}>
-                <h3 className="governance-title" style={{ marginBottom: "24px", fontSize: "28px", lineHeight: "36px" }}>
+                <h3 style={{ marginBottom: "24px" }}>
                   Preservation-First Stewardship
                 </h3>
-                <p className="governance-description" style={{ marginBottom: "16px" }}>
+                <p style={{ marginBottom: "16px" }}>
                   Prioritizing long-duration ownership over liquidity
                 </p>
-                <p className="governance-description" style={{ marginBottom: "16px" }}>
+                <p style={{ marginBottom: "16px" }}>
                   Maintaining museum-quality custody and care standards
                 </p>
-                <p className="governance-description" style={{ marginBottom: "16px" }}>
+                <p style={{ marginBottom: "16px" }}>
                   Preserving provenance, context, and historical integrity
                 </p>
-                <p className="governance-description">Minimizing turnover to support long-term cultural value</p>
+                <p>Minimizing turnover to support long-term cultural value</p>
               </div>
             </div>
           </div>
@@ -234,15 +234,15 @@ export default function BlueChipArtFundPage() {
         <section className="w-full py-12 sm:py-16 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
-              <h2 className="governance-title text-center">A Distinct Mandate</h2>
-              <p className="governance-subtitle text-center max-w-[735px]">
+              <h2 className="text-center">A Distinct Mandate</h2>
+              <h3 className="text-center max-w-[735px]">
                 The Blue Chip Art Fund is differentiated by its preservation-first mandate and long-term ownership horizon.
-              </p>
-              <p className="governance-description text-center max-w-[995px]">
+              </h3>
+              <p className="text-center max-w-[995px]">
                 The Blue Chip Art Fund operates with the explicit objective of long-term stewardship. It prioritizes permanence,
                 stability, and cultural continuity over liquidity or market responsiveness.
               </p>
-              <p className="governance-description text-center max-w-[995px]">
+              <p className="text-center max-w-[995px]">
                 Acquisitions are made with the expectation of extended holding periods, limited turnover, and careful custodial
                 management designed to preserve both physical condition and historical context.
               </p>
@@ -284,24 +284,24 @@ export default function BlueChipArtFundPage() {
 
               {/* Right: Content */}
               <div className="max-w-[579px] w-full lg:pl-0">
-                <h2 className="governance-title" style={{ marginBottom: "24px" }}>
+                <h2 style={{ marginBottom: "24px" }}>
                   Curatorial and Acquisition Focus
                 </h2>
-                <p className="governance-description">
+                <p>
                   The Blue Chip Art Fund is focused on the acquisition and long-term stewardship of artworks with established
                   cultural, historical, and institutional significance.
                 </p>
-                <p className="governance-description">
+                <p>
                   Works are selected based on enduring relevance, provenance integrity, and suitability for extended custodial care.
                   The fund prioritizes pieces that have demonstrated lasting influence within art history rather than short-term
                   market momentum.
                 </p>
-                <p className="governance-description">
+                <p>
                   Acquisition activity remains selective and deliberate, with an emphasis on quality, context, and preservation over
                   volume.
                 </p>
-                <p className="governance-description">Areas of focus to include:</p>
-                <ul className="governance-description" style={{ paddingLeft: "20px", listStyle: "disc", marginTop: "8px" }}>
+                <p>Areas of focus to include:</p>
+                <ul style={{ paddingLeft: "20px", listStyle: "disc", marginTop: "8px" }}>
                   <li>Historically significant modern and contemporary works</li>
                   <li>Artists with sustained institutional recognition</li>
                   <li>Works with documented exhibition and publication history</li>
@@ -316,11 +316,11 @@ export default function BlueChipArtFundPage() {
         <section className="w-full py-12 sm:py-16 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
-              <h2 className="governance-title text-center">How the Blue Chip Art Fund Operates</h2>
-              <p className="governance-subtitle text-center max-w-[817px]">
+              <h2 className="text-center">How the Blue Chip Art Fund Operates</h2>
+              <h3 className="text-center max-w-[817px]">
                 An overview of stewardship priorities, acquisition discipline, and long-term custodial care.
-              </p>
-              <p className="governance-description text-center max-w-[995px]">
+              </h3>
+              <p className="text-center max-w-[995px]">
                 The Blue Chip Art Fund operates through selective acquisition, long-duration ownership, institutional custody
                 standards, and governance designed to minimize turnover while preserving cultural value.
               </p>
@@ -329,8 +329,8 @@ export default function BlueChipArtFundPage() {
             <div className="grid lg:grid-cols-2 gap-8">
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Long-Term Ownership</h3>
-                  <p className="practice-card-description">
+                  <h3>Long-Term Ownership</h3>
+                  <p>
                     The fund is designed for extended holding periods, with no expectation of short-term liquidity.
                   </p>
                 </div>
@@ -338,8 +338,8 @@ export default function BlueChipArtFundPage() {
 
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Lower Risk Profile</h3>
-                  <p className="practice-card-description">
+                  <h3>Lower Risk Profile</h3>
+                  <p>
                     By focusing on historically established works, the fund emphasizes stability over market volatility.
                   </p>
                 </div>
@@ -347,8 +347,8 @@ export default function BlueChipArtFundPage() {
 
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Selective Acquisition</h3>
-                  <p className="practice-card-description">
+                  <h3>Selective Acquisition</h3>
+                  <p>
                     Growth occurs infrequently and only when works meet strict cultural and custodial criteria.
                   </p>
                 </div>
@@ -356,8 +356,8 @@ export default function BlueChipArtFundPage() {
 
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Institutional Custody</h3>
-                  <p className="practice-card-description">
+                  <h3>Institutional Custody</h3>
+                  <p>
                     Works are maintained under professional standards appropriate for museum-quality art.
                   </p>
                 </div>
@@ -369,10 +369,10 @@ export default function BlueChipArtFundPage() {
         {/* Participation and Alignment */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <h2 className="governance-title" style={{ marginBottom: "16px" }}>
+            <h2 style={{ marginBottom: "16px" }}>
               Participation and Alignment
             </h2>
-            <p className="governance-description max-w-[1038px]" style={{ marginBottom: "48px" }}>
+            <p className="max-w-[1038px]" style={{ marginBottom: "48px" }}>
               Participation in the Blue Chip Art Fund is designed for those aligned with long-term stewardship and
               preservation-first ownership.
             </p>
@@ -468,23 +468,23 @@ export default function BlueChipArtFundPage() {
         <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{ backgroundColor: "#ffffff" }}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
-              <h2 className="footer-tagline">Governed platforms for the long-term stewardship of culturally significant art.</h2>
+              <h2 className="text-center max-w-[912px] mx-auto">Governed platforms for the long-term stewardship of culturally significant art.</h2>
 
-              <div className="private-conversations text-center flex flex-col items-center">
-                <h3 className="private-conversations-title">Private Conversations</h3>
-                <p className="private-conversations-text max-w-[789px]">
+              <div className="text-center flex flex-col items-center gap-4">
+                <h3 className="text-center">Private Conversations</h3>
+                <p className="text-center max-w-[789px] mx-auto">
                   Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct,
                   considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not
                   transactions.
                 </p>
-                <p className="private-conversations-text max-w-[789px]">
+                <p className="text-center max-w-[789px] mx-auto">
                   These conversations are exploratory by design. They allow space to discuss long-term intent, governance
                   alignment, and the role each participant seeks to play in preserving cultural value across generations.
                 </p>
               </div>
 
               <div className="flex justify-center">
-                <a
+                
                   href="/request-access"
                   className="footer-cta-primary"
                   style={{ textDecoration: "none", display: "inline-flex" }}
