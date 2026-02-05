@@ -259,11 +259,11 @@ export default function InteractiveGlobe() {
 
       const originalDotProperties = new Map<THREE.Mesh, { color: number; scale: number }>();
 
-      const findClosestDot = (targetLat: number, targetLon: number) => {
+      const findClosestDot = (targetLat: number, targetLon: number): THREE.Mesh | null => {
         let closestDot: THREE.Mesh | null = null;
         let minDistance = Infinity;
 
-        allDotMeshes.forEach((dotMesh) => {
+        allDotMeshes.forEach((dotMesh: THREE.Mesh) => {
           const dotPos = dotMesh.position;
           const targetPos = calcPosFromLatLonRad(targetLon, targetLat);
           const distance = dotPos.distanceTo(targetPos);
@@ -287,8 +287,9 @@ export default function InteractiveGlobe() {
         }
 
         if (!originalDotProperties.has(dotMesh)) {
+          const material = dotMesh.material as THREE.MeshBasicMaterial;
           originalDotProperties.set(dotMesh, {
-            color: (dotMesh.material as THREE.MeshBasicMaterial).color.getHex(),
+            color: material.color.getHex(),
             scale: dotMesh.scale.x,
           });
         }
