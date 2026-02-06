@@ -34,7 +34,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 5000);
 
     // Single knob that controls how big the globe appears
-    const FIT = 1.4; // increase = smaller globe
+    const FIT = 1.2; // increase = smaller globe
 
     const fovRad = THREE.MathUtils.degToRad(camera.fov);
     const fitHeightDistance = (RADIUS * FIT) / Math.tan(fovRad / 2);
