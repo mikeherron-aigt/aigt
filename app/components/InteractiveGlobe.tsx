@@ -141,7 +141,6 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
       const mat = new THREE.PointsMaterial({
         size: DOT_SIZE,
-size: DOT_SIZE,
   vertexColors: true,
   transparent: true,
   opacity: 0.95,
