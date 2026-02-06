@@ -1,9 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCollectionArtworks, getCollections, type Artwork } from "@/app/lib/artApiServer";
 import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
 
 const PAGE_SIZE = 16;
 
@@ -83,6 +83,9 @@ export default async function CollectionPage({
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const pageItems = sorted.slice(startIndex, startIndex + PAGE_SIZE);
   const heroArtwork = sorted[0];
+  const heroArtworkHref = heroArtwork
+    ? `/collections/${collectionSlug}/${slugify(heroArtwork.title)}`
+    : null;
   const pageRange = getPageRange(currentPage, totalPages);
 
   return (
@@ -111,15 +114,31 @@ export default async function CollectionPage({
 
               <div className="relative w-full h-full overflow-hidden min-h-[520px]">
                 {heroArtwork?.image_url ? (
-                  <div className="absolute inset-0">
-                    <Image
-                      src={heroArtwork.image_url}
-                      alt={heroArtwork.title}
-                      fill
-                      className="object-cover object-center"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                    />
-                  </div>
+                  heroArtworkHref ? (
+                    <Link
+                      href={heroArtworkHref}
+                      aria-label={`View details for ${heroArtwork.title}`}
+                      className="absolute inset-0"
+                    >
+                      <ProtectedImage
+                        src={heroArtwork.image_url}
+                        alt={heroArtwork.title}
+                        fill
+                        className="object-cover object-center"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                      />
+                    </Link>
+                  ) : (
+                    <div className="absolute inset-0">
+                      <ProtectedImage
+                        src={heroArtwork.image_url}
+                        alt={heroArtwork.title}
+                        fill
+                        className="object-cover object-center"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                      />
+                    </div>
+                  )
                 ) : (
                   <div
                     className="w-full h-full"

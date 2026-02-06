@@ -7,8 +7,8 @@ type InquiryPayload = {
   phone?: string;
   message: string;
   artworkTitle: string;
-  artworkArtist?: string;
   artworkCollection?: string;
+  artworkCollectionId?: string | number;
 };
 
 const sanitize = (value: string) => value.trim();
@@ -22,8 +22,8 @@ export async function POST(request: NextRequest) {
     const phone = sanitize(payload.phone || "");
     const message = sanitize(payload.message || "");
     const artworkTitle = sanitize(payload.artworkTitle || "");
-    const artworkArtist = sanitize(payload.artworkArtist || "");
     const artworkCollection = sanitize(payload.artworkCollection || "");
+    const artworkCollectionId = sanitize(String(payload.artworkCollectionId || ""));
 
     if (!fullName || !email || !message || !artworkTitle) {
       return NextResponse.json(
@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
 New Artwork Inquiry
 
 Artwork: ${artworkTitle}
-Artist: ${artworkArtist || "Not provided"}
 Collection: ${artworkCollection || "Not provided"}
+Collection ID: ${artworkCollectionId || "Not provided"}
 
 Name: ${fullName}
 Email: ${email}

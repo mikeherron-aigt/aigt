@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getCollectionArtworks, getCollections } from "@/app/lib/artApiServer";
 import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
 
 const collectionDescriptions: Record<string, string> = {
   // Add collection descriptions here, keyed by collection name.
@@ -32,22 +32,41 @@ export default async function CollectionsPage() {
   const heroCollection =
     collectionsWithImages.find((collection) => collection.featured) ||
     collectionsWithImages[0];
+  const heroArtworkHref = heroCollection?.featured
+    ? `/collections/${slugify(heroCollection.collection_name)}/${slugify(heroCollection.featured.title)}`
+    : null;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
       <main>
-        <section className="w-full bg-white pt-12 pb-16 sm:pb-20 lg:pb-[104px]">
+        <section className="w-full bg-white pt-12 pb-16 sm:pb-20 lg:pb-[104px] featured-collections-section">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="collection-hero-banner">
               <div className="absolute inset-0 overflow-hidden">
                 {heroCollection?.featured?.image_url ? (
-                  <Image
-                    src={heroCollection.featured.image_url}
-                    alt={heroCollection.collection_name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 80vw"
-                  />
+                  heroArtworkHref ? (
+                    <Link
+                      href={heroArtworkHref}
+                      aria-label={`View details for ${heroCollection.featured.title}`}
+                      className="absolute inset-0"
+                    >
+                      <ProtectedImage
+                        src={heroCollection.featured.image_url}
+                        alt={heroCollection.featured.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 80vw"
+                      />
+                    </Link>
+                  ) : (
+                    <ProtectedImage
+                      src={heroCollection.featured.image_url}
+                      alt={heroCollection.collection_name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 80vw"
+                    />
+                  )
                 ) : (
                   <div
                     className="w-full h-full"
@@ -70,6 +89,9 @@ export default async function CollectionsPage() {
               {collectionsWithImages.map((collection) => {
                 const slug = slugify(collection.collection_name);
                 const description = collectionDescriptions[collection.collection_name];
+                const featuredArtworkHref = collection.featured
+                  ? `/collections/${slug}/${slugify(collection.featured.title)}`
+                  : null;
 
                 return (
                   <article
@@ -77,30 +99,58 @@ export default async function CollectionsPage() {
                     className="artwork-card collection-card"
                     style={{ width: "100%" }}
                   >
-                    <Link
-                      href={`/collections/${slug}`}
-                      className="artwork-card-button"
-                      aria-label={`View ${collection.collection_name} collection`}
-                    >
-                      <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
-                        {collection.featured?.image_url ? (
-                          <ProgressiveImage
-                            src={collection.featured.image_url}
-                            alt={collection.collection_name}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                          />
-                        ) : (
-                          <div
-                            className="w-full h-full"
-                            style={{ backgroundColor: "var(--gallery-plaster)" }}
-                          />
-                        )}
+                    {featuredArtworkHref ? (
+                      <Link
+                        href={featuredArtworkHref}
+                        className="artwork-card-button"
+                        aria-label={`View details for ${collection.featured?.title ?? collection.collection_name}`}
+                      >
+                        <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
+                          {collection.featured?.image_url ? (
+                            <ProgressiveImage
+                              src={collection.featured.image_url}
+                              alt={collection.featured.title}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            />
+                          ) : (
+                            <div
+                              className="w-full h-full"
+                              style={{ backgroundColor: "var(--gallery-plaster)" }}
+                            />
+                          )}
+                        </div>
+                      </Link>
+                    ) : (
+                      <div className="artwork-card-button">
+                        <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
+                          {collection.featured?.image_url ? (
+                            <ProgressiveImage
+                              src={collection.featured.image_url}
+                              alt={collection.collection_name}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                            />
+                          ) : (
+                            <div
+                              className="w-full h-full"
+                              style={{ backgroundColor: "var(--gallery-plaster)" }}
+                            />
+                          )}
+                        </div>
                       </div>
-                    </Link>
+                    )}
                     <div className="artwork-info">
-                      <h3 className="artwork-title">{collection.collection_name}</h3>
+                      <h3 className="artwork-title">
+                        <Link
+                          href={`/collections/${slug}`}
+                          style={{ textDecoration: "none", color: "inherit" }}
+                        >
+                          {collection.collection_name}
+                        </Link>
+                      </h3>
                       <p className="artwork-details">
                         {collection.artwork_count} artworks
                       </p>

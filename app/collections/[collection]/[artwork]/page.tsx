@@ -5,6 +5,7 @@ import { slugify } from "@/app/lib/slug";
 import ArtworkInquiryModal from "@/app/components/ArtworkInquiryModal";
 import ArtworkImageModal from "@/app/components/ArtworkImageModal";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import ScrollToTop from "@/app/components/ScrollToTop";
 
 const isValidArtwork = (title: string) =>
   !title.toLowerCase().includes("untitled");
@@ -56,6 +57,7 @@ export default async function ArtworkDetailPage({
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
+      <ScrollToTop />
       <main>
         <section className="w-full bg-white pt-12 pb-16 sm:pb-20 lg:pb-[104px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
@@ -85,8 +87,9 @@ export default async function ArtworkDetailPage({
                 </div>
                 <ArtworkInquiryModal
                   artworkTitle={artwork.title}
-                  artworkArtist={artwork.artist}
                   artworkCollection={artwork.collection_name}
+                  artworkCollectionId={matchedCollection.collection_id}
+                  artworkHref={`/collections/${collectionSlug}/${artworkSlug}`}
                 />
               </div>
             </div>

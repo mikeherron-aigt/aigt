@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getArtworkBySku, type Artwork } from "@/app/lib/api";
+import { slugify } from "@/app/lib/slug";
 
 // fix deploy
 interface TeamMember {
@@ -94,6 +96,22 @@ const teamMembers: TeamMember[] = [
 ];
 
 export default function AboutPage() {
+  const [heroArtwork, setHeroArtwork] = useState<Artwork | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    getArtworkBySku("2025-JD-CD-0001").then((artwork) => {
+      if (isMounted) setHeroArtwork(artwork);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const heroArtworkHref = heroArtwork
+    ? `/collections/${slugify(heroArtwork.collection_name)}/${slugify(heroArtwork.title)}`
+    : null;
+
   return (
     <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
 
@@ -125,14 +143,31 @@ export default function AboutPage() {
 
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden">
-                <Image
-                  src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F8ed0757f4d7d41f9a6492d6376f81844?format=webp&width=800"
-                  alt="Art collage representing stewardship and accountability"
-                  fill
-                  className="object-cover object-center"
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 601px"
-                />
+                {heroArtworkHref ? (
+                  <Link
+                    href={heroArtworkHref}
+                    aria-label={`View details for ${heroArtwork?.title ?? "featured artwork"}`}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src="https://image.artigt.com/JD/CD/2025-JD-CD-0001/2025-JD-CD-0001__full__v02.webp"
+                      alt="Art collage representing stewardship and accountability"
+                      fill
+                      className="object-cover object-center aigt-protected-image"
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 601px"
+                    />
+                  </Link>
+                ) : (
+                  <Image
+                    src="https://image.artigt.com/JD/CD/2025-JD-CD-0001/2025-JD-CD-0001__full__v02.webp"
+                    alt="Art collage representing stewardship and accountability"
+                    fill
+                    className="object-cover object-center aigt-protected-image"
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 601px"
+                  />
+                )}
               </div>
             </div>
 
@@ -179,7 +214,7 @@ export default function AboutPage() {
                       src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620"
                       alt="John Dowling Jr."
                       fill
-                      className="object-cover"
+                      className="object-cover aigt-protected-image"
                       sizes="310px"
                     />
                   </div>
@@ -280,7 +315,7 @@ export default function AboutPage() {
                       src={member.imageUrl}
                       alt={member.name}
                       fill
-                      className="object-cover"
+                      className="object-cover aigt-protected-image"
                       sizes="102px"
                     />
                   </div>
@@ -289,18 +324,7 @@ export default function AboutPage() {
                 return (
                   <div key={index} className="flex flex-col items-center text-center">
                     {/* Photo */}
-                    {member.linkedinUrl ? (
-                      <a
-                        href={member.linkedinUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Visit ${member.name}'s LinkedIn profile`}
-                      >
-                        {photoElement}
-                      </a>
-                    ) : (
-                      photoElement
-                    )}
+                    {photoElement}
 
                     {/* Name */}
                     <h3 className="team-member-name" style={{fontFamily: 'Georgia, "Times New Roman", serif'}}>{member.name}</h3>

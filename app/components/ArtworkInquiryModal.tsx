@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 
@@ -19,12 +20,14 @@ const initialState: InquiryFormState = {
 
 export default function ArtworkInquiryModal({
   artworkTitle,
-  artworkArtist,
   artworkCollection,
+  artworkCollectionId,
+  artworkHref,
 }: {
   artworkTitle: string;
-  artworkArtist: string;
   artworkCollection: string;
+  artworkCollectionId: number | string;
+  artworkHref?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [formState, setFormState] = useState(initialState);
@@ -51,8 +54,8 @@ export default function ArtworkInquiryModal({
         body: JSON.stringify({
           ...formState,
           artworkTitle,
-          artworkArtist,
           artworkCollection,
+          artworkCollectionId,
         }),
       });
 
@@ -147,12 +150,24 @@ export default function ArtworkInquiryModal({
                     />
                   </div>
                   <div className="inquiry-row">
-                    <input
-                      className="inquiry-input"
-                      value={artworkTitle}
-                      readOnly
-                      aria-label="Artwork title"
-                    />
+                    {artworkHref ? (
+                      <Link
+                        className="inquiry-input"
+                        href={artworkHref}
+                        aria-label={`View details for ${artworkTitle}`}
+                        style={{ display: "block", textDecoration: "none", cursor: "pointer" }}
+                        onClick={closeModal}
+                      >
+                        {artworkTitle}
+                      </Link>
+                    ) : (
+                      <input
+                        className="inquiry-input"
+                        value={artworkTitle}
+                        readOnly
+                        aria-label="Artwork title"
+                      />
+                    )}
                     <input
                       className="inquiry-input"
                       value={artworkCollection}
@@ -162,9 +177,9 @@ export default function ArtworkInquiryModal({
                   </div>
                   <input
                     className="inquiry-input"
-                    value={artworkArtist}
+                    value={artworkCollectionId}
                     readOnly
-                    aria-label="Artwork artist"
+                    aria-label="Artwork collection ID"
                   />
                   <textarea
                     className="inquiry-textarea"

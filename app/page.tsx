@@ -1,12 +1,14 @@
 'use client';
 
-import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useRef, useState, useEffect, useMemo, useCallback, type CSSProperties } from "react";
 import { useArtworks } from "@/app/hooks/useArtworks";
 import { getArtworkBySku, type Artwork } from "@/app/lib/api";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
+import { slugify } from "@/app/lib/slug";
 
 
 interface ArtworkItem {
@@ -18,12 +20,11 @@ interface ArtworkItem {
 }
 
 const HERO_SKUS = [
-  "2024-JD-AG-0020",
-  "2025-JD-CD-0155",
   "2025-JD-DW-0007",
-  "2025-JD-DW-0008",
   "2024-JD-MM-0009",
-  "2025-JD-CD-0019",
+  "2025-JD-DW-0008",
+  "2025-JD-CD-0347",
+  "2024-JD-AG-0020",
 ];
 const GOVERNANCE_SKU = "2025-JD-DW-0019";
 const MEDIUMS_SKU = "2024-JD-AG-0025";
@@ -37,6 +38,190 @@ const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
   collection: artwork.collection_name,
 });
 
+const getArtworkHref = (artwork: { title: string; collection?: string; collection_name?: string }) => {
+  const collectionName = artwork.collection ?? artwork.collection_name;
+  if (!collectionName) return null;
+  return `/collections/${slugify(collectionName)}/${slugify(artwork.title)}`;
+};
+
+type HeroImageRotatorProps = {
+  images: string[];
+  links?: (string | null)[];
+  intervalMs?: number;
+  transitionMs?: number;
+  className?: string;
+  alt?: string;
+};
+
+const heroAltText = "Cultural artwork representing the trust's collection";
+
+function HeroImageRotator({
+  images,
+  links,
+  intervalMs = 9000,
+  transitionMs = 1200,
+  className = "",
+  alt = heroAltText,
+}: HeroImageRotatorProps) {
+  const normalizedItems = useMemo(
+    () =>
+      images
+        .map((src, index) => {
+          const normalized = normalizeArtworkImageUrl(src);
+          if (!normalized) return null;
+          return {
+            src: normalized,
+            href: links?.[index] ?? null,
+          };
+        })
+        .filter((item): item is { src: string; href: string | null } => Boolean(item?.src)),
+    [images, links]
+  );
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isReady, setIsReady] = useState(false);
+  const loadStatusRef = useRef(new Map<string, "loaded" | "failed">());
+  const intervalRef = useRef<number | null>(null);
+  const isMountedRef = useRef(false);
+
+  const preload = useCallback(
+    (index: number) =>
+      new Promise<void>((resolve) => {
+        const src = normalizedItems[index]?.src;
+        if (!src) {
+          resolve();
+          return;
+        }
+
+        const status = loadStatusRef.current.get(src);
+        if (status === "loaded" || status === "failed") {
+          resolve();
+          return;
+        }
+
+        let settled = false;
+        const finalize = (nextStatus: "loaded" | "failed") => {
+          if (settled) return;
+          settled = true;
+          loadStatusRef.current.set(src, nextStatus);
+          resolve();
+        };
+
+        const img = new Image();
+        img.onload = () => finalize("loaded");
+        img.onerror = () => finalize("failed");
+        img.src = src;
+
+        if ("decode" in img) {
+          img.decode().then(
+            () => finalize("loaded"),
+            () => finalize("failed")
+          );
+        }
+      }),
+    [normalizedItems]
+  );
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    setActiveIndex(0);
+    setIsReady(false);
+
+    if (intervalRef.current) window.clearTimeout(intervalRef.current);
+
+    if (normalizedItems.length === 0) {
+      return () => {
+        isMountedRef.current = false;
+      };
+    }
+
+    const scheduleNext = (currentIndex: number) => {
+      if (!isMountedRef.current || normalizedItems.length <= 1) return;
+
+      intervalRef.current = window.setTimeout(async () => {
+        const nextIndex = (currentIndex + 1) % normalizedItems.length;
+        await preload(nextIndex);
+        if (!isMountedRef.current) return;
+        setActiveIndex(nextIndex);
+        scheduleNext(nextIndex);
+      }, intervalMs);
+    };
+
+    const start = async () => {
+      await preload(0);
+      if (!isMountedRef.current) return;
+      setIsReady(true);
+      if (normalizedItems.length > 1) {
+        scheduleNext(0);
+      }
+    };
+
+    start();
+
+    return () => {
+      isMountedRef.current = false;
+      if (intervalRef.current) window.clearTimeout(intervalRef.current);
+    };
+  }, [normalizedItems, intervalMs, preload]);
+
+  if (normalizedItems.length === 0) {
+    return (
+      <div className={`relative ${className}`}>
+        <div className="absolute inset-0 bg-gallery-plaster" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`relative overflow-hidden ${className}`}>
+      <div className="absolute inset-0 bg-gallery-plaster" />
+      {normalizedItems.map((item, index) => {
+        const wrapperStyle: CSSProperties = {
+          opacity: index === activeIndex ? 1 : 0,
+          transition: `opacity ${transitionMs}ms ease-in-out`,
+          zIndex: index === activeIndex ? 2 : 1,
+          willChange: "opacity",
+          pointerEvents: index === activeIndex ? "auto" : "none",
+        };
+
+        const image = (
+          <ProtectedImage
+            src={item.src}
+            alt={alt}
+            fill
+            className="object-cover object-center"
+            priority={index === 0}
+            sizes="(max-width: 1024px) 100vw, 50vw"
+          />
+        );
+
+        return item.href ? (
+          <Link
+            key={`${item.src}-${index}`}
+            href={item.href}
+            aria-label={`View details for ${alt}`}
+            className="absolute inset-0"
+            style={wrapperStyle}
+          >
+            {image}
+          </Link>
+        ) : (
+          <div
+            key={`${item.src}-${index}`}
+            className="absolute inset-0"
+            style={wrapperStyle}
+          >
+            {image}
+          </div>
+        );
+      })}
+      {!isReady && (
+        <div className="absolute inset-0 bg-gallery-plaster" />
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   const sliderRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -45,15 +230,11 @@ export default function Home() {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [heroImage, setHeroImage] = useState<string>("");
-  const [previousHeroImage, setPreviousHeroImage] = useState<string>("");
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
   const { artworks, loading: artworksLoading, error: artworksError, refetch: refetchArtworks } = useArtworks({
     version: "v02",
-    limit: 12,
   });
   const [backupArtworks, setBackupArtworks] = useState<Artwork[]>([]);
 
@@ -91,28 +272,63 @@ export default function Home() {
   );
   const sourceArtworks = validArtworks.length > 0 ? validArtworks : backupFiltered;
 
-  const collectionMap = new Map<string, Artwork>();
-  sourceArtworks.forEach((artwork) => {
-    if (!collectionMap.has(artwork.collection_name)) {
-      collectionMap.set(artwork.collection_name, artwork);
+  // Shuffle function using Fisher-Yates algorithm
+  const shuffleArray = <T,>(array: T[], seed: number): T[] => {
+    const shuffled = [...array];
+    let currentIndex = shuffled.length;
+    // Simple seeded random number generator
+    const seededRandom = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+    while (currentIndex !== 0) {
+      const randomIndex = Math.floor(seededRandom() * currentIndex);
+      currentIndex--;
+      [shuffled[currentIndex], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[currentIndex]];
     }
-  });
+    return shuffled;
+  };
 
-  const uniqueByCollection = Array.from(collectionMap.values());
-  const remaining = sourceArtworks.filter((artwork) => {
-    const firstForCollection = collectionMap.get(artwork.collection_name);
-    return firstForCollection && firstForCollection.artwork_id !== artwork.artwork_id;
-  });
-  const combined = [...uniqueByCollection, ...remaining];
-  const derivedItems = combined.map(mapArtworkToItem);
-  const featuredArtworks = derivedItems.slice(0, 12);
+  // Use a seed based on the current date so it changes daily but is consistent within a session
+  const dailySeed = useMemo(() => {
+    const today = new Date();
+    return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+  }, []);
+
+  // Shuffle source artworks and then pick diverse collection representation
+  const shuffledArtworks = useMemo(() => {
+    if (sourceArtworks.length === 0) return [];
+    return shuffleArray(sourceArtworks, dailySeed);
+  }, [sourceArtworks, dailySeed]);
+
+  // Pick one random artwork from each collection, then fill remaining slots
+  const featuredArtworks = useMemo(() => {
+    if (shuffledArtworks.length === 0) return [];
+
+    const collectionMap = new Map<string, Artwork>();
+    shuffledArtworks.forEach((artwork) => {
+      if (!collectionMap.has(artwork.collection_name)) {
+        collectionMap.set(artwork.collection_name, artwork);
+      }
+    });
+
+    const uniqueByCollection = Array.from(collectionMap.values());
+    const remaining = shuffledArtworks.filter((artwork) => {
+      const firstForCollection = collectionMap.get(artwork.collection_name);
+      return firstForCollection && firstForCollection.artwork_id !== artwork.artwork_id;
+    });
+
+    // Combine unique collection picks with shuffled remaining
+    const combined = [...uniqueByCollection, ...remaining];
+    return combined.slice(0, 12).map(mapArtworkToItem);
+  }, [shuffledArtworks]);
 
   const [heroArtworks, setHeroArtworks] = useState<Artwork[]>([]);
   const [governanceArtwork, setGovernanceArtwork] = useState<Artwork | null>(null);
   const [mediumsArtwork, setMediumsArtwork] = useState<Artwork | null>(null);
   const [artArtistsArtwork, setArtArtistsArtwork] = useState<Artwork | null>(null);
 
-  const modalArtworks = derivedItems.length > 0 ? derivedItems : featuredArtworks;
+  const modalArtworks = featuredArtworks;
   const governanceImage = governanceArtwork
     ? mapArtworkToItem(governanceArtwork)
     : undefined;
@@ -122,6 +338,9 @@ export default function Home() {
   const artArtistsImage = artArtistsArtwork
     ? mapArtworkToItem(artArtistsArtwork)
     : undefined;
+  const governanceHref = governanceArtwork ? getArtworkHref(governanceArtwork) : null;
+  const mediumsHref = mediumsArtwork ? getArtworkHref(mediumsArtwork) : null;
+  const artArtistsHref = artArtistsArtwork ? getArtworkHref(artArtistsArtwork) : null;
 
   const faqItems = [
     {
@@ -140,8 +359,8 @@ export default function Home() {
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
-    // Don't start dragging if clicking on a button
-    if ((e.target as HTMLElement).closest('button')) return;
+    // Don't start dragging if clicking on interactive elements
+    if ((e.target as HTMLElement).closest('button, a')) return;
     setIsDragging(true);
     setStartX(e.pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -160,6 +379,7 @@ export default function Home() {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!sliderRef.current) return;
+    if ((e.target as HTMLElement).closest('a')) return;
     setIsDragging(true);
     setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -261,31 +481,16 @@ export default function Home() {
     resolveSkus();
   }, []);
 
-  useEffect(() => {
-    const fallbackHero = modalArtworks[0]?.src || "";
+  // Compute the hero image list
+  const heroImageList = useMemo(() => {
     const heroSources = heroArtworks.map((artwork) => artwork.image_url);
-    const list = heroSources.length > 0 ? heroSources : [fallbackHero].filter(Boolean);
-    if (list.length === 0) return;
+    return heroSources.length > 0 ? heroSources : [];
+  }, [heroArtworks]);
 
-    let index = 0;
-    setHeroImage(list[index]);
-    setPreviousHeroImage("");
-
-    const interval = setInterval(() => {
-      index = (index + 1) % list.length;
-      setIsTransitioning(true);
-      setPreviousHeroImage(list[(index - 1 + list.length) % list.length]);
-      setHeroImage(list[index]);
-
-      // Reset transition state after animation completes
-      setTimeout(() => {
-        setIsTransitioning(false);
-        setPreviousHeroImage("");
-      }, 1000);
-    }, 6000);
-
-    return () => clearInterval(interval);
-  }, [heroArtworks, modalArtworks]);
+  const heroImageLinks = useMemo(
+    () => heroArtworks.map((artwork) => getArtworkHref(artwork)),
+    [heroArtworks]
+  );
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -379,33 +584,13 @@ export default function Home() {
             </div>
 
             {/* Image Column */}
-            <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
-              <div className="absolute inset-0">
-                {/* Previous image - fades out */}
-                {previousHeroImage && isTransitioning && (
-                  <Image
-                    src={previousHeroImage}
-                    alt="Cultural artwork representing the trust's collection"
-                    fill
-                    className="object-cover object-center transition-opacity duration-1000"
-                    style={{ opacity: 0 }}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                )}
-                {/* Current image - fades in */}
-                {heroImage && (
-                  <Image
-                    src={heroImage}
-                    alt="Cultural artwork representing the trust's collection"
-                    fill
-                    className="object-cover object-center transition-opacity duration-1000"
-                    style={{ opacity: isTransitioning ? 1 : 1 }}
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                )}
-              </div>
-            </div>
+            <HeroImageRotator
+              images={heroImageList}
+              links={heroImageLinks}
+              intervalMs={7000}
+              transitionMs={1200}
+              className="h-[400px] sm:h-[500px] lg:h-[680px] bg-gallery-plaster"
+            />
           </div>
 
           {/* Decorative Elements - Positioned at bottom of image, above footer */}
@@ -500,7 +685,7 @@ export default function Home() {
         </section>
 
         {/* Featured Collection Section */}
-        <section className="w-full bg-white pt-0 pb-16 sm:pb-20 lg:pb-[104px]">
+        <section className="w-full bg-white pt-0 pb-16 sm:pb-20 lg:pb-[104px] featured-collection-section">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <h2 className="section-heading">
               Featured Collection
@@ -545,32 +730,51 @@ export default function Home() {
                 >
                   {[...featuredArtworks, ...featuredArtworks].map((artwork, index) => (
                     <div key={`${artwork.title}-${index}`} className="artwork-card">
-                      <button
-                        className="artwork-card-button"
-                        onClick={() => openModal(artwork)}
-                        aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
-                      >
-                        <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
-                          {artwork.src ? (
-                            <ProgressiveImage
-                              src={artwork.src}
-                              alt={artwork.title}
-                              fill
-                              eager={index < 3}
-                              className="object-cover"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                            />
-                          ) : (
-                            <div
-                              className="w-full h-full"
-                              style={{ backgroundColor: "var(--gallery-plaster)" }}
-                            />
-                          )}
-                        </div>
-                      </button>
+                      {(() => {
+                        const artworkHref = getArtworkHref(artwork);
+                        const imageContent = (
+                          <div className="artwork-image-wrapper">
+                            {artwork.src ? (
+                              <ProgressiveImage
+                                src={artwork.src}
+                                alt={artwork.title}
+                                fill
+                                eager={index < 3}
+                                className="object-cover"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                              />
+                            ) : (
+                              <div
+                                className="w-full h-full"
+                                style={{ backgroundColor: "var(--gallery-plaster)" }}
+                              />
+                            )}
+                          </div>
+                        );
+
+                        return artworkHref ? (
+                          <Link
+                            href={artworkHref}
+                            className="artwork-card-button"
+                            aria-label={`View details for ${artwork.title}`}
+                          >
+                            {imageContent}
+                          </Link>
+                        ) : (
+                          <div className="artwork-card-button">{imageContent}</div>
+                        );
+                      })()}
                       <div className="artwork-info">
                         <h3 className="artwork-title">{artwork.title}</h3>
-                        <p className="artwork-details">{artwork.artist}<br />{artwork.collection || 'Cosmic Dreams Collection'}</p>
+                        <p className="artwork-details">
+                          {artwork.artist}
+                          {artwork.collection ? (
+                            <>
+                              <br />
+                              {artwork.collection}
+                            </>
+                          ) : null}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -639,32 +843,42 @@ export default function Home() {
 
               {/* Image Column */}
               <div className="relative w-full h-full overflow-hidden min-h-[900px]">
-                <button
-                  onClick={() => {
-                    if (governanceImage) {
-                      openModal(governanceImage);
-                    }
-                  }}
-                  className="governance-image-button"
-                  aria-label="View full-size image of Contemporary Governance artwork"
-                >
-                  <div className="absolute inset-0">
-                    {governanceImage?.src ? (
-                      <Image
-                        src={governanceImage.src}
-                        alt={governanceImage.title}
-                        fill
-                        className="object-cover object-center"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                      />
-                    ) : (
-                      <div
-                        className="w-full h-full"
-                        style={{ backgroundColor: "var(--gallery-plaster)" }}
-                      />
-                    )}
-                  </div>
-                </button>
+                {governanceImage?.src ? (
+                  governanceHref ? (
+                    <Link
+                      href={governanceHref}
+                      className="governance-image-button"
+                      aria-label={`View details for ${governanceImage.title}`}
+                    >
+                      <div className="absolute inset-0">
+                        <ProtectedImage
+                          src={governanceImage.src}
+                          alt={governanceImage.title}
+                          fill
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="governance-image-button">
+                      <div className="absolute inset-0">
+                        <ProtectedImage
+                          src={governanceImage.src}
+                          alt={governanceImage.title}
+                          fill
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <div
+                    className="w-full h-full"
+                    style={{ backgroundColor: "var(--gallery-plaster)" }}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -737,32 +951,42 @@ export default function Home() {
             <div className="grid lg:grid-cols-[1fr_1fr] gap-0">
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
-                <button
-                  onClick={() => {
-                    if (mediumsImage) {
-                      openModal(mediumsImage);
-                    }
-                  }}
-                  className="mediums-image-button"
-                  aria-label="View full-size image of One Standard Across Mediums artwork"
-                >
-                  <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
-                    {mediumsImage?.src ? (
-                      <Image
-                        src={mediumsImage.src}
-                        alt={mediumsImage.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 100vw, 482px"
-                      />
-                    ) : (
-                      <div
-                        className="w-full h-full"
-                        style={{ backgroundColor: "var(--gallery-plaster)" }}
-                      />
-                    )}
-                  </div>
-                </button>
+                {mediumsImage?.src ? (
+                  mediumsHref ? (
+                    <Link
+                      href={mediumsHref}
+                      className="mediums-image-button"
+                      aria-label={`View details for ${mediumsImage.title}`}
+                    >
+                      <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
+                        <ProtectedImage
+                          src={mediumsImage.src}
+                          alt={mediumsImage.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 482px"
+                        />
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="mediums-image-button">
+                      <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
+                        <ProtectedImage
+                          src={mediumsImage.src}
+                          alt={mediumsImage.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 482px"
+                        />
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <div
+                    className="w-full h-full"
+                    style={{ backgroundColor: "var(--gallery-plaster)" }}
+                  />
+                )}
               </div>
 
               {/* Content Column */}
@@ -804,32 +1028,42 @@ export default function Home() {
 
               {/* Image Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center">
-                <button
-                  onClick={() => {
-                    if (artArtistsImage) {
-                      openModal(artArtistsImage);
-                    }
-                  }}
-                  className="art-artists-image-button"
-                  aria-label="View full-size image of Art and Artists artwork"
-                >
-                  <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
-                    {artArtistsImage?.src ? (
-                      <Image
-                        src={artArtistsImage.src}
-                        alt={artArtistsImage.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 100vw, 482px"
-                      />
-                    ) : (
-                      <div
-                        className="w-full h-full"
-                        style={{ backgroundColor: "var(--gallery-plaster)" }}
-                      />
-                    )}
-                  </div>
-                </button>
+                {artArtistsImage?.src ? (
+                  artArtistsHref ? (
+                    <Link
+                      href={artArtistsHref}
+                      className="art-artists-image-button"
+                      aria-label={`View details for ${artArtistsImage.title}`}
+                    >
+                      <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
+                        <ProtectedImage
+                          src={artArtistsImage.src}
+                          alt={artArtistsImage.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 482px"
+                        />
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="art-artists-image-button">
+                      <div className="relative w-full max-w-[482px]" style={{ aspectRatio: '482 / 612' }}>
+                        <ProtectedImage
+                          src={artArtistsImage.src}
+                          alt={artArtistsImage.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 482px"
+                        />
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <div
+                    className="w-full h-full"
+                    style={{ backgroundColor: "var(--gallery-plaster)" }}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -988,7 +1222,7 @@ export default function Home() {
             </button>
 
             <div className="image-modal-image-container">
-              <Image
+              <ProtectedImage
                 src={selectedImage.src}
                 alt={selectedImage.title}
                 fill

@@ -1,16 +1,19 @@
 'use client';
 
-import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useArtworks } from "@/app/hooks/useArtworks";
 import type { Artwork } from "@/app/lib/api";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { slugify } from "@/app/lib/slug";
 
 interface ArtworkItem {
   src: string;
   title: string;
   artist: string;
   year: string;
+  collection?: string;
 }
 
 const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
@@ -18,7 +21,13 @@ const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
   title: artwork.title,
   artist: artwork.artist,
   year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
+  collection: artwork.collection_name,
 });
+
+const getArtworkHref = (artwork: { title: string; collection?: string }) => {
+  if (!artwork.collection) return null;
+  return `/collections/${slugify(artwork.collection)}/${slugify(artwork.title)}`;
+};
 
 export default function BlueChipArtFundPage() {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -35,6 +44,8 @@ export default function BlueChipArtFundPage() {
     .map(mapArtworkToItem);
   const heroArtwork = featuredWorks[0];
   const focusArtwork = featuredWorks[1] || featuredWorks[0];
+  const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
+  const focusArtworkHref = focusArtwork ? getArtworkHref(focusArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
@@ -140,21 +151,33 @@ export default function BlueChipArtFundPage() {
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
                   {heroArtwork?.src ? (
-                    <button
-                      type="button"
-                      className="w-full h-full"
-                      onClick={() => openModal(heroArtwork)}
-                      aria-label={`View full-size image of ${heroArtwork.title}`}
-                    >
-                      <ProgressiveImage
-                        src={heroArtwork.src}
-                        alt={heroArtwork.title}
-                        fill
-                        eager
-                        className="object-cover object-center"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                      />
-                    </button>
+                    heroArtworkHref ? (
+                      <Link
+                        href={heroArtworkHref}
+                        aria-label={`View details for ${heroArtwork.title}`}
+                        className="block w-full h-full"
+                      >
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </Link>
+                    ) : (
+                      <div className="w-full h-full">
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </div>
+                    )
                   ) : (
                     <div
                       className="w-full h-full"
@@ -270,20 +293,31 @@ export default function BlueChipArtFundPage() {
               <div className="flex justify-center lg:justify-start">
                 <div className="relative w-full max-w-[417px] aspect-square overflow-hidden">
                   {focusArtwork?.src ? (
-                    <button
-                      type="button"
-                      className="w-full h-full"
-                      onClick={() => openModal(focusArtwork)}
-                      aria-label={`View full-size image of ${focusArtwork.title}`}
-                    >
-                      <ProgressiveImage
-                        src={focusArtwork.src}
-                        alt={focusArtwork.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 100vw, 417px"
-                      />
-                    </button>
+                    focusArtworkHref ? (
+                      <Link
+                        href={focusArtworkHref}
+                        aria-label={`View details for ${focusArtwork.title}`}
+                        className="block w-full h-full"
+                      >
+                        <ProgressiveImage
+                          src={focusArtwork.src}
+                          alt={focusArtwork.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 417px"
+                        />
+                      </Link>
+                    ) : (
+                      <div className="w-full h-full">
+                        <ProgressiveImage
+                          src={focusArtwork.src}
+                          alt={focusArtwork.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 417px"
+                        />
+                      </div>
+                    )
                   ) : (
                     <div
                       className="w-full h-full"
@@ -535,7 +569,7 @@ export default function BlueChipArtFundPage() {
             </button>
 
             <div className="image-modal-image-container">
-              <Image src={selectedImage.src} alt={selectedImage.title} fill className="object-contain" sizes="90vw" />
+              <ProtectedImage src={selectedImage.src} alt={selectedImage.title} fill className="object-contain" sizes="90vw" />
             </div>
 
             <div className="image-modal-info">

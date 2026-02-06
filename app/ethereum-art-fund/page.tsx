@@ -1,17 +1,22 @@
 'use client';
 
-import Image from "next/image";
-
-import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useArtworks } from "@/app/hooks/useArtworks";
 import type { Artwork } from "@/app/lib/api";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
+import Image from "next/image";
+import { slugify } from "@/app/lib/slug";
+
+const JOHN_DOWLING_PROFILE_URL = "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620";
 
 interface ArtworkItem {
   src: string;
   title: string;
   artist: string;
   year: string;
+  collection?: string;
 }
 
 const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
@@ -19,7 +24,13 @@ const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
   title: artwork.title,
   artist: artwork.artist,
   year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
+  collection: artwork.collection_name,
 });
+
+const getArtworkHref = (artwork: { title: string; collection?: string }) => {
+  if (!artwork.collection) return null;
+  return `/collections/${slugify(artwork.collection)}/${slugify(artwork.title)}`;
+};
 
 export default function EthereumArtFundPage() {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -29,15 +40,24 @@ export default function EthereumArtFundPage() {
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { artworks } = useArtworks({ version: "v02" });
-  const featuredWorks = artworks
-    .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
-    .map(mapArtworkToItem);
+
+  // Get random featured works from all collections
+  const featuredWorks = useMemo(() => {
+    const validArtworks = artworks
+      .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
+      .map(mapArtworkToItem);
+
+    // Shuffle array to get random selection
+    const shuffled = [...validArtworks].sort(() => Math.random() - 0.5);
+    return shuffled;
+  }, [artworks]);
+
   const heroArtwork = featuredWorks[0];
-  const catalogArtwork = featuredWorks[1] || featuredWorks[0];
+  const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
-    if ((e.target as HTMLElement).closest('button')) return;
+    if ((e.target as HTMLElement).closest('button, a')) return;
     setIsDragging(true);
     setStartX(e.pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -56,6 +76,7 @@ export default function EthereumArtFundPage() {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!sliderRef.current) return;
+    if ((e.target as HTMLElement).closest('a')) return;
     setIsDragging(true);
     setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -153,21 +174,33 @@ export default function EthereumArtFundPage() {
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
                   {heroArtwork?.src ? (
-                    <button
-                      type="button"
-                      className="w-full h-full"
-                      onClick={() => openModal(heroArtwork)}
-                      aria-label={`View full-size image of ${heroArtwork.title}`}
-                    >
-                      <ProgressiveImage
-                        src={heroArtwork.src}
-                        alt={heroArtwork.title}
-                        fill
-                        eager
-                        className="object-cover object-center"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                      />
-                    </button>
+                    heroArtworkHref ? (
+                      <Link
+                        href={heroArtworkHref}
+                        aria-label={`View details for ${heroArtwork.title}`}
+                        className="block w-full h-full"
+                      >
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </Link>
+                    ) : (
+                      <div className="w-full h-full">
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </div>
+                    )
                   ) : (
                     <div
                       className="w-full h-full"
@@ -279,30 +312,16 @@ export default function EthereumArtFundPage() {
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid lg:grid-cols-[278px_1fr] gap-12 lg:gap-[120px] items-start">
-              {/* Left: Image */}
+              {/* Left: Image - John Dowling Jr. Profile Photo */}
               <div className="flex justify-center lg:justify-start">
                 <div className="relative w-[278px] h-[278px] rounded-full overflow-hidden">
-                  {catalogArtwork?.src ? (
-                    <button
-                      type="button"
-                      className="w-full h-full"
-                      onClick={() => openModal(catalogArtwork)}
-                      aria-label={`View full-size image of ${catalogArtwork.title}`}
-                    >
-                      <ProgressiveImage
-                        src={catalogArtwork.src}
-                        alt={catalogArtwork.title}
-                        fill
-                        className="object-cover"
-                        sizes="278px"
-                      />
-                    </button>
-                  ) : (
-                    <div
-                      className="w-full h-full"
-                      style={{ backgroundColor: "var(--gallery-plaster)" }}
-                    />
-                  )}
+                  <Image
+                    src={JOHN_DOWLING_PROFILE_URL}
+                    alt="John Dowling Jr."
+                    fill
+                    className="object-cover aigt-protected-image"
+                    sizes="278px"
+                  />
                 </div>
               </div>
 
@@ -352,21 +371,32 @@ export default function EthereumArtFundPage() {
                   >
                     {[...featuredWorks, ...featuredWorks].map((artwork, index) => (
                       <div key={index} className="artwork-card">
-                        <button
-                          className="artwork-card-button"
-                          onClick={() => openModal(artwork)}
-                          aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
-                        >
-                          <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
-                            <ProgressiveImage
-                              src={artwork.src}
-                              alt={artwork.title}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                            />
-                          </div>
-                        </button>
+                        {(() => {
+                          const artworkHref = getArtworkHref(artwork);
+                          const imageContent = (
+                            <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
+                              <ProgressiveImage
+                                src={artwork.src}
+                                alt={artwork.title}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                              />
+                            </div>
+                          );
+
+                          return artworkHref ? (
+                            <Link
+                              href={artworkHref}
+                              className="artwork-card-button"
+                              aria-label={`View details for ${artwork.title}`}
+                            >
+                              {imageContent}
+                            </Link>
+                          ) : (
+                            <div className="artwork-card-button">{imageContent}</div>
+                          );
+                        })()}
                         <div className="artwork-info">
                           <h3 className="artwork-title">{artwork.title}</h3>
                           <p className="artwork-details">{artwork.artist}</p>
@@ -596,7 +626,7 @@ export default function EthereumArtFundPage() {
             </button>
 
             <div className="image-modal-image-container">
-              <Image
+              <ProtectedImage
                 src={selectedImage.src}
                 alt={selectedImage.title}
                 fill

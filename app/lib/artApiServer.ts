@@ -1,3 +1,5 @@
+import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
+
 const API_BASE_URL =
   process.env.ART_API_BASE_URL || "https://art.artigt.com/api/public";
 
@@ -21,6 +23,14 @@ export interface Collection {
   artwork_count: number;
 }
 
+const normalizeArtwork = (artwork: Artwork): Artwork => ({
+  ...artwork,
+  image_url: normalizeArtworkImageUrl(artwork.image_url),
+});
+
+const normalizeArtworks = (artworks: Artwork[]): Artwork[] =>
+  artworks.map(normalizeArtwork);
+
 async function fetchServer<T>(endpoint: string) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     next: { revalidate: 300 },
@@ -43,9 +53,10 @@ export async function getCollectionArtworks(
 ): Promise<Artwork[]> {
   const encodedName = encodeURIComponent(collectionName);
   const query = version ? `?version=${encodeURIComponent(version)}` : "";
-  return fetchServer<Artwork[]>(
+  const data = await fetchServer<Artwork[]>(
     `/collections/${encodedName}/artworks${query}`
   );
+  return normalizeArtworks(data);
 }
 
 export interface ArtworkFilters {
@@ -87,11 +98,12 @@ export async function getArtworks(filters?: ArtworkFilters): Promise<Artwork[]> 
     }
   }
 
-  return data;
+  return normalizeArtworks(data);
 }
 
 export async function getArtwork(id: number): Promise<Artwork> {
-  return fetchServer<Artwork>(`/artworks/${id}`);
+  const data = await fetchServer<Artwork>(`/artworks/${id}`);
+  return normalizeArtwork(data);
 }
 
 export async function getArtworkBySku(sku: string): Promise<Artwork | null> {

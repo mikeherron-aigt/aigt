@@ -1,3 +1,5 @@
+import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
+
 const API_BASE_URL = "/api";
 
 export interface Artwork {
@@ -27,6 +29,14 @@ export interface ArtworkFilters {
   offset?: number;
   sku?: string;
 }
+
+const normalizeArtwork = (artwork: Artwork): Artwork => ({
+  ...artwork,
+  image_url: normalizeArtworkImageUrl(artwork.image_url),
+});
+
+const normalizeArtworks = (artworks: Artwork[]): Artwork[] =>
+  artworks.map(normalizeArtwork);
 
 export class APIError extends Error {
   statusCode?: number;
@@ -140,18 +150,21 @@ function buildQueryString(filters?: ArtworkFilters): string {
 
 export async function getArtworks(filters?: ArtworkFilters): Promise<Artwork[]> {
   const queryString = buildQueryString(filters);
-  return fetchAPI<Artwork[]>(`/artworks${queryString}`);
+  const data = await fetchAPI<Artwork[]>(`/artworks${queryString}`);
+  return normalizeArtworks(data);
 }
 
 export async function getArtwork(id: number): Promise<Artwork> {
-  return fetchAPI<Artwork>(`/artworks/${id}`);
+  const data = await fetchAPI<Artwork>(`/artworks/${id}`);
+  return normalizeArtwork(data);
 }
 
 export async function getArtworkBySku(sku: string): Promise<Artwork | null> {
   const encodedSku = encodeURIComponent(sku);
   try {
     const results = await fetchAPI<Artwork[]>(`/artworks/sku/${encodedSku}`);
-    return results[0] || null;
+    const normalized = normalizeArtworks(results);
+    return normalized[0] || null;
   } catch {
     return null;
   }
@@ -167,7 +180,8 @@ export async function getCollectionArtworks(
 ): Promise<Artwork[]> {
   const queryString = filters?.version ? `?version=${filters.version}` : "";
   const encodedName = encodeURIComponent(collectionName);
-  return fetchAPI<Artwork[]>(`/collections/${encodedName}/artworks${queryString}`);
+  const data = await fetchAPI<Artwork[]>(`/collections/${encodedName}/artworks${queryString}`);
+  return normalizeArtworks(data);
 }
 
 export async function getArtworksByVersion(version: string): Promise<Artwork[]> {

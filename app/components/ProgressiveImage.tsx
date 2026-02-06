@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
 
 type ProgressiveImageProps = {
   src: string;
@@ -26,15 +26,35 @@ export function ProgressiveImage({
 }: ProgressiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const currentSrcRef = useRef(src);
 
-  useEffect(() => {
+  // Reset state when src changes
+  if (currentSrcRef.current !== src) {
+    currentSrcRef.current = src;
     setIsLoaded(false);
     setHasError(false);
-  }, [src]);
+  }
+
+  // Callback ref to check if image is already loaded (cached) when element mounts
+  const imgRef = useCallback((img: HTMLImageElement | null) => {
+    if (img && img.complete && img.naturalWidth > 0 && !isLoaded && !hasError) {
+      setIsLoaded(true);
+    }
+  }, [isLoaded, hasError]);
+
+  const handleLoad = useCallback(() => {
+    setIsLoaded(true);
+  }, []);
+
+  const handleError = useCallback(() => {
+    setHasError(true);
+    setIsLoaded(true);
+  }, []);
 
   return (
     <>
-      <Image
+      <ProtectedImage
+        ref={imgRef}
         src={src}
         alt={alt}
         fill={fill}
@@ -43,14 +63,11 @@ export function ProgressiveImage({
         sizes={sizes}
         loading={eager ? "eager" : "lazy"}
         priority={eager}
-        className={`${className} transition-all duration-500 ${
+        className={`${className} transition-all duration-300 ${
           isLoaded ? "blur-0 scale-100 opacity-100" : "blur-sm scale-105 opacity-70"
         }`}
-        onLoad={() => setIsLoaded(true)}
-        onError={() => {
-          setHasError(true);
-          setIsLoaded(true);
-        }}
+        onLoad={handleLoad}
+        onError={handleError}
       />
 
       {!isLoaded && !hasError ? (
