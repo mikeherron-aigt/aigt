@@ -45,7 +45,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     // One knob that controls how big the globe appears in-frame
     // Increase = smaller globe, decrease = larger globe
-    const FIT = 1.6;
+    const FIT = 1.2;
 
     const fovRad = THREE.MathUtils.degToRad(camera.fov);
     const fitHeightDistance = (RADIUS * FIT) / Math.tan(fovRad / 2);
