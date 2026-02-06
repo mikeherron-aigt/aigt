@@ -10,9 +10,10 @@ import dynamic from "next/dynamic";
  * - This path avoids build failures caused by relative import confusion across environments.
  */
 const InteractiveGlobe = dynamic(
-  () => import("../../components/InteractiveGlobe"),
+  () => import("../components/InteractiveGlobe"),
   { ssr: false }
 );
+
 
 export default function PhilanthropyPage() {
   return (
