@@ -144,10 +144,10 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
         size: DOT_SIZE,
         vertexColors: true,
         transparent: true,
-        opacity: 0.95,
+        opacity: 0.85,
         depthTest: true,
         depthWrite: false,
-        alphaTest: 0.15,
+        alphaTest: 0.25,
         sizeAttenuation: true,
       });
 
