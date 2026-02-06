@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
  * - In the Next.js app router, `app/philanthropy/page.tsx` should import shared components from `/components`.
  * - This path avoids build failures caused by relative import confusion across environments.
  */
-const InteractiveGlobe = dynamic(() => import("@/components/InteractiveGlobe"), {
+const InteractiveGlobe = dynamic(() => import("../../components/InteractiveGlobe"), {
   ssr: false,
 });
 
