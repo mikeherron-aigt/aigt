@@ -81,7 +81,7 @@ export default function PhilanthropyPage() {
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
                   <Image
-                    src={heroImage}
+                     src="/girl_viewing_art.png"
                     alt="A child viewing a painting in a museum"
                     fill
                     className="object-cover object-center"
