@@ -179,7 +179,7 @@ export default function PhilanthropyPage() {
           
  {/* GLOBE (bleeds off left like Figma, scrolls with section) */}
 <div
-  className="pointer-events-none absolute hidden lg:block z-0"
+ className="absolute hidden lg:block z-50 pointer-events-auto"
   style={{
     left: "calc(-300px + max(0px, (100dvw - 1440px) / 2))",
     top: "420px",
