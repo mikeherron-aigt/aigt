@@ -175,8 +175,8 @@ export default function PhilanthropyPage() {
   style={{
     left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
     top: "680px",
-    width: "1250px",
-    height: "1250px",
+    width: "1450px",
+    height: "1450px",
     transform: "translate(-50%, -50%)",
   }}
 >
