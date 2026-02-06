@@ -20,7 +20,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     let raf = 0;
 
-    // Lock canvas size
+    // Lock canvas size to provided dimensions
     canvas.width = width;
     canvas.height = height;
 
@@ -29,20 +29,6 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     // Globe size
     const RADIUS = 120;
-
-    // Camera
-    const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 5000);
-
-    // Single knob that controls how big the globe appears
-    const FIT = 1.2; // increase = smaller globe
-
-    const fovRad = THREE.MathUtils.degToRad(camera.fov);
-    const fitHeightDistance = (RADIUS * FIT) / Math.tan(fovRad / 2);
-    const fitWidthDistance =
-      (RADIUS * FIT) / (Math.tan(fovRad / 2) * camera.aspect);
-
-    camera.position.set(0, 0, Math.max(fitHeightDistance, fitWidthDistance));
-    camera.lookAt(0, 0, 0);
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({
@@ -53,26 +39,53 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height, false);
 
-    // Controls
-    
+    // Camera
+    const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 5000);
+
+    // One knob that controls how big the globe appears in-frame
+    // Increase = smaller globe, decrease = larger globe
+    const FIT = 1.6;
+
+    const fovRad = THREE.MathUtils.degToRad(camera.fov);
+    const fitHeightDistance = (RADIUS * FIT) / Math.tan(fovRad / 2);
+    const fitWidthDistance =
+      (RADIUS * FIT) / (Math.tan(fovRad / 2) * camera.aspect);
+
+    camera.position.set(0, 0, Math.max(fitHeightDistance, fitWidthDistance));
+    camera.lookAt(0, 0, 0);
+
+    // Controls (interactive)
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enabled = true;
+    controls.enableRotate = true;
+    controls.enablePan = false;
+    controls.enableZoom = false;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.rotateSpeed = 0.6;
+
+    // Light
     scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-    // Globe base (white)
+    // Ocean (sphere)
     const globeGeom = new THREE.SphereGeometry(RADIUS, 128, 96);
-    const globeMat = new THREE.MeshBasicMaterial({ color: 0xfafafa });
+    const globeMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); // ocean color here
     const globeMesh = new THREE.Mesh(globeGeom, globeMat);
     scene.add(globeMesh);
 
-    // Dots group
+    // Dots
     const dotsGroup = new THREE.Group();
     scene.add(dotsGroup);
 
     const DOT_COLOR = new THREE.Color('#8d948a');
+    // Keep dots very close to surface to reduce rim/halo
     const DOT_RADIUS = RADIUS + 0.2;
     const DOT_SIZE = 0.35;
 
     const STEP = 1;
     const THRESHOLD = 70;
+
+    let disposed = false;
 
     const buildDots = async () => {
       while (dotsGroup.children.length) dotsGroup.remove(dotsGroup.children[0]);
@@ -86,6 +99,8 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
         img.onerror = () => reject(new Error('Failed to load /globe-map.png'));
       });
 
+      if (disposed) return;
+
       const c = document.createElement('canvas');
       c.width = img.width;
       c.height = img.height;
@@ -95,7 +110,10 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
       ctx.drawImage(img, 0, 0);
 
-      const { data, width: w, height: h } = ctx.getImageData(0, 0, c.width, c.height);
+      const imageData = ctx.getImageData(0, 0, c.width, c.height);
+      const data = imageData.data;
+      const w = imageData.width;
+      const h = imageData.height;
 
       const positions: number[] = [];
       const colors: number[] = [];
@@ -135,12 +153,13 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
       const mat = new THREE.PointsMaterial({
         size: DOT_SIZE,
-  vertexColors: true,
-  transparent: true,
-  opacity: 0.95,
-  depthWrite: true,
-  depthTest: true,
-  sizeAttenuation: true,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.95,
+        // Depth settings reduce halo around silhouette
+        depthWrite: true,
+        depthTest: true,
+        sizeAttenuation: true,
       });
 
       const points = new THREE.Points(geo, mat);
@@ -151,14 +170,19 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     const animate = () => {
       controls.update();
+
+      // Auto-spin (keep your original behavior)
       globeMesh.rotation.y += 0.0012;
       dotsGroup.rotation.y += 0.0012;
+
       renderer.render(scene, camera);
       raf = requestAnimationFrame(animate);
     };
     animate();
 
     return () => {
+      disposed = true;
+
       cancelAnimationFrame(raf);
       controls.dispose();
 
@@ -176,7 +200,10 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
   }, [width, height]);
 
   return (
-    <div ref={containerRef} style={{ width, height }}>
+    <div
+      ref={containerRef}
+      style={{ width, height }}
+    >
       <canvas
         ref={canvasRef}
         style={{ width: '100%', height: '100%', display: 'block' }}
