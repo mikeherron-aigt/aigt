@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0 -p 3002",
-    "build": "next build",
-    "sitemap": "next-sitemap",
+    "dev": "next dev --webpack -H 0.0.0.0 -p 3002",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sitemap": "next-sitemap"
   },
   "dependencies": {
     "@builder.io/react": "^9.1.0",
