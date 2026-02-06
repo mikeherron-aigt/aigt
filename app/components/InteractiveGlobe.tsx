@@ -22,15 +22,14 @@ export default function InteractiveGlobe({ width, height, className }: Props) {
     let raf = 0;
     let disposed = false;
 
-    // Scene
+    // ---- Scene ----
     const scene = new THREE.Scene();
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(30, 1, 1, 2000);
-    camera.position.z = window.innerWidth > 700 ? 100 : 140;
+    // ---- Camera ----
+    const camera = new THREE.PerspectiveCamera(30, 1, 1, 3000);
     scene.add(camera);
 
-    // Renderer
+    // ---- Renderer ----
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
@@ -39,39 +38,88 @@ export default function InteractiveGlobe({ width, height, className }: Props) {
     });
     renderer.setClearColor(0x000000, 0);
 
-    // Globe (simple placeholder - keep your existing globe build below if you already have one)
-    // If you already have your full globe code (textures, dots, arcs, etc), paste it where indicated.
+    // ---- Globe ----
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    const sphereGeo = new THREE.SphereGeometry(40, 64, 64);
-    const sphereMat = new THREE.MeshBasicMaterial({
-      color: 0x111111,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.12,
-    });
-    const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-    globeGroup.add(sphere);
+    // Dotted globe settings (tweak if you want denser/lighter)
+    const radius = 40;
+    const dotCount = 2400;
+    const dotSize = 0.55;
 
-    // Controls
+    // Build dot positions uniformly over sphere
+    const positions = new Float32Array(dotCount * 3);
+    const random = (min: number, max: number) => min + Math.random() * (max - min);
+
+    for (let i = 0; i < dotCount; i++) {
+      // Uniform distribution on a sphere surface
+      const u = Math.random();
+      const v = Math.random();
+      const theta = 2 * Math.PI * u;
+      const phi = Math.acos(2 * v - 1);
+
+      const x = radius * Math.sin(phi) * Math.cos(theta);
+      const y = radius * Math.cos(phi);
+      const z = radius * Math.sin(phi) * Math.sin(theta);
+
+      positions[i * 3 + 0] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+    }
+
+    const dotsGeo = new THREE.BufferGeometry();
+    dotsGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+    const dotsMat = new THREE.PointsMaterial({
+      color: 0x111111,
+      size: dotSize,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+    });
+
+    const dots = new THREE.Points(dotsGeo, dotsMat);
+    globeGroup.add(dots);
+
+    // A very subtle halo to soften the edge
+    const haloGeo = new THREE.SphereGeometry(radius * 1.01, 64, 64);
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: 0x111111,
+      transparent: true,
+      opacity: 0.035,
+      side: THREE.BackSide,
+      depthWrite: false,
+    });
+    const halo = new THREE.Mesh(haloGeo, haloMat);
+    globeGroup.add(halo);
+
+    // ---- Controls ----
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.enableZoom = false;
     controls.enablePan = false;
 
-    // ---- IMPORTANT: real sizing logic for production ----
+    // Optional: keep user from flipping it upside down
+    controls.minPolarAngle = 0.25;
+    controls.maxPolarAngle = Math.PI - 0.25;
+
+    // ---- Sizing ----
     const resize = () => {
       if (disposed) return;
 
-      // Prefer actual rendered size of the container
       const w = container.clientWidth;
       const h = container.clientHeight;
-
       if (!w || !h) return;
 
       camera.aspect = w / h;
+
+      // Camera distance tuned to keep globe consistent across aspect ratios
+      // Slightly farther back on smaller viewports
+      const baseZ = window.innerWidth > 700 ? 140 : 185;
+      camera.position.set(0, 0, baseZ);
+
       camera.updateProjectionMatrix();
 
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -81,20 +129,20 @@ export default function InteractiveGlobe({ width, height, className }: Props) {
     // First paint after layout
     requestAnimationFrame(() => resize());
 
-    // Keep in sync on any layout changes (Netlify/prod timing fix)
+    // Observe container changes (prod/permalink timing fix)
     const ro = new ResizeObserver(() => resize());
     ro.observe(container);
 
-    // Also handle window resize
     window.addEventListener('resize', resize);
 
+    // ---- Animate ----
     const animate = () => {
       if (disposed) return;
 
       controls.update();
 
-      // subtle spin
-      globeGroup.rotation.y += 0.0015;
+      // subtle, calm rotation
+      globeGroup.rotation.y += 0.0012;
 
       renderer.render(scene, camera);
       raf = window.requestAnimationFrame(animate);
@@ -111,13 +159,14 @@ export default function InteractiveGlobe({ width, height, className }: Props) {
 
       controls.dispose();
 
-      // Dispose scene objects
-      sphereGeo.dispose();
-      sphereMat.dispose();
+      // Dispose objects
+      dotsGeo.dispose();
+      dotsMat.dispose();
+      haloGeo.dispose();
+      haloMat.dispose();
 
       renderer.dispose();
 
-      // Ensure WebGL context releases
       try {
         renderer.forceContextLoss();
       } catch {
