@@ -179,23 +179,28 @@ export default function PhilanthropyPage() {
           
           {/* GLOBE (positioned relative to THIS section) */}
   {/* GLOBE (bleeds off left side like Figma) */}
-<div
-  className="pointer-events-none absolute hidden lg:block z-0"
-  style={{
-    position: "absolute",
-
-    // Anchor from the viewport edge
-    left: "-420px",   // move more negative to push further off-screen
-    top: "560px",     // adjust vertically
-
-    // Make the globe large
-    width: "1100px",
-    height: "1100px",
-
-    overflow: "visible",
-  }}
->
-  <InteractiveGlobe width={1100} height={1100} />
+{/* Globe wrapper that behaves consistently */}
+<div className="pointer-events-none hidden lg:block absolute inset-0 z-0">
+  <div
+    className="sticky"
+    style={{
+      top: 140,            // distance from top of viewport
+      height: 0,           // so it doesn't take layout space
+    }}
+  >
+    <div
+      style={{
+        position: "absolute",
+        left: "-420px",     // off-screen bleed
+        top: "240px",       // internal offset from the sticky line
+        width: "1100px",
+        height: "1100px",
+        overflow: "visible",
+      }}
+    >
+      <InteractiveGlobe width={1100} height={1100} />
+    </div>
+  </div>
 </div>
 
        
