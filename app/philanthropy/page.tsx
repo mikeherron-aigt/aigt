@@ -177,31 +177,22 @@ export default function PhilanthropyPage() {
         <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
         
           
-          {/* GLOBE (positioned relative to THIS section) */}
-  {/* GLOBE (bleeds off left side like Figma) */}
-{/* Globe wrapper that behaves consistently */}
-<div className="pointer-events-none hidden lg:block absolute inset-0 z-0">
-  <div
-    className="sticky"
-    style={{
-      top: 140,            // distance from top of viewport
-      height: 0,           // so it doesn't take layout space
-    }}
-  >
-    <div
-      style={{
-        position: "absolute",
-        left: "-420px",     // off-screen bleed
-        top: "240px",       // internal offset from the sticky line
-        width: "1100px",
-        height: "1100px",
-        overflow: "visible",
-      }}
-    >
-      <InteractiveGlobe width={1100} height={1100} />
-    </div>
-  </div>
+ {/* GLOBE (bleeds off left like Figma, scrolls with section) */}
+<div
+  className="pointer-events-none absolute hidden lg:block z-0"
+  style={{
+    // anchor from viewport left edge, but still positioned within the section
+    left: "calc(-420px + max(0px, (100dvw - 1440px) / 2))",
+    top: "420px",
+
+    width: "1100px",
+    height: "1100px",
+    overflow: "visible",
+  }}
+>
+  <InteractiveGlobe width={1100} height={1100} />
 </div>
+
 
        
 
