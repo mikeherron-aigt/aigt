@@ -55,16 +55,29 @@ export default function PhilanthropyPage() {
             </div>
 
             {/* Right: Image */}
-            <div className="relative w-full h-[420px] lg:h-auto bg-white">
-              <Image
-                src="/girl_viewing_art.png"
-                alt="Young girl in yellow dress viewing art in museum"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
-            </div>
+            <div className="relative w-full h-[420px] lg:h-auto bg-white flex items-center justify-center">
+  {/* Decorative frame */}
+  <div className="relative w-full h-full max-w-[92%] max-h-[92%] border border-gray-300">
+    {/* Corner accent */}
+    <span
+      aria-hidden="true"
+      className="absolute -bottom-2 -left-2 h-3 w-3 bg-gray-300"
+    />
+
+    {/* Image */}
+    <div className="relative w-full h-full">
+      <Image
+        src="/girl_viewing_art.png"
+        alt="Young girl viewing art in museum"
+        fill
+        className="object-cover"
+        sizes="(max-width: 1024px) 100vw, 50vw"
+        priority
+      />
+    </div>
+  </div>
+</div>
+
           </div>
         </div>
       </section>
