@@ -169,21 +169,22 @@ export default function PhilanthropyPage() {
 
         {/* Stewardship is enforced through process */}
         <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
-          {/* GLOBE: fixed size, center locked to the red line */}
-          <div
-            className="pointer-events-none absolute z-0 hidden lg:block"
-            style={{
-              // Red line = left edge of the centered 1440 container + 80px padding
-              // On ultrawide, this moves right correctly.
-              left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
-              top: "680px",
-              width: "1250px",
-              height: "1250px",
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            <InteractiveGlobe width={1250} height={1250} />
-          </div>
+          {/* GLOBE: responsive wrapper controls size */}
+<div
+  className="pointer-events-none absolute z-0 hidden lg:block"
+  style={{
+    left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
+    top: "680px",
+    width: "1250px",
+    height: "1250px",
+    transform: "translate(-50%, -50%)",
+  }}
+>
+  <div className="relative w-full h-full pointer-events-auto">
+    <InteractiveGlobe />
+  </div>
+</div>
+
 
           <div className="max-w-[1440px] mx-auto relative z-10">
             <div className="grid lg:grid-cols-12 gap-0">
