@@ -1,4 +1,3 @@
-// app/components/InteractiveGlobe.tsx
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -19,10 +18,6 @@ export default function InteractiveGlobe() {
     // Scene
     const scene = new THREE.Scene();
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 2000);
-    camera.position.set(0, 0, 140);
-
     // Renderer
     const renderer = new THREE.WebGLRenderer({
       canvas,
@@ -31,24 +26,9 @@ export default function InteractiveGlobe() {
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
-    // Lights (kept minimal, base is MeshBasicMaterial anyway)
-    const ambient = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(ambient);
-
-    // Globe base (white)
-    const RADIUS = 50;
-    const globeGeom = new THREE.SphereGeometry(RADIUS, 96, 64);
-    const globeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const globeMesh = new THREE.Mesh(globeGeom, globeMat);
-    scene.add(globeMesh);
-
-    // Dots group
-    const dotsGroup = new THREE.Group();
-    scene.add(dotsGroup);
-
-    const DOT_COLOR = new THREE.Color('#8d948a');
-    const DOT_SIZE = 0.55; // make a little bigger if needed
-    const DOT_RADIUS = RADIUS + 0.85;
+    // Camera (fixed distance, do not change on resize)
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 4000);
+    camera.position.set(0, 0, 360);
 
     // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -58,33 +38,48 @@ export default function InteractiveGlobe() {
     controls.dampingFactor = 0.06;
     controls.rotateSpeed = 0.5;
 
-    // Resize
+    // Lights (not really needed, base is MeshBasic, but harmless)
+    scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+    // Globe base (white)
+    const RADIUS = 120; // larger so it fills like Figma
+    const globeGeom = new THREE.SphereGeometry(RADIUS, 128, 96);
+    const globeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const globeMesh = new THREE.Mesh(globeGeom, globeMat);
+    scene.add(globeMesh);
+
+    // Dots group
+    const dotsGroup = new THREE.Group();
+    scene.add(dotsGroup);
+
+    const DOT_COLOR = new THREE.Color('#8d948a');
+    const DOT_RADIUS = RADIUS + 1.2;
+    const DOT_SIZE = 0.35; // smaller dots like the comp
+
+    // Resize (only aspect + renderer size)
     const resize = () => {
-      const w = container.clientWidth;
-      const h = container.clientHeight;
+      const rect = container.getBoundingClientRect();
+      const w = Math.max(1, Math.floor(rect.width));
+      const h = Math.max(1, Math.floor(rect.height));
 
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
-
       renderer.setSize(w, h, false);
-
-      // Keep a consistent visual scale
-      camera.position.z = w > 700 ? 140 : 170;
     };
 
     const ro = new ResizeObserver(resize);
     ro.observe(container);
-    resize();
+
+    // Force an initial layout pass before first resize
+    requestAnimationFrame(() => {
+      resize();
+    });
 
     // Build dots from /public/globe-map.png
-    // Tips:
-    // - LOWER STEP = MORE DOTS (1 = densest, 2 = dense, 3+ = sparse)
-    // - LOWER THRESHOLD = more land accepted (if your land is gray)
-    const STEP = 2;
-    const THRESHOLD = 40; // 0..255, lower means stricter
+    const STEP = 1;        // dense
+    const THRESHOLD = 70;  // adjust land detection (higher = more land picked up)
 
     const buildDots = async () => {
-      // Clear any existing dots
       while (dotsGroup.children.length) dotsGroup.remove(dotsGroup.children[0]);
 
       const img = new Image();
@@ -99,11 +94,14 @@ export default function InteractiveGlobe() {
       const c = document.createElement('canvas');
       c.width = img.width;
       c.height = img.height;
+
       const ctx = c.getContext('2d', { willReadFrequently: true });
       if (!ctx) return;
 
       ctx.drawImage(img, 0, 0);
-      const { data, width, height } = ctx.getImageData(0, 0, c.width, c.height);
+
+      const imageData = ctx.getImageData(0, 0, c.width, c.height);
+      const { data, width, height } = imageData;
 
       const positions: number[] = [];
       const colors: number[] = [];
@@ -111,25 +109,23 @@ export default function InteractiveGlobe() {
       for (let y = 0; y < height; y += STEP) {
         for (let x = 0; x < width; x += STEP) {
           const idx = (y * width + x) * 4;
+
           const r = data[idx];
           const g = data[idx + 1];
           const b = data[idx + 2];
           const a = data[idx + 3];
 
-          // ignore fully transparent pixels (if your png uses transparency)
           if (a < 10) continue;
 
-          // treat dark pixels as land (black land on white ocean)
+          // black land on white ocean
           const brightness = (r + g + b) / 3;
-          const isLand = brightness < THRESHOLD;
-          if (!isLand) continue;
+          if (brightness >= THRESHOLD) continue;
 
-          // Convert x,y on equirectangular map to spherical coords
-          const u = x / width;  // 0..1
-          const v = y / height; // 0..1
+          const u = x / width;
+          const v = y / height;
 
-          const lon = (u * Math.PI * 2) - Math.PI;        // -PI..PI
-          const lat = (Math.PI / 2) - (v * Math.PI);      // PI/2..-PI/2
+          const lon = u * Math.PI * 2 - Math.PI;
+          const lat = Math.PI / 2 - v * Math.PI;
 
           const cosLat = Math.cos(lat);
           const px = DOT_RADIUS * cosLat * Math.cos(lon);
@@ -151,6 +147,7 @@ export default function InteractiveGlobe() {
         transparent: true,
         opacity: 0.95,
         depthWrite: false,
+        sizeAttenuation: true,
       });
 
       const points = new THREE.Points(geo, mat);
@@ -158,10 +155,10 @@ export default function InteractiveGlobe() {
     };
 
     buildDots().catch(() => {
-      // If the map fails, you still get the white globe
+      // leave blank if the map fails
     });
 
-    // Animation loop
+    // Animate
     const animate = () => {
       controls.update();
       globeMesh.rotation.y += 0.0012;
@@ -181,9 +178,9 @@ export default function InteractiveGlobe() {
       globeMat.dispose();
 
       dotsGroup.traverse((obj) => {
-        const o = obj as THREE.Points;
-        if ((o as any).geometry) (o as any).geometry.dispose?.();
-        if ((o as any).material) (o as any).material.dispose?.();
+        const anyObj = obj as any;
+        if (anyObj.geometry?.dispose) anyObj.geometry.dispose();
+        if (anyObj.material?.dispose) anyObj.material.dispose();
       });
 
       renderer.dispose();
