@@ -186,7 +186,7 @@ export default function PhilanthropyPage() {
 
     // Anchor from the viewport edge
     left: "-420px",   // move more negative to push further off-screen
-    top: "420px",     // adjust vertically
+    top: "560px",     // adjust vertically
 
     // Make the globe large
     width: "1100px",
