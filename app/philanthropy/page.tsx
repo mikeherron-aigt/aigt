@@ -178,44 +178,24 @@ export default function PhilanthropyPage() {
         
           
           {/* GLOBE (positioned relative to THIS section) */}
-          <div
-            className="pointer-events-none absolute hidden lg:block z-0"
-            style={{
-              /**
-               * Only adjust these two to move it around.
-               * This uses 100dvw to avoid scrollbar drift in production.
-               */
-              left: "calc(max(0px, (100dvw - 1440px) / 2) + 80px)",
-              top: "520px",
-
-              /**
-               * The wrapper IS the visible box.
-               * No translate centering, no internal scaling.
-               */
-              width: "clamp(620px, 55vw, 950px)",
-              height: "clamp(620px, 55vw, 950px)",
-
-              overflow: "visible",
-            }}
-          >
-           <div
+  {/* GLOBE (bleeds off left side like Figma) */}
+<div
+  className="pointer-events-none absolute hidden lg:block z-0"
   style={{
-    width: "100%",
-    height: "100%",
-    display: "grid",
-    placeItems: "center",
+    position: "absolute",
+
+    // Anchor from the viewport edge
+    left: "-420px",   // move more negative to push further off-screen
+    top: "420px",     // adjust vertically
+
+    // Make the globe large
+    width: "1100px",
+    height: "1100px",
+
+    overflow: "visible",
   }}
 >
-  <div
-    style={{
-      width: "100%",
-      height: "100%",
-      transform: "scale(0.5)",   // ← change this number to control globe size
-      transformOrigin: "center",
-    }}
-  >
-    <InteractiveGlobe />
-  </div>
+  <InteractiveGlobe width={1100} height={1100} />
 </div>
 
           </div>
