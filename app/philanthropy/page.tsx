@@ -168,118 +168,121 @@ export default function PhilanthropyPage() {
         </section>
 
     
-       {/* GLOBE */}
-<div
-  className="pointer-events-none absolute hidden lg:block z-0"
-  style={{
-    left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
-    top: "800px",
-    width: "1450px",
-    height: "1450px",
-    // IMPORTANT: remove translate so left/top are top-left corner
-  }}
->
+      {/* Globe + Stewardship Process Section */}
+<section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
+  {/* GLOBE (positioned relative to THIS section) */}
   <div
+    className="pointer-events-none absolute hidden lg:block z-0"
     style={{
-      width: "100%",
-      height: "100%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
+      left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
+      top: "520px",
+      width: "1450px",
+      height: "1450px",
+      transform: "translate(-50%, -50%)", // center the wrapper at left/top
+      overflow: "visible",
     }}
   >
+    {/* This centers the globe inside the wrapper box */}
     <div
       style={{
-        width: "80%",
-        height: "80%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        width: "100%",
+        height: "100%",
+        display: "grid",
+        placeItems: "center",
       }}
     >
-      <InteractiveGlobe width={950} height={950} />
+      {/* This is the "inner box" you can resize without moving the wrapper */}
+      <div
+        style={{
+          width: "950px",
+          height: "950px",
+          transform: "scale(0.85)", // <- adjust this number to shrink/grow globe INSIDE wrapper
+          transformOrigin: "center",
+        }}
+      >
+        <InteractiveGlobe width={950} height={950} />
+      </div>
     </div>
   </div>
-</div>
+
+  {/* Content sits above globe */}
+  <div className="max-w-[1440px] mx-auto relative z-10">
+    <div className="grid lg:grid-cols-12 gap-0">
+      {/* Left */}
+      <div className="px-4 sm:px-8 lg:px-[80px] lg:col-span-5 flex flex-col justify-start">
+        <h2 style={{ maxWidth: 520 }}>
+          Stewardship is enforced
+          <br />
+          through process.
+        </h2>
+
+        <p style={{ maxWidth: 520 }}>
+          The platform supports multiple funds with independent economics and governance.
+          This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
+        </p>
+
+        <div className="mt-6">
+          <Link
+            href="/stewardship"
+            className="cta-primary"
+            style={{
+              textDecoration: "none",
+              width: "fit-content",
+              display: "inline-flex",
+            }}
+          >
+            See the Stewardship Standard
+          </Link>
+        </div>
+      </div>
+
+      {/* Spacer */}
+      <div className="hidden lg:block lg:col-span-2" />
+
+      {/* Right */}
+      <div className="px-4 sm:px-8 lg:px-[80px] lg:col-span-5 mt-10 lg:mt-0 space-y-6">
+        <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
+          <h3>Sharing Art With the World</h3>
+          <h4>Access as a Core Principle</h4>
+          <p>
+            We believe art should be experienced, not hidden. When appropriate, works under our stewardship
+            are shared through exhibitions, institutional loans, and public-facing placements that expand access
+            while maintaining curatorial and conservation standards.
+          </p>
+          <p>
+            These efforts are undertaken thoughtfully and responsibly, and reflect how museums and cultural institutions
+            around the world are sustained. Public access, education, and stewardship are core components of modern philanthropy.
+          </p>
+        </div>
+
+        <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
+          <h3>Art as Education</h3>
+          <h4>Teaching the Next Generation to See</h4>
+          <p>Art shapes curiosity long before it shapes taste.</p>
+          <p>
+            Introducing children and young people to art builds visual literacy, emotional awareness, and creative confidence.
+            Learning how to look, ask questions, and make something tangible helps develop perspective, empathy, and problem-solving skills.
+          </p>
+        </div>
+
+        <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
+          <h3>Philanthropy as Cultural Infrastructure</h3>
+          <h4>How art institutions are sustained over time</h4>
+          <p>
+            Philanthropy plays a foundational role in sustaining cultural institutions. Around the world,
+            museums, educational programs, and public art initiatives rely on philanthropy to support work
+            that cannot be reduced to admissions, transactions, or short-term metrics.
+          </p>
+          <p>
+            By treating philanthropy as infrastructure rather than charity, we align our work with the long-term needs
+            of cultural institutions and the communities they serve.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-
-          <div className="max-w-[1440px] mx-auto relative z-10">
-            <div className="grid lg:grid-cols-12 gap-0">
-              {/* Left */}
-              <div className="px-4 sm:px-8 lg:px-[80px] lg:col-span-5 flex flex-col justify-start">
-                <h2 style={{ maxWidth: 520 }}>
-                  Stewardship is enforced
-                  <br />
-                  through process.
-                </h2>
-
-                <p style={{ maxWidth: 520 }}>
-                  The platform supports multiple funds with independent economics and governance.
-                  This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
-                </p>
-
-                <div className="mt-6">
-                  <Link
-                    href="/stewardship"
-                    className="cta-primary"
-                    style={{
-                      textDecoration: "none",
-                      width: "fit-content",
-                      display: "inline-flex",
-                    }}
-                  >
-                    See the Stewardship Standard
-                  </Link>
-                </div>
-              </div>
-
-              {/* Spacer */}
-              <div className="hidden lg:block lg:col-span-2" />
-
-              {/* Right */}
-              <div className="px-4 sm:px-8 lg:px-[80px] lg:col-span-5 mt-10 lg:mt-0 space-y-6">
-                <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
-                  <h3>Sharing Art With the World</h3>
-                  <h4>Access as a Core Principle</h4>
-                  <p>
-                    We believe art should be experienced, not hidden. When appropriate, works under our stewardship
-                    are shared through exhibitions, institutional loans, and public-facing placements that expand access
-                    while maintaining curatorial and conservation standards.
-                  </p>
-                  <p>
-                    These efforts are undertaken thoughtfully and responsibly, and reflect how museums and cultural institutions
-                    around the world are sustained. Public access, education, and stewardship are core components of modern philanthropy.
-                  </p>
-                </div>
-
-                <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
-                  <h3>Art as Education</h3>
-                  <h4>Teaching the Next Generation to See</h4>
-                  <p>Art shapes curiosity long before it shapes taste.</p>
-                  <p>
-                    Introducing children and young people to art builds visual literacy, emotional awareness, and creative confidence.
-                    Learning how to look, ask questions, and make something tangible helps develop perspective, empathy, and problem-solving skills.
-                  </p>
-                </div>
-
-                <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
-                  <h3>Philanthropy as Cultural Infrastructure</h3>
-                  <h4>How art institutions are sustained over time</h4>
-                  <p>
-                    Philanthropy plays a foundational role in sustaining cultural institutions. Around the world,
-                    museums, educational programs, and public art initiatives rely on philanthropy to support work
-                    that cannot be reduced to admissions, transactions, or short-term metrics.
-                  </p>
-                  <p>
-                    By treating philanthropy as infrastructure rather than charity, we align our work with the long-term needs
-                    of cultural institutions and the communities they serve.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Title of Something + 4 cards */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
