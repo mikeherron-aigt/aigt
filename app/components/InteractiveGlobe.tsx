@@ -277,7 +277,7 @@ export default function InteractiveGlobe() {
       // start glow
       setTimeout(startNextGlow, 100);
     };
-    img.src = '/globe-map.jpg';
+    img.src = '/globe-map.png';
 
     const onResize = () => {
       const w = container.clientWidth;
