@@ -9,7 +9,7 @@ type Props = {
   height?: number;
 };
 
-export default function InteractiveGlobe({ width = 1250, height = 1250 }: Props) {
+export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
