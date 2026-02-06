@@ -12,7 +12,7 @@ const InteractiveGlobe = dynamic(
 export default function PhilanthropyPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#ffffff" }}>
-      {/* HERO WRAPPER */}
+      {/* HERO WRAPPER (must be f5f5f5 like Home) */}
       <div className="w-full" style={{ backgroundColor: "#f5f5f5" }}>
         <main>
           <div className="max-w-[1440px] mx-auto relative">
@@ -92,7 +92,7 @@ export default function PhilanthropyPage() {
               </div>
             </div>
 
-            {/* Decorative Elements */}
+            {/* Decorative Elements (VERTICAL BAR + deep green cube alignment) */}
             <div
               className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none"
               style={{ top: "0", height: "calc(100% - 242px)" }}
@@ -103,7 +103,7 @@ export default function PhilanthropyPage() {
             />
           </div>
 
-          {/* DESIGN BAR */}
+          {/* DESIGN BAR (HORIZONTAL) */}
           <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
             <div
               className="absolute top-0 left-0 h-full bg-gallery-plaster"
@@ -124,7 +124,7 @@ export default function PhilanthropyPage() {
         </main>
       </div>
 
-      {/* BELOW HERO */}
+      {/* EVERYTHING BELOW HERO SHOULD BE WHITE */}
       <div className="w-full bg-white">
         {/* Stewardship Beyond Ownership */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
@@ -168,24 +168,25 @@ export default function PhilanthropyPage() {
         </section>
 
         {/* Stewardship is enforced through process */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          {/* IMPORTANT: The anchor lives inside this centered wrapper */}
-          <div className="max-w-[1440px] mx-auto relative overflow-visible lg:min-h-[1250px]">
-            {/* GLOBE: center locked to the red line (the left content padding line inside the 1440 wrapper) */}
-            <div
-              className="pointer-events-none absolute z-0 hidden lg:block"
-              style={{
-                left: 80,      // matches lg:px-[80px]
-                top: 680,      // desktop placement
-                transform: "translate(-50%, -50%)",
-                width: 1250,   // matches your Figma scale
-                height: 1250,  // matches your Figma scale
-              }}
-            >
-              <InteractiveGlobe />
-            </div>
+        <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
+          {/* GLOBE: fixed size, center locked to the red line */}
+          <div
+            className="pointer-events-none absolute z-0 hidden lg:block"
+            style={{
+              // Red line = left edge of the centered 1440 container + 80px padding
+              // On ultrawide, this moves right correctly.
+              left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
+              top: "680px",
+              width: "1250px",
+              height: "1250px",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <InteractiveGlobe width={1250} height={1250} />
+          </div>
 
-            <div className="grid lg:grid-cols-12 gap-0 relative z-10">
+          <div className="max-w-[1440px] mx-auto relative z-10">
+            <div className="grid lg:grid-cols-12 gap-0">
               {/* Left */}
               <div className="px-4 sm:px-8 lg:px-[80px] lg:col-span-5 flex flex-col justify-start">
                 <h2 style={{ maxWidth: 520 }}>
@@ -256,13 +257,6 @@ export default function PhilanthropyPage() {
                     of cultural institutions and the communities they serve.
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Mobile globe placeholder (desktop first, you said you will handle breakpoints later) */}
-            <div className="block lg:hidden mt-12 px-4 sm:px-8">
-              <div className="w-full" style={{ height: 340 }}>
-                <InteractiveGlobe />
               </div>
             </div>
           </div>
