@@ -167,7 +167,7 @@ export default function PhilanthropyPage() {
           </div>
         </section>
 
-        {/* Stewardship is enforced through process */}
+    
        {/* GLOBE */}
 <div
   className="pointer-events-none absolute hidden lg:block z-0"
@@ -201,7 +201,7 @@ export default function PhilanthropyPage() {
     </div>
   </div>
 </div>
-
+</section>
 
 
           <div className="max-w-[1440px] mx-auto relative z-10">
