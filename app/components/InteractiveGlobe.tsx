@@ -68,7 +68,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     const dotsGroup = new THREE.Group();
     scene.add(dotsGroup);
 
-    const DOT_COLOR = new THREE.Color('#8d948a');
+    const DOT_COLOR = new THREE.Color('#A1A69D');
     const DOT_RADIUS = RADIUS + 0.8; // close to surface, but avoids shimmer
     const DOT_SIZE = 0.35;
 
