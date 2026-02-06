@@ -54,13 +54,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     renderer.setSize(width, height, false);
 
     // Controls
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enablePan = false;
-    controls.enableZoom = false;
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.06;
-    controls.rotateSpeed = 0.5;
-
+    
     scene.add(new THREE.AmbientLight(0xffffff, 1));
 
     // Globe base (white)
