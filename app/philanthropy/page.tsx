@@ -175,6 +175,8 @@ export default function PhilanthropyPage() {
 
         {/* Globe + Stewardship Process Section */}
         <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
+        
+          
           {/* GLOBE (positioned relative to THIS section) */}
           <div
             className="pointer-events-none absolute hidden lg:block z-0"
@@ -196,10 +198,26 @@ export default function PhilanthropyPage() {
               overflow: "visible",
             }}
           >
-            <div style={{ width: "100%", height: "100%" }}>
-              {/* InteractiveGlobe should be written to size to its container */}
-              <InteractiveGlobe />
-            </div>
+           <div
+  style={{
+    width: "100%",
+    height: "100%",
+    display: "grid",
+    placeItems: "center",
+  }}
+>
+  <div
+    style={{
+      width: "100%",
+      height: "100%",
+      transform: "scale(0.5)",   // ← change this number to control globe size
+      transformOrigin: "center",
+    }}
+  >
+    <InteractiveGlobe />
+  </div>
+</div>
+
           </div>
 
           {/* Content sits above globe */}
