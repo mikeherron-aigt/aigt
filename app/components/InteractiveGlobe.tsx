@@ -74,7 +74,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     scene.add(dotsGroup);
 
     const DOT_COLOR = new THREE.Color('#8d948a');
-    const DOT_RADIUS = RADIUS + 1.2;
+    const DOT_RADIUS = RADIUS + 0.2;
     const DOT_SIZE = 0.35;
 
     const STEP = 1;
