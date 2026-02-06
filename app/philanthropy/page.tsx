@@ -182,7 +182,7 @@ export default function PhilanthropyPage() {
   className="pointer-events-none absolute hidden lg:block z-0"
   style={{
     // anchor from viewport left edge, but still positioned within the section
-    left: "calc(-420px + max(0px, (100dvw - 1440px) / 2))",
+    left: "calc(-300px + max(0px, (100dvw - 1440px) / 2))",
     top: "420px",
 
     width: "1100px",
