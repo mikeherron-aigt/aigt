@@ -19,6 +19,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     if (!container || !canvas) return;
 
     let raf = 0;
+    let disposed = false;
 
     // Lock canvas size to provided dimensions
     canvas.width = width;
@@ -39,7 +40,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height, false);
 
-    // Camera
+    // Camera (fit globe to frame)
     const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 5000);
 
     // One knob that controls how big the globe appears in-frame
@@ -54,22 +55,12 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     camera.position.set(0, 0, Math.max(fitHeightDistance, fitWidthDistance));
     camera.lookAt(0, 0, 0);
 
-    // Controls (interactive)
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enabled = true;
-    controls.enableRotate = true;
-    controls.enablePan = false;
-    controls.enableZoom = false;
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
-    controls.rotateSpeed = 0.6;
-
     // Light
     scene.add(new THREE.AmbientLight(0xffffff, 1));
 
     // Ocean (sphere)
     const globeGeom = new THREE.SphereGeometry(RADIUS, 128, 96);
-    const globeMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); // ocean color here
+    const globeMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); // ocean color
     const globeMesh = new THREE.Mesh(globeGeom, globeMat);
     scene.add(globeMesh);
 
@@ -78,14 +69,11 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     scene.add(dotsGroup);
 
     const DOT_COLOR = new THREE.Color('#8d948a');
-    // Keep dots very close to surface to reduce rim/halo
-    const DOT_RADIUS = RADIUS + 0.2;
+    const DOT_RADIUS = RADIUS + 0.8; // close to surface, but avoids shimmer
     const DOT_SIZE = 0.35;
 
-    const STEP = 1;
+    const STEP = 2; // smoother + less noise than 1
     const THRESHOLD = 70;
-
-    let disposed = false;
 
     const buildDots = async () => {
       while (dotsGroup.children.length) dotsGroup.remove(dotsGroup.children[0]);
@@ -151,14 +139,15 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
       geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
       geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
+      // NOTE: depthWrite false avoids shimmer/noise at the silhouette
       const mat = new THREE.PointsMaterial({
         size: DOT_SIZE,
         vertexColors: true,
         transparent: true,
         opacity: 0.95,
-        // Depth settings reduce halo around silhouette
-        depthWrite: true,
         depthTest: true,
+        depthWrite: false,
+        alphaTest: 0.15,
         sizeAttenuation: true,
       });
 
@@ -168,13 +157,33 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     buildDots().catch(() => {});
 
+    // Controls (interactive + smooth)
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enabled = true;
+    controls.enableRotate = true;
+    controls.enablePan = false;
+    controls.enableZoom = false;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.10;
+    controls.rotateSpeed = 0.35;
+
+    // Smooth auto-rotate (no manual mesh rotation, prevents jitter)
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.6;
+
+    // Important on touch devices / trackpads
+    renderer.domElement.style.touchAction = 'none';
+
+    // Pause auto-rotate while dragging
+    controls.addEventListener('start', () => {
+      controls.autoRotate = false;
+    });
+    controls.addEventListener('end', () => {
+      controls.autoRotate = true;
+    });
+
     const animate = () => {
       controls.update();
-
-      // Auto-spin (keep your original behavior)
-      globeMesh.rotation.y += 0.0012;
-      dotsGroup.rotation.y += 0.0012;
-
       renderer.render(scene, camera);
       raf = requestAnimationFrame(animate);
     };
@@ -200,10 +209,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
   }, [width, height]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{ width, height }}
-    >
+    <div ref={containerRef} style={{ width, height }}>
       <canvas
         ref={canvasRef}
         style={{ width: '100%', height: '100%', display: 'block' }}
