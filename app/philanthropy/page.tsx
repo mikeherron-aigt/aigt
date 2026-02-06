@@ -171,19 +171,28 @@ export default function PhilanthropyPage() {
         <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
           {/* GLOBE: responsive wrapper controls size */}
 <div
-  className="pointer-events-none absolute z-0 hidden lg:block"
+  className="absolute hidden lg:block z-0"
   style={{
     left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
-    top: "1100px",
+    top: "680px",
     width: "1250px",
     height: "1250px",
     transform: "translate(-50%, -50%)",
   }}
 >
-  <div className="relative w-full h-full pointer-events-auto">
-    <InteractiveGlobe />
+  <div
+    style={{
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <InteractiveGlobe width={950} height={950} />
   </div>
 </div>
+
 
 
           <div className="max-w-[1440px] mx-auto relative z-10">
