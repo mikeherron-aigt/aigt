@@ -174,7 +174,7 @@ export default function PhilanthropyPage() {
   className="pointer-events-none absolute z-0 hidden lg:block"
   style={{
     left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
-    top: "680px",
+    top: "1000px",
     width: "1250px",
     height: "1250px",
     transform: "translate(-50%, -50%)",
