@@ -198,7 +198,7 @@ export default function PhilanthropyPage() {
   <InteractiveGlobe width={1100} height={1100} />
 </div>
 
-          </div>
+       
 
           {/* Content sits above globe */}
           <div className="max-w-[1440px] mx-auto relative z-10">
