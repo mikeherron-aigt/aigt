@@ -170,38 +170,27 @@ export default function PhilanthropyPage() {
     
       {/* Globe + Stewardship Process Section */}
 <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
-  {/* GLOBE (positioned relative to THIS section) */}
-  <div
-    className="pointer-events-none absolute hidden lg:block z-0"
-    style={{
-      left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
-      top: "520px",
-      width: "1450px",
-      height: "1450px",
-      transform: "translate(-50%, -50%)", // center the wrapper at left/top
-      overflow: "visible",
-    }}
-  >
-    {/* This centers the globe inside the wrapper box */}
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "grid",
-        placeItems: "center",
-      }}
-    >
-      {/* This is the "inner box" you can resize without moving the wrapper */}
-      <div
-        style={{
-          width: "950px",
-          height: "950px",
-          transform: "scale(0.85)", // <- adjust this number to shrink/grow globe INSIDE wrapper
-          transformOrigin: "center",
-        }}
-      >
-        <InteractiveGlobe width={950} height={950} />
-      </div>
+ {/* GLOBE (positioned relative to THIS section) */}
+<div
+  className="pointer-events-none absolute hidden lg:block z-0"
+  style={{
+    // Only adjust these two to move it around
+    left: "calc(max(0px, (100vw - 1440px) / 2) + 80px)",
+    top: "520px",
+
+    // Wrapper is the visible box. No translate, no scale.
+    width: "clamp(620px, 55vw, 950px)",
+    height: "clamp(620px, 55vw, 950px)",
+
+    overflow: "visible",
+  }}
+>
+  {/* Make the globe fill the box */}
+  <div style={{ width: "100%", height: "100%" }}>
+    <InteractiveGlobe />
+  </div>
+</div>
+
     </div>
   </div>
 
