@@ -89,9 +89,7 @@ export default async function CollectionsPage() {
               {collectionsWithImages.map((collection) => {
                 const slug = slugify(collection.collection_name);
                 const description = collectionDescriptions[collection.collection_name];
-                const featuredArtworkHref = collection.featured
-                  ? `/collections/${slug}/${slugify(collection.featured.title)}`
-                  : null;
+                const collectionHref = `/collections/${slug}`;
 
                 return (
                   <article
@@ -99,53 +97,32 @@ export default async function CollectionsPage() {
                     className="artwork-card collection-card"
                     style={{ width: "100%" }}
                   >
-                    {featuredArtworkHref ? (
-                      <Link
-                        href={featuredArtworkHref}
-                        className="artwork-card-button"
-                        aria-label={`View details for ${collection.featured?.title ?? collection.collection_name}`}
-                      >
-                        <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
-                          {collection.featured?.image_url ? (
-                            <ProgressiveImage
-                              src={collection.featured.image_url}
-                              alt={collection.featured.title}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            />
-                          ) : (
-                            <div
-                              className="w-full h-full"
-                              style={{ backgroundColor: "var(--gallery-plaster)" }}
-                            />
-                          )}
-                        </div>
-                      </Link>
-                    ) : (
-                      <div className="artwork-card-button">
-                        <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
-                          {collection.featured?.image_url ? (
-                            <ProgressiveImage
-                              src={collection.featured.image_url}
-                              alt={collection.collection_name}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                            />
-                          ) : (
-                            <div
-                              className="w-full h-full"
-                              style={{ backgroundColor: "var(--gallery-plaster)" }}
-                            />
-                          )}
-                        </div>
+                    <Link
+                      href={collectionHref}
+                      className="artwork-card-button"
+                      aria-label={`View ${collection.collection_name} collection`}
+                    >
+                      <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
+                        {collection.featured?.image_url ? (
+                          <ProgressiveImage
+                            src={collection.featured.image_url}
+                            alt={collection.featured.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          />
+                        ) : (
+                          <div
+                            className="w-full h-full"
+                            style={{ backgroundColor: "var(--gallery-plaster)" }}
+                          />
+                        )}
                       </div>
-                    )}
+                    </Link>
                     <div className="artwork-info">
                       <h3 className="artwork-title">
                         <Link
-                          href={`/collections/${slug}`}
+                          href={collectionHref}
                           style={{ textDecoration: "none", color: "inherit" }}
                         >
                           {collection.collection_name}
