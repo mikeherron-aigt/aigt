@@ -190,7 +190,7 @@ export default function PhilanthropyPage() {
     overflow: "visible",
   }}
 >
-  <InteractiveGlobe width={750} height={750} />
+  <InteractiveGlobe width={400} height={400} />
 </div>
 
 
