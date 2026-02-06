@@ -141,11 +141,13 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
       const mat = new THREE.PointsMaterial({
         size: DOT_SIZE,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.95,
-        depthWrite: false,
-        sizeAttenuation: true,
+size: DOT_SIZE,
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.95,
+  depthWrite: true,
+  depthTest: true,
+  sizeAttenuation: true,
       });
 
       const points = new THREE.Points(geo, mat);
