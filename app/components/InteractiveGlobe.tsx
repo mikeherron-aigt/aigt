@@ -5,11 +5,18 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 type Props = {
+  /** Optional fallback size. If omitted, the component fills its container. */
   width?: number;
   height?: number;
+  /** Optional: cap device pixel ratio for performance */
+  maxDpr?: number;
 };
 
-export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
+export default function InteractiveGlobe({
+  width,
+  height,
+  maxDpr = 2,
+}: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -20,27 +27,21 @@ export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
 
     let raf = 0;
 
-    // Lock canvas physical size so it does NOT respond to viewport resize
-    canvas.width = width;
-    canvas.height = height;
-
     // Scene
     const scene = new THREE.Scene();
 
-    // Renderer (fixed size)
+    // Renderer (resizes to container)
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
       alpha: true,
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(width, height, false);
 
-    // Camera (fixed)
-    const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 5000);
+    // Camera (aspect updated on resize)
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 5000);
     camera.position.set(0, 0, 360);
 
-    // Controls (optional, keeps your existing behavior)
+    // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enablePan = false;
     controls.enableZoom = false;
@@ -48,6 +49,7 @@ export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
     controls.dampingFactor = 0.06;
     controls.rotateSpeed = 0.5;
 
+    // Light
     scene.add(new THREE.AmbientLight(0xffffff, 1));
 
     // Globe base (white)
@@ -65,11 +67,13 @@ export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
     const DOT_RADIUS = RADIUS + 1.2;
     const DOT_SIZE = 0.35;
 
-    // Dense dots from map
     const STEP = 1;
     const THRESHOLD = 70;
 
+    let disposed = false;
+
     const buildDots = async () => {
+      // Clear old dots
       while (dotsGroup.children.length) dotsGroup.remove(dotsGroup.children[0]);
 
       const img = new Image();
@@ -81,6 +85,8 @@ export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
         img.onerror = () => reject(new Error('Failed to load /globe-map.png'));
       });
 
+      if (disposed) return;
+
       const c = document.createElement('canvas');
       c.width = img.width;
       c.height = img.height;
@@ -89,8 +95,10 @@ export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
       if (!ctx) return;
 
       ctx.drawImage(img, 0, 0);
-
-      const { data, width: w, height: h } = ctx.getImageData(0, 0, c.width, c.height);
+      const imageData = ctx.getImageData(0, 0, c.width, c.height);
+      const data = imageData.data;
+      const w = imageData.width;
+      const h = imageData.height;
 
       const positions: number[] = [];
       const colors: number[] = [];
@@ -141,6 +149,38 @@ export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
       dotsGroup.add(points);
     };
 
+    // Resize logic
+    const setSize = (w: number, h: number) => {
+      if (w <= 0 || h <= 0) return;
+
+      const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+      renderer.setPixelRatio(dpr);
+      renderer.setSize(w, h, false);
+
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+
+    // Observe container size
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+
+      // Prefer borderBoxSize when available, fall back to contentRect
+      const box = (entry as any).borderBoxSize?.[0];
+      const nextW = Math.round(box?.inlineSize ?? entry.contentRect.width);
+      const nextH = Math.round(box?.blockSize ?? entry.contentRect.height);
+
+      setSize(nextW, nextH);
+    });
+
+    ro.observe(container);
+
+    // Initial size (covers first paint)
+    const initialW = Math.round(width ?? container.clientWidth);
+    const initialH = Math.round(height ?? container.clientHeight);
+    setSize(initialW, initialH);
+
     buildDots().catch(() => {});
 
     const animate = () => {
@@ -153,7 +193,10 @@ export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
     animate();
 
     return () => {
+      disposed = true;
+
       cancelAnimationFrame(raf);
+      ro.disconnect();
       controls.dispose();
 
       globeGeom.dispose();
@@ -167,17 +210,24 @@ export default function InteractiveGlobe({ width = 950, height = 950 }: Props) {
 
       renderer.dispose();
     };
-  }, [width, height]);
+  }, [width, height, maxDpr]);
 
-  // IMPORTANT: container is fixed size so CSS cannot shrink it on resize
+  /**
+   * IMPORTANT:
+   * - If parent gives a size (recommended), this fills it.
+   * - If parent does not size it, you can pass width/height as a fallback.
+   */
   return (
     <div
       ref={containerRef}
-      style={{ width, height }}
+      style={{
+        width: width ?? '100%',
+        height: height ?? '100%',
+      }}
     >
       <canvas
         ref={canvasRef}
-        style={{ width: "100%", height: "100%", display: "block" }}
+        style={{ width: '100%', height: '100%', display: 'block' }}
       />
     </div>
   );
