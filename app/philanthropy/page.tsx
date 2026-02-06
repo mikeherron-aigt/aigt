@@ -1,4 +1,3 @@
-// app/philanthropy/page.tsx
 'use client';
 
 import Image from "next/image";
@@ -13,7 +12,7 @@ const InteractiveGlobe = dynamic(
 export default function PhilanthropyPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#ffffff" }}>
-      {/* HERO WRAPPER (must be f5f5f5 like Home) */}
+      {/* HERO WRAPPER */}
       <div className="w-full" style={{ backgroundColor: "#f5f5f5" }}>
         <main>
           <div className="max-w-[1440px] mx-auto relative">
@@ -26,9 +25,7 @@ export default function PhilanthropyPage() {
                   </h1>
 
                   <div className="hero-subtitle">
-                    <p>
-                      Sharing art through stewardship, education, and healing.
-                    </p>
+                    <p>Sharing art through stewardship, education, and healing.</p>
                   </div>
 
                   <div className="mt-6 sm:mt-8 space-y-6 text-[#1f2933]">
@@ -80,7 +77,7 @@ export default function PhilanthropyPage() {
                 </div>
               </div>
 
-              {/* Image Column (match Home sizing) */}
+              {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
                   <Image
@@ -95,7 +92,7 @@ export default function PhilanthropyPage() {
               </div>
             </div>
 
-            {/* Decorative Elements (VERTICAL BAR + deep green cube alignment) */}
+            {/* Decorative Elements */}
             <div
               className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none"
               style={{ top: "0", height: "calc(100% - 242px)" }}
@@ -106,7 +103,7 @@ export default function PhilanthropyPage() {
             />
           </div>
 
-          {/* DESIGN BAR (HORIZONTAL) */}
+          {/* DESIGN BAR */}
           <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
             <div
               className="absolute top-0 left-0 h-full bg-gallery-plaster"
@@ -127,7 +124,7 @@ export default function PhilanthropyPage() {
         </main>
       </div>
 
-      {/* EVERYTHING BELOW HERO SHOULD BE WHITE */}
+      {/* BELOW HERO */}
       <div className="w-full bg-white">
         {/* Stewardship Beyond Ownership */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
@@ -170,17 +167,25 @@ export default function PhilanthropyPage() {
           </div>
         </section>
 
-        {/* Stewardship is enforced through process (LEFT COPY + GLOBE + RIGHT STACKED BOXES) */}
-        <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible lg:min-h-[980px]">
-          {/* GLOBE (big, outside max width, center locked to the left content edge) */}
-          <div className="pointer-events-none absolute hidden lg:block z-0 left-[80px] top-[58%] -translate-x-1/2 -translate-y-1/2">
-            <div className="w-[1200px] h-[1200px]">
+        {/* Stewardship is enforced through process */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
+          {/* IMPORTANT: The anchor lives inside this centered wrapper */}
+          <div className="max-w-[1440px] mx-auto relative overflow-visible lg:min-h-[1250px]">
+            {/* GLOBE: center locked to the red line (the left content padding line inside the 1440 wrapper) */}
+            <div
+              className="pointer-events-none absolute z-0 hidden lg:block"
+              style={{
+                left: 80,      // matches lg:px-[80px]
+                top: 680,      // desktop placement
+                transform: "translate(-50%, -50%)",
+                width: 1250,   // matches your Figma scale
+                height: 1250,  // matches your Figma scale
+              }}
+            >
               <InteractiveGlobe />
             </div>
-          </div>
 
-          <div className="max-w-[1440px] mx-auto">
-            <div className="grid lg:grid-cols-12 gap-0">
+            <div className="grid lg:grid-cols-12 gap-0 relative z-10">
               {/* Left */}
               <div className="px-4 sm:px-8 lg:px-[80px] lg:col-span-5 flex flex-col justify-start">
                 <h2 style={{ maxWidth: 520 }}>
@@ -254,9 +259,9 @@ export default function PhilanthropyPage() {
               </div>
             </div>
 
-            {/* Mobile globe (simple) */}
+            {/* Mobile globe placeholder (desktop first, you said you will handle breakpoints later) */}
             <div className="block lg:hidden mt-12 px-4 sm:px-8">
-              <div className="mx-auto w-[320px] h-[320px]">
+              <div className="w-full" style={{ height: 340 }}>
                 <InteractiveGlobe />
               </div>
             </div>
