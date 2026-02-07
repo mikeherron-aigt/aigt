@@ -320,39 +320,6 @@ export default function PhilanthropyPage() {
 </section>
 
 
-        {/* Title of Something + 4 cards */}
-        <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
-          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <div className="text-center max-w-[995px] mx-auto">
-              <h2>Title of Something</h2>
-              <p>
-                An overview of how stewardship practice, acquisition discipline, and long-term accountability align.
-              </p>
-            </div>
-
-            <div className="mt-12 grid md:grid-cols-2 gap-6 lg:gap-8 max-w-[1280px] mx-auto">
-              <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
-                <h3>Art Therapy and Healing</h3>
-                <p>Art can be a form of care.</p>
-              </div>
-
-              <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
-                <h3>Community and Care Settings</h3>
-                <p>Placing art where people are.</p>
-              </div>
-
-              <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
-                <h3>A Thoughtful, Governed Approach</h3>
-                <p>Clear boundaries and accountability.</p>
-              </div>
-
-              <div className="p-10" style={{ backgroundColor: "#f5f5f5" }}>
-                <h3>Stewardship Includes People</h3>
-                <p>Responsibility beyond the collection.</p>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Closing CTA */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
