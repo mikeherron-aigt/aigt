@@ -62,18 +62,7 @@ export default function PhilanthropyPage() {
                       Request Access
                     </Link>
 
-                    <Link
-                      href="/stewardship"
-                      className="cta-secondary"
-                      style={{
-                        textDecoration: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      Stewardship Overview
-                    </Link>
+              
                   </div>
                 </div>
               </div>
@@ -192,9 +181,7 @@ export default function PhilanthropyPage() {
               {/* Left */}
               <div className="px-4 sm:px-8 lg:px-[80px] lg:col-span-5 flex flex-col justify-start">
                 <h2 style={{ maxWidth: 520 }}>
-                  Stewardship is enforced
-                  <br />
-                  through process.
+                  Stewardship is enforced through process.
                 </h2>
 
                 <p style={{ maxWidth: 520 }}>
@@ -203,18 +190,7 @@ export default function PhilanthropyPage() {
                 </p>
 
                 <div className="mt-6">
-                  <Link
-                    href="/stewardship"
-                    className="cta-primary"
-                    style={{
-                      textDecoration: "none",
-                      width: "fit-content",
-                      display: "inline-flex",
-                    }}
-                  >
-                    See the Stewardship Standard
-                  </Link>
-                </div>
+                          </div>
               </div>
 
               {/* Spacer */}
