@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 
 // Use the absolute alias to avoid deploy path issues
 const InteractiveGlobe = dynamic(
-  () => import("@/components/InteractiveGlobe"),
+  () => import("../components/InteractiveGlobe"),
   { ssr: false }
 );
 
