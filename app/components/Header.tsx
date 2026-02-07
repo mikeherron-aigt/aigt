@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
 export default function Header() {
@@ -10,18 +11,14 @@ export default function Header() {
   const [isOfferingsOpen, setIsOfferingsOpen] = useState(false);
   const offeringsRef = useRef<HTMLDivElement | null>(null);
 
-  // NEW: Stewardship dropdown state + ref
   const [isStewardshipOpen, setIsStewardshipOpen] = useState(false);
   const stewardshipRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
-      // Close Offerings if click outside
       if (offeringsRef.current && !offeringsRef.current.contains(e.target as Node)) {
         setIsOfferingsOpen(false);
       }
-
-      // NEW: Close Stewardship if click outside
       if (stewardshipRef.current && !stewardshipRef.current.contains(e.target as Node)) {
         setIsStewardshipOpen(false);
       }
@@ -30,7 +27,7 @@ export default function Header() {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsOfferingsOpen(false);
-        setIsStewardshipOpen(false); // NEW
+        setIsStewardshipOpen(false);
         setIsMenuOpen(false);
       }
     };
@@ -77,7 +74,17 @@ export default function Header() {
             </Link>
 
             {/* Offerings Dropdown */}
-            <div className="relative" ref={offeringsRef}>
+            <div
+              className="relative"
+              ref={offeringsRef}
+              onMouseEnter={() => {
+                setIsOfferingsOpen(true);
+                setIsStewardshipOpen(false);
+              }}
+              onMouseLeave={() => {
+                setIsOfferingsOpen(false);
+              }}
+            >
               <button
                 type="button"
                 className="nav-link flex items-center gap-2"
@@ -85,11 +92,7 @@ export default function Header() {
                 aria-expanded={isOfferingsOpen}
                 onClick={() => {
                   setIsOfferingsOpen((v) => !v);
-                  setIsStewardshipOpen(false); // NEW: keep only one dropdown open
-                }}
-                onMouseEnter={() => {
-                  setIsOfferingsOpen(true);
-                  setIsStewardshipOpen(false); // NEW
+                  setIsStewardshipOpen(false);
                 }}
               >
                 Offerings
@@ -112,7 +115,6 @@ export default function Header() {
                 <div
                   className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
                   role="menu"
-                  onMouseLeave={() => setIsOfferingsOpen(false)}
                 >
                   <div className="p-4 flex flex-col gap-2">
                     <Link
@@ -141,8 +143,18 @@ export default function Header() {
               Gallery
             </a>
 
-            {/* NEW: Stewardship Dropdown */}
-            <div className="relative" ref={stewardshipRef}>
+            {/* Stewardship Dropdown */}
+            <div
+              className="relative"
+              ref={stewardshipRef}
+              onMouseEnter={() => {
+                setIsStewardshipOpen(true);
+                setIsOfferingsOpen(false);
+              }}
+              onMouseLeave={() => {
+                setIsStewardshipOpen(false);
+              }}
+            >
               <button
                 type="button"
                 className="nav-link flex items-center gap-2"
@@ -150,10 +162,6 @@ export default function Header() {
                 aria-expanded={isStewardshipOpen}
                 onClick={() => {
                   setIsStewardshipOpen((v) => !v);
-                  setIsOfferingsOpen(false); // keep only one open
-                }}
-                onMouseEnter={() => {
-                  setIsStewardshipOpen(true);
                   setIsOfferingsOpen(false);
                 }}
               >
@@ -177,7 +185,6 @@ export default function Header() {
                 <div
                   className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
                   role="menu"
-                  onMouseLeave={() => setIsStewardshipOpen(false)}
                 >
                   <div className="p-4 flex flex-col gap-2">
                     <Link
@@ -187,6 +194,15 @@ export default function Header() {
                       onClick={() => setIsStewardshipOpen(false)}
                     >
                       Museum
+                    </Link>
+
+                    <Link
+                      href="/philanthropy"
+                      className="nav-link text-base"
+                      role="menuitem"
+                      onClick={() => setIsStewardshipOpen(false)}
+                    >
+                      Philanthropy
                     </Link>
                   </div>
                 </div>
@@ -270,14 +286,28 @@ export default function Header() {
                     Gallery
                   </a>
 
-                  {/* Mobile Stewardship stays simple as requested */}
-                  <a
-                    href="/museum"
-                    className="nav-link text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Stewardship
-                  </a>
+                  {/* Mobile Stewardship list */}
+                  <div className="flex flex-col gap-3">
+                    <span className="nav-link text-base" style={{ opacity: 0.9 }}>
+                      Stewardship
+                    </span>
+                    <div className="pl-4 flex flex-col gap-3">
+                      <Link
+                        href="/museum"
+                        className="nav-link text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Museum
+                      </Link>
+                      <Link
+                        href="/philanthropy"
+                        className="nav-link text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Philanthropy
+                      </Link>
+                    </div>
+                  </div>
 
                   <div className="border-t border-gallery-plaster pt-4">
                     <Link
