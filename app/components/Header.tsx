@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
 export default function Header() {
@@ -10,17 +9,35 @@ export default function Header() {
 
   const [isOfferingsOpen, setIsOfferingsOpen] = useState(false);
   const offeringsRef = useRef<HTMLDivElement | null>(null);
+  const offeringsCloseTimer = useRef<number | null>(null);
 
   const [isStewardshipOpen, setIsStewardshipOpen] = useState(false);
   const stewardshipRef = useRef<HTMLDivElement | null>(null);
+  const stewardshipCloseTimer = useRef<number | null>(null);
+
+  const clearOfferingsTimer = () => {
+    if (offeringsCloseTimer.current) {
+      window.clearTimeout(offeringsCloseTimer.current);
+      offeringsCloseTimer.current = null;
+    }
+  };
+
+  const clearStewardshipTimer = () => {
+    if (stewardshipCloseTimer.current) {
+      window.clearTimeout(stewardshipCloseTimer.current);
+      stewardshipCloseTimer.current = null;
+    }
+  };
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
       if (offeringsRef.current && !offeringsRef.current.contains(e.target as Node)) {
         setIsOfferingsOpen(false);
+        clearOfferingsTimer();
       }
       if (stewardshipRef.current && !stewardshipRef.current.contains(e.target as Node)) {
         setIsStewardshipOpen(false);
+        clearStewardshipTimer();
       }
     };
 
@@ -29,6 +46,8 @@ export default function Header() {
         setIsOfferingsOpen(false);
         setIsStewardshipOpen(false);
         setIsMenuOpen(false);
+        clearOfferingsTimer();
+        clearStewardshipTimer();
       }
     };
 
@@ -46,6 +65,20 @@ export default function Header() {
       document.body.style.overflow = "";
     };
   }, [isMenuOpen]);
+
+  const scheduleCloseOfferings = () => {
+    clearOfferingsTimer();
+    offeringsCloseTimer.current = window.setTimeout(() => {
+      setIsOfferingsOpen(false);
+    }, 140);
+  };
+
+  const scheduleCloseStewardship = () => {
+    clearStewardshipTimer();
+    stewardshipCloseTimer.current = window.setTimeout(() => {
+      setIsStewardshipOpen(false);
+    }, 140);
+  };
 
   return (
     <header className="w-full sticky top-0 z-[9999]" style={{ backgroundColor: "#f5f5f5" }}>
@@ -75,14 +108,16 @@ export default function Header() {
 
             {/* Offerings Dropdown */}
             <div
-              className="relative"
+              className="relative pt-3 -mt-3"
               ref={offeringsRef}
               onMouseEnter={() => {
+                clearOfferingsTimer();
                 setIsOfferingsOpen(true);
                 setIsStewardshipOpen(false);
+                clearStewardshipTimer();
               }}
               onMouseLeave={() => {
-                setIsOfferingsOpen(false);
+                scheduleCloseOfferings();
               }}
             >
               <button
@@ -93,6 +128,7 @@ export default function Header() {
                 onClick={() => {
                   setIsOfferingsOpen((v) => !v);
                   setIsStewardshipOpen(false);
+                  clearStewardshipTimer();
                 }}
               >
                 Offerings
@@ -113,8 +149,10 @@ export default function Header() {
 
               {isOfferingsOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
+                  className="absolute top-full left-0 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
                   role="menu"
+                  onMouseEnter={clearOfferingsTimer}
+                  onMouseLeave={scheduleCloseOfferings}
                 >
                   <div className="p-4 flex flex-col gap-2">
                     <Link
@@ -145,14 +183,16 @@ export default function Header() {
 
             {/* Stewardship Dropdown */}
             <div
-              className="relative"
+              className="relative pt-3 -mt-3"
               ref={stewardshipRef}
               onMouseEnter={() => {
+                clearStewardshipTimer();
                 setIsStewardshipOpen(true);
                 setIsOfferingsOpen(false);
+                clearOfferingsTimer();
               }}
               onMouseLeave={() => {
-                setIsStewardshipOpen(false);
+                scheduleCloseStewardship();
               }}
             >
               <button
@@ -163,6 +203,7 @@ export default function Header() {
                 onClick={() => {
                   setIsStewardshipOpen((v) => !v);
                   setIsOfferingsOpen(false);
+                  clearOfferingsTimer();
                 }}
               >
                 Stewardship
@@ -183,8 +224,10 @@ export default function Header() {
 
               {isStewardshipOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
+                  className="absolute top-full left-0 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
                   role="menu"
+                  onMouseEnter={clearStewardshipTimer}
+                  onMouseLeave={scheduleCloseStewardship}
                 >
                   <div className="p-4 flex flex-col gap-2">
                     <Link
@@ -286,7 +329,6 @@ export default function Header() {
                     Gallery
                   </a>
 
-                  {/* Mobile Stewardship list */}
                   <div className="flex flex-col gap-3">
                     <span className="nav-link text-base" style={{ opacity: 0.9 }}>
                       Stewardship
