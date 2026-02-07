@@ -4,16 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-/**
- * IMPORTANT:
- * - In the Next.js app router, `app/philanthropy/page.tsx` should import shared components from `/components`.
- * - This path avoids build failures caused by relative import confusion across environments.
- */
+// Use the absolute alias to avoid deploy path issues
 const InteractiveGlobe = dynamic(
-  () => import("../components/InteractiveGlobe"),
+  () => import("@/components/InteractiveGlobe"),
   { ssr: false }
 );
-
 
 export default function PhilanthropyPage() {
   return (
@@ -175,28 +170,21 @@ export default function PhilanthropyPage() {
 
         {/* Globe + Stewardship Process Section */}
         <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
-        
-          
- {/* GLOBE (bleeds off left like Figma, scrolls with section) */}
-<div
- className="absolute hidden lg:block z-50 pointer-events-auto"
-  style={{
-    left: "calc(-300px + max(0px, (100dvw - 1440px) / 2))",
-    top: "420px",
-    width: "1100px",
-    height: "1100px",
-    overflow: "visible",
-  }}
->
-  {/* Allow interaction only on the globe itself */}
-  <div className="pointer-events-auto" style={{ width: "100%", height: "100%" }}>
-    <InteractiveGlobe width={1100} height={1100} />
-  </div>
-</div>
-
-
-
-       
+          {/* GLOBE (bleeds off left like Figma, scrolls with section) */}
+          <div
+            className="absolute hidden lg:block z-0 pointer-events-none"
+            style={{
+              left: "calc(-300px + max(0px, (100dvw - 1440px) / 2))",
+              top: "420px",
+              width: "1100px",
+              height: "1100px",
+              overflow: "visible",
+            }}
+          >
+            <div className="pointer-events-auto" style={{ width: "100%", height: "100%" }}>
+              <InteractiveGlobe width={1100} height={1100} />
+            </div>
+          </div>
 
           {/* Content sits above globe */}
           <div className="max-w-[1440px] mx-auto relative z-10">
@@ -210,7 +198,7 @@ export default function PhilanthropyPage() {
                 </h2>
 
                 <p style={{ maxWidth: 520 }}>
-                  The platform supports multiple funds with independent economics and governance.
+                  The platform supports multiple vehicles with independent economics and governance.
                   This separation preserves clarity, reduces cross-risk, and reinforces institutional credibility.
                 </p>
 
@@ -276,6 +264,73 @@ export default function PhilanthropyPage() {
           </div>
         </section>
 
+        {/* Art Therapy Section */}
+        <section style={{ backgroundColor: "#ffffff" }}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-14 sm:py-16 lg:py-20">
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+              {/* Copy */}
+              <div>
+                <p className="text-xs tracking-[0.22em] uppercase mb-4" style={{ color: "#A1A69D" }}>
+                  Art Therapy
+                </p>
+
+                <h2 className="text-3xl sm:text-4xl leading-tight mb-5" style={{ color: "#111111" }}>
+                  A clinical practice, held with the same level of care as the collection
+                </h2>
+
+                <p className="text-base sm:text-lg leading-relaxed mb-5" style={{ color: "#3a3a3a" }}>
+                  We support art therapy programs that meet people where they are, inside museums,
+                  partner institutions, and community settings. The work is quiet by design: structured
+                  sessions, trained facilitators, and environments that let art do what it does best.
+                </p>
+
+                <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: "#3a3a3a" }}>
+                  Our focus is access and continuity. The goal is not spectacle. It is a repeatable
+                  model that helps institutions offer meaningful outcomes, without compromising the dignity
+                  of the experience.
+                </p>
+
+                <div className="flex flex-wrap gap-3">
+                  <span className="text-xs px-3 py-2 rounded-full border" style={{ borderColor: "#e6e6e6", color: "#5a5a5a" }}>
+                    Mobility-accessible sessions
+                  </span>
+                  <span className="text-xs px-3 py-2 rounded-full border" style={{ borderColor: "#e6e6e6", color: "#5a5a5a" }}>
+                    Museum and nonprofit partners
+                  </span>
+                  <span className="text-xs px-3 py-2 rounded-full border" style={{ borderColor: "#e6e6e6", color: "#5a5a5a" }}>
+                    Long-horizon support
+                  </span>
+                </div>
+              </div>
+
+              {/* Image */}
+              <div className="w-full">
+                <div
+                  className="relative w-full overflow-hidden rounded-2xl"
+                  style={{ backgroundColor: "#f5f5f5", border: "1px solid #ededed" }}
+                >
+                  <div className="relative w-full aspect-[4/3]">
+                    <Image
+                      src="/art_therapy.png"
+                      alt="An art therapy session in a modern museum setting"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
+
+                  <div className="px-5 sm:px-6 py-4">
+                    <p className="text-xs leading-relaxed" style={{ color: "#6b6b6b" }}>
+                      A calm setting matters. We design programs that feel institutional, accessible,
+                      and human, with the artwork as the anchor.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Title of Something + 4 cards */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
@@ -334,85 +389,3 @@ export default function PhilanthropyPage() {
     </div>
   );
 }
-{/* Art Therapy Section */}
-<section style={{ backgroundColor: "#ffffff" }}>
-  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-14 sm:py-16 lg:py-20">
-    <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-      {/* Copy */}
-      <div>
-        <p
-          className="text-xs tracking-[0.22em] uppercase mb-4"
-          style={{ color: "#A1A69D" }}
-        >
-          Art Therapy
-        </p>
-
-        <h2 className="text-3xl sm:text-4xl leading-tight mb-5" style={{ color: "#111111" }}>
-          A clinical practice, held with the same level of care as the collection
-        </h2>
-
-        <p className="text-base sm:text-lg leading-relaxed mb-5" style={{ color: "#3a3a3a" }}>
-          We support art therapy programs that meet people where they are, inside museums,
-          partner institutions, and community settings. The work is quiet by design:
-          structured sessions, trained facilitators, and environments that let art do what it does best.
-        </p>
-
-        <p className="text-base sm:text-lg leading-relaxed mb-8" style={{ color: "#3a3a3a" }}>
-          Our focus is access and continuity. The goal is not spectacle. It is a repeatable
-          model that helps institutions offer meaningful outcomes, without compromising the dignity
-          of the experience.
-        </p>
-
-        <div className="flex flex-wrap gap-3">
-          <span
-            className="text-xs px-3 py-2 rounded-full border"
-            style={{ borderColor: "#e6e6e6", color: "#5a5a5a" }}
-          >
-            Mobility-accessible sessions
-          </span>
-          <span
-            className="text-xs px-3 py-2 rounded-full border"
-            style={{ borderColor: "#e6e6e6", color: "#5a5a5a" }}
-          >
-            Museum and nonprofit partners
-          </span>
-          <span
-            className="text-xs px-3 py-2 rounded-full border"
-            style={{ borderColor: "#e6e6e6", color: "#5a5a5a" }}
-          >
-            Long-horizon support
-          </span>
-        </div>
-      </div>
-
-      {/* Image */}
-      <div className="w-full">
-        <div
-          className="relative w-full overflow-hidden rounded-2xl"
-          style={{
-            backgroundColor: "#f5f5f5",
-            border: "1px solid #ededed",
-          }}
-        >
-          <div className="relative w-full aspect-[4/3]">
-            <Image
-              src="/art_therapy.png"
-              alt="An art therapy session in a modern museum setting"
-              fill
-              priority={false}
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-
-          <div className="px-5 sm:px-6 py-4">
-            <p className="text-xs leading-relaxed" style={{ color: "#6b6b6b" }}>
-              A calm setting matters. We design programs that feel institutional, accessible,
-              and human, with the artwork as the anchor.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
