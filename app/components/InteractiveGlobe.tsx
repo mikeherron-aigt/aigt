@@ -70,7 +70,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     const DOT_COLOR = new THREE.Color('#A1A69D');
     const DOT_RADIUS = RADIUS + 0.8; // close to surface, but avoids shimmer
-    const DOT_SIZE = 0.6;
+    const DOT_SIZE = 0.95;
 
     const STEP = 2; // smoother + less noise than 1
     const THRESHOLD = 70;
@@ -147,7 +147,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
         opacity: 0.85,
         depthTest: true,
         depthWrite: false,
-        alphaTest: 0.25,
+        alphaTest: 0.0,
         sizeAttenuation: true,
       });
 
