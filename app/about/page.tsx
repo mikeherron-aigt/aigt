@@ -308,7 +308,7 @@ export default function AboutPage() {
                 return (
                   <div key={member.name} className="flex flex-col items-center text-center">
                     {/* Photo */}
-                    {photoElement}
+                    {photo}
 
                     <h3 className="text-[20px] lg:text-[22px] font-normal leading-normal m-0 mb-2">{member.name}</h3>
 

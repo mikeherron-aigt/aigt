@@ -1,5 +1,6 @@
 [[redirects]]
   from = "/api/*"
-  to = "https://art.artigt.com/api/:splat"
+  to = "https://art.artigt.com/api/public/:splat"
   status = 200
   force = true
+  headers = {User-Agent = "Mozilla/5.0 (compatible; AIGT-App/1.0)"}
