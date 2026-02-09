@@ -71,6 +71,25 @@ ${message}
       text: emailContent,
     });
 
+    // Send confirmation email to user
+    const confirmationEmail = {
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      to: email,
+      subject: "Your Inquiry Has Been Received - Art Investment Group Trust",
+      text: `Dear ${fullName},
+
+Thank you for your inquiry about "${artworkTitle}".
+
+Your message has been received and will be reviewed by our team. We will be in touch shortly to discuss your inquiry and next steps.
+
+If you have any questions in the meantime, please feel free to reach out.
+
+Best regards,
+Art Investment Group Trust`,
+    };
+
+    await transporter.sendMail(confirmationEmail);
+
     return NextResponse.json(
       { success: true, message: "Inquiry sent successfully" },
       { status: 200 }

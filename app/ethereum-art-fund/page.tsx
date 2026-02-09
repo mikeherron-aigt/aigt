@@ -11,6 +11,31 @@ import { slugify } from "@/app/lib/slug";
 
 const JOHN_DOWLING_PROFILE_URL = "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620";
 
+// Fallback hero artworks when API data is unavailable
+const FALLBACK_HERO_ARTWORKS: ArtworkItem[] = [
+  {
+    src: "https://image.artigt.com/JD/CD/2025-JD-CD-0347/2025-JD-CD-0347__full__v02.webp",
+    title: "Artwork",
+    artist: "John Dowling Jr.",
+    year: "2025",
+    collection: "Curated Drawings",
+  },
+  {
+    src: "https://image.artigt.com/JD/DW/2025-JD-DW-0008/2025-JD-DW-0008__full__v02.webp",
+    title: "Artwork",
+    artist: "John Dowling Jr.",
+    year: "2025",
+    collection: "Digital Works",
+  },
+  {
+    src: "https://image.artigt.com/JD/AG/2024-JD-AG-0025/2024-JD-AG-0025__full__v02.webp",
+    title: "Artwork",
+    artist: "John Dowling Jr.",
+    year: "2024",
+    collection: "AI Generations",
+  },
+];
+
 interface ArtworkItem {
   src: string;
   title: string;
@@ -41,18 +66,34 @@ export default function EthereumArtFundPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { artworks } = useArtworks({ version: "v02" });
 
-  // Get random featured works from all collections
+  // Get featured works from all collections (v02, no untitled)
   const featuredWorks = useMemo(() => {
-    const validArtworks = artworks
+    return artworks
       .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
       .map(mapArtworkToItem);
-
-    // Shuffle array to get random selection
-    const shuffled = [...validArtworks].sort(() => Math.random() - 0.5);
-    return shuffled;
   }, [artworks]);
 
-  const heroArtwork = featuredWorks[0];
+  // Select 3 specific hero artworks for cycling (deterministic selection by sorting)
+  // Falls back to static images if API data is unavailable
+  const heroArtworks = useMemo(() => {
+    if (featuredWorks.length === 0) return FALLBACK_HERO_ARTWORKS;
+    // Sort by title for consistent selection, then pick first 3
+    const sorted = [...featuredWorks].sort((a, b) => a.title.localeCompare(b.title));
+    return sorted.slice(0, 3);
+  }, [featuredWorks]);
+
+  // Cycle through hero artworks
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    if (heroArtworks.length <= 1) return;
+    const interval = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % heroArtworks.length);
+    }, 6000); // Cycle every 6 seconds
+    return () => clearInterval(interval);
+  }, [heroArtworks.length]);
+
+  const heroArtwork = heroArtworks[heroIndex];
   const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {

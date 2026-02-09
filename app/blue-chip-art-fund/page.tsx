@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useArtworks } from "@/app/hooks/useArtworks";
 import type { Artwork } from "@/app/lib/api";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
@@ -15,6 +15,31 @@ interface ArtworkItem {
   year: string;
   collection?: string;
 }
+
+// Fallback hero artworks when API data is unavailable
+const FALLBACK_HERO_ARTWORKS: ArtworkItem[] = [
+  {
+    src: "https://image.artigt.com/JD/CD/2025-JD-CD-0347/2025-JD-CD-0347__full__v02.webp",
+    title: "Artwork",
+    artist: "John Dowling Jr.",
+    year: "2025",
+    collection: "Curated Drawings",
+  },
+  {
+    src: "https://image.artigt.com/JD/DW/2025-JD-DW-0008/2025-JD-DW-0008__full__v02.webp",
+    title: "Artwork",
+    artist: "John Dowling Jr.",
+    year: "2025",
+    collection: "Digital Works",
+  },
+  {
+    src: "https://image.artigt.com/JD/AG/2024-JD-AG-0025/2024-JD-AG-0025__full__v02.webp",
+    title: "Artwork",
+    artist: "John Dowling Jr.",
+    year: "2024",
+    collection: "AI Generations",
+  },
+];
 
 const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
   src: artwork.image_url,
@@ -39,11 +64,34 @@ export default function BlueChipArtFundPage() {
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { artworks } = useArtworks({ version: "v02" });
-  const featuredWorks = artworks
-    .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
-    .map(mapArtworkToItem);
-  const heroArtwork = featuredWorks[0];
-  const focusArtwork = featuredWorks[1] || featuredWorks[0];
+  const featuredWorks = useMemo(() => {
+    return artworks
+      .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
+      .map(mapArtworkToItem);
+  }, [artworks]);
+
+  // Select 3 specific hero artworks for cycling (deterministic selection by sorting)
+  // Falls back to static images if API data is unavailable
+  const heroArtworks = useMemo(() => {
+    if (featuredWorks.length === 0) return FALLBACK_HERO_ARTWORKS;
+    // Sort by title for consistent selection, then pick first 3
+    const sorted = [...featuredWorks].sort((a, b) => a.title.localeCompare(b.title));
+    return sorted.slice(0, 3);
+  }, [featuredWorks]);
+
+  // Cycle through hero artworks
+  const [heroIndex, setHeroIndex] = useState(0);
+
+  useEffect(() => {
+    if (heroArtworks.length <= 1) return;
+    const interval = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % heroArtworks.length);
+    }, 6000); // Cycle every 6 seconds
+    return () => clearInterval(interval);
+  }, [heroArtworks.length]);
+
+  const heroArtwork = heroArtworks[heroIndex];
+  const focusArtwork = heroArtworks[(heroIndex + 1) % heroArtworks.length] || heroArtwork;
   const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
   const focusArtworkHref = focusArtwork ? getArtworkHref(focusArtwork) : null;
 
