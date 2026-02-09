@@ -233,9 +233,11 @@ export default function Home() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
-  const { artworks, loading: artworksLoading, error: artworksError, refetch: refetchArtworks } = useArtworks({
-    version: "v02",
-  });
+  const { artworks, loading: artworksLoading, error: artworksError, refetch: refetchArtworks } = useArtworks(
+    {
+      version: "v02",
+    }
+  );
   const [backupArtworks, setBackupArtworks] = useState<Artwork[]>([]);
 
   useEffect(() => {
