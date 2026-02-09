@@ -1,6 +1,5 @@
 import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
-
-const API_BASE_URL = "/api";
+import { getApiUrl } from "@/app/lib/apiUrl";
 
 export interface Artwork {
   artwork_id: number;
@@ -79,18 +78,18 @@ async function fetchAPI<T>(
   ttlMs = DEFAULT_TTL_MS,
   retries = 2
 ): Promise<T> {
-  const cacheKey = `${API_BASE_URL}${endpoint}`;
-  const cached = getCached<T>(cacheKey);
+  const url = getApiUrl(`/api${endpoint}`);
+  const cached = getCached<T>(url);
   if (cached) return cached;
 
-  if (pendingRequests.has(cacheKey)) {
-    return pendingRequests.get(cacheKey) as Promise<T>;
+  if (pendingRequests.has(url)) {
+    return pendingRequests.get(url) as Promise<T>;
   }
 
   const requestPromise = (async () => {
     for (let attempt = 0; attempt <= retries; attempt += 1) {
       try {
-        const response = await fetch(cacheKey);
+        const response = await fetch(url);
 
         if (!response.ok) {
           if (response.status >= 500 && attempt < retries) {
@@ -106,7 +105,7 @@ async function fetchAPI<T>(
         }
 
         const data = (await response.json()) as T;
-        setCached(cacheKey, data, ttlMs);
+        setCached(url, data, ttlMs);
         return data;
       } catch (error) {
         if (attempt === retries) {
@@ -123,12 +122,12 @@ async function fetchAPI<T>(
     throw new APIError("Max retries exceeded");
   })();
 
-  pendingRequests.set(cacheKey, requestPromise);
+  pendingRequests.set(url, requestPromise);
 
   try {
     return await requestPromise;
   } finally {
-    pendingRequests.delete(cacheKey);
+    pendingRequests.delete(url);
   }
 }
 

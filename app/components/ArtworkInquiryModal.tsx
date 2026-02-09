@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { getApiUrl } from "../lib/apiUrl";
 
 type InquiryFormState = {
   fullName: string;
@@ -48,7 +49,7 @@ export default function ArtworkInquiryModal({
     setErrorMessage(null);
 
     try {
-      const response = await fetch("/api/artwork-inquiry", {
+      const response = await fetch(getApiUrl("/api/artwork-inquiry"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { trackFormSubmission } from "../lib/gtm";
+import { getApiUrl } from "../lib/apiUrl";
 
 interface FormData {
   fullName: string;
@@ -66,7 +67,7 @@ export default function RequestAccessPage() {
     try {
       trackFormSubmission('access_request_form');
 
-      const response = await fetch('/api/send-email', {
+      const response = await fetch(getApiUrl('/api/send-email'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
