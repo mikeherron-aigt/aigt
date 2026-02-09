@@ -561,10 +561,8 @@ export default function Home() {
             <div className="px-4 sm:px-8 lg:px-[80px] pt-0 pb-12 sm:pb-16 lg:pb-24 flex items-center">
               <div className="max-w-[637px]">
                 {/* Heading */}
-                <h1 className="hero-title" style={{marginBottom: '17px'}}>
-                  <div style={{fontSize: '41px', lineHeight: '45px'}}>
-                    The Art That Matters<br />The Stewardship It Deserves
-                  </div>
+                <h1 style={{marginBottom: '17px'}}>
+                  The Art That Matters<br />The Stewardship It Deserves
                 </h1>
 
                 {/* Subtitle */}
@@ -618,13 +616,13 @@ export default function Home() {
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
                 <div className="max-w-[711px]">
-                  <h2 className="governance-title">
+                  <h2>
                     Art Investment, Structured for the Long Term
                   </h2>
-                  <p className="governance-description">
+                  <p>
                     Art Investment Group Trust is a governed art investment platform focused on the acquisition, stewardship, and long term ownership of museum quality and culturally significant artworks for qualified participants.
                   </p>
-                  <p className="governance-description">
+                  <p>
                     Art Investment Group Trust operates art investment funds and stewardship platforms for those seeking long term exposure to fine art as an alternative asset class. Our approach prioritizes governance, custody, care, and cultural legitimacy over short term trading or speculation.
                   </p>
                 </div>
@@ -687,7 +685,7 @@ export default function Home() {
         {/* Featured Collection Section */}
         <section className="w-full bg-white pt-0 pb-16 sm:pb-20 lg:pb-[104px] featured-collection-section">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <h2 className="section-heading">
+            <h2>
               Featured Collection
             </h2>
           </div>
@@ -816,10 +814,10 @@ export default function Home() {
                 <div className="max-w-[579px]">
                   {/* Our Purpose */}
                   <div>
-                    <h2 className="governance-title">
+                    <h2>
                       Our Purpose
                     </h2>
-                    <p className="governance-description">
+                    <p>
                       Art carries cultural weight long before it carries financial value. When important works are treated primarily as assets, their context, integrity, and long-term significance are often compromised.<br /><br />Art Investment Group Trust exists to address this imbalance. We provide structures designed to protect cultural importance, resist short-term pressures, and ensure that significant works are held with intention, care, and institutional discipline.<br /><br />This philosophy guides every acquisition, every governance decision, and every relationship we enter.
                     </p>
                   </div>
@@ -831,10 +829,10 @@ export default function Home() {
                 <div className="max-w-[579px]">
                   {/* Our Approach */}
                   <div>
-                    <h2 className="governance-title">
+                    <h2>
                       Stewardship Before Everything
                     </h2>
-                    <p className="governance-description">
+                    <p>
                       We approach art through the lens of stewardship rather than speculation. That means prioritizing long-horizon ownership, rigorous governance, and responsible custody over velocity or volume.<br /><br />Our structures are intentionally designed to slow the process, encourage patience, and align participants around preservation, context, and care. Liquidity is episodic. Cultural responsibility is continuous.<br /><br />This approach applies equally across all mediums.
                     </p>
                   </div>
@@ -891,13 +889,13 @@ export default function Home() {
               {/* Top Content */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex flex-col items-center gap-4 max-w-full">
                 <div className="flex flex-col items-center gap-4 max-w-[995px]">
-                  <h2 className="funds-title">
+                  <h2 className="text-center">
                     Investment Offerings
                   </h2>
-                  <h3 className="funds-subtitle">
+                  <h3 className="text-center">
                     Distinct Platforms.  One Philosophy
                   </h3>
-                  <p className="funds-description">
+                  <p className="text-center">
                     Art Investment Group Trust operates multiple governed platforms, each designed to support different forms of cultural expression while adhering to the same standards of stewardship and oversight.
                   </p>
                 </div>
@@ -908,8 +906,8 @@ export default function Home() {
                   {/* Ethereum Art Fund Card */}
                   <div className="fund-card">
                     <div className="fund-card-content">
-                      <h3 className="fund-card-title">Ethereum Art Fund</h3>
-                      <p className="fund-card-description">
+                      <h3>Ethereum Art Fund</h3>
+                      <p>
                         The Ethereum Art Fund extends the same stewardship philosophy to Ethereum native artworks. These works are approached not as speculative instruments, but as culturally relevant expressions native to a digital medium.<br /><br />Governance, custody, and long-term intent mirror those applied to traditional art, with optional structures introduced only where appropriate and permitted.
                       </p>
                       <Link href="/ethereum-art-fund" className="cta-primary" style={{textDecoration: 'none', width: 'fit-content', alignSelf: 'flex-start'}}>
@@ -921,8 +919,8 @@ export default function Home() {
                   {/* Blue Chip Art Fund Card */}
                   <div className="fund-card">
                     <div className="fund-card-content">
-                      <h3 className="fund-card-title">Blue Chip Art Fund</h3>
-                      <p className="fund-card-description">
+                      <h3>Blue Chip Art Fund</h3>
+                      <p>
                         Focused on established works with deep cultural and historical significance, the Blue Chip Art Fund acquires and stewards museum-quality artworks through long-horizon ownership and institutional governance.<br /><br />The emphasis is on preservation, context, and disciplined acquisition rather than transaction frequency or short-term outcomes.
                       </p>
                       <Link href="/blue-chip-art-fund" className="cta-primary" style={{textDecoration: 'none', width: 'fit-content', alignSelf: 'flex-start'}}>
@@ -992,13 +990,13 @@ export default function Home() {
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center pt-8 sm:pt-12 lg:pt-0">
                 <div className="max-w-[579px]">
-                  <h2 className="one-standard-title">
+                  <h2>
                     One Standard Across Mediums
                   </h2>
-                  <h3 className="one-standard-subtitle">
+                  <h3>
                     Cultural Significance Is Medium Agnostic
                   </h3>
-                  <p className="one-standard-description">
+                  <p>
                     Whether a work exists on canvas or on chain, our standards do not change. Cultural relevance, provenance, context, and stewardship guide our decisions, not the medium itself.<br /><br />By applying the same governance framework across traditional and digital art, we aim to normalize contemporary forms of expression within an institutional and culturally legitimate context.
                   </p>
                 </div>
@@ -1014,13 +1012,13 @@ export default function Home() {
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:pl-[115px] lg:pr-0 flex items-center">
                 <div className="max-w-[579px]">
-                  <h2 className="art-artists-title">
+                  <h2>
                     Art and Artists
                   </h2>
-                  <h3 className="art-artists-subtitle">
+                  <h3>
                     The Works We Steward
                   </h3>
-                  <p className="art-artists-description">
+                  <p>
                     AIGT stewards a curated collection of culturally significant works, selected for their artistic relevance, historical importance, and long-term cultural contribution.<br /><br />In addition to fund held works, we also support the placement and stewardship of select individual artworks through private acquisition. These works are approached with the same care, discretion, and contextual consideration.<br /><br />Art is never treated as inventory. Each work is considered within its broader cultural and curatorial narrative.
                   </p>
                 </div>
@@ -1074,10 +1072,10 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-24">
             {/* Header */}
             <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20">
-              <h2 className="stewardship-practice-title">
+              <h2 className="text-center">
                 Stewardship in Practice
               </h2>
-              <p className="stewardship-practice-description">
+              <p className="text-center max-w-[789px]">
                 Structured governance and a long horizon perspective ensure each work is protected, contextualized, and allowed to mature culturally over time.
               </p>
             </div>
@@ -1087,9 +1085,9 @@ export default function Home() {
               {/* Governance and Care Card */}
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h2 className="practice-card-title">Governance and Care</h2>
-                  <h3 className="practice-card-subtitle">Responsibility Requires Structure</h3>
-                  <p className="practice-card-description">
+                  <h2>Governance and Care</h2>
+                  <h3>Responsibility Requires Structure</h3>
+                  <p>
                     Stewardship without governance is fragile. Art Investment Trust Group operates with centralized oversight, clear separation between economic participation and control, and institutional standards for custody, insurance, conservation, and compliance.<br /><br />The governance framework exists to protect the artwork first, ensuring decisions are made with long term cultural responsibility rather than short term incentives.
                   </p>
                 </div>
@@ -1098,9 +1096,9 @@ export default function Home() {
               {/* Perspective Card */}
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h2 className="practice-card-title">Perspective</h2>
-                  <h3 className="practice-card-subtitle">Art Requires Time</h3>
-                  <p className="practice-card-description">
+                  <h2>Perspective</h2>
+                  <h3>Art Requires Time</h3>
+                  <p>
                     The value of important art unfolds over years, not quarters. Cultural relevance is shaped through context, exhibition, scholarship, and preservation.<br /><br />The structures are designed to reflect this reality. Outcomes are not rushed, liquidity is not forced, and art is not framed through performance metrics. Time is allowed to do its work.
                   </p>
                 </div>
@@ -1114,7 +1112,7 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             {/* Header */}
             <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20 max-w-[995px] mx-auto">
-              <h2 className="section-heading text-center">
+              <h2 className="text-center">
                 Art Investment and Stewardship FAQs
               </h2>
             </div>
@@ -1129,7 +1127,7 @@ export default function Home() {
                     aria-expanded={expandedFAQ === index}
                     aria-controls={`faq-answer-${index}`}
                   >
-                    <h3 className="governance-subtitle m-0">
+                    <h3 className="m-0">
                       {item.question}
                     </h3>
                     <svg
@@ -1154,7 +1152,7 @@ export default function Home() {
                       id={`faq-answer-${index}`}
                       className="px-6 lg:px-8 pt-6 lg:pt-8 pb-6 lg:pb-8 border-t border-gallery-plaster"
                     >
-                      <p className="governance-description">
+                      <p>
                         {item.answer}
                       </p>
                     </div>
@@ -1170,19 +1168,19 @@ export default function Home() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
               {/* Tagline */}
-              <h2 className="footer-tagline">
+              <h2 className="text-center max-w-[912px] mx-auto">
                 Governed platforms for the long-term stewardship of culturally significant art.
               </h2>
 
               {/* Private Conversations Section */}
-              <div className="private-conversations text-center flex flex-col items-center">
-                <h3 className="private-conversations-title">
+              <div className="text-center flex flex-col items-center">
+                <h3 className="text-center">
                   Private Conversations
                 </h3>
-                <p className="private-conversations-text max-w-[789px]">
+                <p className="text-center max-w-[789px] mx-auto">
                   Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not transactions.
                 </p>
-                <p className="private-conversations-text max-w-[789px]">
+                <p className="text-center max-w-[789px] mx-auto">
                   These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
                 </p>
               </div>

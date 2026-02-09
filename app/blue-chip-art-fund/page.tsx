@@ -126,7 +126,7 @@ export default function BlueChipArtFundPage() {
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center py-12 lg:py-0">
                 <div className="max-w-[711px] w-full">
-                  <h1 className="hero-title" style={{ marginBottom: "17px", textAlign: "left" }}>
+                  <h1 style={{ marginBottom: "17px", textAlign: "left" }}>
                     Blue Chip Art Fund
                   </h1>
 
@@ -134,7 +134,7 @@ export default function BlueChipArtFundPage() {
                     <p>Long-Term Stewardship of Historically Significant Works</p>
                   </div>
 
-                  <div className="hero-description" style={{ textAlign: "left", marginTop: "24px" }}>
+                  <div style={{ textAlign: "left", marginTop: "24px" }}>
                     <p>
                       The Blue Chip Art Fund is a governed platform established to acquire, hold, and steward culturally and
                       historically significant artworks within a long-duration ownership framework.
@@ -513,29 +513,31 @@ export default function BlueChipArtFundPage() {
         <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{ backgroundColor: "#ffffff" }}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
-              <h2 className="footer-tagline">Governed platforms for the long-term stewardship of culturally significant art.</h2>
+              <h2 className="text-center max-w-[912px] mx-auto">
+                Governed platforms for the long-term stewardship of culturally significant art.
+              </h2>
 
-              <div className="private-conversations text-center flex flex-col items-center">
-                <h3 className="private-conversations-title">Private Conversations</h3>
-                <p className="private-conversations-text max-w-[789px]">
+              <div className="text-center flex flex-col items-center gap-4">
+                <h3 className="text-center">Private Conversations</h3>
+                <p className="text-center max-w-[789px] mx-auto">
                   Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct,
                   considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not
                   transactions.
                 </p>
-                <p className="private-conversations-text max-w-[789px]">
+                <p className="text-center max-w-[789px] mx-auto">
                   These conversations are exploratory by design. They allow space to discuss long-term intent, governance
                   alignment, and the role each participant seeks to play in preserving cultural value across generations.
                 </p>
               </div>
 
               <div className="flex justify-center">
-                <a
+                <Link
                   href="/request-access"
                   className="footer-cta-primary"
                   style={{ textDecoration: "none", display: "inline-flex" }}
                 >
                   Schedule a Discussion
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -147,7 +147,7 @@ export default function EthereumArtFundPage() {
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center py-12 lg:py-0">
                 <div className="max-w-[711px] w-full">
                   {/* Heading */}
-                  <h1 className="hero-title" style={{marginBottom: '17px', textAlign: 'left'}}>
+                  <h1 style={{marginBottom: '17px', textAlign: 'left'}}>
                     Ethereum Art Fund
                   </h1>
 
@@ -159,7 +159,7 @@ export default function EthereumArtFundPage() {
                   </div>
 
                   {/* Body Copy */}
-                  <div className="hero-description" style={{textAlign: 'left', marginTop: '24px'}}>
+                  <div style={{textAlign: 'left', marginTop: '24px'}}>
                     <p>
                       The Ethereum Art Fund is a governed platform designed to explore structured ownership, fractionalization, and tokenized access to culturally significant, Ethereum-native artworks.
                     </p>
@@ -233,13 +233,13 @@ export default function EthereumArtFundPage() {
               {/* Left Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
                 <div className="max-w-[579px]">
-                  <h2 className="governance-title" style={{marginBottom: '24px'}}>
+                  <h2 style={{marginBottom: '24px'}}>
                     Institutional Discipline for an Experimental Medium
                   </h2>
-                  <p className="governance-description">
+                  <p>
                     Ethereum-native art represents one of the most important cultural developments of the digital era. It also introduces new forms of ownership, liquidity, and risk.
                   </p>
-                  <p className="governance-description">
+                  <p>
                     Ethereum Art Fund is intentionally designed to operate with a higher risk profile and a shorter expected time horizon than other AIGT platforms.
                   </p>
                 </div>
@@ -247,19 +247,19 @@ export default function EthereumArtFundPage() {
 
               {/* Right Column */}
               <div className="px-4 sm:px-8 lg:p-[80px_40px]" style={{backgroundColor: '#f5f5f5'}}>
-                <h3 className="governance-title" style={{marginBottom: '24px', fontSize: '28px', lineHeight: '36px'}}>
+                <h3 style={{marginBottom: '24px'}}>
                   Structured Exposure to Innovation
                 </h3>
-                <p className="governance-description" style={{marginBottom: '16px'}}>
+                <p style={{marginBottom: '16px'}}>
                   Applying governance to tokenized art ownership
                 </p>
-                <p className="governance-description" style={{marginBottom: '16px'}}>
+                <p style={{marginBottom: '16px'}}>
                   Exploring fractional participation structures
                 </p>
-                <p className="governance-description" style={{marginBottom: '16px'}}>
+                <p style={{marginBottom: '16px'}}>
                   Establishing standards for custody, documentation, and access
                 </p>
-                <p className="governance-description">
+                <p>
                   Creating controlled exposure to an evolving market
                 </p>
               </div>
@@ -271,13 +271,13 @@ export default function EthereumArtFundPage() {
         <section className="w-full py-12 sm:py-16 lg:py-20" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
-              <h2 className="governance-title text-center">
+              <h2 className="text-center">
                 A Distinct Mandate
               </h2>
-              <p className="governance-subtitle text-center max-w-[735px]">
+              <h3 className="text-center max-w-[735px]">
                 The Ethereum Art Fund is differentiated from other Art Investment Group Trust stewardship platforms by its mandate.
-              </p>
-              <p className="governance-description text-center max-w-[995px]">
+              </h3>
+              <p className="text-center max-w-[995px]">
                 The Ethereum Art Fund was established with a clearly defined mandate. It operates at the intersection of cultural stewardship and evolving ownership models, engaging selectively with tokenization and fractional participation while maintaining institutional governance. This flexibility introduces additional risk and shorter time horizons, which are acknowledged and managed through structure rather than avoided.
               </p>
             </div>
@@ -327,19 +327,19 @@ export default function EthereumArtFundPage() {
 
               {/* Right: Content */}
               <div className="max-w-[579px]">
-                <h2 className="governance-title" style={{marginBottom: '24px'}}>
+                <h2 style={{marginBottom: '24px'}}>
                   The Catalog of John Dowling Jr.
                 </h2>
-                <p className="governance-description">
+                <p>
                   The fund launched with the complete Ethereum-native catalog of John Dowling Jr. as its foundational body of work.
                 </p>
-                <p className="governance-description">
+                <p>
                   Dowling's on-chain practice represents a cohesive and historically significant contribution to early Ethereum-native art. The catalog provides a structured and well-documented foundation suitable for experimentation with fractional ownership models under governance.
                 </p>
-                <p className="governance-description">
+                <p>
                   The collection offers:
                 </p>
-                <ul className="governance-description" style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
+                <ul style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
                   <li>Clear provenance</li>
                   <li>Cohesive artistic narrative</li>
                   <li>Sufficient scale for structured participation</li>
@@ -350,7 +350,7 @@ export default function EthereumArtFundPage() {
 
             {/* Featured Works Slider */}
             <div className="mt-16">
-              <h3 className="governance-title" style={{marginBottom: '32px', fontSize: '28px'}}>
+              <h3 style={{marginBottom: '32px'}}>
                 Featured Works
               </h3>
               
@@ -398,7 +398,7 @@ export default function EthereumArtFundPage() {
                           );
                         })()}
                         <div className="artwork-info">
-                          <h3 className="artwork-title">{artwork.title}</h3>
+                          <h3>{artwork.title}</h3>
                           <p className="artwork-details">{artwork.artist}</p>
                         </div>
                       </div>
@@ -436,13 +436,13 @@ export default function EthereumArtFundPage() {
         <section className="w-full py-12 sm:py-16 lg:py-20" style={{backgroundColor: '#f5f5f5'}}>
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
-              <h2 className="governance-title text-center">
+              <h2 className="text-center">
                 How the Ethereum Art Fund Operates
               </h2>
-              <p className="governance-subtitle text-center max-w-[817px]">
+              <h3 className="text-center max-w-[817px]">
                 An overview of participation mechanics, risk profile, and operating discipline.
-              </p>
-              <p className="governance-description text-center max-w-[995px]">
+              </h3>
+              <p className="text-center max-w-[995px]">
                 The Ethereum Art Fund operates through selective acquisition, experimental ownership structures, higher risk tolerance, and governance designed to explore emerging models while maintaining institutional discipline.
               </p>
             </div>
@@ -452,20 +452,20 @@ export default function EthereumArtFundPage() {
               {/* Fractionalized Participation */}
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Fractionalized Participation</h3>
-                  <p className="practice-card-description">
+                  <h3>Fractionalized Participation</h3>
+                  <p>
                     Ethereum Art Fund is designed to enable fractional exposure to curated bodies of work rather than sole ownership of individual pieces.
                   </p>
-                  <p className="practice-card-description">
+                  <p>
                     Participation structures may include:
                   </p>
-                  <ul className="practice-card-description" style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
+                  <ul style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
                     <li>Tokenized representations of pooled artworks</li>
                     <li>Fractional economic interests</li>
                     <li>Defined governance and transfer parameters</li>
                     <li>Clear disclosures around risk and liquidity constraints</li>
                   </ul>
-                  <p className="practice-card-description">
+                  <p>
                     These structures are subject to regulatory considerations and are implemented conservatively.
                   </p>
                 </div>
@@ -474,21 +474,21 @@ export default function EthereumArtFundPage() {
               {/* Higher Risk. Shorter Horizon */}
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Higher Risk. Shorter Horizon</h3>
-                  <p className="practice-card-description">
+                  <h3>Higher Risk. Shorter Horizon</h3>
+                  <p>
                     The Ethereum Art Fund carries a higher risk profile than the long-horizon stewardship Blue Chip Art Fund platform
                   </p>
-                  <p className="practice-card-description">
+                  <p>
                     Risk factors include:
                   </p>
-                  <ul className="practice-card-description" style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
+                  <ul style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
                     <li>Market volatility</li>
                     <li>Regulatory evolution</li>
                     <li>Technological change</li>
                     <li>Liquidity uncertainty</li>
                     <li>Novel ownership structures</li>
                   </ul>
-                  <p className="practice-card-description">
+                  <p>
                     Ethereum Art Fund is intended for participants who understand and accept these dynamics as part of exposure to an emerging asset class.
                   </p>
                 </div>
@@ -497,11 +497,11 @@ export default function EthereumArtFundPage() {
               {/* Selective and Disciplined Growth */}
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Selective and Disciplined Growth</h3>
-                  <p className="practice-card-description">
+                  <h3>Selective and Disciplined Growth</h3>
+                  <p>
                     While the Dowling catalog serves as the foundation, Ethereum Art Fund may expand to include additional Ethereum-native works that meet the fund's acquisition and governance criteria.
                   </p>
-                  <p className="practice-card-description">
+                  <p>
                     Expansion remains selective and committee-driven, with a focus on cultural relevance and suitability for tokenized participation models.
                   </p>
                 </div>
@@ -510,17 +510,17 @@ export default function EthereumArtFundPage() {
               {/* Governance in a Digital Context */}
               <div className="practice-card">
                 <div className="practice-card-content">
-                  <h3 className="practice-card-title">Governance in a Digital Context</h3>
-                  <p className="practice-card-description">
+                  <h3>Governance in a Digital Context</h3>
+                  <p>
                     Despite its experimental mandate, Ethereum Art Fund maintains institutional custody and control standards, including:
                   </p>
-                  <ul className="practice-card-description" style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
+                  <ul style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
                     <li>Secure digital asset custody</li>
                     <li>Redundant access management</li>
                     <li>Documentation and provenance continuity</li>
                     <li>Ongoing technical review</li>
                   </ul>
-                  <p className="practice-card-description">
+                  <p>
                     Innovation does not replace discipline.
                   </p>
                 </div>
@@ -532,10 +532,10 @@ export default function EthereumArtFundPage() {
         {/* Participation and Alignment */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <h2 className="governance-title" style={{marginBottom: '16px'}}>
+            <h2 style={{marginBottom: '16px'}}>
               Participation and Alignment
             </h2>
-            <p className="governance-description max-w-[1038px]" style={{marginBottom: '48px'}}>
+            <p className="max-w-[1038px]" style={{marginBottom: '48px'}}>
               Participation in the Ethereum Art Fund is intentionally structured. The following considerations outline who the platform is designed for, how it differs from other stewardship platforms, and the expectations around engagement, risk, and alignment.
             </p>
 
@@ -574,19 +574,19 @@ export default function EthereumArtFundPage() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
               {/* Tagline */}
-              <h2 className="footer-tagline">
+              <h2 className="text-center max-w-[912px] mx-auto">
                 Governed platforms for the long-term stewardship of culturally significant art.
               </h2>
 
               {/* Private Conversations Section */}
-              <div className="private-conversations text-center flex flex-col items-center">
-                <h3 className="private-conversations-title">
+              <div className="text-center flex flex-col items-center gap-4">
+                <h3 className="text-center">
                   Private Conversations
                 </h3>
-                <p className="private-conversations-text max-w-[789px]">
+                <p className="text-center max-w-[789px] mx-auto">
                   Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not transactions.
                 </p>
-                <p className="private-conversations-text max-w-[789px]">
+                <p className="text-center max-w-[789px] mx-auto">
                   These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
                 </p>
               </div>

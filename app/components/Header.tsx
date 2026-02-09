@@ -9,29 +9,45 @@ export default function Header() {
 
   const [isOfferingsOpen, setIsOfferingsOpen] = useState(false);
   const offeringsRef = useRef<HTMLDivElement | null>(null);
+  const offeringsCloseTimer = useRef<number | null>(null);
 
-  // NEW: Stewardship dropdown state + ref
   const [isStewardshipOpen, setIsStewardshipOpen] = useState(false);
   const stewardshipRef = useRef<HTMLDivElement | null>(null);
+  const stewardshipCloseTimer = useRef<number | null>(null);
+
+  const clearOfferingsTimer = () => {
+    if (offeringsCloseTimer.current) {
+      window.clearTimeout(offeringsCloseTimer.current);
+      offeringsCloseTimer.current = null;
+    }
+  };
+
+  const clearStewardshipTimer = () => {
+    if (stewardshipCloseTimer.current) {
+      window.clearTimeout(stewardshipCloseTimer.current);
+      stewardshipCloseTimer.current = null;
+    }
+  };
 
   useEffect(() => {
     const onMouseDown = (e: MouseEvent) => {
-      // Close Offerings if click outside
       if (offeringsRef.current && !offeringsRef.current.contains(e.target as Node)) {
         setIsOfferingsOpen(false);
+        clearOfferingsTimer();
       }
-
-      // NEW: Close Stewardship if click outside
       if (stewardshipRef.current && !stewardshipRef.current.contains(e.target as Node)) {
         setIsStewardshipOpen(false);
+        clearStewardshipTimer();
       }
     };
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsOfferingsOpen(false);
-        setIsStewardshipOpen(false); // NEW
+        setIsStewardshipOpen(false);
         setIsMenuOpen(false);
+        clearOfferingsTimer();
+        clearStewardshipTimer();
       }
     };
 
@@ -49,6 +65,20 @@ export default function Header() {
       document.body.style.overflow = "";
     };
   }, [isMenuOpen]);
+
+  const scheduleCloseOfferings = () => {
+    clearOfferingsTimer();
+    offeringsCloseTimer.current = window.setTimeout(() => {
+      setIsOfferingsOpen(false);
+    }, 140);
+  };
+
+  const scheduleCloseStewardship = () => {
+    clearStewardshipTimer();
+    stewardshipCloseTimer.current = window.setTimeout(() => {
+      setIsStewardshipOpen(false);
+    }, 140);
+  };
 
   return (
     <header className="w-full sticky top-0 z-[9999]" style={{ backgroundColor: "#f5f5f5" }}>
@@ -77,7 +107,19 @@ export default function Header() {
             </Link>
 
             {/* Offerings Dropdown */}
-            <div className="relative" ref={offeringsRef}>
+            <div
+              className="relative pt-3 -mt-3"
+              ref={offeringsRef}
+              onMouseEnter={() => {
+                clearOfferingsTimer();
+                setIsOfferingsOpen(true);
+                setIsStewardshipOpen(false);
+                clearStewardshipTimer();
+              }}
+              onMouseLeave={() => {
+                scheduleCloseOfferings();
+              }}
+            >
               <button
                 type="button"
                 className="nav-link flex items-center gap-2"
@@ -85,11 +127,8 @@ export default function Header() {
                 aria-expanded={isOfferingsOpen}
                 onClick={() => {
                   setIsOfferingsOpen((v) => !v);
-                  setIsStewardshipOpen(false); // NEW: keep only one dropdown open
-                }}
-                onMouseEnter={() => {
-                  setIsOfferingsOpen(true);
-                  setIsStewardshipOpen(false); // NEW
+                  setIsStewardshipOpen(false);
+                  clearStewardshipTimer();
                 }}
               >
                 Offerings
@@ -110,9 +149,10 @@ export default function Header() {
 
               {isOfferingsOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
+                  className="absolute top-full left-0 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
                   role="menu"
-                  onMouseLeave={() => setIsOfferingsOpen(false)}
+                  onMouseEnter={clearOfferingsTimer}
+                  onMouseLeave={scheduleCloseOfferings}
                 >
                   <div className="p-4 flex flex-col gap-2">
                     <Link
@@ -141,8 +181,20 @@ export default function Header() {
               Collections
             </Link>
 
-            {/* NEW: Stewardship Dropdown */}
-            <div className="relative" ref={stewardshipRef}>
+            {/* Stewardship Dropdown */}
+            <div
+              className="relative pt-3 -mt-3"
+              ref={stewardshipRef}
+              onMouseEnter={() => {
+                clearStewardshipTimer();
+                setIsStewardshipOpen(true);
+                setIsOfferingsOpen(false);
+                clearOfferingsTimer();
+              }}
+              onMouseLeave={() => {
+                scheduleCloseStewardship();
+              }}
+            >
               <button
                 type="button"
                 className="nav-link flex items-center gap-2"
@@ -150,11 +202,8 @@ export default function Header() {
                 aria-expanded={isStewardshipOpen}
                 onClick={() => {
                   setIsStewardshipOpen((v) => !v);
-                  setIsOfferingsOpen(false); // keep only one open
-                }}
-                onMouseEnter={() => {
-                  setIsStewardshipOpen(true);
                   setIsOfferingsOpen(false);
+                  clearOfferingsTimer();
                 }}
               >
                 Stewardship
@@ -175,9 +224,10 @@ export default function Header() {
 
               {isStewardshipOpen && (
                 <div
-                  className="absolute top-full left-0 mt-3 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
+                  className="absolute top-full left-0 w-[320px] bg-white border border-gallery-plaster shadow-md z-[9999]"
                   role="menu"
-                  onMouseLeave={() => setIsStewardshipOpen(false)}
+                  onMouseEnter={clearStewardshipTimer}
+                  onMouseLeave={scheduleCloseStewardship}
                 >
                   <div className="p-4 flex flex-col gap-2">
                     <Link
@@ -187,6 +237,15 @@ export default function Header() {
                       onClick={() => setIsStewardshipOpen(false)}
                     >
                       Museum
+                    </Link>
+
+                    <Link
+                      href="/philanthropy"
+                      className="nav-link text-base"
+                      role="menuitem"
+                      onClick={() => setIsStewardshipOpen(false)}
+                    >
+                      Philanthropy
                     </Link>
                   </div>
                 </div>
@@ -270,14 +329,27 @@ export default function Header() {
                     Collections
                   </Link>
 
-                  {/* Mobile Stewardship stays simple as requested */}
-                  <a
-                    href="/museum"
-                    className="nav-link text-base"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Stewardship
-                  </a>
+                  <div className="flex flex-col gap-3">
+                    <span className="nav-link text-base" style={{ opacity: 0.9 }}>
+                      Stewardship
+                    </span>
+                    <div className="pl-4 flex flex-col gap-3">
+                      <Link
+                        href="/museum"
+                        className="nav-link text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Museum
+                      </Link>
+                      <Link
+                        href="/philanthropy"
+                        className="nav-link text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Philanthropy
+                      </Link>
+                    </div>
+                  </div>
 
                   <div className="border-t border-gallery-plaster pt-4">
                     <Link

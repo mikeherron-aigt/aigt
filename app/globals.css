@@ -2773,3 +2773,102 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+/* ========================================
+   SEMANTIC HEADING SYSTEM
+   Add these global styles, then refactor pages to use H1, H2, H3 instead of custom classes
+   ======================================== */
+
+/* H1 - Page Titles / Hero Headlines */
+h1 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 640px) {
+  h1 {
+    font-size: 42px;
+  }
+}
+
+@media (min-width: 1024px) {
+  h1 {
+    font-size: 56px;
+    line-height: 64px;
+  }
+}
+
+/* H2 - Section Titles */
+h2 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 48px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  h2 {
+    font-size: 40px;
+  }
+}
+
+/* H3 - Subsection Titles */
+h3 {
+  color: var(--archive-slate);
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  h3 {
+    font-size: 22px;
+  }
+}
+
+/* Body Paragraphs */
+p {
+  color: var(--archive-slate);
+  font-family: var(--font-open-sans), -apple-system, Roboto, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 26px;
+  margin: 0 0 16px 0;
+}
+
+@media (min-width: 1024px) {
+  p {
+    font-size: 16px;
+  }
+}
+
+/* Utility Classes for Special Cases */
+.text-center {
+  text-align: center;
+}
+
+.hero-subtitle {
+  font-family: Georgia, serif;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 30px;
+}
+
+@media (min-width: 640px) {
+  .hero-subtitle {
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-subtitle {
+    font-size: 22px;
+  }
+}

@@ -25,13 +25,10 @@ export default function MuseumPage() {
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-full max-w-[1440px] mx-auto relative h-full">
             <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-8 sm:p-10 lg:p-12 shadow-lg max-w-[550px] mr-6 sm:mr-8 lg:mr-0">
-              <h1 
-                className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal leading-tight mb-6"
-                style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}
-              >
+              <h1 className="mb-6">
                 A Public Institution for Long-Horizon Art Stewardship
               </h1>
-              <p className="text-base lg:text-lg leading-relaxed" style={{ color: "#252e3a" }}>
+              <p className="text-base lg:text-lg leading-relaxed">
                 The John Dowling Jr. Museum of Contemporary Art is a planned contemporary art museum conceived as a living cultural institution rooted on Long Island.
               </p>
             </div>
@@ -47,7 +44,7 @@ export default function MuseumPage() {
               <div className="max-w-[720px] mx-auto text-center pb-8 lg:pb-12">
 
                 {/* First paragraph - h2 - larger serif font */}
-                <h2 className="text-xl lg:text-2xl leading-relaxed mb-8 font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
+                <h2 className="hero-subtitle mb-8">
                   John Dowling Jr.'s personal history is inseparable from Long Island, where the museum is planned to take shape. Born in Queens and raised in the region, his connection to place grounds the institution in lived experience rather than abstraction, shaping how art is created, cared for, and shared.
                 </h2>
                 
@@ -57,7 +54,7 @@ export default function MuseumPage() {
                 </div>
                 
                 {/* Second paragraph - h3 - regular serif font */}
-                <h3 className="text-lg lg:text-xl leading-relaxed font-normal" style={{ fontFamily: "Georgia, serif", color: "#252e3a" }}>
+                <h3 className="text-center">
                   The museum bears his name not as recognition, but as responsibility. It reflects a lifelong commitment to artistic creation, care, and stewardship, anchoring the Trust's collections to a human narrative and a specific place while holding them to a standard designed to endure.
                 </h3>
               </div>
@@ -284,19 +281,19 @@ export default function MuseumPage() {
         {/* CTA Section - Full width background */}
         <section className="py-16 lg:py-24 bg-white !max-w-none w-full !mx-0 !px-0">
           <div className="text-center max-w-[900px] mx-auto px-6 sm:px-8">
-            <h2 className="mb-8 text-3xl sm:text-4xl lg:text-5xl" style={{ fontFamily: "Georgia, serif" }}>
+            <h2 className="mb-8 text-center">
               Governed platforms for the long-term stewardship of culturally significant art.
             </h2>
             
-            <h3 className="mb-6 text-2xl sm:text-3xl" style={{ fontFamily: "Georgia, serif" }}>
+            <h3 className="mb-6 text-center">
               Private Conversations
             </h3>
             
-            <p className="mb-6 text-base lg:text-lg leading-relaxed">
+            <p className="mb-6 text-center">
               Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not transactions.
             </p>
             
-            <p className="mb-10 text-base lg:text-lg leading-relaxed">
+            <p className="mb-10 text-center">
               These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
             </p>
             

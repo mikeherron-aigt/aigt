@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { trackFormSubmission } from "../lib/gtm";
 
-
 interface FormData {
   fullName: string;
   email: string;
@@ -38,13 +37,15 @@ export default function RequestAccessPage() {
   const [charCount, setCharCount] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    
+
     if (name === 'interestDescription') {
       setCharCount(value.length);
     }
@@ -63,14 +64,11 @@ export default function RequestAccessPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Track form submission to GTM
       trackFormSubmission('access_request_form');
 
       const response = await fetch('/api/send-email', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
@@ -117,25 +115,28 @@ export default function RequestAccessPage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
-  
-
-      {/* Main Content */}
-      <main className="w-full py-16 sm:py-20 lg:py-24">
+    <main className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="w-full py-16 sm:py-20 lg:py-24">
         <div className="max-w-[900px] mx-auto px-4 sm:px-8 lg:px-[80px]">
           {isSubmitted ? (
-            // Success Acknowledgement
-            <div className="success-acknowledgement">
+            <section className="success-acknowledgement" aria-live="polite">
               <div className="success-icon-wrapper">
-                <svg className="success-checkmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="success-checkmark"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
+                >
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </div>
 
-              <h1 className="success-title">
-                Request Received
-              </h1>
+              {/* Use global H1 for the success headline */}
+              <h1>Request Received</h1>
 
+              {/* Use global P for body copy */}
               <p className="success-description">
                 Thank you for your interest in Art Investment Group Trust. Your request has been received and will be reviewed carefully.
               </p>
@@ -149,6 +150,7 @@ export default function RequestAccessPage() {
                   Return to Home
                 </Link>
                 <button
+                  type="button"
                   onClick={() => {
                     setIsSubmitted(false);
                     setFormData({
@@ -171,224 +173,248 @@ export default function RequestAccessPage() {
                   Submit Another Request
                 </button>
               </div>
-            </div>
+            </section>
           ) : (
             <>
               {/* Header */}
-              <div className="mb-12 lg:mb-16">
-                <h1 className="request-access-title mb-4">
-                  Request Access
-                </h1>
-                <p className="request-access-description">
+              <header className="mb-12 lg:mb-16">
+                {/* Use global H1 */}
+                <h1 className="mb-4">Request Access</h1>
+
+                {/* Use global P */}
+                <p>
                   Access to Art Investment Group Trust, its platforms and conversations is considered and intentional. Requests are reviewed to ensure alignment with our stewardship philosophy and governance standards.
                 </p>
-              </div>
+              </header>
 
               {/* Info Paragraph */}
-              <div className="mb-12 lg:mb-16 pb-8 lg:pb-12 border-b border-gallery-plaster">
-                <p className="governance-description">
+              <section className="mb-12 lg:mb-16 pb-8 lg:pb-12 border-b border-gallery-plaster">
+                <p>
                   Access to Art Investment Group Trust platforms is limited to qualified purchasers, institutional participants, and approved cultural partners. Requests are reviewed to ensure alignment with our stewardship philosophy and regulatory requirements.
                 </p>
-              </div>
+              </section>
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-12">
-            {/* Section 1: Identity */}
-            <div className="form-section">
-              <h2 className="form-section-title">Identity</h2>
-              
-              <div className="form-group">
-                <label className="form-label">Full Name <span className="form-required">*</span></label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
+                {/* Section 1: Identity */}
+                <section className="form-section">
+                  {/* Keep form-section-title because it includes the divider rule */}
+                  <h2 className="form-section-title">Identity</h2>
 
-              <div className="form-group">
-                <label className="form-label">Email Address <span className="form-required">*</span></label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Full Name <span className="form-required">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      required
+                    />
+                  </div>
 
-              <div className="form-group">
-                <label className="form-label">Organization or Affiliation</label>
-                <input
-                  type="text"
-                  name="organization"
-                  value={formData.organization}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="Optional"
-                />
-              </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Email Address <span className="form-required">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      required
+                    />
+                  </div>
 
-              <div className="form-group">
-                <label className="form-label">Country of Residence <span className="form-required">*</span></label>
-                <input
-                  type="text"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  required
-                />
-              </div>
-            </div>
+                  <div className="form-group">
+                    <label className="form-label">Organization or Affiliation</label>
+                    <input
+                      type="text"
+                      name="organization"
+                      value={formData.organization}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      placeholder="Optional"
+                    />
+                  </div>
 
-            {/* Section 2: Nature of Interest */}
-            <div className="form-section">
-              <h2 className="form-section-title">Nature of Interest</h2>
-              
-              <div className="form-group">
-                <label className="form-label">Relationship to Art <span className="form-required">*</span></label>
-                <select
-                  name="relationshipToArt"
-                  value={formData.relationshipToArt}
-                  onChange={handleInputChange}
-                  className="form-select"
-                  required
-                >
-                  <option value="">Select one</option>
-                  {relationshipOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Country of Residence <span className="form-required">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="country"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                </section>
 
-              <div className="form-group">
-                <label className="form-label">Area of Interest</label>
-                <div className="space-y-3">
-                  {areasOfInterestOptions.map(option => (
-                    <div key={option} className="form-checkbox-group">
-                      <input
-                        type="checkbox"
-                        id={option}
-                        name={option}
-                        checked={formData.areasOfInterest.includes(option)}
-                        onChange={handleCheckboxChange}
-                        className="form-checkbox"
-                      />
-                      <label htmlFor={option} className="form-checkbox-label">{option}</label>
+                {/* Section 2: Nature of Interest */}
+                <section className="form-section">
+                  <h2 className="form-section-title">Nature of Interest</h2>
+
+                  <div className="form-group">
+                    <label className="form-label">
+                      Relationship to Art <span className="form-required">*</span>
+                    </label>
+                    <select
+                      name="relationshipToArt"
+                      value={formData.relationshipToArt}
+                      onChange={handleInputChange}
+                      className="form-select"
+                      required
+                    >
+                      <option value="">Select one</option>
+                      {relationshipOptions.map(option => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Area of Interest</label>
+                    <div className="space-y-3">
+                      {areasOfInterestOptions.map(option => (
+                        <div key={option} className="form-checkbox-group">
+                          <input
+                            type="checkbox"
+                            id={option}
+                            name={option}
+                            checked={formData.areasOfInterest.includes(option)}
+                            onChange={handleCheckboxChange}
+                            className="form-checkbox"
+                          />
+                          <label htmlFor={option} className="form-checkbox-label">
+                            {option}
+                          </label>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+                  </div>
+                </section>
 
-            {/* Section 3: Intent and Alignment */}
-            <div className="form-section">
-              <h2 className="form-section-title">Intent and Alignment</h2>
-              
-              <div className="form-group">
-                <label className="form-label">Briefly describe your interest in engaging with Art Investment Group Trust <span className="form-required">*</span></label>
-                <textarea
-                  name="interestDescription"
-                  value={formData.interestDescription}
-                  onChange={handleInputChange}
-                  className="form-textarea"
-                  rows={5}
-                  maxLength={300}
-                  required
-                  placeholder="Please share your interest and intent..."
-                />
-                <div className="form-helper-text">{charCount} / 300 characters</div>
-              </div>
+                {/* Section 3: Intent and Alignment */}
+                <section className="form-section">
+                  <h2 className="form-section-title">Intent and Alignment</h2>
 
-              <div className="form-group">
-                <label className="form-label">Investment or Stewardship Horizon <span className="form-required">*</span></label>
-                <select
-                  name="investmentHorizon"
-                  value={formData.investmentHorizon}
-                  onChange={handleInputChange}
-                  className="form-select"
-                  required
-                >
-                  <option value="">Select one</option>
-                  {horizonOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Briefly describe your interest in engaging with Art Investment Group Trust <span className="form-required">*</span>
+                    </label>
+                    <textarea
+                      name="interestDescription"
+                      value={formData.interestDescription}
+                      onChange={handleInputChange}
+                      className="form-textarea"
+                      rows={5}
+                      maxLength={300}
+                      required
+                      placeholder="Please share your interest and intent..."
+                    />
+                    <div className="form-helper-text">{charCount} / 300 characters</div>
+                  </div>
 
-            {/* Section 4: Experience and Context */}
-            <div className="form-section">
-              <h2 className="form-section-title">Experience and Context</h2>
-              
-              <div className="form-group">
-                <label className="form-label">Experience with art stewardship, collecting, or institutional engagement</label>
-                <textarea
-                  name="experience"
-                  value={formData.experience}
-                  onChange={handleInputChange}
-                  className="form-textarea"
-                  rows={4}
-                  placeholder="Optional. Share relevant background or experience..."
-                />
-              </div>
-            </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Investment or Stewardship Horizon <span className="form-required">*</span>
+                    </label>
+                    <select
+                      name="investmentHorizon"
+                      value={formData.investmentHorizon}
+                      onChange={handleInputChange}
+                      className="form-select"
+                      required
+                    >
+                      <option value="">Select one</option>
+                      {horizonOptions.map(option => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </section>
 
-            {/* Section 5: Follow Up Preferences */}
-            <div className="form-section">
-              <h2 className="form-section-title">Follow Up Preferences</h2>
-              
-              <div className="form-group">
-                <label className="form-label">Preferred method of follow up <span className="form-required">*</span></label>
-                <select
-                  name="followUpPreference"
-                  value={formData.followUpPreference}
-                  onChange={handleInputChange}
-                  className="form-select"
-                  required
-                >
-                  <option value="">Select one</option>
-                  {followUpOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
+                {/* Section 4: Experience and Context */}
+                <section className="form-section">
+                  <h2 className="form-section-title">Experience and Context</h2>
 
-              <div className="form-group">
-                <label className="form-label">How did you hear about Art Investment Group Trust?</label>
-                <input
-                  type="text"
-                  name="howYouHeard"
-                  value={formData.howYouHeard}
-                  onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="Optional"
-                />
-              </div>
-            </div>
+                  <div className="form-group">
+                    <label className="form-label">
+                      Experience with art stewardship, collecting, or institutional engagement
+                    </label>
+                    <textarea
+                      name="experience"
+                      value={formData.experience}
+                      onChange={handleInputChange}
+                      className="form-textarea"
+                      rows={4}
+                      placeholder="Optional. Share relevant background or experience..."
+                    />
+                  </div>
+                </section>
 
-            {/* Submit Button and Disclaimer */}
-            <div className="mt-16 pt-12 form-submit-divider">
-              <button type="submit" className="request-submit-button">
-                Request Access
-              </button>
-              
-              <p className="form-disclaimer">
-                Submissions are reviewed confidentially. A request does not obligate participation or access.
-              </p>
-            </div>
-            </form>
+                {/* Section 5: Follow Up Preferences */}
+                <section className="form-section">
+                  <h2 className="form-section-title">Follow Up Preferences</h2>
+
+                  <div className="form-group">
+                    <label className="form-label">
+                      Preferred method of follow up <span className="form-required">*</span>
+                    </label>
+                    <select
+                      name="followUpPreference"
+                      value={formData.followUpPreference}
+                      onChange={handleInputChange}
+                      className="form-select"
+                      required
+                    >
+                      <option value="">Select one</option>
+                      {followUpOptions.map(option => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">How did you hear about Art Investment Group Trust?</label>
+                    <input
+                      type="text"
+                      name="howYouHeard"
+                      value={formData.howYouHeard}
+                      onChange={handleInputChange}
+                      className="form-input"
+                      placeholder="Optional"
+                    />
+                  </div>
+                </section>
+
+                {/* Submit Button and Disclaimer */}
+                <section className="mt-16 pt-12 form-submit-divider">
+                  <button type="submit" className="request-submit-button">
+                    Request Access
+                  </button>
+
+                  <p className="form-disclaimer">
+                    Submissions are reviewed confidentially. A request does not obligate participation or access.
+                  </p>
+                </section>
+              </form>
             </>
           )}
         </div>
-      </main>
-
-
-    </div>
+      </section>
+    </main>
   );
 }

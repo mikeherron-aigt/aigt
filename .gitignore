@@ -1,2 +1,42 @@
-node_modules
+# Next.js
 .next/
+out/
+
+# Dependencies
+node_modules/
+
+# Env
+.env*
+*.log
+
+# macOS
+.DS_Store
+**/.DS_Store
+# Next.js
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Env
+.env*
+*.log
+
+# macOS
+.DS_Store
+**/.DS_Store
+# Next.js
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Env
+.env*
+*.log
+
+# macOS
+.DS_Store
+**/.DS_Store
