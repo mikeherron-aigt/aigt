@@ -89,10 +89,13 @@ async function fetchAPI<T>(
   const requestPromise = (async () => {
     for (let attempt = 0; attempt <= retries; attempt += 1) {
       try {
+        console.log(`[API] Fetching: ${url} (attempt ${attempt + 1}/${retries + 1})`);
         const response = await fetch(url);
 
         if (!response.ok) {
+          console.error(`[API] Error: ${url} returned ${response.status} ${response.statusText}`);
           if (response.status >= 500 && attempt < retries) {
+            console.log(`[API] Retrying after ${1000 * (attempt + 1)}ms...`);
             await new Promise((resolve) =>
               setTimeout(resolve, 1000 * (attempt + 1))
             );
@@ -105,9 +108,12 @@ async function fetchAPI<T>(
         }
 
         const data = (await response.json()) as T;
+        console.log(`[API] Success: ${url}`);
         setCached(url, data, ttlMs);
         return data;
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`[API] Fetch error for ${url}:`, errorMessage);
         if (attempt === retries) {
           if (error instanceof APIError) {
             throw error;
