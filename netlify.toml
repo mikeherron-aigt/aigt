@@ -1,6 +1,2 @@
-[[redirects]]
-  from = "/api/*"
-  to = "https://art.artigt.com/api/public/:splat"
-  status = 200
-  force = true
-  headers = {User-Agent = "Mozilla/5.0 (compatible; AIGT-App/1.0)"}
+# Removed: Next.js API routes handle backend communication directly
+# The Next.js routes make server-side fetches to art.artigt.com/api/public/*
