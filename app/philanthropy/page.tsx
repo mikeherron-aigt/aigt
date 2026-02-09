@@ -159,21 +159,20 @@ export default function PhilanthropyPage() {
 
         {/* Globe + Stewardship Process Section */}
         <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
-          {/* GLOBE (bleeds off left like Figma, scrolls with section) */}
-          <div
-            className="absolute hidden lg:block z-0 pointer-events-none"
-            style={{
-              left: "calc(-300px + max(0px, (100dvw - 1440px) / 2))",
-              top: "420px",
-              width: "1100px",
-              height: "1100px",
-              overflow: "visible",
-            }}
-          >
-            <div className="pointer-events-auto" style={{ width: "100%", height: "100%" }}>
-              <InteractiveGlobe width={1100} height={1100} />
-            </div>
-          </div>
+         {/* GLOBE (bleeds off left like Figma, scrolls with section) */}
+<div
+  className="absolute hidden lg:block z-10 pointer-events-auto"
+  style={{
+    left: "calc(-300px + max(0px, (100dvw - 1440px) / 2))",
+    top: "420px",
+    width: "1100px",
+    height: "1100px",
+    overflow: "visible",
+  }}
+>
+  <InteractiveGlobe width={1100} height={1100} />
+</div>
+
 
           {/* Content sits above globe */}
           <div className="max-w-[1440px] mx-auto relative z-10">
