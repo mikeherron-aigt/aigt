@@ -1,3 +1,13 @@
+const IMAGE_BASE_URL = "https://image.artigt.com";
+
+const ensureAbsoluteImageUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("//")) return `https:${url}`;
+  if (url.startsWith("data:") || url.startsWith("blob:")) return url;
+  return `${IMAGE_BASE_URL}/${url.replace(/^\/+/, "")}`;
+};
+
 export function normalizeArtworkImageUrl(url: string): string {
   if (!url) return url;
 
@@ -31,5 +41,5 @@ export function normalizeArtworkImageUrl(url: string): string {
   const querySuffix = query ? `?${query}` : "";
   const hashSuffix = hash ? `#${hash}` : "";
 
-  return `${updated}${querySuffix}${hashSuffix}`;
+  return ensureAbsoluteImageUrl(`${updated}${querySuffix}${hashSuffix}`);
 }
