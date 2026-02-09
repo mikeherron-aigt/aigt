@@ -4,6 +4,8 @@ import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 
+export const dynamic = "force-dynamic";
+
 const collectionDescriptions: Record<string, string> = {
   // Add collection descriptions here, keyed by collection name.
   // Example: "Cosmic Dreams": "A short description of the collection."

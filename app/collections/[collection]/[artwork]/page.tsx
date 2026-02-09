@@ -7,6 +7,8 @@ import ArtworkImageModal from "@/app/components/ArtworkImageModal";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import ScrollToTop from "@/app/components/ScrollToTop";
 
+export const dynamic = "force-dynamic";
+
 const isValidArtwork = (title: string) =>
   !title.toLowerCase().includes("untitled");
 

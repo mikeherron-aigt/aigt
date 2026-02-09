@@ -5,6 +5,8 @@ import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 
+export const dynamic = "force-dynamic";
+
 const PAGE_SIZE = 16;
 
 const isValidArtwork = (title: string) =>
