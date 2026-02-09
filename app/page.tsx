@@ -30,53 +30,13 @@ const GOVERNANCE_SKU = "2025-JD-DW-0019";
 const MEDIUMS_SKU = "2024-JD-AG-0025";
 const ART_ARTISTS_SKU = "2025-JD-CD-0361";
 
-const IMAGE_BASE_URL = "https://image.artigt.com";
-
-const ensureAbsoluteImageUrl = (url: string) => {
-  if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("//")) return `https:${url}`;
-  return `${IMAGE_BASE_URL}/${url.replace(/^\/+/, "")}`;
-};
-
-const buildSkuImageUrl = (sku: string) => {
-  const parts = sku.split("-");
-  if (parts.length < 4) return "";
-  const [, collection, subcollection] = parts;
-  if (!collection || !subcollection) return "";
-  return `${IMAGE_BASE_URL}/${collection}/${subcollection}/${sku}/${sku}__full__v02.webp`;
-};
-
-const resolveArtworkSrc = (artwork: Artwork) => {
-  const normalized = normalizeArtworkImageUrl(artwork.image_url || "");
-  if (normalized) {
-    return ensureAbsoluteImageUrl(normalized);
-  }
-  return artwork.sku ? buildSkuImageUrl(artwork.sku) : "";
-};
-
 const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
-  src: resolveArtworkSrc(artwork),
+  src: artwork.image_url,
   title: artwork.title,
   artist: artwork.artist,
   year: artwork.year_created ? artwork.year_created.toString() : "",
   collection: artwork.collection_name,
 });
-
-const buildFallbackArtworkItem = (
-  sku: string | null | undefined,
-  title = "Featured artwork"
-): ArtworkItem | undefined => {
-  if (!sku) return undefined;
-  const src = buildSkuImageUrl(sku);
-  if (!src) return undefined;
-  return {
-    src,
-    title,
-    artist: "",
-    year: "",
-  };
-};
 
 const getArtworkHref = (artwork: { title: string; collection?: string; collection_name?: string }) => {
   const collectionName = artwork.collection ?? artwork.collection_name;
@@ -273,9 +233,14 @@ export default function Home() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
-  const { artworks, loading: artworksLoading, error: artworksError, refetch: refetchArtworks } = useArtworks({
-    version: "v02",
-  });
+  const { artworks, loading: artworksLoading, error: artworksError, refetch: refetchArtworks } = useArtworks(
+    {
+      version: "v02",
+    },
+    {
+      baseUrl: "/data",
+    }
+  );
   const [backupArtworks, setBackupArtworks] = useState<Artwork[]>([]);
 
   useEffect(() => {
@@ -371,13 +336,13 @@ export default function Home() {
   const modalArtworks = featuredArtworks;
   const governanceImage = governanceArtwork
     ? mapArtworkToItem(governanceArtwork)
-    : buildFallbackArtworkItem(GOVERNANCE_SKU);
+    : undefined;
   const mediumsImage = mediumsArtwork
     ? mapArtworkToItem(mediumsArtwork)
-    : buildFallbackArtworkItem(MEDIUMS_SKU);
+    : undefined;
   const artArtistsImage = artArtistsArtwork
     ? mapArtworkToItem(artArtistsArtwork)
-    : buildFallbackArtworkItem(ART_ARTISTS_SKU);
+    : undefined;
   const governanceHref = governanceArtwork ? getArtworkHref(governanceArtwork) : null;
   const mediumsHref = mediumsArtwork ? getArtworkHref(mediumsArtwork) : null;
   const artArtistsHref = artArtistsArtwork ? getArtworkHref(artArtistsArtwork) : null;
@@ -523,11 +488,8 @@ export default function Home() {
 
   // Compute the hero image list
   const heroImageList = useMemo(() => {
-    const heroSources = heroArtworks
-      .map((artwork) => resolveArtworkSrc(artwork))
-      .filter(Boolean);
-    if (heroSources.length > 0) return heroSources;
-    return HERO_SKUS.map((sku) => buildSkuImageUrl(sku)).filter(Boolean);
+    const heroSources = heroArtworks.map((artwork) => artwork.image_url);
+    return heroSources.length > 0 ? heroSources : [];
   }, [heroArtworks]);
 
   const heroImageLinks = useMemo(

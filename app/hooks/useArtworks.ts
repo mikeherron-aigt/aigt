@@ -16,18 +16,28 @@ interface UseArtworksResult {
   refetch: () => void;
 }
 
-export function useArtworks(filters?: ArtworkFilters): UseArtworksResult {
+interface UseArtworksOptions {
+  baseUrl?: string;
+}
+
+export function useArtworks(
+  filters?: ArtworkFilters,
+  options?: UseArtworksOptions
+): UseArtworksResult {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const filtersRef = useRef<string>("");
-  const currentFilters = JSON.stringify(filters || {});
+  const currentFilters = JSON.stringify({
+    filters: filters || {},
+    baseUrl: options?.baseUrl ?? null,
+  });
 
   const fetchArtworks = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getArtworks(filters);
+      const data = await getArtworks(filters, { baseUrl: options?.baseUrl });
       setArtworks(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load artworks");
