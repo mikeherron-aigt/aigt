@@ -161,17 +161,21 @@ export default function PhilanthropyPage() {
         <section className="relative w-full bg-white py-12 sm:py-16 lg:py-24 overflow-visible">
          {/* GLOBE (bleeds off left like Figma, scrolls with section) */}
 <div
-  className="absolute hidden lg:block z-10 pointer-events-auto"
+  className="absolute hidden lg:block z-10"
   style={{
     left: "calc(-300px + max(0px, (100dvw - 1440px) / 2))",
     top: "420px",
     width: "1100px",
     height: "1100px",
     overflow: "visible",
+    pointerEvents: "none", // default: pass through
   }}
 >
-  <InteractiveGlobe width={1100} height={1100} />
+  <div style={{ width: "100%", height: "100%", pointerEvents: "auto" }}>
+    <InteractiveGlobe width={1100} height={1100} />
+  </div>
 </div>
+
 
 
           {/* Content sits above globe */}
