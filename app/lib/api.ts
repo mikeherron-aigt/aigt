@@ -167,7 +167,8 @@ export async function getArtwork(id: number): Promise<Artwork> {
 export async function getArtworkBySku(sku: string): Promise<Artwork | null> {
   const encodedSku = encodeURIComponent(sku);
   try {
-    const results = await fetchAPI<Artwork[]>(`/artworks/sku/${encodedSku}`);
+    const results = await fetchAPI<Artwork[]>(`/artworks?sku=${encodedSku}`);
+    if (!Array.isArray(results)) return null;
     const normalized = normalizeArtworks(results);
     return normalized[0] || null;
   } catch {
