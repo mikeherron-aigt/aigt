@@ -20,6 +20,17 @@ const sortOptions = [
 const compareNumbers = (a: number, b: number) => a - b;
 const compareStrings = (a: string, b: string) => a.localeCompare(b);
 
+const collectionHeroParagraphs: Record<string, string> = {
+  "A Miracle in the Making":
+    "A Miracle in the Making explores transformation in motion. Each work begins as an original photograph, then evolves through layered design, color, and form, capturing the moment where reality gives way to imagination. The result is immersive and expressive, turning lived experience into something elevated, symbolic, and quietly powerful.",
+  "American Graffiti":
+    "American Graffiti is bold, kinetic, and unapologetically modern. Drawing from the language of the street, these works pulse with movement, rhythm, and controlled chaos, blending raw energy with intentional structure. It is a collection that feels alive, built for collectors drawn to intensity, momentum, and cultural edge.",
+  "Cosmic Dreams":
+    "Cosmic Dreams invites viewers into a fully imagined universe. Rooted in classical technique yet driven by futuristic vision, these works feel cinematic and timeless, weaving mythology, symbolism, and surreal narrative into a single evolving world. Each piece stands as both artwork and chapter, offering collectors entry into a much larger story.",
+  "Dreams and Wonders":
+    "Dreams and Wonders is the purest expression of the studio practice. Each painting is a one of one, created without repetition and never revisited. These works are intimate, painterly, and singular, designed for collectors who value originality, craftsmanship, and the quiet power of owning something that exists nowhere else.",
+};
+
 const getPageRange = (current: number, total: number) => {
   const pages = new Set<number>();
   pages.add(1);
@@ -87,6 +98,7 @@ export default async function CollectionPage({
     ? `/collections/${collectionSlug}/${slugify(heroArtwork.title)}`
     : null;
   const pageRange = getPageRange(currentPage, totalPages);
+  const heroParagraph = collectionHeroParagraphs[collectionName];
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
@@ -97,18 +109,9 @@ export default async function CollectionPage({
               <div className="px-4 sm:px-8 lg:px-[124px] py-12 sm:py-16 lg:py-24 flex flex-col">
                 <div className="max-w-[579px]">
                   <h1 className="hero-title">{collectionName}</h1>
-                  <p className="hero-description">
-                    Something about the collection, what is being explored and thought about
-                    while these pieces were created.
-                  </p>
-                  <p className="governance-description">
-                    The platform is designed to protect the work, preserve provenance, and
-                    govern participation through clear authority, disciplined process, and
-                    controlled access.
-                  </p>
-                  <p className="governance-description" style={{ marginBottom: 0 }}>
-                    Quote for the John might be nice
-                  </p>
+                  {heroParagraph ? (
+                    <p className="governance-description">{heroParagraph}</p>
+                  ) : null}
                 </div>
               </div>
 
