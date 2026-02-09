@@ -1,2 +1,17 @@
-# Removed: Next.js API routes handle backend communication directly
-# The Next.js routes make server-side fetches to art.artigt.com/api/public/*
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Fallback: If you need to bypass Next.js API routes and go directly to backend
+# (Uncomment these redirects ONLY if the plugin approach fails)
+#
+# [[redirects]]
+#   from = "/api/external/*"
+#   to = "https://art.artigt.com/api/public/:splat"
+#   status = 200
+#   force = true
+#
+# Then update your frontend to use /api/external/* instead of /api/*
