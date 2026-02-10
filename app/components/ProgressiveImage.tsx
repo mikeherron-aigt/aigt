@@ -1,8 +1,7 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
-import { analyzeImageResolution } from "@/app/lib/imageUrl";
 
 type ProgressiveImageProps = {
   src: string;
@@ -27,28 +26,31 @@ export function ProgressiveImage({
 }: ProgressiveImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const currentSrcRef = useRef(src);
+  const prevSrcRef = useRef<string>(src);
 
-  // Reset state when src prop changes
-  if (currentSrcRef.current !== src) {
-    currentSrcRef.current = src;
-    setIsLoaded(false);
-    setHasError(false);
-  }
+  useEffect(() => {
+    if (prevSrcRef.current !== src) {
+      prevSrcRef.current = src;
+      setIsLoaded(false);
+      setHasError(false);
+    }
+  }, [src]);
 
   // Callback ref to check if image is already loaded (cached) when element mounts
-  const imgRef = useCallback((img: HTMLImageElement | null) => {
-    if (img && img.complete && img.naturalWidth > 0 && !isLoaded && !hasError) {
-      setIsLoaded(true);
-    }
-  }, [isLoaded, hasError]);
+  const imgRef = useCallback(
+    (img: HTMLImageElement | null) => {
+      if (img && img.complete && img.naturalWidth > 0 && !isLoaded && !hasError) {
+        setIsLoaded(true);
+      }
+    },
+    [isLoaded, hasError]
+  );
 
   const handleLoad = useCallback(() => {
     setIsLoaded(true);
   }, []);
 
   const handleError = useCallback(() => {
-    // Do not fall back to v01 - only use v02 images
     setHasError(true);
     setIsLoaded(true);
   }, []);
@@ -56,6 +58,7 @@ export function ProgressiveImage({
   return (
     <>
       <ProtectedImage
+        // @ts-expect-error - typing mismatch between Next/Image and HTMLImageElement ref
         ref={imgRef}
         src={src}
         alt={alt}
@@ -68,8 +71,8 @@ export function ProgressiveImage({
         className={`${className} transition-all duration-300 ${
           isLoaded ? "blur-0 scale-100 opacity-100" : "blur-sm scale-105 opacity-70"
         }`}
-        onLoad={handleLoad}
-        onError={handleError}
+        onLoad={handleLoad as any}
+        onError={handleError as any}
       />
 
       {!isLoaded && !hasError ? (
