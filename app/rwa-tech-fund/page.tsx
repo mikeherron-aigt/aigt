@@ -75,10 +75,7 @@ export default function RWATechFundPage() {
                   <div className="absolute top-0 -right-4 bottom-0 w-px bg-black/15" />
                 </div>
 
-                <p className="mt-3 text-[12px] leading-[1.5] text-black/50">
-                  Image direction: institutional, minimal, architectural. Tech feeling without crypto tropes.
-                </p>
-              </div>
+                          </div>
             </div>
           </div>
         </main>
