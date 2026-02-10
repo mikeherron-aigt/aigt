@@ -2,13 +2,15 @@ import type { NextConfig } from "next";
 
 // Disable image optimization on Netlify to avoid 403 errors on deploy previews
 // Netlify's Image Optimization is only available on paid plans for deploy previews
-const isNetlify = process.env.NETLIFY === "true";
+const isNetlify = process.env.NETLIFY === "true" || process.env.NETLIFY_DEV === "true" || !!process.env.DEPLOY_PRIME_URL;
 
 const nextConfig: NextConfig = {
   images: {
     unoptimized: isNetlify,
     formats: ["image/webp"],
     minimumCacheTTL: 86400,
+    loader: isNetlify ? 'custom' : undefined,
+    loaderFile: isNetlify ? './app/lib/imageLoader.ts' : undefined,
     remotePatterns: [
       {
         protocol: "https",

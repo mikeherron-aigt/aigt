@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
 
 const API_BASE_URL =
   process.env.ART_API_BASE_URL || "https://art.artigt.com/api/public";
 
 interface UpstreamArtwork {
   sku: string;
+  image_url?: string;
   [key: string]: unknown;
 }
+
+const normalizeArtwork = (artwork: UpstreamArtwork): UpstreamArtwork => ({
+  ...artwork,
+  image_url: artwork.image_url ? normalizeArtworkImageUrl(artwork.image_url) : artwork.image_url,
+});
 
 export async function GET(request: NextRequest) {
   const skusParam = request.nextUrl.searchParams.get("skus");
@@ -44,7 +51,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const allArtworks: UpstreamArtwork[] = await response.json();
+    let allArtworks: UpstreamArtwork[] = await response.json();
+
+    // Normalize artwork image URLs to unwrap image-proxy URLs
+    allArtworks = allArtworks.map(normalizeArtwork);
 
     // SKU lookup
     const skuSet = new Set(requestedSkus);

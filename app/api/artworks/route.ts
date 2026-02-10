@@ -1,7 +1,26 @@
 import { NextResponse } from "next/server";
+import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
 
 const API_BASE_URL =
   process.env.ART_API_BASE_URL || "https://art.artigt.com/api/public";
+
+interface Artwork {
+  artwork_id: number;
+  sku: string;
+  title: string;
+  artist: string;
+  short_description: string | null;
+  review: string | null;
+  year_created: number;
+  collection_name: string;
+  image_url: string;
+  version?: string;
+}
+
+const normalizeArtwork = (artwork: Artwork): Artwork => ({
+  ...artwork,
+  image_url: normalizeArtworkImageUrl(artwork.image_url),
+});
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -32,14 +51,20 @@ export async function GET(request: Request) {
 
     let data = await response.json();
 
-    // Apply limit/offset on the proxy side
+    // Normalize artwork image URLs to unwrap image-proxy URLs
     if (Array.isArray(data)) {
+      data = data.map(normalizeArtwork);
+
+      // Apply limit/offset on the proxy side
       const start = offset ?? 0;
       if (limit != null) {
         data = data.slice(start, start + limit);
       } else if (start > 0) {
         data = data.slice(start);
       }
+    } else if (data && typeof data === 'object' && 'image_url' in data) {
+      // Handle single artwork responses
+      data = normalizeArtwork(data);
     }
 
     return NextResponse.json(data, {

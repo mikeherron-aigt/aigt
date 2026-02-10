@@ -12,16 +12,31 @@ export function normalizeArtworkImageUrl(url: string): string {
   if (!url) return url;
 
   // If the URL is using the image-proxy pattern, extract the actual image URL
-  if (url.includes('/api/public/image-proxy?url=')) {
+  // This handles URLs like: https://art.artigt.com/api/public/image-proxy?url=https://image.artigt.com/...
+  if (url.includes('/image-proxy?url=') || url.includes('/image-proxy%3Furl=')) {
     try {
-      const urlObj = new URL(url);
+      // Handle both regular and already-encoded URLs
+      const decodedUrl = decodeURIComponent(url);
+      const urlObj = new URL(decodedUrl);
       const actualImageUrl = urlObj.searchParams.get('url');
       if (actualImageUrl) {
+        console.log('Unwrapping image-proxy URL:', url, '->', actualImageUrl);
         url = actualImageUrl;
       }
     } catch (e) {
-      // If URL parsing fails, continue with original URL
-      console.error('Failed to parse image-proxy URL:', e);
+      // If URL parsing fails, try a simpler extraction method
+      const match = url.match(/[?&]url=([^&]+)/);
+      if (match) {
+        try {
+          const extractedUrl = decodeURIComponent(match[1]);
+          console.log('Extracted URL via regex:', url, '->', extractedUrl);
+          url = extractedUrl;
+        } catch (decodeError) {
+          console.error('Failed to decode extracted URL:', decodeError);
+        }
+      } else {
+        console.error('Failed to parse image-proxy URL:', e);
+      }
     }
   }
 
