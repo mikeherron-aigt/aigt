@@ -36,16 +36,6 @@ export function ProgressiveImage({
     }
   }, [src]);
 
-  // Callback ref to check if image is already loaded (cached) when element mounts
-  const imgRef = useCallback(
-    (img: HTMLImageElement | null) => {
-      if (img && img.complete && img.naturalWidth > 0 && !isLoaded && !hasError) {
-        setIsLoaded(true);
-      }
-    },
-    [isLoaded, hasError]
-  );
-
   const handleLoad = useCallback(() => {
     setIsLoaded(true);
   }, []);
@@ -58,8 +48,6 @@ export function ProgressiveImage({
   return (
     <>
       <ProtectedImage
-        // @ts-expect-error - typing mismatch between Next/Image and HTMLImageElement ref
-        ref={imgRef}
         src={src}
         alt={alt}
         fill={fill}
