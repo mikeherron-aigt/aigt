@@ -75,8 +75,7 @@ function setCached<T>(key: string, data: T, ttlMs = DEFAULT_TTL_MS) {
 
 async function fetchAPI<T>(
   endpoint: string,
-  ttlMs = DEFAULT_TTL_MS,
-  retries = 2
+  ttlMs = DEFAULT_TTL_MS
 ): Promise<T> {
   const url = getApiUrl(`/api${endpoint}`);
   const cached = getCached<T>(url);
@@ -87,45 +86,27 @@ async function fetchAPI<T>(
   }
 
   const requestPromise = (async () => {
-    for (let attempt = 0; attempt <= retries; attempt += 1) {
-      try {
-        console.log(`[API] Fetching: ${url} (attempt ${attempt + 1}/${retries + 1})`);
-        const response = await fetch(url);
+    try {
+      const response = await fetch(url);
 
-        if (!response.ok) {
-          console.error(`[API] Error: ${url} returned ${response.status} ${response.statusText}`);
-          if (response.status >= 500 && attempt < retries) {
-            console.log(`[API] Retrying after ${1000 * (attempt + 1)}ms...`);
-            await new Promise((resolve) =>
-              setTimeout(resolve, 1000 * (attempt + 1))
-            );
-            continue;
-          }
-          throw new APIError(
-            `API request failed: ${response.statusText}`,
-            response.status
-          );
-        }
-
-        const data = (await response.json()) as T;
-        console.log(`[API] Success: ${url}`);
-        setCached(url, data, ttlMs);
-        return data;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error(`[API] Fetch error for ${url}:`, errorMessage);
-        if (attempt === retries) {
-          if (error instanceof APIError) {
-            throw error;
-          }
-          throw new APIError(
-            "Failed to connect to artwork database. Please try again later."
-          );
-        }
+      if (!response.ok) {
+        throw new APIError(
+          `API request failed: ${response.statusText}`,
+          response.status
+        );
       }
-    }
 
-    throw new APIError("Max retries exceeded");
+      const data = (await response.json()) as T;
+      setCached(url, data, ttlMs);
+      return data;
+    } catch (error) {
+      if (error instanceof APIError) {
+        throw error;
+      }
+      throw new APIError(
+        "Failed to connect to artwork database. Please try again later."
+      );
+    }
   })();
 
   pendingRequests.set(url, requestPromise);

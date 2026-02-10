@@ -25,6 +25,8 @@ const HERO_SKUS = [
   "2025-JD-DW-0008",
   "2025-JD-CD-0347",
   "2024-JD-AG-0020",
+  "2025-JD-CD-0091",
+  "2025-JD-MM-0018",
 ];
 const GOVERNANCE_SKU = "2025-JD-DW-0019";
 const MEDIUMS_SKU = "2024-JD-AG-0025";
@@ -53,6 +55,12 @@ type StaticHeroImageProps = {
 
 const heroAltText = "Cultural artwork representing the trust's collection";
 
+// Helper function to extract collection from SKU
+const extractCollectionFromSku = (sku: string): string | null => {
+  const match = sku.match(/^\d{4}-[A-Z]+-([A-Z]+)-\d+$/);
+  return match ? match[1] : null;
+};
+
 function StaticHeroImage({
   images,
   links,
@@ -75,10 +83,82 @@ function StaticHeroImage({
   );
 
   // Pick a random image on mount (changes only on page refresh)
+  // Avoid repeating images from the last 6 refreshes and avoid same collection as previous
   const selectedIndex = useMemo(() => {
     if (normalizedItems.length === 0) return 0;
-    return Math.floor(Math.random() * normalizedItems.length);
+
+    // Get history of last 6 selections from sessionStorage
+    let recentHistory: string[] = [];
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = window.sessionStorage.getItem('hero_history');
+        if (stored) {
+          recentHistory = JSON.parse(stored);
+        }
+      } catch {
+        // Ignore storage errors
+      }
+    }
+
+    // Get previous collection (most recent from history)
+    const previousCollection = recentHistory.length > 0
+      ? extractCollectionFromSku(recentHistory[0])
+      : null;
+
+    // Get available indices (exclude recent history and previous collection)
+    const availableIndices: number[] = [];
+
+    HERO_SKUS.forEach((sku, index) => {
+      if (index < normalizedItems.length) {
+        // Exclude if this SKU was shown in the last 6 refreshes
+        if (recentHistory.includes(sku)) {
+          return;
+        }
+
+        // Exclude if from the same collection as the most recent
+        const collection = extractCollectionFromSku(sku);
+        if (collection && collection === previousCollection) {
+          return;
+        }
+
+        availableIndices.push(index);
+      }
+    });
+
+    // If no valid alternatives (all were recently shown), allow any except the immediate previous
+    const indicesToUse = availableIndices.length > 0
+      ? availableIndices
+      : HERO_SKUS.map((sku, index) => {
+          // At minimum, don't repeat the immediate previous image
+          if (recentHistory.length > 0 && sku === recentHistory[0]) {
+            return -1;
+          }
+          return index < normalizedItems.length ? index : -1;
+        }).filter(i => i >= 0);
+
+    // Pick a random index from available options
+    const randomIdx = Math.floor(Math.random() * indicesToUse.length);
+    return indicesToUse[randomIdx];
   }, [normalizedItems.length]);
+
+  // Save selection to history after component mounts (side effect)
+  useEffect(() => {
+    if (typeof window === 'undefined' || selectedIndex >= HERO_SKUS.length) return;
+
+    try {
+      const selectedSku = HERO_SKUS[selectedIndex];
+      const stored = window.sessionStorage.getItem('hero_history');
+      const recentHistory: string[] = stored ? JSON.parse(stored) : [];
+
+      // Only update if this isn't already the most recent
+      if (recentHistory[0] !== selectedSku) {
+        const updatedHistory = [selectedSku, ...recentHistory].slice(0, 6);
+        window.sessionStorage.setItem('hero_history', JSON.stringify(updatedHistory));
+      }
+    } catch {
+      // Ignore storage errors
+    }
+  }, [selectedIndex]);
 
   if (normalizedItems.length === 0) {
     return (
