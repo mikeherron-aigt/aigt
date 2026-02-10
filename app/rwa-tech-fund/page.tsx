@@ -1,12 +1,13 @@
 'use client';
 
+import Link from "next/link";
 import Image from "next/image";
 
 export default function RWATechFundPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
       <main>
-        {/* Hero Section */}
+        {/* Hero Section (matches About page structure) */}
         <section className="w-full" style={{ backgroundColor: "#f5f5f5" }}>
           <div className="max-w-[1440px] mx-auto relative">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
@@ -17,18 +18,18 @@ export default function RWATechFundPage() {
 
                   <div className="hero-subtitle flex flex-col gap-4">
                     <p>
-                      A standalone platform designed to power regulated private funds with consistent operations, governance,
-                      and reporting.
+                      A standalone platform designed to power regulated private funds with consistent operations,
+                      governance, and reporting.
                     </p>
 
                     <p>
-                      This is a technology focused fund. It is separate from any art fund, museum initiative, or real estate
-                      vehicle.
+                      This is a technology focused fund. It is separate from any art fund, museum initiative, or real
+                      estate vehicle.
                     </p>
 
                     <p>
-                      What we know for sure: any outside fund that wants to use the platform comes to the board for approval,
-                      and if approved, pays fees to the technology company for using the system.
+                      What we know for sure: any outside fund that wants to use the platform comes to the board for
+                      approval, and if approved, pays fees to the technology company for using the system.
                     </p>
                   </div>
                 </div>
@@ -63,419 +64,257 @@ export default function RWATechFundPage() {
         <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
           <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{ width: "calc(50vw + 112px)" }} />
           <div className="absolute top-0 h-full bg-ledger-stone" style={{ left: "calc(50vw + 105px)", right: "0" }} />
-
           <div className="max-w-[1440px] w-full h-full relative">
             <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{ left: "calc(60% - 32px)" }} />
           </div>
         </div>
 
-        {/* ============================= */}
-{/* EVERYTHING UNDER THE HERO */}
-{/* Drop this directly under your hero wrapper in the page */}
-{/* ============================= */}
+        {/* Section 1: What is being built (simple white module) */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20 border-b border-gallery-plaster">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-10 lg:gap-14 items-start">
+              <div className="max-w-[711px] flex flex-col gap-4">
+                <h2 className="m-0">What is being built</h2>
+                <p>
+                  At the center of this initiative is a fund operating platform. The goal is to provide a standardized
+                  backend system that supports fundraising workflows, investor onboarding, governance, and reporting for
+                  approved funds.
+                </p>
+                <p>
+                  The platform is being developed as a standalone operating company so it can be built, funded, and
+                  scaled independently.
+                </p>
+              </div>
 
-<section className="w-full bg-white">
-  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-20">
-    {/* Intro + quick proof points */}
-    <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-10 lg:gap-14 items-start">
-      <div>
-        <h2 className="text-[26px] sm:text-[32px] lg:text-[38px] leading-tight tracking-[-0.02em] text-black">
-          Stewardship first, execution always.
-        </h2>
-
-        <p className="mt-5 text-[15px] sm:text-[16px] leading-relaxed text-black/70 max-w-[70ch]">
-          We built this to feel institutional, not experimental. The work is simple: acquire with
-          discipline, document with rigor, steward with care, and report in a way serious allocators
-          can actually trust.
-        </p>
-
-        <div className="mt-8 grid sm:grid-cols-3 gap-3">
-          <div className="rounded-2xl border border-black/10 bg-white p-4">
-            <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-              Governance
-            </div>
-            <div className="mt-2 text-[15px] font-medium text-black">
-              Centralized oversight
-            </div>
-            <div className="mt-2 text-[13px] leading-relaxed text-black/65">
-              Clear decision rights, consistent process.
+              {/* Governance callout (different format) */}
+              <div className="bg-paper-white p-10">
+                <p className="uppercase tracking-[0.08em] text-[11px] font-medium text-archive-slate m-0">
+                  Governance
+                </p>
+                <h3 className="mt-4">Board-approved access</h3>
+                <p className="mt-4">
+                  Outside funds are reviewed by the board before onboarding. If approved, they pay fees to the
+                  technology company for platform access.
+                </p>
+              </div>
             </div>
           </div>
+        </section>
 
-          <div className="rounded-2xl border border-black/10 bg-white p-4">
-            <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-              Reporting
+        {/* Section 2: How the platform is used (light gray module) */}
+        <section className="w-full py-12 sm:py-16 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-14 items-start">
+              <div className="max-w-[711px]">
+                <h2 className="m-0">How the platform is used</h2>
+                <p className="mt-4">
+                  Approved funds use the platform to support core operational needs. This keeps workflows consistent and
+                  governance clear across the ecosystem.
+                </p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="bg-white p-10">
+                  <h3 className="m-0">Onboarding</h3>
+                  <p className="mt-4">
+                    Investor onboarding and accreditation workflows built for a clean, repeatable process.
+                  </p>
+                </div>
+
+                <div className="bg-white p-10">
+                  <h3 className="m-0">Governance</h3>
+                  <p className="mt-4">
+                    Structured approval flows that keep oversight explicit and consistent.
+                  </p>
+                </div>
+
+                <div className="bg-white p-10">
+                  <h3 className="m-0">Reporting</h3>
+                  <p className="mt-4">
+                    Fund level reporting and ongoing investor communications in a consistent format.
+                  </p>
+                </div>
+
+                <div className="bg-white p-10">
+                  <h3 className="m-0">Operations</h3>
+                  <p className="mt-4">
+                    A standardized backend system that reduces fragmentation and manual processes.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="mt-2 text-[15px] font-medium text-black">
-              Institutional cadence
+          </div>
+        </section>
+
+        {/* Section 3: Why a separate technology fund (white module, different layout) */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20 border-b border-gallery-plaster">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[900px]">
+              <h2 className="m-0">Why a separate technology fund</h2>
+              <div className="mt-6 flex flex-col gap-4">
+                <p>
+                  The technology carries a different risk profile than art, museum initiatives, or real estate. The goal
+                  of separating the technology into its own operating company and fund is clarity, risk isolation, and
+                  long term scalability.
+                </p>
+                <p>
+                  Investors in the RWA Tech Fund are investing in the technology business itself, not in underlying art
+                  holdings, museum initiatives, or real estate projects.
+                </p>
+              </div>
             </div>
-            <div className="mt-2 text-[13px] leading-relaxed text-black/65">
-              Updates that reflect reality, not hype.
+
+            {/* Three-step bar module */}
+            <div className="mt-10 bg-paper-white">
+              <div className="px-10 py-10">
+                <h3 className="m-0">How platform fees turn into a business</h3>
+                <p className="mt-4 max-w-[850px]">
+                  Approved funds pay fees to the technology company for using the platform. Those fees support buildout,
+                  maintenance, and ongoing operations.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3">
+                <div className="p-10 border-t border-gallery-plaster md:border-t-0 md:border-r border-gallery-plaster bg-white">
+                  <p className="uppercase tracking-[0.08em] text-[11px] font-medium text-archive-slate m-0">01</p>
+                  <h3 className="mt-4 m-0">Build</h3>
+                  <p className="mt-4 m-0">
+                    Core platform development and infrastructure that supports real fund operations.
+                  </p>
+                </div>
+                <div className="p-10 border-t border-gallery-plaster md:border-t-0 md:border-r border-gallery-plaster bg-white">
+                  <p className="uppercase tracking-[0.08em] text-[11px] font-medium text-archive-slate m-0">02</p>
+                  <h3 className="mt-4 m-0">Maintain</h3>
+                  <p className="mt-4 m-0">
+                    Ongoing maintenance, security hardening, and operational continuity.
+                  </p>
+                </div>
+                <div className="p-10 border-t border-gallery-plaster md:border-t-0 bg-white">
+                  <p className="uppercase tracking-[0.08em] text-[11px] font-medium text-archive-slate m-0">03</p>
+                  <h3 className="mt-4 m-0">Scale</h3>
+                  <p className="mt-4 m-0">
+                    Additional approved funds onboard over time, increasing recurring platform revenue.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
-          <div className="rounded-2xl border border-black/10 bg-white p-4">
-            <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-              Optionality
+        {/* Section 4: What investors are supporting (gray module, icon-less tiles) */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{ backgroundColor: "#f5f5f5" }}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center gap-4 mb-10 sm:mb-12 lg:mb-14 max-w-[995px] mx-auto">
+              <h2 className="text-center m-0">What investors are supporting</h2>
+              <p className="text-center max-w-[820px] m-0">
+                An investment in the RWA Tech Fund supports the development of the platform, the team building it, and
+                the infrastructure that powers current and future approved funds.
+              </p>
             </div>
-            <div className="mt-2 text-[15px] font-medium text-black">
-              Digital record layer
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-10 min-h-[220px] flex flex-col gap-3">
+                <h3 className="m-0">Platform development</h3>
+                <p className="m-0">
+                  Funding core engineering work that makes the platform real and operational.
+                </p>
+              </div>
+              <div className="bg-white p-10 min-h-[220px] flex flex-col gap-3">
+                <h3 className="m-0">Technology team</h3>
+                <p className="m-0">
+                  Building and maintaining the team responsible for delivery, security, and continuity.
+                </p>
+              </div>
+              <div className="bg-white p-10 min-h-[220px] flex flex-col gap-3">
+                <h3 className="m-0">Shared infrastructure</h3>
+                <p className="m-0">
+                  A backend system that powers internal funds and approved third party funds.
+                </p>
+              </div>
+              <div className="bg-white p-10 min-h-[220px] flex flex-col gap-3">
+                <h3 className="m-0">Recurring model</h3>
+                <p className="m-0">
+                  A business model based on platform access fees paid by approved funds over time.
+                </p>
+              </div>
             </div>
-            <div className="mt-2 text-[13px] leading-relaxed text-black/65">
-              Tech supports governance, not speculation.
+          </div>
+        </section>
+
+        {/* Section 5: FAQ (white module, details elements) */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20 border-b border-gallery-plaster">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="max-w-[900px]">
+              <h2 className="m-0">FAQ</h2>
+              <p className="mt-4">
+                Fast answers to the questions that typically come up early.
+              </p>
+
+              <div className="mt-8 flex flex-col">
+                {[
+                  {
+                    q: "Is every fund allowed to onboard?",
+                    a: "No. Outside funds are reviewed by the board before onboarding. Approval is required.",
+                  },
+                  {
+                    q: "Is this tied to a specific asset class?",
+                    a: "The platform is being built as infrastructure. Approved funds may span different asset classes over time.",
+                  },
+                  {
+                    q: "Is this a token launch?",
+                    a: "No. This page describes fund operations infrastructure. Anything beyond that would be a separate discussion and timeline.",
+                  },
+                  {
+                    q: "What is the business model?",
+                    a: "Approved funds pay fees to the technology company for platform access and services.",
+                  },
+                ].map((item) => (
+                  <details key={item.q} className="border-t border-gallery-plaster py-6">
+                    <summary className="cursor-pointer list-none flex items-center justify-between gap-6">
+                      <span className="text-[16px] font-medium">{item.q}</span>
+                      <span className="text-[18px] opacity-50">+</span>
+                    </summary>
+                    <p className="mt-4 mb-0">{item.a}</p>
+                  </details>
+                ))}
+                <div className="border-t border-gallery-plaster" />
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Side panel */}
-      <div className="rounded-3xl border border-black/10 bg-[#f7f7f7] p-6 sm:p-7">
-        <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-          What this is
-        </div>
-        <div className="mt-2 text-[18px] font-medium text-black">
-          A long-horizon art ownership vehicle
-        </div>
-        <p className="mt-3 text-[14px] leading-relaxed text-black/70">
-          Not a trading product. Not a marketplace. Not a token launch. A governed structure built
-          to own, steward, and contextualize works over time.
-        </p>
+        {/* Section 6: CTA (gray module) */}
+        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{ backgroundColor: "#f5f5f5" }}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="bg-white p-10 lg:p-14 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+              <div className="max-w-[760px]">
+                <h2 className="m-0">Request materials</h2>
+                <p className="mt-4 mb-0">
+                  If you are evaluating fit, we will share the materials and walk through the operating model, governance,
+                  and platform strategy.
+                </p>
+              </div>
 
-        <div className="mt-6 rounded-2xl bg-white border border-black/10 p-4">
-          <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-            Designed for
-          </div>
-          <ul className="mt-3 space-y-2 text-[14px] text-black/70">
-            <li className="flex gap-2">
-              <span className="mt-[7px] h-[5px] w-[5px] rounded-full bg-black/40" />
-              Investors who can hold illiquid assets long-term
-            </li>
-            <li className="flex gap-2">
-              <span className="mt-[7px] h-[5px] w-[5px] rounded-full bg-black/40" />
-              People who want reporting discipline and process clarity
-            </li>
-            <li className="flex gap-2">
-              <span className="mt-[7px] h-[5px] w-[5px] rounded-full bg-black/40" />
-              Allocators who value cultural legitimacy as part of value creation
-            </li>
-          </ul>
-        </div>
-
-        <div className="mt-6 flex flex-col sm:flex-row gap-3">
-          <a
-            href="/contact"
-            className="inline-flex items-center justify-center rounded-full bg-black text-white px-5 py-3 text-[14px] hover:opacity-90 transition"
-          >
-            Request materials
-          </a>
-          <a
-            href="/stewardship"
-            className="inline-flex items-center justify-center rounded-full bg-white border border-black/15 text-black px-5 py-3 text-[14px] hover:bg-black/[0.03] transition"
-          >
-            Learn the model
-          </a>
-        </div>
-
-        <p className="mt-4 text-[12px] leading-relaxed text-black/50">
-          Private offering. Accredited investors only. Information provided for discussion purposes.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* Section divider */}
-<div className="w-full bg-white">
-  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-    <div className="h-px w-full bg-black/10" />
-  </div>
-</div>
-
-{/* Pillars (different module style) */}
-<section className="w-full bg-white">
-  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-20">
-    <div className="grid lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-14 items-start">
-      <div>
-        <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-          The framework
-        </div>
-        <h3 className="mt-3 text-[24px] sm:text-[28px] lg:text-[32px] tracking-[-0.02em] text-black">
-          Four pillars, one operating standard.
-        </h3>
-        <p className="mt-4 text-[15px] sm:text-[16px] leading-relaxed text-black/70 max-w-[55ch]">
-          Everything maps back to a few principles. They keep the operation clean, repeatable, and
-          defensible.
-        </p>
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div className="rounded-3xl border border-black/10 bg-white p-6">
-          <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-            Acquisition
-          </div>
-          <div className="mt-2 text-[16px] font-medium text-black">
-            Conviction, not volume
-          </div>
-          <p className="mt-3 text-[14px] leading-relaxed text-black/70">
-            Sourcing, diligence, pricing discipline, and a clear reason to own the work for years.
-          </p>
-        </div>
-
-        <div className="rounded-3xl border border-black/10 bg-white p-6">
-          <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-            Documentation
-          </div>
-          <div className="mt-2 text-[16px] font-medium text-black">
-            Provenance you can audit
-          </div>
-          <p className="mt-3 text-[14px] leading-relaxed text-black/70">
-            Title, condition, custody, and rights captured with enough structure to stand up later.
-          </p>
-        </div>
-
-        <div className="rounded-3xl border border-black/10 bg-white p-6">
-          <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-            Stewardship
-          </div>
-          <div className="mt-2 text-[16px] font-medium text-black">
-            Preserve the asset, elevate the context
-          </div>
-          <p className="mt-3 text-[14px] leading-relaxed text-black/70">
-            Conservation, storage, insurance, and institutional placement decisions that protect
-            value over time.
-          </p>
-        </div>
-
-        <div className="rounded-3xl border border-black/10 bg-white p-6">
-          <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-            Reporting
-          </div>
-          <div className="mt-2 text-[16px] font-medium text-black">
-            Clarity without theater
-          </div>
-          <p className="mt-3 text-[14px] leading-relaxed text-black/70">
-            A consistent cadence that respects illiquidity and avoids pretending this trades like
-            public markets.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* Dark band module (different format) */}
-<section className="w-full bg-black text-white">
-  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-20">
-    <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-14 items-start">
-      <div>
-        <div className="text-[12px] uppercase tracking-[0.14em] text-white/60">
-          Optional digital layer
-        </div>
-        <h3 className="mt-3 text-[24px] sm:text-[28px] lg:text-[32px] tracking-[-0.02em] text-white">
-          Technology is a record, not a promise.
-        </h3>
-        <p className="mt-4 text-[15px] sm:text-[16px] leading-relaxed text-white/70 max-w-[70ch]">
-          If used, blockchain is simply a way to mirror ownership records and metadata. It does not
-          change the nature of the interest. It does not create liquidity. It does not create a
-          marketplace.
-        </p>
-
-        <div className="mt-7 grid sm:grid-cols-3 gap-3">
-          {[
-            { t: "No trading", d: "Not listed. No exchange." },
-            { t: "No new rights", d: "Governance stays centralized." },
-            { t: "No hype layer", d: "Admin, not marketing." },
-          ].map((item) => (
-            <div key={item.t} className="rounded-2xl border border-white/15 bg-white/5 p-4">
-              <div className="text-[14px] font-medium text-white">{item.t}</div>
-              <div className="mt-2 text-[13px] leading-relaxed text-white/70">{item.d}</div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/request-access" className="footer-cta-primary" style={{ textDecoration: "none" }}>
+                  Request Access
+                </Link>
+                <Link
+                  href="/about"
+                  className="footer-cta-secondary"
+                  style={{ textDecoration: "none", display: "inline-flex" }}
+                >
+                  Learn more
+                </Link>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="rounded-3xl border border-white/15 bg-white/5 p-6 sm:p-7">
-        <div className="text-[12px] uppercase tracking-[0.14em] text-white/60">
-          What you actually get
-        </div>
-        <ul className="mt-4 space-y-3 text-[14px] text-white/75">
-          <li className="flex gap-2">
-            <span className="mt-[7px] h-[5px] w-[5px] rounded-full bg-white/50" />
-            A governed interest with contractual economics
-          </li>
-          <li className="flex gap-2">
-            <span className="mt-[7px] h-[5px] w-[5px] rounded-full bg-white/50" />
-            Centralized decision-making and operating controls
-          </li>
-          <li className="flex gap-2">
-            <span className="mt-[7px] h-[5px] w-[5px] rounded-full bg-white/50" />
-            Structured documentation and reporting cadence
-          </li>
-          <li className="flex gap-2">
-            <span className="mt-[7px] h-[5px] w-[5px] rounded-full bg-white/50" />
-            Optional digital representation as an administrative layer
-          </li>
-        </ul>
-
-        <div className="mt-6 rounded-2xl bg-black/40 border border-white/10 p-4">
-          <div className="text-[12px] uppercase tracking-[0.14em] text-white/60">
-            Plain english
-          </div>
-          <p className="mt-2 text-[13px] leading-relaxed text-white/75">
-            We do not use tech to make art feel liquid. We use tech to make records feel clean.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* Timeline module (different format) */}
-<section className="w-full bg-white">
-  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] py-12 sm:py-16 lg:py-20">
-    <div className="flex items-end justify-between gap-6 flex-wrap">
-      <div>
-        <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-          How it works
-        </div>
-        <h3 className="mt-3 text-[24px] sm:text-[28px] lg:text-[32px] tracking-[-0.02em] text-black">
-          A simple lifecycle. Built for long holds.
-        </h3>
-      </div>
-
-      <a
-        href="/process"
-        className="text-[14px] text-black/70 hover:text-black transition underline underline-offset-4 decoration-black/20"
-      >
-        See full operating model
-      </a>
-    </div>
-
-    <div className="mt-10 grid lg:grid-cols-4 gap-4">
-      {[
-        {
-          step: "01",
-          title: "Source",
-          body: "Deal flow, curatorial filter, pricing discipline.",
-        },
-        {
-          step: "02",
-          title: "Diligence",
-          body: "Title, authenticity, condition, rights, custody plan.",
-        },
-        {
-          step: "03",
-          title: "Steward",
-          body: "Insurance, storage, conservation, contextual placement.",
-        },
-        {
-          step: "04",
-          title: "Report",
-          body: "Periodic updates that match the asset class reality.",
-        },
-      ].map((s) => (
-        <div key={s.step} className="rounded-3xl border border-black/10 bg-[#fafafa] p-6">
-          <div className="flex items-baseline justify-between">
-            <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-              Step {s.step}
-            </div>
-            <div className="h-1.5 w-1.5 rounded-full bg-black/20" />
-          </div>
-          <div className="mt-3 text-[16px] font-medium text-black">{s.title}</div>
-          <div className="mt-2 text-[14px] leading-relaxed text-black/70">{s.body}</div>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
-
-{/* FAQ accordion-lite (no JS, different format) */}
-<section className="w-full bg-white">
-  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] pb-12 sm:pb-16 lg:pb-20">
-    <div className="rounded-[32px] border border-black/10 bg-white overflow-hidden">
-      <div className="px-6 sm:px-8 py-8 bg-[#f7f7f7]">
-        <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-          FAQ
-        </div>
-        <h3 className="mt-2 text-[22px] sm:text-[26px] tracking-[-0.02em] text-black">
-          Quick answers, no theatrics.
-        </h3>
-      </div>
-
-      <div className="divide-y divide-black/10">
-        {[
-          {
-            q: "Is this liquid?",
-            a: "No. This is built for long-term ownership. There is no public market and no promised exit path.",
-          },
-          {
-            q: "Do tokens change anything?",
-            a: "No. If used, a token is only an administrative representation of the same underlying interest, not a separate product.",
-          },
-          {
-            q: "What do investors control?",
-            a: "Investors do not direct acquisitions, sales, custody, or day-to-day decisions. Governance is centralized by design.",
-          },
-          {
-            q: "How does valuation work?",
-            a: "Art is illiquid and subjective. Valuations are based on good-faith methodology and may remain unchanged for long periods.",
-          },
-        ].map((item) => (
-          <details key={item.q} className="group px-6 sm:px-8 py-6">
-            <summary className="cursor-pointer list-none flex items-center justify-between gap-6">
-              <span className="text-[15px] sm:text-[16px] font-medium text-black">
-                {item.q}
-              </span>
-              <span className="text-black/40 group-open:rotate-45 transition text-[20px] leading-none">
-                +
-              </span>
-            </summary>
-            <p className="mt-3 text-[14px] leading-relaxed text-black/70 max-w-[85ch]">
-              {item.a}
+            <p className="mt-6 text-[12px] text-archive-slate max-w-[900px]">
+              Private offering. Information provided for discussion purposes only.
             </p>
-          </details>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* CTA band */}
-<section className="w-full bg-white">
-  <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px] pb-16 lg:pb-24">
-    <div className="rounded-[36px] border border-black/10 bg-[#f7f7f7] p-8 sm:p-10 lg:p-12">
-      <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-8 lg:gap-12 items-center">
-        <div>
-          <div className="text-[12px] uppercase tracking-[0.14em] text-black/50">
-            Next step
           </div>
-          <h3 className="mt-3 text-[24px] sm:text-[28px] lg:text-[32px] tracking-[-0.02em] text-black">
-            Want the full materials package?
-          </h3>
-          <p className="mt-4 text-[15px] sm:text-[16px] leading-relaxed text-black/70 max-w-[70ch]">
-            If you are evaluating fit, we will share the docs and walk you through the structure,
-            operating model, and reporting cadence.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <a
-            href="/contact"
-            className="inline-flex items-center justify-center rounded-full bg-black text-white px-6 py-3.5 text-[14px] hover:opacity-90 transition"
-          >
-            Request offering materials
-          </a>
-          <a
-            href="/faq"
-            className="inline-flex items-center justify-center rounded-full bg-white border border-black/15 text-black px-6 py-3.5 text-[14px] hover:bg-black/[0.03] transition"
-          >
-            Read FAQs
-          </a>
-          <p className="text-[12px] leading-relaxed text-black/50">
-            Private offering. Accredited investors only.
-          </p>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
-  </div>
-</section>
+  );
+}
