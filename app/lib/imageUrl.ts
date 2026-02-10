@@ -9,6 +9,7 @@ const ensureAbsoluteImageUrl = (url: string): string => {
 };
 
 export function normalizeArtworkImageUrl(url: string): string {
+  console.log('[IMAGE URL] CALLED with:', url?.substring(0, 100));
   if (!url) return url;
 
   const originalUrl = url;
