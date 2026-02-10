@@ -1,9 +1,15 @@
 "use client";
 
 import React, { forwardRef, useCallback } from "react";
-import { normalizeArtworkImageUrl, analyzeImageResolution } from "@/app/lib/imageUrl";
+import Image from "next/image";
+import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
 
-type ProtectedImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
+type ProtectedImageProps = Omit<
+  React.ComponentProps<typeof Image>,
+  "src" | "alt"
+> & {
+  src: string;
+  alt: string;
   disableContextMenu?: boolean;
   disableDrag?: boolean;
   fill?: boolean;
@@ -27,59 +33,70 @@ export const ProtectedImage = forwardRef<HTMLImageElement, ProtectedImageProps>(
       loading,
       src,
       alt,
+      sizes,
+      width,
+      height,
       ...props
     },
     ref
   ) {
-    const normalizedSrc = typeof src === "string" ? normalizeArtworkImageUrl(src) : src;
+    const normalizedSrc =
+      typeof src === "string" ? normalizeArtworkImageUrl(src) : src;
 
     const handleLoad = useCallback(
       (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        // Call original onLoad handler if provided
-        onLoad?.(event);
+        onLoad?.(event as any);
       },
       [onLoad]
     );
 
     const handleError = useCallback(
       (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        // Do not fall back to v01 - only use v02 images
-        // Call original onError handler if provided
-        onError?.(event);
+        onError?.(event as any);
       },
       [onError]
     );
 
-    const mergedClassName = [className, "aigt-protected-image"].filter(Boolean).join(" ");
+    const mergedClassName = [className, "aigt-protected-image"]
+      .filter(Boolean)
+      .join(" ");
+
     const mergedStyle: React.CSSProperties = {
-      ...(fill
-        ? { position: "absolute", inset: 0, width: "100%", height: "100%" }
-        : null),
       WebkitTouchCallout: disableContextMenu ? "none" : undefined,
       ...style,
     };
+
     const resolvedLoading = priority ? loading ?? "eager" : loading;
 
+    // Note:
+    // Next/Image will serve images from your own origin via /_next/image by default.
+    // That usually eliminates browser-side CORS issues and dramatically improves performance.
     return (
-      <img
-        ref={ref}
+      <Image
         {...props}
+        // @ts-expect-error - Next Image does not accept HTMLImageElement ref typing cleanly
+        ref={ref}
         src={normalizedSrc}
         alt={alt}
+        fill={fill}
+        width={fill ? undefined : width}
+        height={fill ? undefined : height}
+        sizes={sizes}
+        priority={priority}
+        loading={resolvedLoading as any}
         className={mergedClassName}
         style={mergedStyle}
-        loading={resolvedLoading}
         draggable={disableDrag ? false : draggable}
         onContextMenu={(event) => {
           if (disableContextMenu) event.preventDefault();
-          onContextMenu?.(event);
+          onContextMenu?.(event as any);
         }}
         onDragStart={(event) => {
           if (disableDrag) event.preventDefault();
-          onDragStart?.(event);
+          onDragStart?.(event as any);
         }}
-        onLoad={handleLoad}
-        onError={handleError}
+        onLoad={handleLoad as any}
+        onError={handleError as any}
       />
     );
   }
