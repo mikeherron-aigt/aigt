@@ -21,10 +21,6 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     let raf = 0;
     let disposed = false;
 
-    // Lock canvas size to provided dimensions
-    canvas.width = width;
-    canvas.height = height;
-
     // Scene
     const scene = new THREE.Scene();
 
@@ -36,15 +32,17 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
       canvas,
       antialias: true,
       alpha: true,
+      powerPreference: 'high-performance',
     });
+
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height, false);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     // Camera (fit globe to frame)
     const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 5000);
 
     // One knob that controls how big the globe appears in-frame
-    // Increase = smaller globe, decrease = larger globe
     const FIT = 1.2;
 
     const fovRad = THREE.MathUtils.degToRad(camera.fov);
@@ -60,7 +58,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     // Ocean (sphere)
     const globeGeom = new THREE.SphereGeometry(RADIUS, 128, 96);
-    const globeMat = new THREE.MeshBasicMaterial({ color: 0xffffff }); // ocean color
+    const globeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const globeMesh = new THREE.Mesh(globeGeom, globeMat);
     scene.add(globeMesh);
 
@@ -70,9 +68,11 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     const DOT_COLOR = new THREE.Color('#A1A69D');
     const DOT_RADIUS = RADIUS + 0.8; // close to surface, but avoids shimmer
-    const DOT_SIZE = 0.95;
+    const DOT_SIZE = 0.9;
 
-    const STEP = 2; // smoother + less noise than 1
+    // Performance knobs
+    // If you want even smoother, set STEP to 3. Visual difference is small, perf gain is real.
+    const STEP = 3;
     const THRESHOLD = 70;
 
     const buildDots = async () => {
@@ -89,14 +89,18 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
       if (disposed) return;
 
+      // Read pixels from a smaller working canvas (keeps things fast even if source is large)
+      const workW = Math.min(img.width, 2048);
+      const workH = Math.round((workW / img.width) * img.height);
+
       const c = document.createElement('canvas');
-      c.width = img.width;
-      c.height = img.height;
+      c.width = workW;
+      c.height = workH;
 
       const ctx = c.getContext('2d', { willReadFrequently: true });
       if (!ctx) return;
 
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
 
       const imageData = ctx.getImageData(0, 0, c.width, c.height);
       const data = imageData.data;
@@ -119,7 +123,10 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
           const brightness = (r + g + b) / 3;
           if (brightness >= THRESHOLD) continue;
 
-          const u = x / w;
+          // IMPORTANT: Horizontal flip fix
+          // Original: const u = x / w;
+          // Flipped:  const u = 1 - x / w;
+          const u = 1 - x / w;
           const v = y / h;
 
           const lon = u * Math.PI * 2 - Math.PI;
@@ -139,7 +146,6 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
       geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
       geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
-      // NOTE: depthWrite false avoids shimmer/noise at the silhouette
       const mat = new THREE.PointsMaterial({
         size: DOT_SIZE,
         vertexColors: true,
@@ -147,7 +153,6 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
         opacity: 0.85,
         depthTest: true,
         depthWrite: false,
-        alphaTest: 0.0,
         sizeAttenuation: true,
       });
 
@@ -163,11 +168,12 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     controls.enableRotate = true;
     controls.enablePan = false;
     controls.enableZoom = false;
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.10;
-    controls.rotateSpeed = 0.35;
 
-    // Smooth auto-rotate (no manual mesh rotation, prevents jitter)
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.rotateSpeed = 0.45;
+
+    // Smooth auto-rotate
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.6;
 
@@ -182,8 +188,15 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
       controls.autoRotate = true;
     });
 
+    const clock = new THREE.Clock();
+
     const animate = () => {
-      controls.update();
+      if (disposed) return;
+
+      // OrbitControls uses time-based rotation internally if you pass delta
+      const delta = clock.getDelta();
+      controls.update(delta);
+
       renderer.render(scene, camera);
       raf = requestAnimationFrame(animate);
     };
@@ -205,6 +218,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
       });
 
       renderer.dispose();
+      scene.clear();
     };
   }, [width, height]);
 
@@ -212,7 +226,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
     <div ref={containerRef} style={{ width, height }}>
       <canvas
         ref={canvasRef}
-        style={{ width: '100%', height: '100%', display: 'block' }}
+        style={{ width: '100%', height: '100%', display: 'block', cursor: 'grab' }}
       />
     </div>
   );
