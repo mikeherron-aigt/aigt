@@ -28,7 +28,16 @@ export function normalizeArtworkImageUrl(url: string): string {
   }
 
   const updated = `${prefix}${filename}`;
-  const querySuffix = query ? `?${query}` : "";
+
+  // Strip image optimization query params (format, width) so URLs are
+  // canonical. Resizing is handled by Next.js Image or the /api/img proxy.
+  const cleanedQuery = query
+    ? new URLSearchParams(query)
+    : new URLSearchParams();
+  cleanedQuery.delete("format");
+  cleanedQuery.delete("width");
+  const remaining = cleanedQuery.toString();
+  const querySuffix = remaining ? `?${remaining}` : "";
   const hashSuffix = hash ? `#${hash}` : "";
 
   return `${updated}${querySuffix}${hashSuffix}`;

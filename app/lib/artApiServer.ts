@@ -33,8 +33,7 @@ const normalizeArtworks = (artworks: Artwork[]): Artwork[] =>
 
 async function fetchServer<T>(endpoint: string) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    next: { revalidate: 0 }, // Disable cache during development
-    cache: 'no-store',
+    next: { revalidate: 300 },
     headers: {
       "User-Agent": "Mozilla/5.0 (compatible; AIGT-App/1.0)",
     },
@@ -61,6 +60,20 @@ export async function getCollectionArtworks(
     `/collections/${encodedName}/artworks${query}`
   );
   return normalizeArtworks(data);
+}
+
+/**
+ * Fetch a small pool of artworks from a collection for display purposes.
+ * Instead of loading the entire collection (which can be 2000+ items),
+ * this returns at most `poolSize` artworks, enabling lightweight random
+ * selection on the caller side.
+ */
+export async function getCollectionArtworkPool(
+  collectionName: string,
+  poolSize: number = 24
+): Promise<Artwork[]> {
+  const all = await getCollectionArtworks(collectionName, "v02");
+  return all.slice(0, poolSize);
 }
 
 export interface ArtworkFilters {

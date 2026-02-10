@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCollectionArtworks, getCollections } from "@/app/lib/artApiServer";
+import { getCollectionArtworkPool, getCollections } from "@/app/lib/artApiServer";
 import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
@@ -14,32 +14,29 @@ const collectionDescriptions: Record<string, string> = {
 
 const isValidArtwork = (title: string) => !title.toLowerCase().includes("untitled");
 
+// Static hero image — no API call or randomization needed
+const HERO_IMAGE_URL = "https://image.artigt.com/JD/DW/2025-JD-DW-0017/2025-JD-DW-0017__full__v02.webp";
+
 export default async function CollectionsPage() {
   const collections = await getCollections();
 
+  // Fetch a small pool (max 24) per collection instead of the entire catalog
   const results = await Promise.allSettled(
     collections.map(async (collection) => {
-      const artworks = await getCollectionArtworks(collection.collection_name, "v02");
-      const featured = artworks.find((artwork) => isValidArtwork(artwork.title)) || null;
+      const pool = await getCollectionArtworkPool(collection.collection_name, 24);
+      const valid = pool.filter((a) => isValidArtwork(a.title));
+      // Pick a random artwork from the pool for visual variety on refresh
+      const featured = valid.length > 0
+        ? valid[Math.floor(Math.random() * valid.length)]
+        : null;
       return { ...collection, featured };
     })
   );
 
   const collectionsWithImages = results.map((r, idx) => {
     if (r.status === "fulfilled") return r.value;
-    // If a single collection fails, do not break the page
     return { ...collections[idx], featured: null };
   });
-
-  const heroCollection =
-    collectionsWithImages.find((collection) => collection.featured) ||
-    collectionsWithImages[0];
-
-  const heroArtworkHref = heroCollection?.featured
-    ? `/collections/${slugify(heroCollection.collection_name)}/${slugify(
-        heroCollection.featured.title
-      )}`
-    : null;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
@@ -48,38 +45,14 @@ export default async function CollectionsPage() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="collection-hero-banner">
               <div className="absolute inset-0 overflow-hidden">
-                {heroCollection?.featured?.image_url ? (
-                  heroArtworkHref ? (
-                    <Link
-                      href={heroArtworkHref}
-                      aria-label={`View details for ${heroCollection.featured.title}`}
-                      className="absolute inset-0"
-                    >
-                      <ProtectedImage
-                        src={heroCollection.featured.image_url}
-                        alt={heroCollection.featured.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 100vw, 80vw"
-                        priority
-                      />
-                    </Link>
-                  ) : (
-                    <ProtectedImage
-                      src={heroCollection.featured.image_url}
-                      alt={heroCollection.collection_name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 80vw"
-                      priority
-                    />
-                  )
-                ) : (
-                  <div
-                    className="w-full h-full"
-                    style={{ backgroundColor: "var(--gallery-plaster)" }}
-                  />
-                )}
+                <ProtectedImage
+                  src={HERO_IMAGE_URL}
+                  alt="Featured collections"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 80vw"
+                  priority
+                />
               </div>
 
               <div className="collection-hero-card relative z-10">

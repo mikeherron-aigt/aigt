@@ -17,8 +17,7 @@ export async function GET(
 
   try {
     const response = await fetch(endpoint, {
-      next: { revalidate: 0 }, // Disable cache during development
-      cache: 'no-store'
+      next: { revalidate: 300 },
     });
 
     if (!response.ok) {
