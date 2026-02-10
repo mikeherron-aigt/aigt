@@ -180,7 +180,7 @@ export default function AboutPage() {
                    <h3 className="mb-2">About John Dowling Jr.h3>
                 <p className="text-ledger-stone text-sm">A Legacy Being Stewarded in Real Time</p>
               </div>
-                  
+                    </div>
 
               <div className="flex flex-col gap-4 p-10 bg-paper-white">
                 <p>
