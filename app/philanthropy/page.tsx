@@ -169,8 +169,7 @@ export default function PhilanthropyPage() {
     height: "1100px",
     overflow: "visible",
     pointerEvents: "auto",
-    outline: "2px solid red",
-zIndex: 9999,
+zIndex: 20,
   }}
 >
   <div style={{ width: "100%", height: "100%", pointerEvents: "auto" }}>
