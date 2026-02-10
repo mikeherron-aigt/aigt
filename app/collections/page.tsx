@@ -4,9 +4,10 @@ import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 
-// Cache the rendered page for 5 minutes.
-// This is a big win on Netlify because it avoids re-fetching huge data for every visit.
-export const revalidate = 300;
+// Force dynamic rendering to avoid build-time API calls that return 403.
+// This ensures fresh data on every request and random artwork selection works properly.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const collectionDescriptions: Record<string, string> = {
   // Add collection descriptions here, keyed by collection name.

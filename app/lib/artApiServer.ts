@@ -32,15 +32,25 @@ const normalizeArtworks = (artworks: Artwork[]): Artwork[] =>
   artworks.map(normalizeArtwork);
 
 async function fetchServer<T>(endpoint: string) {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    next: { revalidate: 300 },
-  });
+  const url = `${API_BASE_URL}${endpoint}`;
 
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.statusText}`);
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: 300 },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(
+        `API request failed: ${response.status} ${response.statusText} - ${errorText}\nURL: ${url}`
+      );
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    console.error(`Error fetching ${url}:`, error);
+    throw error;
   }
-
-  return (await response.json()) as T;
 }
 
 export async function getCollections(): Promise<Collection[]> {

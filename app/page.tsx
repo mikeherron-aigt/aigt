@@ -8,6 +8,9 @@ import { FAQSection } from "@/app/components/FAQSection";
 import { VideoSection } from "@/app/components/VideoSection";
 import { slugify } from "@/app/lib/slug";
 
+// Force dynamic rendering to avoid build-time API calls that return 403
+export const dynamic = 'force-dynamic';
+
 const HERO_SKUS = [
   "2025-JD-DW-0007",
   "2024-JD-MM-0009",
