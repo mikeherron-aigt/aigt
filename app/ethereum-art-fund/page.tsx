@@ -8,6 +8,8 @@ import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 import Image from "next/image";
 import { slugify } from "@/app/lib/slug";
+import { useStaticHeroImage } from "@/app/hooks/useStaticHeroImage";
+import { HERO_IMAGES } from "@/app/lib/heroImageConfig";
 
 const JOHN_DOWLING_PROFILE_URL =
   "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620";
@@ -71,7 +73,7 @@ export default function EthereumArtFundPage() {
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
+  const heroImageUrl = useStaticHeroImage({ images: HERO_IMAGES, storageKey: 'eth_fund_hero' });
 
   const { artworks } = useArtworks({ versions: "v02", limit: 100 });
 
@@ -130,85 +132,6 @@ export default function EthereumArtFundPage() {
     return finalShuffled.map(mapArtworkToItem);
   }, [artworks, dailySeed]);
 
-  // Hero artwork selection (cycles through collections before repeating)
-  useEffect(() => {
-    if (featuredArtworks.length === 0) return;
-
-    const ARTWORK_HISTORY_SIZE = 7;
-    const COLLECTIONS_KEY = "eth_fund_collections";
-    const ARTWORK_HISTORY_KEY = "eth_fund_artwork_history";
-
-    const collectionMap = new Map<string, ArtworkItem[]>();
-    featuredArtworks.forEach((artwork) => {
-      const collection = artwork.collection || "unknown";
-      if (!collectionMap.has(collection)) collectionMap.set(collection, []);
-      collectionMap.get(collection)!.push(artwork);
-    });
-
-    const collections = Array.from(collectionMap.keys());
-    if (collections.length === 0) return;
-
-    // Get artwork history to avoid repeating same artwork within 6-8 refreshes
-    let artworkHistory: string[] = [];
-    try {
-      const stored = window.sessionStorage.getItem(ARTWORK_HISTORY_KEY);
-      if (stored) artworkHistory = JSON.parse(stored);
-    } catch {
-      // ignore
-    }
-
-    // Get shown collections to cycle through collections
-    let shownCollections: string[] = [];
-    try {
-      const stored = window.sessionStorage.getItem(COLLECTIONS_KEY);
-      if (stored) shownCollections = JSON.parse(stored);
-    } catch {
-      // ignore
-    }
-
-    const availableCollections = collections.filter(
-      (c) => !shownCollections.includes(c)
-    );
-    const collectionsToUse =
-      availableCollections.length > 0 ? availableCollections : collections;
-
-    const selectedCollection =
-      collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
-    const artworksInCollection = collectionMap.get(selectedCollection)!;
-
-    // Filter out artworks that were recently shown
-    const freshArtworks = artworksInCollection.filter((a) => !artworkHistory.includes(a.id));
-    const artworkPool = freshArtworks.length > 0 ? freshArtworks : artworksInCollection;
-
-    const selected =
-      artworkPool[Math.floor(Math.random() * artworkPool.length)];
-    setHeroArtwork(selected);
-
-    if (selected?.collection) {
-      try {
-        // Update artwork history (keep last 7)
-        const newHistory = [...artworkHistory.filter((id) => id !== selected.id), selected.id].slice(
-          -ARTWORK_HISTORY_SIZE
-        );
-        window.sessionStorage.setItem(ARTWORK_HISTORY_KEY, JSON.stringify(newHistory));
-
-        // Update collection history
-        const newShownCollections = shownCollections.includes(selectedCollection)
-          ? shownCollections
-          : [...shownCollections, selectedCollection];
-
-        // Reset collection history if all collections have been shown
-        const finalCollections =
-          newShownCollections.length >= collections.length ? [] : newShownCollections;
-
-        window.sessionStorage.setItem(COLLECTIONS_KEY, JSON.stringify(finalCollections));
-      } catch {
-        // ignore
-      }
-    }
-  }, [featuredArtworks]);
-
-  const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
@@ -316,34 +239,15 @@ export default function EthereumArtFundPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
-                  {heroArtwork?.src ? (
-                    heroArtworkHref ? (
-                      <Link
-                        href={heroArtworkHref}
-                        aria-label={`View details for ${heroArtwork.title}`}
-                        className="block w-full h-full"
-                      >
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </Link>
-                    ) : (
-                      <div className="w-full h-full">
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </div>
-                    )
+                  {heroImageUrl ? (
+                    <ProgressiveImage
+                      src={heroImageUrl}
+                      alt="Featured artwork"
+                      fill
+                      eager
+                      className="object-cover object-center"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
                   ) : (
                     <div
                       className="w-full h-full"

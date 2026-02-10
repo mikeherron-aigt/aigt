@@ -3,11 +3,11 @@ import { getCollectionArtworkPool, getCollections } from "@/app/lib/artApiServer
 import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { COLLECTION_IMAGES } from "@/app/lib/heroImageConfig";
 
-// Force dynamic rendering to avoid build-time API calls that return 403.
-// This ensures fresh data on every request and random artwork selection works properly.
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Use ISR (Incremental Static Regeneration) with a short revalidation time
+// to balance fresh data with performance. This prevents hanging on slow API responses.
+export const revalidate = 60; // Revalidate every 60 seconds
 
 const collectionDescriptions: Record<string, string> = {
   // Add collection descriptions here, keyed by collection name.
@@ -18,25 +18,52 @@ const isValidArtwork = (title: string) => !title.toLowerCase().includes("untitle
 // Static hero image — no API call or randomization needed
 const HERO_IMAGE_URL = "https://image.artigt.com/JD/DW/2025-JD-DW-0017/2025-JD-DW-0017__full__v02.webp";
 
+/**
+ * Get a random image from the collection's static image pool
+ * If no custom images are configured, return null to fall back to dynamic
+ */
+const getCollectionFeaturedImage = (collectionName: string): string | null => {
+  const images = COLLECTION_IMAGES[collectionName];
+  if (!images || images.length === 0) return null;
+  // Pick a random image from the pool for variety
+  return images[Math.floor(Math.random() * images.length)];
+};
+
 export default async function CollectionsPage() {
   const collections = await getCollections();
 
   // Fetch a small pool (max 24) per collection instead of the entire catalog
+  // Use Promise.allSettled to prevent one failed collection from blocking others
   const results = await Promise.allSettled(
     collections.map(async (collection) => {
-      const pool = await getCollectionArtworkPool(collection.collection_name, 24);
-      const valid = pool.filter((a) => isValidArtwork(a.title));
-      // Pick a random artwork from the pool for visual variety on refresh
-      const featured = valid.length > 0
-        ? valid[Math.floor(Math.random() * valid.length)]
-        : null;
-      return { ...collection, featured };
+      // First, try to get a custom static image for this collection
+      const staticImage = getCollectionFeaturedImage(collection.collection_name);
+
+      if (staticImage) {
+        // Use the custom static image
+        return { ...collection, featuredImageUrl: staticImage };
+      }
+
+      // Fall back to dynamic image selection
+      try {
+        const pool = await getCollectionArtworkPool(collection.collection_name, 24);
+        const valid = pool.filter((a) => isValidArtwork(a.title));
+        // Pick a random artwork from the pool for visual variety on refresh
+        const featured = valid.length > 0
+          ? valid[Math.floor(Math.random() * valid.length)]
+          : null;
+        return { ...collection, featured, featuredImageUrl: featured?.image_url || null };
+      } catch (error) {
+        console.error(`Failed to fetch artworks for collection ${collection.collection_name}:`, error);
+        return { ...collection, featured: null, featuredImageUrl: null };
+      }
     })
   );
 
   const collectionsWithImages = results.map((r, idx) => {
     if (r.status === "fulfilled") return r.value;
-    return { ...collections[idx], featured: null };
+    console.error(`Collection ${collections[idx].collection_name} failed to load:`, r.reason);
+    return { ...collections[idx], featured: null, featuredImageUrl: null };
   });
 
   return (
@@ -86,10 +113,10 @@ export default async function CollectionsPage() {
                       aria-label={`View ${collection.collection_name} collection`}
                     >
                       <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
-                        {collection.featured?.image_url ? (
+                        {collection.featuredImageUrl ? (
                           <ProgressiveImage
-                            src={collection.featured.image_url}
-                            alt={collection.featured.title}
+                            src={collection.featuredImageUrl}
+                            alt={`${collection.collection_name} collection`}
                             fill
                             className="object-cover"
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

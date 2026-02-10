@@ -2,11 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { useArtworks } from "@/app/hooks/useArtworks";
-import type { Artwork } from "@/app/lib/api";
-import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import { useStaticHeroImage } from "@/app/hooks/useStaticHeroImage";
+import { HERO_IMAGES } from "@/app/lib/heroImageConfig";
 
 interface TeamMember {
   name: string;
@@ -90,109 +88,11 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
-interface ArtworkItem {
-  id: string;
-  src: string;
-  title: string;
-  artist: string;
-  year: string;
-  collection?: string;
-}
-
-const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
-  id: artwork.artwork_id.toString(),
-  src: artwork.image_url,
-  title: artwork.title,
-  artist: artwork.artist,
-  year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
-  collection: artwork.collection_name,
-});
-
 export default function AboutPage() {
-  const { artworks } = useArtworks({ versions: "v02", limit: 60 });
-  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
-
-  const featuredWorks = useMemo(() => {
-    return artworks
-      .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
-      .map(mapArtworkToItem);
-  }, [artworks]);
-
-  useEffect(() => {
-    if (featuredWorks.length === 0) return;
-
-    const ARTWORK_HISTORY_SIZE = 7;
-    const COLLECTIONS_KEY = "about_collections";
-    const ARTWORK_HISTORY_KEY = "about_artwork_history";
-
-    const collectionMap = new Map<string, ArtworkItem[]>();
-    featuredWorks.forEach((artwork) => {
-      const collection = artwork.collection || "unknown";
-      if (!collectionMap.has(collection)) collectionMap.set(collection, []);
-      collectionMap.get(collection)!.push(artwork);
-    });
-
-    const collections = Array.from(collectionMap.keys());
-    if (collections.length === 0) return;
-
-    // Get artwork history to avoid repeating same artwork within 6-8 refreshes
-    let artworkHistory: string[] = [];
-    try {
-      const stored = window.sessionStorage.getItem(ARTWORK_HISTORY_KEY);
-      if (stored) artworkHistory = JSON.parse(stored);
-    } catch {
-      // ignore
-    }
-
-    // Get shown collections to cycle through collections
-    let shownCollections: string[] = [];
-    try {
-      const stored = window.sessionStorage.getItem(COLLECTIONS_KEY);
-      if (stored) shownCollections = JSON.parse(stored);
-    } catch {
-      // ignore
-    }
-
-    const availableCollections = collections.filter((c) => !shownCollections.includes(c));
-    const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
-
-    const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
-    const artworksInCollection = collectionMap.get(selectedCollection)!;
-
-    // Filter out artworks that were recently shown
-    const freshArtworks = artworksInCollection.filter((a) => !artworkHistory.includes(a.id));
-    const artworkPool = freshArtworks.length > 0 ? freshArtworks : artworksInCollection;
-
-    const selected = artworkPool[Math.floor(Math.random() * artworkPool.length)];
-    setHeroArtwork(selected);
-
-    if (selected?.collection) {
-      try {
-        // Update artwork history (keep last 7)
-        const newHistory = [...artworkHistory.filter((id) => id !== selected.id), selected.id].slice(
-          -ARTWORK_HISTORY_SIZE
-        );
-        window.sessionStorage.setItem(ARTWORK_HISTORY_KEY, JSON.stringify(newHistory));
-
-        // Update collection history
-        const newShownCollections = shownCollections.includes(selectedCollection)
-          ? shownCollections
-          : [...shownCollections, selectedCollection];
-
-        // Reset collection history if all collections have been shown
-        const finalCollections =
-          newShownCollections.length >= collections.length ? [] : newShownCollections;
-
-        window.sessionStorage.setItem(COLLECTIONS_KEY, JSON.stringify(finalCollections));
-      } catch {
-        // ignore
-      }
-    }
-  }, [featuredWorks]);
-
-  const heroArtworkHref = heroArtwork?.collection
-    ? `/collections/${slugify(heroArtwork.collection)}/${slugify(heroArtwork.title)}`
-    : null;
+  const heroImageUrl = useStaticHeroImage({
+    images: HERO_IMAGES,
+    storageKey: 'about_hero',
+  });
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
@@ -223,34 +123,15 @@ export default function AboutPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
-                  {heroArtwork?.src ? (
-                    heroArtworkHref ? (
-                      <Link
-                        href={heroArtworkHref}
-                        aria-label={`View details for ${heroArtwork.title}`}
-                        className="block w-full h-full"
-                      >
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </Link>
-                    ) : (
-                      <div className="w-full h-full">
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </div>
-                    )
+                  {heroImageUrl ? (
+                    <ProgressiveImage
+                      src={heroImageUrl}
+                      alt="Featured artwork"
+                      fill
+                      eager
+                      className="object-cover object-center"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
                   ) : (
                     <div
                       className="w-full h-full"

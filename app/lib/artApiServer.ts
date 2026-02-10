@@ -31,12 +31,17 @@ const normalizeArtwork = (artwork: Artwork): Artwork => ({
 const normalizeArtworks = (artworks: Artwork[]): Artwork[] =>
   artworks.map(normalizeArtwork);
 
-async function fetchServer<T>(endpoint: string) {
+async function fetchServer<T>(endpoint: string, timeoutMs: number = 10000) {
   const url = `${API_BASE_URL}${endpoint}`;
 
   try {
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
     const response = await fetch(url, {
       next: { revalidate: 300 },
+      signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (compatible; AIGTBot/1.0; +https://www.artigt.com)',
         'Accept': 'application/json',
@@ -44,6 +49,8 @@ async function fetchServer<T>(endpoint: string) {
         'Referer': 'https://www.artigt.com',
       },
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => response.statusText);
@@ -54,6 +61,10 @@ async function fetchServer<T>(endpoint: string) {
 
     return (await response.json()) as T;
   } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.error(`Request timeout after ${timeoutMs}ms for ${url}`);
+      throw new Error(`Request timeout: ${url}`);
+    }
     console.error(`Error fetching ${url}:`, error);
     throw error;
   }

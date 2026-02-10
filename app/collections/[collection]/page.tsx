@@ -4,6 +4,7 @@ import { getCollectionArtworks, getCollections, type Artwork } from "@/app/lib/a
 import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { COLLECTION_IMAGES } from "@/app/lib/heroImageConfig";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,7 @@ const collectionHeroParagraphs: Record<string, string> = {
     "American Graffiti is bold, kinetic, and unapologetically modern. Drawing from the language of the street, these works pulse with movement, rhythm, and controlled chaos, blending raw energy with intentional structure. It is a collection that feels alive, built for collectors drawn to intensity, momentum, and cultural edge.",
   "Cosmic Dreams":
     "Cosmic Dreams invites viewers into a fully imagined universe. Rooted in classical technique yet driven by futuristic vision, these works feel cinematic and timeless, weaving mythology, symbolism, and surreal narrative into a single evolving world. Each piece stands as both artwork and chapter, offering collectors entry into a much larger story.",
-  "Dreams and Wonders":
+  "Dreams & Wonders":
     "Dreams and Wonders is the purest expression of the studio practice. Each painting is a one of one, created without repetition and never revisited. These works are intimate, painterly, and singular, designed for collectors who value originality, craftsmanship, and the quiet power of owning something that exists nowhere else.",
 };
 
@@ -41,6 +42,17 @@ const getPageRange = (current: number, total: number) => {
     if (i >= 1 && i <= total) pages.add(i);
   }
   return Array.from(pages).sort((a, b) => a - b);
+};
+
+/**
+ * Get a random hero image from the collection's static image pool
+ * If no custom images are configured, return null to fall back to dynamic
+ */
+const getCollectionHeroImage = (collectionName: string): string | null => {
+  const images = COLLECTION_IMAGES[collectionName];
+  if (!images || images.length === 0) return null;
+  // Pick a random image from the pool for variety on each page load
+  return images[Math.floor(Math.random() * images.length)];
 };
 
 export default async function CollectionPage({
@@ -95,10 +107,12 @@ export default async function CollectionPage({
   const currentPage = Math.min(page, totalPages);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const pageItems = sorted.slice(startIndex, startIndex + PAGE_SIZE);
+
+  // Try to get a static hero image first, otherwise fall back to first artwork
+  const staticHeroImage = getCollectionHeroImage(collectionName);
   const heroArtwork = sorted[0];
-  const heroArtworkHref = heroArtwork
-    ? `/collections/${collectionSlug}/${slugify(heroArtwork.title)}`
-    : null;
+  const heroImageUrl = staticHeroImage || heroArtwork?.image_url;
+
   const pageRange = getPageRange(currentPage, totalPages);
   const heroParagraph = collectionHeroParagraphs[collectionName];
 
@@ -118,32 +132,16 @@ export default async function CollectionPage({
               </div>
 
               <div className="relative w-full h-full overflow-hidden min-h-[520px]">
-                {heroArtwork?.image_url ? (
-                  heroArtworkHref ? (
-                    <Link
-                      href={heroArtworkHref}
-                      aria-label={`View details for ${heroArtwork.title}`}
-                      className="absolute inset-0"
-                    >
-                      <ProtectedImage
-                        src={heroArtwork.image_url}
-                        alt={heroArtwork.title}
-                        fill
-                        className="object-cover object-center"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                      />
-                    </Link>
-                  ) : (
-                    <div className="absolute inset-0">
-                      <ProtectedImage
-                        src={heroArtwork.image_url}
-                        alt={heroArtwork.title}
-                        fill
-                        className="object-cover object-center"
-                        sizes="(max-width: 1024px) 100vw, 50vw"
-                      />
-                    </div>
-                  )
+                {heroImageUrl ? (
+                  <div className="absolute inset-0">
+                    <ProtectedImage
+                      src={heroImageUrl}
+                      alt={`${collectionName} collection`}
+                      fill
+                      className="object-cover object-center"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  </div>
                 ) : (
                   <div
                     className="w-full h-full"

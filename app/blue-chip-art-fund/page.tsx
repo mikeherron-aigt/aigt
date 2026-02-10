@@ -7,6 +7,8 @@ import type { Artwork } from "@/app/lib/api";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 import { slugify } from "@/app/lib/slug";
+import { useStaticHeroImage } from "@/app/hooks/useStaticHeroImage";
+import { HERO_IMAGES } from "@/app/lib/heroImageConfig";
 
 interface ArtworkItem {
   id: string;
@@ -40,8 +42,10 @@ export default function BlueChipArtFundPage() {
 
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
   const [focusArtwork, setFocusArtwork] = useState<ArtworkItem | null>(null);
+
+  const heroImageUrl = useStaticHeroImage({ images: HERO_IMAGES, storageKey: 'blue_chip_hero' });
+
   const { artworks } = useArtworks({ versions: "v02", limit: 60 });
 
   const featuredWorks = useMemo(() => {
@@ -50,7 +54,7 @@ export default function BlueChipArtFundPage() {
       .map(mapArtworkToItem);
   }, [artworks]);
 
-  // Select random hero artworks on page load (changes only on refresh)
+  // Select random focus artwork on page load (changes only on refresh)
   // Cycles through all collections before repeating
   useEffect(() => {
     if (featuredWorks.length === 0) return;
@@ -98,44 +102,30 @@ export default function BlueChipArtFundPage() {
     // If all collections have been shown, reset
     const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
 
-    // Pick two different collections if possible
-    const selectedCollection1 = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
-    const remainingCollections = collectionsToUse.filter(c => c !== selectedCollection1);
-    const selectedCollection2 = remainingCollections.length > 0
-      ? remainingCollections[Math.floor(Math.random() * remainingCollections.length)]
-      : selectedCollection1;
+    // Pick one collection for the focus artwork
+    const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
 
-    const artworksInCollection1 = collectionMap.get(selectedCollection1)!;
-    const artworksInCollection2 = collectionMap.get(selectedCollection2)!;
+    const artworksInCollection = collectionMap.get(selectedCollection)!;
 
-    // Filter out artworks that were recently shown from both collections
-    const freshArtworks1 = artworksInCollection1.filter((a) => !artworkHistory.includes(a.id));
-    const artworkPool1 = freshArtworks1.length > 0 ? freshArtworks1 : artworksInCollection1;
+    // Filter out artworks that were recently shown
+    const freshArtworks = artworksInCollection.filter((a) => !artworkHistory.includes(a.id));
+    const artworkPool = freshArtworks.length > 0 ? freshArtworks : artworksInCollection;
 
-    const freshArtworks2 = artworksInCollection2.filter((a) => !artworkHistory.includes(a.id));
-    const artworkPool2 = freshArtworks2.length > 0 ? freshArtworks2 : artworksInCollection2;
+    const focus = artworkPool[Math.floor(Math.random() * artworkPool.length)];
 
-    const hero = artworkPool1[Math.floor(Math.random() * artworkPool1.length)];
-    const focus = artworkPool2[Math.floor(Math.random() * artworkPool2.length)];
-
-    setHeroArtwork(hero);
     setFocusArtwork(focus);
 
-    // Save both artworks and collections to history
+    // Save artwork and collection to history
     try {
       // Update artwork history (keep last 7)
       const newHistory = [
-        ...artworkHistory.filter((id) => id !== hero.id && id !== focus.id),
-        hero.id,
+        ...artworkHistory.filter((id) => id !== focus.id),
         focus.id
       ].slice(-ARTWORK_HISTORY_SIZE);
       window.sessionStorage.setItem(ARTWORK_HISTORY_KEY, JSON.stringify(newHistory));
 
       // Update collection history
       const collectionsToAdd: string[] = [];
-      if (hero?.collection && !shownCollections.includes(hero.collection)) {
-        collectionsToAdd.push(hero.collection);
-      }
       if (focus?.collection && !shownCollections.includes(focus.collection)) {
         collectionsToAdd.push(focus.collection);
       }
@@ -152,7 +142,6 @@ export default function BlueChipArtFundPage() {
     }
   }, [featuredWorks]);
 
-  const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
   const focusArtworkHref = focusArtwork ? getArtworkHref(focusArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -258,34 +247,15 @@ export default function BlueChipArtFundPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
-                  {heroArtwork?.src ? (
-                    heroArtworkHref ? (
-                      <Link
-                        href={heroArtworkHref}
-                        aria-label={`View details for ${heroArtwork.title}`}
-                        className="block w-full h-full"
-                      >
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </Link>
-                    ) : (
-                      <div className="w-full h-full">
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </div>
-                    )
+                  {heroImageUrl ? (
+                    <ProgressiveImage
+                      src={heroImageUrl}
+                      alt="Featured artwork"
+                      fill
+                      eager
+                      className="object-cover object-center"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
                   ) : (
                     <div
                       className="w-full h-full"
