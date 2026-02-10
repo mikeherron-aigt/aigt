@@ -9,7 +9,8 @@ import { ProtectedImage } from "@/app/components/ProtectedImage";
 import Image from "next/image";
 import { slugify } from "@/app/lib/slug";
 
-const JOHN_DOWLING_PROFILE_URL = "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620";
+const JOHN_DOWLING_PROFILE_URL =
+  "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620";
 
 interface ArtworkItem {
   src: string;
@@ -23,96 +24,158 @@ const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
   src: artwork.image_url,
   title: artwork.title,
   artist: artwork.artist,
-  year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
+  year: artwork.year_created ? artwork.year_created.toString() : "",
   collection: artwork.collection_name,
 });
 
-const getArtworkHref = (artwork: { title: string; collection?: string }) => {
-  if (!artwork.collection) return null;
-  return `/collections/${slugify(artwork.collection)}/${slugify(artwork.title)}`;
+const getArtworkHref = (artwork: {
+  title: string;
+  collection?: string;
+  collection_name?: string;
+}) => {
+  const collectionName = artwork.collection ?? artwork.collection_name;
+  if (!collectionName) return null;
+  return `/collections/${slugify(collectionName)}/${slugify(artwork.title)}`;
+};
+
+// Shuffle function using Fisher-Yates algorithm (same as Home)
+const shuffleArray = <T,>(array: T[], seed: number): T[] => {
+  const shuffled = [...array];
+  let currentIndex = shuffled.length;
+
+  const seededRandom = () => {
+    seed = (seed * 9301 + 49297) % 233280;
+    return seed / 233280;
+  };
+
+  while (currentIndex !== 0) {
+    const randomIndex = Math.floor(seededRandom() * currentIndex);
+    currentIndex--;
+    [shuffled[currentIndex], shuffled[randomIndex]] = [
+      shuffled[randomIndex],
+      shuffled[currentIndex],
+    ];
+  }
+  return shuffled;
 };
 
 export default function EthereumArtFundPage() {
   const sliderRef = useRef<HTMLDivElement>(null);
+
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
+
   const { artworks } = useArtworks({ versions: "v02" });
 
-  // Get featured works from all collections (v02, no untitled)
-  const featuredWorks = useMemo(() => {
-    return artworks
-      .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
-      .map(mapArtworkToItem);
-  }, [artworks]);
+  const isValidTitle = (title: string) => !title.toLowerCase().includes("untitled");
+  const validArtworks = useMemo(
+    () => artworks.filter((artwork) => isValidTitle(artwork.title)),
+    [artworks]
+  );
 
-  // Select a random hero artwork on page load (changes only on refresh)
-  // Cycles through all collections before repeating
-  useEffect(() => {
-    if (featuredWorks.length === 0) return;
+  // Use a seed based on the current date so it changes daily but is consistent within a session
+  const dailySeed = useMemo(() => {
+    const today = new Date();
+    return (
+      today.getFullYear() * 10000 +
+      (today.getMonth() + 1) * 100 +
+      today.getDate()
+    );
+  }, []);
 
-    // Group artworks by collection
-    const collectionMap = new Map<string, ArtworkItem[]>();
-    featuredWorks.forEach((artwork) => {
-      const collection = artwork.collection || 'unknown';
-      if (!collectionMap.has(collection)) {
-        collectionMap.set(collection, []);
+  // Shuffle artworks daily (same as Home)
+  const shuffledArtworks = useMemo(() => {
+    if (validArtworks.length === 0) return [];
+    return shuffleArray(validArtworks, dailySeed);
+  }, [validArtworks, dailySeed]);
+
+  // Pick one from each collection, then fill remaining slots (same as Home)
+  const featuredArtworks = useMemo(() => {
+    if (shuffledArtworks.length === 0) return [];
+
+    const collectionMap = new Map<string, Artwork>();
+    shuffledArtworks.forEach((artwork) => {
+      if (!collectionMap.has(artwork.collection_name)) {
+        collectionMap.set(artwork.collection_name, artwork);
       }
+    });
+
+    const uniqueByCollection = Array.from(collectionMap.values());
+    const remaining = shuffledArtworks.filter((artwork) => {
+      const firstForCollection = collectionMap.get(artwork.collection_name);
+      return (
+        firstForCollection &&
+        firstForCollection.artwork_id !== artwork.artwork_id
+      );
+    });
+
+    const combined = [...uniqueByCollection, ...remaining];
+    return combined.slice(0, 12).map(mapArtworkToItem);
+  }, [shuffledArtworks]);
+
+  // Hero artwork selection (cycles through collections before repeating)
+  useEffect(() => {
+    if (featuredArtworks.length === 0) return;
+
+    const collectionMap = new Map<string, ArtworkItem[]>();
+    featuredArtworks.forEach((artwork) => {
+      const collection = artwork.collection || "unknown";
+      if (!collectionMap.has(collection)) collectionMap.set(collection, []);
       collectionMap.get(collection)!.push(artwork);
     });
 
     const collections = Array.from(collectionMap.keys());
     if (collections.length === 0) return;
 
-    // Get shown collections from sessionStorage
     let shownCollections: string[] = [];
     try {
-      const stored = window.sessionStorage.getItem('eth_fund_collections');
-      if (stored) {
-        shownCollections = JSON.parse(stored);
-      }
+      const stored = window.sessionStorage.getItem("eth_fund_collections");
+      if (stored) shownCollections = JSON.parse(stored);
     } catch {
-      // Ignore errors
+      // ignore
     }
 
-    // Find collections that haven't been shown yet
-    const availableCollections = collections.filter(c => !shownCollections.includes(c));
+    const availableCollections = collections.filter(
+      (c) => !shownCollections.includes(c)
+    );
+    const collectionsToUse =
+      availableCollections.length > 0 ? availableCollections : collections;
 
-    // If all collections have been shown, reset
-    const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
-
-    // Pick a random collection from available ones
-    const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
+    const selectedCollection =
+      collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
     const artworksInCollection = collectionMap.get(selectedCollection)!;
 
-    // Pick a random artwork from that collection
-    const selected = artworksInCollection[Math.floor(Math.random() * artworksInCollection.length)];
+    const selected =
+      artworksInCollection[Math.floor(Math.random() * artworksInCollection.length)];
     setHeroArtwork(selected);
 
-    // Save selected collection to history
     if (selected?.collection) {
       try {
-        const stored = window.sessionStorage.getItem('eth_fund_collections');
-        const shownCollections: string[] = stored ? JSON.parse(stored) : [];
-
-        if (!shownCollections.includes(selected.collection)) {
-          const updated = [...shownCollections, selected.collection];
-          window.sessionStorage.setItem('eth_fund_collections', JSON.stringify(updated));
+        const stored = window.sessionStorage.getItem("eth_fund_collections");
+        const prev: string[] = stored ? JSON.parse(stored) : [];
+        if (!prev.includes(selected.collection)) {
+          window.sessionStorage.setItem(
+            "eth_fund_collections",
+            JSON.stringify([...prev, selected.collection])
+          );
         }
       } catch {
-        // Ignore errors
+        // ignore
       }
     }
-  }, [featuredWorks]);
+  }, [featuredArtworks]);
 
   const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
-    if ((e.target as HTMLElement).closest('button, a')) return;
+    if ((e.target as HTMLElement).closest("button, a")) return;
     setIsDragging(true);
     setStartX(e.pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -125,13 +188,11 @@ export default function EthereumArtFundPage() {
     sliderRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+  const handleMouseUp = () => setIsDragging(false);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!sliderRef.current) return;
-    if ((e.target as HTMLElement).closest('a')) return;
+    if ((e.target as HTMLElement).closest("a")) return;
     setIsDragging(true);
     setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -144,82 +205,72 @@ export default function EthereumArtFundPage() {
     sliderRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-  };
+  const handleTouchEnd = () => setIsDragging(false);
 
-  const scrollSlider = (direction: 'left' | 'right') => {
+  const scrollSlider = (direction: "left" | "right") => {
     if (!sliderRef.current) return;
     const scrollAmount = 350;
-    const newScrollLeft = direction === 'left'
-      ? sliderRef.current.scrollLeft - scrollAmount
-      : sliderRef.current.scrollLeft + scrollAmount;
+    const newScrollLeft =
+      direction === "left"
+        ? sliderRef.current.scrollLeft - scrollAmount
+        : sliderRef.current.scrollLeft + scrollAmount;
 
-    sliderRef.current.scrollTo({
-      left: newScrollLeft,
-      behavior: 'smooth'
-    });
+    sliderRef.current.scrollTo({ left: newScrollLeft, behavior: "smooth" });
   };
 
   const openModal = (artwork: ArtworkItem) => {
+    if (!artwork.src) return;
     setSelectedImage(artwork);
     setIsModalOpen(true);
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedImage(null);
-    document.body.style.overflow = 'unset';
+    document.body.style.overflow = "unset";
   };
 
   useEffect(() => {
     const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        closeModal();
-      }
+      if (e.key === "Escape") closeModal();
     };
 
     if (isModalOpen) {
-      document.addEventListener('keydown', handleEscapeKey);
-      return () => {
-        document.removeEventListener('keydown', handleEscapeKey);
-      };
+      document.addEventListener("keydown", handleEscapeKey);
+      return () => document.removeEventListener("keydown", handleEscapeKey);
     }
   }, [isModalOpen]);
 
   return (
-    <div className="min-h-screen" style={{backgroundColor: '#f5f5f5'}}>
-
-
-      {/* Main Content */}
+    <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
       <main>
         {/* Hero Section */}
-        <section className="w-full" style={{backgroundColor: '#f5f5f5'}}>
+        <section className="w-full" style={{ backgroundColor: "#f5f5f5" }}>
           <div className="max-w-[1440px] mx-auto relative">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
               {/* Content Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center justify-center py-12 lg:py-0">
                 <div className="max-w-[711px] w-full">
-                  {/* Heading */}
-                  <h1 style={{marginBottom: '17px', textAlign: 'left'}}>
+                  <h1 style={{ marginBottom: "17px", textAlign: "left" }}>
                     Ethereum Art Fund
                   </h1>
 
-                  {/* Subtitle */}
-                  <div className="hero-subtitle" style={{textAlign: 'left'}}>
-                    <p>
-                      Tokenized Access to Ethereum-Native Cultural Assets
-                    </p>
+                  <div className="hero-subtitle" style={{ textAlign: "left" }}>
+                    <p>Tokenized Access to Ethereum Native Cultural Assets</p>
                   </div>
 
-                  {/* Body Copy */}
-                  <div style={{textAlign: 'left', marginTop: '24px'}}>
+                  <div style={{ textAlign: "left", marginTop: "24px" }}>
                     <p>
-                      The Ethereum Art Fund is a governed platform designed to explore structured ownership, fractionalization, and tokenized access to culturally significant, Ethereum-native artworks.
+                      The Ethereum Art Fund is a governed platform designed to explore
+                      structured ownership, fractionalization, and tokenized access to
+                      culturally significant, Ethereum native artworks.
                     </p>
-                    <p style={{marginTop: '16px'}}>
-                      Operating within the Art Investment Group Trust framework, EAF applies institutional governance to an emerging asset model that blends art stewardship with evolving blockchain-based ownership structures.
+                    <p style={{ marginTop: "16px" }}>
+                      Operating within the Art Investment Group Trust framework, the
+                      Ethereum Art Fund applies institutional governance to an emerging
+                      asset model that blends art stewardship with evolving blockchain
+                      based ownership structures.
                     </p>
                   </div>
                 </div>
@@ -267,17 +318,32 @@ export default function EthereumArtFundPage() {
             </div>
 
             {/* Decorative Elements */}
-            <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none" style={{top: '0', height: 'calc(100% - 242px)'}}></div>
-            <div className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none" style={{top: 'calc(100% - 242px)', height: '242px'}}></div>
+            <div
+              className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none"
+              style={{ top: "0", height: "calc(100% - 242px)" }}
+            />
+            <div
+              className="absolute lg:left-[calc(60%-32px)] w-8 bg-ledger-stone hidden lg:block pointer-events-none"
+              style={{ top: "calc(100% - 242px)", height: "242px" }}
+            />
           </div>
         </section>
 
         {/* Design Bar */}
         <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
-          <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{width: 'calc(50vw + 112px)'}}></div>
-          <div className="absolute top-0 h-full bg-ledger-stone" style={{left: 'calc(50vw + 105px)', right: '0'}}></div>
+          <div
+            className="absolute top-0 left-0 h-full bg-gallery-plaster"
+            style={{ width: "calc(50vw + 112px)" }}
+          />
+          <div
+            className="absolute top-0 h-full bg-ledger-stone"
+            style={{ left: "calc(50vw + 105px)", right: "0" }}
+          />
           <div className="max-w-[1440px] w-full h-full relative">
-            <div className="absolute top-0 w-8 h-full bg-deep-patina" style={{left: 'calc(60% - 32px)'}}></div>
+            <div
+              className="absolute top-0 w-8 h-full bg-deep-patina"
+              style={{ left: "calc(60% - 32px)" }}
+            />
           </div>
         </div>
 
@@ -285,59 +351,68 @@ export default function EthereumArtFundPage() {
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
           <div className="max-w-[1440px] mx-auto relative">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
-              {/* Left Column */}
               <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
                 <div className="max-w-[579px]">
-                  <h2 style={{marginBottom: '24px'}}>
+                  <h2 style={{ marginBottom: "24px" }}>
                     Institutional Discipline for an Experimental Medium
                   </h2>
                   <p>
-                    Ethereum-native art represents one of the most important cultural developments of the digital era. It also introduces new forms of ownership, liquidity, and risk.
+                    Ethereum native art represents one of the most important cultural
+                    developments of the digital era. It also introduces new forms of
+                    ownership, liquidity, and risk.
                   </p>
                   <p>
-                    Ethereum Art Fund is intentionally designed to operate with a higher risk profile and a shorter expected time horizon than other AIGT platforms.
+                    Ethereum Art Fund is intentionally designed to operate with a higher
+                    risk profile and a shorter expected time horizon than other Art
+                    Investment Group Trust platforms.
                   </p>
                 </div>
               </div>
 
-              {/* Right Column */}
-              <div className="px-4 sm:px-8 lg:p-[80px_40px]" style={{backgroundColor: '#f5f5f5'}}>
-                <h3 style={{marginBottom: '24px'}}>
+              <div
+                className="px-4 sm:px-8 lg:p-[80px_40px]"
+                style={{ backgroundColor: "#f5f5f5" }}
+              >
+                <h3 style={{ marginBottom: "24px" }}>
                   Structured Exposure to Innovation
                 </h3>
-                <p style={{marginBottom: '16px'}}>
+                <p style={{ marginBottom: "16px" }}>
                   Applying governance to tokenized art ownership
                 </p>
-                <p style={{marginBottom: '16px'}}>
+                <p style={{ marginBottom: "16px" }}>
                   Exploring fractional participation structures
                 </p>
-                <p style={{marginBottom: '16px'}}>
+                <p style={{ marginBottom: "16px" }}>
                   Establishing standards for custody, documentation, and access
                 </p>
-                <p>
-                  Creating controlled exposure to an evolving market
-                </p>
+                <p>Creating controlled exposure to an evolving market</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* A Distinct Mandate Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-20" style={{backgroundColor: '#f5f5f5'}}>
+        <section
+          className="w-full py-12 sm:py-16 lg:py-20"
+          style={{ backgroundColor: "#f5f5f5" }}
+        >
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
-              <h2 className="text-center">
-                A Distinct Mandate
-              </h2>
+              <h2 className="text-center">A Distinct Mandate</h2>
               <h3 className="text-center max-w-[735px]">
-                The Ethereum Art Fund is differentiated from other Art Investment Group Trust stewardship platforms by its mandate.
+                The Ethereum Art Fund is differentiated from other Art Investment Group
+                Trust stewardship platforms by its mandate.
               </h3>
               <p className="text-center max-w-[995px]">
-                The Ethereum Art Fund was established with a clearly defined mandate. It operates at the intersection of cultural stewardship and evolving ownership models, engaging selectively with tokenization and fractional participation while maintaining institutional governance. This flexibility introduces additional risk and shorter time horizons, which are acknowledged and managed through structure rather than avoided.
+                The Ethereum Art Fund was established with a clearly defined mandate. It
+                operates at the intersection of cultural stewardship and evolving ownership
+                models, engaging selectively with tokenization and fractional participation
+                while maintaining institutional governance. This flexibility introduces
+                additional risk and shorter time horizons, which are acknowledged and
+                managed through structure rather than avoided.
               </p>
             </div>
 
-            {/* Four Boxes */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="stewardship-card">
                 <h3 className="stewardship-card-title text-center">
@@ -367,7 +442,6 @@ export default function EthereumArtFundPage() {
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid lg:grid-cols-[278px_1fr] gap-12 lg:gap-[120px] items-start">
-              {/* Left: Image - John Dowling Jr. Profile Photo */}
               <div className="flex justify-center lg:justify-start">
                 <div className="relative w-[278px] h-[278px] rounded-full overflow-hidden">
                   <Image
@@ -380,163 +454,237 @@ export default function EthereumArtFundPage() {
                 </div>
               </div>
 
-              {/* Right: Content */}
               <div className="max-w-[579px]">
-                <h2 style={{marginBottom: '24px'}}>
+                <h2 style={{ marginBottom: "24px" }}>
                   The Catalog of John Dowling Jr.
                 </h2>
                 <p>
-                  The fund launched with the complete Ethereum-native catalog of John Dowling Jr. as its foundational body of work.
+                  The fund launched with the complete Ethereum native catalog of John
+                  Dowling Jr. as its foundational body of work.
                 </p>
                 <p>
-                  Dowling's on-chain practice represents a cohesive and historically significant contribution to early Ethereum-native art. The catalog provides a structured and well-documented foundation suitable for experimentation with fractional ownership models under governance.
+                  Dowling&apos;s on chain practice represents a cohesive and historically
+                  significant contribution to early Ethereum native art. The catalog
+                  provides a structured and well documented foundation suitable for
+                  experimentation with fractional ownership models under governance.
                 </p>
-                <p>
-                  The collection offers:
-                </p>
-                <ul style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
+                <p>The collection offers:</p>
+                <ul
+                  style={{
+                    paddingLeft: "20px",
+                    listStyle: "disc",
+                    marginTop: "8px",
+                  }}
+                >
                   <li>Clear provenance</li>
                   <li>Cohesive artistic narrative</li>
                   <li>Sufficient scale for structured participation</li>
-                  <li>Alignment with Ethereum-native principles</li>
+                  <li>Alignment with Ethereum native principles</li>
                 </ul>
               </div>
             </div>
 
-            {/* Featured Works Slider */}
+            {/* Featured Works Slider (MATCHES HOME) */}
             <div className="mt-16">
-              <h3 style={{marginBottom: '32px'}}>
-                Featured Works
-              </h3>
-              
-              {/* Slider Container */}
-              <div className="slider-wrapper">
-                <div className="slider-container">
-                  <div
-                    ref={sliderRef}
-                    className="artwork-slider"
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    style={{ cursor: isDragging ? 'grabbing' : 'grab', userSelect: 'none' }}
-                  >
-                    {[...featuredWorks, ...featuredWorks].map((artwork, index) => (
-                      <div key={index} className="artwork-card">
-                        {(() => {
-                          const artworkHref = getArtworkHref(artwork);
-                          const imageContent = (
-                            <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
-                              <ProgressiveImage
-                                src={artwork.src}
-                                alt={artwork.title}
-                                fill
-                                className="object-cover"
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                              />
-                            </div>
-                          );
+              <h3 style={{ marginBottom: "32px" }}>Featured Works</h3>
 
-                          return artworkHref ? (
-                            <Link
-                              href={artworkHref}
-                              className="artwork-card-button"
-                              aria-label={`View details for ${artwork.title}`}
-                            >
-                              {imageContent}
-                            </Link>
-                          ) : (
-                            <div className="artwork-card-button">{imageContent}</div>
-                          );
-                        })()}
-                        <div className="artwork-info">
-                          <h3>{artwork.title}</h3>
-                          <p className="artwork-details">{artwork.artist}</p>
-                        </div>
-                      </div>
-                    ))}
+              {featuredArtworks.length === 0 ? (
+                <div className="slider-wrapper">
+                  <div className="max-w-[1440px] mx-auto">
+                    <p className="governance-description">
+                      No artworks available at this time.
+                    </p>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="slider-wrapper">
+                  <div className="slider-container">
+                    <div
+                      ref={sliderRef}
+                      className="artwork-slider"
+                      onMouseDown={handleMouseDown}
+                      onMouseMove={handleMouseMove}
+                      onMouseUp={handleMouseUp}
+                      onMouseLeave={handleMouseUp}
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
+                      style={{
+                        cursor: isDragging ? "grabbing" : "grab",
+                        userSelect: "none",
+                      }}
+                    >
+                      {[...featuredArtworks, ...featuredArtworks].map(
+                        (artwork, index) => (
+                          <div
+                            key={`${artwork.title}-${index}`}
+                            className="artwork-card"
+                          >
+                            {(() => {
+                              const artworkHref = getArtworkHref(artwork);
+                              const imageContent = (
+                                <div className="artwork-image-wrapper">
+                                  {artwork.src ? (
+                                    <ProgressiveImage
+                                      src={artwork.src}
+                                      alt={artwork.title}
+                                      fill
+                                      eager={index < 3}
+                                      className="object-cover"
+                                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                                    />
+                                  ) : (
+                                    <div
+                                      className="w-full h-full"
+                                      style={{
+                                        backgroundColor: "var(--gallery-plaster)",
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              );
 
-              {/* Slider Navigation Arrows */}
-              <div className="flex justify-center items-center gap-6 mt-12">
-                <button
-                  onClick={() => scrollSlider('left')}
-                  className="slider-nav-arrow slider-nav-arrow-left"
-                  aria-label="Scroll left"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                  </svg>
-                </button>
-                <button
-                  onClick={() => scrollSlider('right')}
-                  className="slider-nav-arrow slider-nav-arrow-right"
-                  aria-label="Scroll right"
-                >
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                  </svg>
-                </button>
-              </div>
+                              return artworkHref ? (
+                                <Link
+                                  href={artworkHref}
+                                  className="artwork-card-button"
+                                  aria-label={`View details for ${artwork.title}`}
+                                >
+                                  {imageContent}
+                                </Link>
+                              ) : (
+                                <div className="artwork-card-button">
+                                  {imageContent}
+                                </div>
+                              );
+                            })()}
+
+                            <div className="artwork-info">
+                              <h3 className="artwork-title">{artwork.title}</h3>
+                              <p className="artwork-details">
+                                {artwork.artist}
+                                {artwork.collection ? (
+                                  <>
+                                    <br />
+                                    {artwork.collection}
+                                  </>
+                                ) : null}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {featuredArtworks.length > 0 && (
+                <div className="flex justify-center items-center gap-6 mt-12">
+                  <button
+                    onClick={() => scrollSlider("left")}
+                    className="slider-nav-arrow slider-nav-arrow-left"
+                    aria-label="Scroll left"
+                  >
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => scrollSlider("right")}
+                    className="slider-nav-arrow slider-nav-arrow-right"
+                    aria-label="Scroll right"
+                  >
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </section>
 
         {/* How the Ethereum Art Fund Operates */}
-        <section className="w-full py-12 sm:py-16 lg:py-20" style={{backgroundColor: '#f5f5f5'}}>
+        <section
+          className="w-full py-12 sm:py-16 lg:py-20"
+          style={{ backgroundColor: "#f5f5f5" }}
+        >
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
-              <h2 className="text-center">
-                How the Ethereum Art Fund Operates
-              </h2>
+              <h2 className="text-center">How the Ethereum Art Fund Operates</h2>
               <h3 className="text-center max-w-[817px]">
-                An overview of participation mechanics, risk profile, and operating discipline.
+                An overview of participation mechanics, risk profile, and operating
+                discipline.
               </h3>
               <p className="text-center max-w-[995px]">
-                The Ethereum Art Fund operates through selective acquisition, experimental ownership structures, higher risk tolerance, and governance designed to explore emerging models while maintaining institutional discipline.
+                The Ethereum Art Fund operates through selective acquisition, experimental
+                ownership structures, higher risk tolerance, and governance designed to
+                explore emerging models while maintaining institutional discipline.
               </p>
             </div>
 
-            {/* Two Column Grid */}
             <div className="grid lg:grid-cols-2 gap-8">
-              {/* Fractionalized Participation */}
               <div className="practice-card">
                 <div className="practice-card-content">
                   <h3>Fractionalized Participation</h3>
                   <p>
-                    Ethereum Art Fund is designed to enable fractional exposure to curated bodies of work rather than sole ownership of individual pieces.
+                    Ethereum Art Fund is designed to enable fractional exposure to curated
+                    bodies of work rather than sole ownership of individual pieces.
                   </p>
-                  <p>
-                    Participation structures may include:
-                  </p>
-                  <ul style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
+                  <p>Participation structures may include:</p>
+                  <ul
+                    style={{
+                      paddingLeft: "20px",
+                      listStyle: "disc",
+                      marginTop: "8px",
+                    }}
+                  >
                     <li>Tokenized representations of pooled artworks</li>
                     <li>Fractional economic interests</li>
                     <li>Defined governance and transfer parameters</li>
                     <li>Clear disclosures around risk and liquidity constraints</li>
                   </ul>
                   <p>
-                    These structures are subject to regulatory considerations and are implemented conservatively.
+                    These structures are subject to regulatory considerations and are
+                    implemented conservatively.
                   </p>
                 </div>
               </div>
 
-              {/* Higher Risk. Shorter Horizon */}
               <div className="practice-card">
                 <div className="practice-card-content">
                   <h3>Higher Risk. Shorter Horizon</h3>
                   <p>
-                    The Ethereum Art Fund carries a higher risk profile than the long-horizon stewardship Blue Chip Art Fund platform
+                    The Ethereum Art Fund carries a higher risk profile than the long
+                    horizon stewardship Blue Chip Art Fund platform.
                   </p>
-                  <p>
-                    Risk factors include:
-                  </p>
-                  <ul style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
+                  <p>Risk factors include:</p>
+                  <ul
+                    style={{
+                      paddingLeft: "20px",
+                      listStyle: "disc",
+                      marginTop: "8px",
+                    }}
+                  >
                     <li>Market volatility</li>
                     <li>Regulatory evolution</li>
                     <li>Technological change</li>
@@ -544,40 +692,47 @@ export default function EthereumArtFundPage() {
                     <li>Novel ownership structures</li>
                   </ul>
                   <p>
-                    Ethereum Art Fund is intended for participants who understand and accept these dynamics as part of exposure to an emerging asset class.
+                    Ethereum Art Fund is intended for participants who understand and
+                    accept these dynamics as part of exposure to an emerging asset class.
                   </p>
                 </div>
               </div>
 
-              {/* Selective and Disciplined Growth */}
               <div className="practice-card">
                 <div className="practice-card-content">
                   <h3>Selective and Disciplined Growth</h3>
                   <p>
-                    While the Dowling catalog serves as the foundation, Ethereum Art Fund may expand to include additional Ethereum-native works that meet the fund's acquisition and governance criteria.
+                    While the Dowling catalog serves as the foundation, Ethereum Art Fund
+                    may expand to include additional Ethereum native works that meet the
+                    fund&apos;s acquisition and governance criteria.
                   </p>
                   <p>
-                    Expansion remains selective and committee-driven, with a focus on cultural relevance and suitability for tokenized participation models.
+                    Expansion remains selective and committee driven, with a focus on
+                    cultural relevance and suitability for tokenized participation models.
                   </p>
                 </div>
               </div>
 
-              {/* Governance in a Digital Context */}
               <div className="practice-card">
                 <div className="practice-card-content">
                   <h3>Governance in a Digital Context</h3>
                   <p>
-                    Despite its experimental mandate, Ethereum Art Fund maintains institutional custody and control standards, including:
+                    Despite its experimental mandate, Ethereum Art Fund maintains
+                    institutional custody and control standards, including:
                   </p>
-                  <ul style={{paddingLeft: '20px', listStyle: 'disc', marginTop: '8px'}}>
+                  <ul
+                    style={{
+                      paddingLeft: "20px",
+                      listStyle: "disc",
+                      marginTop: "8px",
+                    }}
+                  >
                     <li>Secure digital asset custody</li>
                     <li>Redundant access management</li>
                     <li>Documentation and provenance continuity</li>
                     <li>Ongoing technical review</li>
                   </ul>
-                  <p>
-                    Innovation does not replace discipline.
-                  </p>
+                  <p>Innovation does not replace discipline.</p>
                 </div>
               </div>
             </div>
@@ -587,68 +742,145 @@ export default function EthereumArtFundPage() {
         {/* Participation and Alignment */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
-            <h2 style={{marginBottom: '16px'}}>
-              Participation and Alignment
-            </h2>
-            <p className="max-w-[1038px]" style={{marginBottom: '48px'}}>
-              Participation in the Ethereum Art Fund is intentionally structured. The following considerations outline who the platform is designed for, how it differs from other stewardship platforms, and the expectations around engagement, risk, and alignment.
+            <h2 style={{ marginBottom: "16px" }}>Participation and Alignment</h2>
+            <p className="max-w-[1038px]" style={{ marginBottom: "48px" }}>
+              Participation in the Ethereum Art Fund is intentionally structured. The
+              following considerations outline who the platform is designed for, how it
+              differs from other stewardship platforms, and the expectations around
+              engagement, risk, and alignment.
             </p>
 
-            {/* Three Grey Boxes */}
             <div className="flex flex-col gap-6">
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto', backgroundColor: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: '0'}}>
-                <h3 className="stewardship-card-title" style={{textAlign: 'left', width: '100%'}}>For Informed and Qualified Participants</h3>
-                <p className="stewardship-card-description" style={{marginTop: '16px'}}>
-                  Participation in the Ethereum Art Fund is offered through private placement to qualified participants who understand the experimental nature of tokenized art structures.
+              <div
+                className="stewardship-card"
+                style={{
+                  padding: "40px",
+                  width: "100%",
+                  maxWidth: "1199px",
+                  minHeight: "auto",
+                  backgroundColor: "#f5f5f5",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  gap: "0",
+                }}
+              >
+                <h3
+                  className="stewardship-card-title"
+                  style={{ textAlign: "left", width: "100%" }}
+                >
+                  For Informed and Qualified Participants
+                </h3>
+                <p className="stewardship-card-description" style={{ marginTop: "16px" }}>
+                  Participation in the Ethereum Art Fund is offered through private
+                  placement to qualified participants who understand the experimental
+                  nature of tokenized art structures.
                 </p>
                 <p className="stewardship-card-description">
-                  Ethereum Art Fund is not positioned as a preservation-only vehicle, nor as a trading product. It occupies a defined middle ground between stewardship and innovation.
+                  Ethereum Art Fund is not positioned as a preservation only vehicle, nor
+                  as a trading product. It occupies a defined middle ground between
+                  stewardship and innovation.
                 </p>
               </div>
 
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto', backgroundColor: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: '0'}}>
-                <h3 className="stewardship-card-title" style={{textAlign: 'left', width: '100%'}}>Complementary, Not Substitutable</h3>
-                <p className="stewardship-card-description" style={{marginTop: '16px'}}>
-                  Ethereum Art Fund operates alongside Art Investment Group Trust's long-horizon, lower-risk stewardship Blue Chip Art Fund platform. Participants seeking permanent ownership, minimal turnover, and preservation-first mandates may find those platforms more appropriate. Participants seeking structured exposure to tokenized art ownership and emerging market dynamics may find alignment with Ethereum Art Fund.
+              <div
+                className="stewardship-card"
+                style={{
+                  padding: "40px",
+                  width: "100%",
+                  maxWidth: "1199px",
+                  minHeight: "auto",
+                  backgroundColor: "#f5f5f5",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  gap: "0",
+                }}
+              >
+                <h3
+                  className="stewardship-card-title"
+                  style={{ textAlign: "left", width: "100%" }}
+                >
+                  Complementary, Not Substitutable
+                </h3>
+                <p className="stewardship-card-description" style={{ marginTop: "16px" }}>
+                  Ethereum Art Fund operates alongside Art Investment Group Trust&apos;s long
+                  horizon, lower risk stewardship Blue Chip Art Fund platform. Participants
+                  seeking permanent ownership, minimal turnover, and preservation first
+                  mandates may find those platforms more appropriate. Participants seeking
+                  structured exposure to tokenized art ownership and emerging market
+                  dynamics may find alignment with Ethereum Art Fund.
                 </p>
               </div>
 
-              <div className="stewardship-card" style={{padding: '40px', width: '100%', maxWidth: '1199px', minHeight: 'auto', backgroundColor: '#f5f5f5', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', gap: '0'}}>
-                <h3 className="stewardship-card-title" style={{textAlign: 'left', width: '100%'}}>Informed Dialogue Required</h3>
-                <p className="stewardship-card-description" style={{marginTop: '16px'}}>
-                  Art Investment Group Trust engages prospective participants through direct, considered discussion. Understanding intent, risk tolerance, and time horizon is essential before participation. Request access to begin a private conversation about the Ethereum Art Fund.
+              <div
+                className="stewardship-card"
+                style={{
+                  padding: "40px",
+                  width: "100%",
+                  maxWidth: "1199px",
+                  minHeight: "auto",
+                  backgroundColor: "#f5f5f5",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  gap: "0",
+                }}
+              >
+                <h3
+                  className="stewardship-card-title"
+                  style={{ textAlign: "left", width: "100%" }}
+                >
+                  Informed Dialogue Required
+                </h3>
+                <p className="stewardship-card-description" style={{ marginTop: "16px" }}>
+                  Art Investment Group Trust engages prospective participants through
+                  direct, considered discussion. Understanding intent, risk tolerance, and
+                  time horizon is essential before participation. Request access to begin
+                  a private conversation about the Ethereum Art Fund.
                 </p>
               </div>
             </div>
-
           </div>
         </section>
 
         {/* Private Conversations Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{backgroundColor: '#ffffff'}}>
+        <section
+          className="w-full py-12 sm:py-16 lg:py-[80px]"
+          style={{ backgroundColor: "#ffffff" }}
+        >
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
-              {/* Tagline */}
               <h2 className="text-center max-w-[912px] mx-auto">
-                Governed platforms for the long-term stewardship of culturally significant art.
+                Governed platforms for the long term stewardship of culturally significant
+                art.
               </h2>
 
-              {/* Private Conversations Section */}
               <div className="text-center flex flex-col items-center gap-4">
-                <h3 className="text-center">
-                  Private Conversations
-                </h3>
+                <h3 className="text-center">Private Conversations</h3>
                 <p className="text-center max-w-[789px] mx-auto">
-                  Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not transactions.
+                  Art Investment Group Trust engages with collectors, institutions, and
+                  qualified participants through direct, considered dialogue. We believe
+                  the stewardship of important art begins with thoughtful conversation,
+                  not transactions.
                 </p>
                 <p className="text-center max-w-[789px] mx-auto">
-                  These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
+                  These conversations are exploratory by design. They allow space to
+                  discuss long term intent, governance alignment, and the role each
+                  participant seeks to play in preserving cultural value across
+                  generations.
                 </p>
               </div>
 
-              {/* CTA Button */}
               <div className="flex justify-center">
-                <a href="/request-access" className="footer-cta-primary" style={{textDecoration: 'none', display: 'inline-flex'}}>
+                <a
+                  href="/request-access"
+                  className="footer-cta-primary"
+                  style={{ textDecoration: "none", display: "inline-flex" }}
+                >
                   Schedule a Discussion
                 </a>
               </div>
@@ -657,9 +889,7 @@ export default function EthereumArtFundPage() {
         </section>
       </main>
 
-  
-
-      {/* Image Modal - Same as home page */}
+      {/* Image Modal (kept, in case you use it elsewhere) */}
       {isModalOpen && selectedImage && (
         <div
           className="image-modal-backdrop"
@@ -668,15 +898,27 @@ export default function EthereumArtFundPage() {
           aria-modal="true"
           aria-label="Full-size image viewer"
         >
-          <div className="image-modal-content" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="image-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               className="image-modal-close"
               onClick={closeModal}
               aria-label="Close image viewer"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
 
@@ -692,7 +934,9 @@ export default function EthereumArtFundPage() {
 
             <div className="image-modal-info">
               <h2 className="image-modal-title">{selectedImage.title}</h2>
-              <p className="image-modal-artist">{selectedImage.artist}, {selectedImage.year}</p>
+              <p className="image-modal-artist">
+                {selectedImage.artist}, {selectedImage.year}
+              </p>
             </div>
           </div>
         </div>
