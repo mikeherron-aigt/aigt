@@ -257,11 +257,11 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* About John Dowling Section (FIXED ALIGNMENT) */}
+        {/* About John Dowling Section (CENTERED UNDER IMAGE ON MOBILE) */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-[37px] items-center">
-              {/* Left: Portrait + Centered Headings that match portrait width */}
+              {/* Left */}
               <div className="flex flex-col gap-8 items-center lg:items-start">
                 <div className="relative w-[310px] h-[310px] rounded-full overflow-hidden">
                   <Image
@@ -279,7 +279,7 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              {/* Right: Copy */}
+              {/* Right */}
               <div className="flex flex-col gap-4 p-10 bg-paper-white">
                 <p>
                   John Dowling is an accomplished painter, photographer, and writer whose four decade career has produced
@@ -339,7 +339,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Team Section */}
+        {/* Team Section (UPDATED ROLE STYLING) */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[120px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20 max-w-[995px] mx-auto">
@@ -368,20 +368,29 @@ export default function AboutPage() {
                       />
                     </div>
 
-                    <h3 className="text-[20px] lg:text-[22px] font-normal leading-normal m-0 mb-2">{member.name}</h3>
+                    <h3 className="text-[20px] lg:text-[22px] font-normal leading-snug m-0 mb-3">
+                      {member.name}
+                    </h3>
 
-                    <p className="font-bold text-[14px] mt-1 mb-0.5">Board Member</p>
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="uppercase tracking-[0.08em] text-[11px] font-medium text-archive-slate">
+                        Board Member
+                      </span>
 
-                    <p className="text-[14px] lg:text-[16px] leading-none m-0" style={{ whiteSpace: "pre-line" }}>
-                      {member.title}
-                    </p>
+                      <span
+                        className="text-[14px] lg:text-[15px] leading-snug text-archive-slate text-center"
+                        style={{ whiteSpace: "pre-line" }}
+                      >
+                        {member.title}
+                      </span>
+                    </div>
 
                     {member.linkedinUrl && (
                       <a
                         href={member.linkedinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center justify-center w-5 h-5 transition-colors"
+                        className="mt-4 inline-flex items-center justify-center w-5 h-5 transition-colors"
                         style={{ color: "var(--archive-slate, #555)" }}
                         onMouseEnter={(e) => (e.currentTarget.style.color = "#0A66C2")}
                         onMouseLeave={(e) => (e.currentTarget.style.color = "var(--archive-slate, #555)")}
