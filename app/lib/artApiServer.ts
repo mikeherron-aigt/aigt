@@ -120,6 +120,61 @@ export async function getArtwork(id: number): Promise<Artwork> {
   return normalizeArtwork(data);
 }
 
+const FEATURED_COLLECTION_CODES = ["AG", "CD", "MM", "DW"] as const;
+const ARTWORKS_PER_COLLECTION = 3;
+
+function extractCollectionCode(sku: string): string | null {
+  const match = sku.match(/^\d{4}-[A-Z]+-([A-Z]+)-\d+$/);
+  return match ? match[1] : null;
+}
+
+export interface HomePageData {
+  bySkus: Record<string, Artwork | null>;
+  featuredArtworks: Artwork[];
+}
+
+/**
+ * Fetches all data needed for the homepage in two parallel upstream requests:
+ * 1. All artworks (unfiltered) — for specific SKU lookup (hero, governance, etc.)
+ * 2. v02 artworks — grouped by collection, 10 from each of AG, CD, MM, DW
+ */
+export async function getHomePageData(skus: string[]): Promise<HomePageData> {
+  const [allArtworks, v02Artworks] = await Promise.all([
+    fetchServer<Artwork[]>("/artworks"),
+    fetchServer<Artwork[]>("/artworks?versions=v02"),
+  ]);
+
+  // Build SKU lookup from the unfiltered list
+  const skuSet = new Set(skus);
+  const bySkus: Record<string, Artwork | null> = {};
+  for (const sku of skus) bySkus[sku] = null;
+  for (const artwork of allArtworks) {
+    if (skuSet.has(artwork.sku)) {
+      bySkus[artwork.sku] = normalizeArtwork(artwork);
+    }
+  }
+
+  // Featured artworks: up to 3 per collection from AG, CD, MM, DW, shuffled
+  const byCollection = new Map<string, Artwork[]>();
+  for (const code of FEATURED_COLLECTION_CODES) {
+    byCollection.set(code, []);
+  }
+  for (const artwork of normalizeArtworks(v02Artworks)) {
+    const code = extractCollectionCode(artwork.sku);
+    if (code && byCollection.has(code)) {
+      const list = byCollection.get(code)!;
+      if (list.length < ARTWORKS_PER_COLLECTION) list.push(artwork);
+    }
+  }
+  const featuredArtworks = Array.from(byCollection.values()).flat();
+  for (let i = featuredArtworks.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [featuredArtworks[i], featuredArtworks[j]] = [featuredArtworks[j], featuredArtworks[i]];
+  }
+
+  return { bySkus, featuredArtworks };
+}
+
 export async function getArtworkBySku(sku: string): Promise<Artwork | null> {
   try {
     // Try fetching with SKU filter first

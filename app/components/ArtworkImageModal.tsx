@@ -22,6 +22,7 @@ export default function ArtworkImageModal({
   const [isOpen, setIsOpen] = useState(false);
   const [canHover, setCanHover] = useState(false);
   const [isZooming, setIsZooming] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [lensPosition, setLensPosition] = useState({ x: 0, y: 0 });
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
@@ -54,12 +55,8 @@ export default function ArtworkImageModal({
     const media = window.matchMedia("(hover: hover)");
     const updateHover = () => setCanHover(media.matches);
     updateHover();
-    if (media.addEventListener) {
-      media.addEventListener("change", updateHover);
-      return () => media.removeEventListener("change", updateHover);
-    }
-    media.addListener(updateHover);
-    return () => media.removeListener(updateHover);
+    media.addEventListener("change", updateHover);
+    return () => media.removeEventListener("change", updateHover);
   }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -153,21 +150,39 @@ export default function ArtworkImageModal({
                 cursor: "crosshair",
               }}
             >
-              <img
-                ref={imageRef}
-                src={smallImageUrl}
-                alt={imageAlt}
-                className="artwork-detail-image aigt-protected-image"
-                draggable={false}
-                style={{
-                  display: "block",
-                  maxWidth: "100%",
-                  maxHeight: "72vh",
-                  width: "auto",
-                  height: "auto",
-                  margin: "0 auto",
-                }}
-              />
+              {imageError ? (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    maxHeight: "72vh",
+                    minHeight: "300px",
+                    width: "100%",
+                    color: "#8a8a8a",
+                    fontSize: "14px",
+                  }}
+                >
+                  Image unavailable
+                </div>
+              ) : (
+                <img
+                  ref={imageRef}
+                  src={smallImageUrl}
+                  alt={imageAlt}
+                  className="artwork-detail-image aigt-protected-image"
+                  draggable={false}
+                  onError={() => setImageError(true)}
+                  style={{
+                    display: "block",
+                    maxWidth: "100%",
+                    maxHeight: "72vh",
+                    width: "auto",
+                    height: "auto",
+                    margin: "0 auto",
+                  }}
+                />
+              )}
               {/* Lens indicator - shows what area is being magnified */}
               {isZooming && (
                 <div
@@ -205,13 +220,18 @@ export default function ArtworkImageModal({
               )}
             </div>
           ) : (
-            <ProtectedImage
-              src={src}
-              alt={imageAlt}
-              className="artwork-detail-image"
-              loading="eager"
-              decoding="async"
-            />
+            <div style={{ position: "relative", width: "100%", height: "72vh" }}>
+              <ProtectedImage
+                src={src}
+                alt={imageAlt}
+                className="artwork-detail-image"
+                loading="eager"
+                decoding="async"
+                fill
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                style={{ objectFit: "contain" }}
+              />
+            </div>
           )}
         </button>
 
@@ -263,7 +283,14 @@ export default function ArtworkImageModal({
             </button>
 
             <div className="image-modal-image-container">
-              <ProtectedImage src={src} alt={alt} className="object-contain" />
+              <ProtectedImage
+                src={src}
+                alt={alt}
+                className="object-contain"
+                fill
+                sizes="100vw"
+                priority
+              />
             </div>
             <div className="image-modal-info">
               <h2 className="image-modal-title">{title}</h2>

@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    formats: ["image/webp"],
+    minimumCacheTTL: 86400,
     remotePatterns: [
       {
         protocol: "https",
@@ -21,6 +23,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "image.artigt.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "art.artigt.com",
         pathname: "/**",
       },
     ],

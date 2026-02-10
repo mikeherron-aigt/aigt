@@ -43,13 +43,18 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
   try {
     const upstream = await fetch(parsed.toString(), {
+      signal: controller.signal,
       next: { revalidate: CACHE_SECONDS },
       headers: {
         "User-Agent": "Mozilla/5.0 (compatible; AIGT-App/1.0)",
       },
     });
+    clearTimeout(timeoutId);
 
     if (!upstream.ok) {
       return new NextResponse(null, { status: upstream.status });
@@ -65,7 +70,14 @@ export async function GET(request: NextRequest) {
         "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${CACHE_SECONDS * 2}`,
       },
     });
-  } catch {
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === "AbortError") {
+      return NextResponse.json(
+        { error: "Upstream image request timed out" },
+        { status: 504 }
+      );
+    }
     return NextResponse.json(
       { error: "Failed to fetch upstream image" },
       { status: 502 }

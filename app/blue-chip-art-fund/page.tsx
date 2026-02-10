@@ -9,6 +9,7 @@ import { ProtectedImage } from "@/app/components/ProtectedImage";
 import { slugify } from "@/app/lib/slug";
 
 interface ArtworkItem {
+  id: string;
   src: string;
   title: string;
   artist: string;
@@ -17,6 +18,7 @@ interface ArtworkItem {
 }
 
 const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  id: artwork.artwork_id.toString(),
   src: artwork.image_url,
   title: artwork.title,
   artist: artwork.artist,
@@ -40,7 +42,7 @@ export default function BlueChipArtFundPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
   const [focusArtwork, setFocusArtwork] = useState<ArtworkItem | null>(null);
-  const { artworks } = useArtworks({ versions: "v02" });
+  const { artworks } = useArtworks({ versions: "v02", limit: 60 });
 
   const featuredWorks = useMemo(() => {
     return artworks
@@ -52,6 +54,10 @@ export default function BlueChipArtFundPage() {
   // Cycles through all collections before repeating
   useEffect(() => {
     if (featuredWorks.length === 0) return;
+
+    const ARTWORK_HISTORY_SIZE = 7;
+    const COLLECTIONS_KEY = 'blue_chip_collections';
+    const ARTWORK_HISTORY_KEY = 'blue_chip_artwork_history';
 
     // Group artworks by collection
     const collectionMap = new Map<string, ArtworkItem[]>();
@@ -66,10 +72,19 @@ export default function BlueChipArtFundPage() {
     const collections = Array.from(collectionMap.keys());
     if (collections.length === 0) return;
 
+    // Get artwork history to avoid repeating same artwork within 6-8 refreshes
+    let artworkHistory: string[] = [];
+    try {
+      const stored = window.sessionStorage.getItem(ARTWORK_HISTORY_KEY);
+      if (stored) artworkHistory = JSON.parse(stored);
+    } catch {
+      // Ignore errors
+    }
+
     // Get shown collections from sessionStorage
     let shownCollections: string[] = [];
     try {
-      const stored = window.sessionStorage.getItem('blue_chip_collections');
+      const stored = window.sessionStorage.getItem(COLLECTIONS_KEY);
       if (stored) {
         shownCollections = JSON.parse(stored);
       }
@@ -93,18 +108,31 @@ export default function BlueChipArtFundPage() {
     const artworksInCollection1 = collectionMap.get(selectedCollection1)!;
     const artworksInCollection2 = collectionMap.get(selectedCollection2)!;
 
-    const hero = artworksInCollection1[Math.floor(Math.random() * artworksInCollection1.length)];
-    const focus = artworksInCollection2[Math.floor(Math.random() * artworksInCollection2.length)];
+    // Filter out artworks that were recently shown from both collections
+    const freshArtworks1 = artworksInCollection1.filter((a) => !artworkHistory.includes(a.id));
+    const artworkPool1 = freshArtworks1.length > 0 ? freshArtworks1 : artworksInCollection1;
+
+    const freshArtworks2 = artworksInCollection2.filter((a) => !artworkHistory.includes(a.id));
+    const artworkPool2 = freshArtworks2.length > 0 ? freshArtworks2 : artworksInCollection2;
+
+    const hero = artworkPool1[Math.floor(Math.random() * artworkPool1.length)];
+    const focus = artworkPool2[Math.floor(Math.random() * artworkPool2.length)];
 
     setHeroArtwork(hero);
     setFocusArtwork(focus);
 
-    // Save selected collections to history
+    // Save both artworks and collections to history
     try {
-      const stored = window.sessionStorage.getItem('blue_chip_collections');
-      const shownCollections: string[] = stored ? JSON.parse(stored) : [];
-      const collectionsToAdd: string[] = [];
+      // Update artwork history (keep last 7)
+      const newHistory = [
+        ...artworkHistory.filter((id) => id !== hero.id && id !== focus.id),
+        hero.id,
+        focus.id
+      ].slice(-ARTWORK_HISTORY_SIZE);
+      window.sessionStorage.setItem(ARTWORK_HISTORY_KEY, JSON.stringify(newHistory));
 
+      // Update collection history
+      const collectionsToAdd: string[] = [];
       if (hero?.collection && !shownCollections.includes(hero.collection)) {
         collectionsToAdd.push(hero.collection);
       }
@@ -112,10 +140,13 @@ export default function BlueChipArtFundPage() {
         collectionsToAdd.push(focus.collection);
       }
 
-      if (collectionsToAdd.length > 0) {
-        const updated = [...shownCollections, ...collectionsToAdd];
-        window.sessionStorage.setItem('blue_chip_collections', JSON.stringify(updated));
-      }
+      const newShownCollections = [...shownCollections, ...collectionsToAdd];
+
+      // Reset collection history if all collections have been shown
+      const finalCollections =
+        newShownCollections.length >= collections.length ? [] : newShownCollections;
+
+      window.sessionStorage.setItem(COLLECTIONS_KEY, JSON.stringify(finalCollections));
     } catch {
       // Ignore errors
     }

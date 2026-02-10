@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useArtworks } from "@/app/hooks/useArtworks";
 import type { Artwork } from "@/app/lib/api";
 import { slugify } from "@/app/lib/slug";
-import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 
 interface TeamMember {
   name: string;
@@ -91,6 +91,7 @@ const teamMembers: TeamMember[] = [
 ];
 
 interface ArtworkItem {
+  id: string;
   src: string;
   title: string;
   artist: string;
@@ -99,6 +100,7 @@ interface ArtworkItem {
 }
 
 const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  id: artwork.artwork_id.toString(),
   src: artwork.image_url,
   title: artwork.title,
   artist: artwork.artist,
@@ -107,7 +109,7 @@ const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
 });
 
 export default function AboutPage() {
-  const { artworks } = useArtworks({ versions: "v02" });
+  const { artworks } = useArtworks({ versions: "v02", limit: 60 });
   const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
 
   const featuredWorks = useMemo(() => {
@@ -119,6 +121,10 @@ export default function AboutPage() {
   useEffect(() => {
     if (featuredWorks.length === 0) return;
 
+    const ARTWORK_HISTORY_SIZE = 7;
+    const COLLECTIONS_KEY = "about_collections";
+    const ARTWORK_HISTORY_KEY = "about_artwork_history";
+
     const collectionMap = new Map<string, ArtworkItem[]>();
     featuredWorks.forEach((artwork) => {
       const collection = artwork.collection || "unknown";
@@ -129,9 +135,19 @@ export default function AboutPage() {
     const collections = Array.from(collectionMap.keys());
     if (collections.length === 0) return;
 
+    // Get artwork history to avoid repeating same artwork within 6-8 refreshes
+    let artworkHistory: string[] = [];
+    try {
+      const stored = window.sessionStorage.getItem(ARTWORK_HISTORY_KEY);
+      if (stored) artworkHistory = JSON.parse(stored);
+    } catch {
+      // ignore
+    }
+
+    // Get shown collections to cycle through collections
     let shownCollections: string[] = [];
     try {
-      const stored = window.sessionStorage.getItem("about_collections");
+      const stored = window.sessionStorage.getItem(COLLECTIONS_KEY);
       if (stored) shownCollections = JSON.parse(stored);
     } catch {
       // ignore
@@ -143,19 +159,31 @@ export default function AboutPage() {
     const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
     const artworksInCollection = collectionMap.get(selectedCollection)!;
 
-    const selected = artworksInCollection[Math.floor(Math.random() * artworksInCollection.length)];
+    // Filter out artworks that were recently shown
+    const freshArtworks = artworksInCollection.filter((a) => !artworkHistory.includes(a.id));
+    const artworkPool = freshArtworks.length > 0 ? freshArtworks : artworksInCollection;
+
+    const selected = artworkPool[Math.floor(Math.random() * artworkPool.length)];
     setHeroArtwork(selected);
 
     if (selected?.collection) {
       try {
-        const stored = window.sessionStorage.getItem("about_collections");
-        const previouslyShown: string[] = stored ? JSON.parse(stored) : [];
-        if (!previouslyShown.includes(selected.collection)) {
-          window.sessionStorage.setItem(
-            "about_collections",
-            JSON.stringify([...previouslyShown, selected.collection])
-          );
-        }
+        // Update artwork history (keep last 7)
+        const newHistory = [...artworkHistory.filter((id) => id !== selected.id), selected.id].slice(
+          -ARTWORK_HISTORY_SIZE
+        );
+        window.sessionStorage.setItem(ARTWORK_HISTORY_KEY, JSON.stringify(newHistory));
+
+        // Update collection history
+        const newShownCollections = shownCollections.includes(selectedCollection)
+          ? shownCollections
+          : [...shownCollections, selectedCollection];
+
+        // Reset collection history if all collections have been shown
+        const finalCollections =
+          newShownCollections.length >= collections.length ? [] : newShownCollections;
+
+        window.sessionStorage.setItem(COLLECTIONS_KEY, JSON.stringify(finalCollections));
       } catch {
         // ignore
       }
@@ -193,33 +221,43 @@ export default function AboutPage() {
               </div>
 
               {/* Image Column */}
-              <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden">
-                {heroArtwork &&
-                  (heroArtworkHref ? (
-                    <Link
-                      href={heroArtworkHref}
-                      aria-label={`View details for ${heroArtwork.title}`}
-                      className="absolute inset-0"
-                    >
-                      <ProtectedImage
-                        src={heroArtwork.src}
-                        alt={heroArtwork.title}
-                        fill
-                        className="object-cover object-center"
-                        priority
-                        sizes="(max-width: 1024px) 100vw, 601px"
-                      />
-                    </Link>
+              <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
+                <div className="absolute inset-0">
+                  {heroArtwork?.src ? (
+                    heroArtworkHref ? (
+                      <Link
+                        href={heroArtworkHref}
+                        aria-label={`View details for ${heroArtwork.title}`}
+                        className="block w-full h-full"
+                      >
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </Link>
+                    ) : (
+                      <div className="w-full h-full">
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </div>
+                    )
                   ) : (
-                    <ProtectedImage
-                      src={heroArtwork.src}
-                      alt={heroArtwork.title}
-                      fill
-                      className="object-cover object-center"
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 601px"
+                    <div
+                      className="w-full h-full"
+                      style={{ backgroundColor: "var(--gallery-plaster)" }}
                     />
-                  ))}
+                  )}
+                </div>
               </div>
             </div>
 

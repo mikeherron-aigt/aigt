@@ -191,6 +191,80 @@ export async function getArtworkBySku(sku: string): Promise<Artwork | null> {
   }
 }
 
+export async function getArtworksBySkus(
+  skus: string[]
+): Promise<Record<string, Artwork | null>> {
+  if (skus.length === 0) return {};
+
+  try {
+    const param = skus.map(encodeURIComponent).join(",");
+    const data = await fetchAPI<Record<string, Artwork>>(
+      `/artworks/batch?skus=${param}`
+    );
+
+    const result: Record<string, Artwork | null> = {};
+    for (const sku of skus) {
+      const raw = data[sku] ?? null;
+      result[sku] = raw ? normalizeArtwork(raw as Artwork) : null;
+    }
+    return result;
+  } catch {
+    // Fallback: return nulls for all SKUs
+    const result: Record<string, Artwork | null> = {};
+    for (const sku of skus) {
+      result[sku] = null;
+    }
+    return result;
+  }
+}
+
+export interface HomePageData {
+  bySkus: Record<string, Artwork | null>;
+  artworks: Artwork[];
+}
+
+export async function getHomePageData(
+  skus: string[],
+  filters?: { versions?: string; limit?: number }
+): Promise<HomePageData> {
+  const params = new URLSearchParams();
+
+  if (skus.length > 0) {
+    params.set("skus", skus.map(encodeURIComponent).join(","));
+  }
+  if (filters?.versions) {
+    params.set("versions", filters.versions);
+  }
+  if (filters?.limit) {
+    params.set("limit", filters.limit.toString());
+  }
+
+  const query = params.toString();
+
+  try {
+    const data = await fetchAPI<{
+      bySkus: Record<string, Artwork>;
+      artworks?: Artwork[];
+    }>(`/artworks/batch?${query}`);
+
+    const bySkus: Record<string, Artwork | null> = {};
+    for (const sku of skus) {
+      const raw = data.bySkus?.[sku] ?? null;
+      bySkus[sku] = raw ? normalizeArtwork(raw) : null;
+    }
+
+    const artworks = data.artworks ? normalizeArtworks(data.artworks) : [];
+
+    return { bySkus, artworks };
+  } catch {
+    const bySkus: Record<string, Artwork | null> = {};
+    for (const sku of skus) {
+      bySkus[sku] = null;
+    }
+    return { bySkus, artworks: [] };
+  }
+}
+
 export async function getCollections(): Promise<Collection[]> {
   return fetchAPI<Collection[]>("/collections");
 }
