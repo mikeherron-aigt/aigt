@@ -176,11 +176,10 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <div className="flex flex-col gap-4">
-
-                   <h3 className="mb-2">About John Dowling Jr.h3>
-                <p className="text-ledger-stone text-sm">A Legacy Being Stewarded in Real Time</p>
+                  <h2 className="text-center lg:text-left">About John Dowling Jr.</h2>
+                  <h3 className="text-center lg:text-left">A Legacy Being Stewarded in Real Time</h3>
+                </div>
               </div>
-                    </div>
 
               <div className="flex flex-col gap-4 p-10 bg-paper-white">
                 <p>
