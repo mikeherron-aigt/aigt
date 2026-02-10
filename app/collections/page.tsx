@@ -77,11 +77,9 @@ export default async function CollectionsPage() {
                 )}
               </div>
               <div className="collection-hero-card relative z-10">
-                <h2 className="collection-hero-title">Featured Collection or Piece</h2>
+                <h2 className="collection-hero-title">A Structured Body of Work</h2>
                 <p className="collection-hero-text">
-                  The platform is designed to protect the work, preserve provenance, and
-                  govern participation through clear authority, disciplined process, and
-                  controlled access.
+                  The collections below represent the primary pillars of John’s catalog. Each collection is intentionally defined and stewarded as a distinct body of work. Together, they form a coherent system rather than a series of isolated pieces.
                 </p>
               </div>
             </div>
