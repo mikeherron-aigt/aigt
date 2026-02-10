@@ -7,8 +7,11 @@ import type { Artwork } from "@/app/lib/api";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 import { slugify } from "@/app/lib/slug";
+import { useStaticHeroImage } from "@/app/hooks/useStaticHeroImage";
+import { HERO_IMAGES } from "@/app/lib/heroImageConfig";
 
 interface ArtworkItem {
+  id: string;
   src: string;
   title: string;
   artist: string;
@@ -17,6 +20,7 @@ interface ArtworkItem {
 }
 
 const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  id: artwork.artwork_id.toString(),
   src: artwork.image_url,
   title: artwork.title,
   artist: artwork.artist,
@@ -38,9 +42,11 @@ export default function BlueChipArtFundPage() {
 
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
   const [focusArtwork, setFocusArtwork] = useState<ArtworkItem | null>(null);
-  const { artworks } = useArtworks({ versions: "v02" });
+
+  const heroImageUrl = useStaticHeroImage({ images: HERO_IMAGES, storageKey: 'blue_chip_hero' });
+
+  const { artworks } = useArtworks({ versions: "v02", limit: 60 });
 
   const featuredWorks = useMemo(() => {
     return artworks
@@ -48,10 +54,14 @@ export default function BlueChipArtFundPage() {
       .map(mapArtworkToItem);
   }, [artworks]);
 
-  // Select random hero artworks on page load (changes only on refresh)
+  // Select random focus artwork on page load (changes only on refresh)
   // Cycles through all collections before repeating
   useEffect(() => {
     if (featuredWorks.length === 0) return;
+
+    const ARTWORK_HISTORY_SIZE = 7;
+    const COLLECTIONS_KEY = 'blue_chip_collections';
+    const ARTWORK_HISTORY_KEY = 'blue_chip_artwork_history';
 
     // Group artworks by collection
     const collectionMap = new Map<string, ArtworkItem[]>();
@@ -66,10 +76,19 @@ export default function BlueChipArtFundPage() {
     const collections = Array.from(collectionMap.keys());
     if (collections.length === 0) return;
 
+    // Get artwork history to avoid repeating same artwork within 6-8 refreshes
+    let artworkHistory: string[] = [];
+    try {
+      const stored = window.sessionStorage.getItem(ARTWORK_HISTORY_KEY);
+      if (stored) artworkHistory = JSON.parse(stored);
+    } catch {
+      // Ignore errors
+    }
+
     // Get shown collections from sessionStorage
     let shownCollections: string[] = [];
     try {
-      const stored = window.sessionStorage.getItem('blue_chip_collections');
+      const stored = window.sessionStorage.getItem(COLLECTIONS_KEY);
       if (stored) {
         shownCollections = JSON.parse(stored);
       }
@@ -83,45 +102,46 @@ export default function BlueChipArtFundPage() {
     // If all collections have been shown, reset
     const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
 
-    // Pick two different collections if possible
-    const selectedCollection1 = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
-    const remainingCollections = collectionsToUse.filter(c => c !== selectedCollection1);
-    const selectedCollection2 = remainingCollections.length > 0
-      ? remainingCollections[Math.floor(Math.random() * remainingCollections.length)]
-      : selectedCollection1;
+    // Pick one collection for the focus artwork
+    const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
 
-    const artworksInCollection1 = collectionMap.get(selectedCollection1)!;
-    const artworksInCollection2 = collectionMap.get(selectedCollection2)!;
+    const artworksInCollection = collectionMap.get(selectedCollection)!;
 
-    const hero = artworksInCollection1[Math.floor(Math.random() * artworksInCollection1.length)];
-    const focus = artworksInCollection2[Math.floor(Math.random() * artworksInCollection2.length)];
+    // Filter out artworks that were recently shown
+    const freshArtworks = artworksInCollection.filter((a) => !artworkHistory.includes(a.id));
+    const artworkPool = freshArtworks.length > 0 ? freshArtworks : artworksInCollection;
 
-    setHeroArtwork(hero);
+    const focus = artworkPool[Math.floor(Math.random() * artworkPool.length)];
+
     setFocusArtwork(focus);
 
-    // Save selected collections to history
+    // Save artwork and collection to history
     try {
-      const stored = window.sessionStorage.getItem('blue_chip_collections');
-      const shownCollections: string[] = stored ? JSON.parse(stored) : [];
-      const collectionsToAdd: string[] = [];
+      // Update artwork history (keep last 7)
+      const newHistory = [
+        ...artworkHistory.filter((id) => id !== focus.id),
+        focus.id
+      ].slice(-ARTWORK_HISTORY_SIZE);
+      window.sessionStorage.setItem(ARTWORK_HISTORY_KEY, JSON.stringify(newHistory));
 
-      if (hero?.collection && !shownCollections.includes(hero.collection)) {
-        collectionsToAdd.push(hero.collection);
-      }
+      // Update collection history
+      const collectionsToAdd: string[] = [];
       if (focus?.collection && !shownCollections.includes(focus.collection)) {
         collectionsToAdd.push(focus.collection);
       }
 
-      if (collectionsToAdd.length > 0) {
-        const updated = [...shownCollections, ...collectionsToAdd];
-        window.sessionStorage.setItem('blue_chip_collections', JSON.stringify(updated));
-      }
+      const newShownCollections = [...shownCollections, ...collectionsToAdd];
+
+      // Reset collection history if all collections have been shown
+      const finalCollections =
+        newShownCollections.length >= collections.length ? [] : newShownCollections;
+
+      window.sessionStorage.setItem(COLLECTIONS_KEY, JSON.stringify(finalCollections));
     } catch {
       // Ignore errors
     }
   }, [featuredWorks]);
 
-  const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
   const focusArtworkHref = focusArtwork ? getArtworkHref(focusArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -227,34 +247,15 @@ export default function BlueChipArtFundPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
-                  {heroArtwork?.src ? (
-                    heroArtworkHref ? (
-                      <Link
-                        href={heroArtworkHref}
-                        aria-label={`View details for ${heroArtwork.title}`}
-                        className="block w-full h-full"
-                      >
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </Link>
-                    ) : (
-                      <div className="w-full h-full">
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </div>
-                    )
+                  {heroImageUrl ? (
+                    <ProgressiveImage
+                      src={heroImageUrl}
+                      alt="Featured artwork"
+                      fill
+                      eager
+                      className="object-cover object-center"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
                   ) : (
                     <div
                       className="w-full h-full"

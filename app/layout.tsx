@@ -48,6 +48,7 @@ export default function RootLayout({
       className={openSans.variable}
     >
       <head>
+        <link rel="preconnect" href="https://image.artigt.com" crossOrigin="anonymous" />
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{

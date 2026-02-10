@@ -1,3 +1,13 @@
+const IMAGE_BASE_URL = "https://image.artigt.com";
+
+const ensureAbsoluteImageUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("//")) return `https:${url}`;
+  if (url.startsWith("data:") || url.startsWith("blob:")) return url;
+  return `${IMAGE_BASE_URL}/${url.replace(/^\/+/, "")}`;
+};
+
 export function normalizeArtworkImageUrl(url: string): string {
   if (!url) return url;
 
@@ -28,10 +38,19 @@ export function normalizeArtworkImageUrl(url: string): string {
   }
 
   const updated = `${prefix}${filename}`;
-  const querySuffix = query ? `?${query}` : "";
+
+  // Strip image optimization query params (format, width) so URLs are
+  // canonical. Resizing is handled by Next.js Image or the /api/img proxy.
+  const cleanedQuery = query
+    ? new URLSearchParams(query)
+    : new URLSearchParams();
+  cleanedQuery.delete("format");
+  cleanedQuery.delete("width");
+  const remaining = cleanedQuery.toString();
+  const querySuffix = remaining ? `?${remaining}` : "";
   const hashSuffix = hash ? `#${hash}` : "";
 
-  return `${updated}${querySuffix}${hashSuffix}`;
+  return ensureAbsoluteImageUrl(`${updated}${querySuffix}${hashSuffix}`);
 }
 
 /**

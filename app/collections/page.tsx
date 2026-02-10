@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { getCollectionArtworks, getCollections } from "@/app/lib/artApiServer";
+import { getCollectionArtworkPool, getCollections } from "@/app/lib/artApiServer";
 import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { COLLECTION_IMAGES } from "@/app/lib/heroImageConfig";
 
-// Cache the rendered page for 5 minutes.
-// This is a big win on Netlify because it avoids re-fetching huge data for every visit.
-export const revalidate = 300;
+// Use ISR (Incremental Static Regeneration) with a short revalidation time
+// to balance fresh data with performance. This prevents hanging on slow API responses.
+export const revalidate = 60; // Revalidate every 60 seconds
 
 const collectionDescriptions: Record<string, string> = {
   // Add collection descriptions here, keyed by collection name.
@@ -14,32 +15,61 @@ const collectionDescriptions: Record<string, string> = {
 
 const isValidArtwork = (title: string) => !title.toLowerCase().includes("untitled");
 
+// Static hero image — no API call or randomization needed
+const HERO_IMAGE_URL = "https://image.artigt.com/JD/DW/2025-JD-DW-0017/2025-JD-DW-0017__full__v02.webp";
+
+/**
+ * Get a random image from the collection's static image pool
+ * If no custom images are configured, return null to fall back to dynamic
+ */
+const getCollectionFeaturedImage = (collectionName: string): string | null => {
+  const images = COLLECTION_IMAGES[collectionName];
+  if (!images || images.length === 0) return null;
+  // Pick a random image from the pool for variety
+  return images[Math.floor(Math.random() * images.length)];
+};
+
 export default async function CollectionsPage() {
   const collections = await getCollections();
 
+  // If no collections are available (e.g., API error during build), show fallback UI
+  if (collections.length === 0) {
+    console.warn('No collections available - API may be unreachable');
+  }
+
+  // Fetch a small pool (max 24) per collection instead of the entire catalog
+  // Use Promise.allSettled to prevent one failed collection from blocking others
   const results = await Promise.allSettled(
     collections.map(async (collection) => {
-      const artworks = await getCollectionArtworks(collection.collection_name, "v02");
-      const featured = artworks.find((artwork) => isValidArtwork(artwork.title)) || null;
-      return { ...collection, featured };
+      // First, try to get a custom static image for this collection
+      const staticImage = getCollectionFeaturedImage(collection.collection_name);
+
+      if (staticImage) {
+        // Use the custom static image
+        return { ...collection, featuredImageUrl: staticImage };
+      }
+
+      // Fall back to dynamic image selection
+      try {
+        const pool = await getCollectionArtworkPool(collection.collection_name, 24);
+        const valid = pool.filter((a) => isValidArtwork(a.title));
+        // Pick a random artwork from the pool for visual variety on refresh
+        const featured = valid.length > 0
+          ? valid[Math.floor(Math.random() * valid.length)]
+          : null;
+        return { ...collection, featured, featuredImageUrl: featured?.image_url || null };
+      } catch (error) {
+        console.error(`Failed to fetch artworks for collection ${collection.collection_name}:`, error);
+        return { ...collection, featured: null, featuredImageUrl: null };
+      }
     })
   );
 
   const collectionsWithImages = results.map((r, idx) => {
     if (r.status === "fulfilled") return r.value;
-    // If a single collection fails, do not break the page
-    return { ...collections[idx], featured: null };
+    console.error(`Collection ${collections[idx].collection_name} failed to load:`, r.reason);
+    return { ...collections[idx], featured: null, featuredImageUrl: null };
   });
-
-  const heroCollection =
-    collectionsWithImages.find((collection) => collection.featured) ||
-    collectionsWithImages[0];
-
-  const heroArtworkHref = heroCollection?.featured
-    ? `/collections/${slugify(heroCollection.collection_name)}/${slugify(
-        heroCollection.featured.title
-      )}`
-    : null;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
@@ -48,38 +78,14 @@ export default async function CollectionsPage() {
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="collection-hero-banner">
               <div className="absolute inset-0 overflow-hidden">
-                {heroCollection?.featured?.image_url ? (
-                  heroArtworkHref ? (
-                    <Link
-                      href={heroArtworkHref}
-                      aria-label={`View details for ${heroCollection.featured.title}`}
-                      className="absolute inset-0"
-                    >
-                      <ProtectedImage
-                        src={heroCollection.featured.image_url}
-                        alt={heroCollection.featured.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1024px) 100vw, 80vw"
-                        priority
-                      />
-                    </Link>
-                  ) : (
-                    <ProtectedImage
-                      src={heroCollection.featured.image_url}
-                      alt={heroCollection.collection_name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 80vw"
-                      priority
-                    />
-                  )
-                ) : (
-                  <div
-                    className="w-full h-full"
-                    style={{ backgroundColor: "var(--gallery-plaster)" }}
-                  />
-                )}
+                <ProtectedImage
+                  src={HERO_IMAGE_URL}
+                  alt="Featured collections"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 80vw"
+                  priority
+                />
               </div>
 
               <div className="collection-hero-card relative z-10">
@@ -94,8 +100,15 @@ export default async function CollectionsPage() {
 
             <h2 className="section-heading">Featured Collections</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mt-8">
-              {collectionsWithImages.map((collection) => {
+            {collectionsWithImages.length === 0 ? (
+              <div className="mt-8">
+                <p className="governance-description">
+                  Collections are temporarily unavailable. Please check back soon.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mt-8">
+                {collectionsWithImages.map((collection) => {
                 const slug = slugify(collection.collection_name);
                 const description = collectionDescriptions[collection.collection_name];
                 const collectionHref = `/collections/${slug}`;
@@ -112,10 +125,10 @@ export default async function CollectionsPage() {
                       aria-label={`View ${collection.collection_name} collection`}
                     >
                       <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
-                        {collection.featured?.image_url ? (
+                        {collection.featuredImageUrl ? (
                           <ProgressiveImage
-                            src={collection.featured.image_url}
-                            alt={collection.featured.title}
+                            src={collection.featuredImageUrl}
+                            alt={`${collection.collection_name} collection`}
                             fill
                             className="object-cover"
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -146,7 +159,8 @@ export default async function CollectionsPage() {
                   </article>
                 );
               })}
-            </div>
+              </div>
+            )}
           </div>
         </section>
 

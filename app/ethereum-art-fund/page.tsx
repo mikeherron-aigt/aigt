@@ -8,11 +8,14 @@ import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 import Image from "next/image";
 import { slugify } from "@/app/lib/slug";
+import { useStaticHeroImage } from "@/app/hooks/useStaticHeroImage";
+import { HERO_IMAGES } from "@/app/lib/heroImageConfig";
 
 const JOHN_DOWLING_PROFILE_URL =
   "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620";
 
 interface ArtworkItem {
+  id: string;
   src: string;
   title: string;
   artist: string;
@@ -21,6 +24,7 @@ interface ArtworkItem {
 }
 
 const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  id: artwork.artwork_id.toString(),
   src: artwork.image_url,
   title: artwork.title,
   artist: artwork.artist,
@@ -69,15 +73,11 @@ export default function EthereumArtFundPage() {
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
+  const heroImageUrl = useStaticHeroImage({ images: HERO_IMAGES, storageKey: 'eth_fund_hero' });
 
-  const { artworks } = useArtworks({ versions: "v02" });
+  const { artworks } = useArtworks({ versions: "v02", limit: 100 });
 
   const isValidTitle = (title: string) => !title.toLowerCase().includes("untitled");
-  const validArtworks = useMemo(
-    () => artworks.filter((artwork) => isValidTitle(artwork.title)),
-    [artworks]
-  );
 
   // Use a seed based on the current date so it changes daily but is consistent within a session
   const dailySeed = useMemo(() => {
@@ -89,89 +89,49 @@ export default function EthereumArtFundPage() {
     );
   }, []);
 
-  // Shuffle artworks daily (same as Home)
-  const shuffledArtworks = useMemo(() => {
-    if (validArtworks.length === 0) return [];
-    return shuffleArray(validArtworks, dailySeed);
-  }, [validArtworks, dailySeed]);
+  // Featured collection codes (same as home page)
+  const FEATURED_COLLECTION_CODES = ["AG", "CD", "MM", "DW"];
+  const ARTWORKS_PER_COLLECTION = 3;
 
-  // Pick one from each collection, then fill remaining slots (same as Home)
+  // Extract collection code from SKU (YYYY-AA-CC-NNNN)
+  const extractCollectionCode = (sku: string): string | null => {
+    const match = sku.match(/^\d{4}-[A-Z]+-([A-Z]+)-\d+$/);
+    return match ? match[1] : null;
+  };
+
+  // Pick artworks ensuring diversity across 4 collections
   const featuredArtworks = useMemo(() => {
-    if (shuffledArtworks.length === 0) return [];
+    if (artworks.length === 0) return [];
 
-    const collectionMap = new Map<string, Artwork>();
-    shuffledArtworks.forEach((artwork) => {
-      if (!collectionMap.has(artwork.collection_name)) {
-        collectionMap.set(artwork.collection_name, artwork);
-      }
-    });
+    // Filter valid titles
+    const validArtworks = artworks.filter((artwork) => isValidTitle(artwork.title));
 
-    const uniqueByCollection = Array.from(collectionMap.values());
-    const remaining = shuffledArtworks.filter((artwork) => {
-      const firstForCollection = collectionMap.get(artwork.collection_name);
-      return (
-        firstForCollection &&
-        firstForCollection.artwork_id !== artwork.artwork_id
-      );
-    });
+    // Shuffle all valid artworks
+    const shuffled = shuffleArray(validArtworks, dailySeed);
 
-    const combined = [...uniqueByCollection, ...remaining];
-    return combined.slice(0, 12).map(mapArtworkToItem);
-  }, [shuffledArtworks]);
-
-  // Hero artwork selection (cycles through collections before repeating)
-  useEffect(() => {
-    if (featuredArtworks.length === 0) return;
-
-    const collectionMap = new Map<string, ArtworkItem[]>();
-    featuredArtworks.forEach((artwork) => {
-      const collection = artwork.collection || "unknown";
-      if (!collectionMap.has(collection)) collectionMap.set(collection, []);
-      collectionMap.get(collection)!.push(artwork);
-    });
-
-    const collections = Array.from(collectionMap.keys());
-    if (collections.length === 0) return;
-
-    let shownCollections: string[] = [];
-    try {
-      const stored = window.sessionStorage.getItem("eth_fund_collections");
-      if (stored) shownCollections = JSON.parse(stored);
-    } catch {
-      // ignore
+    // Group by collection code
+    const byCollection = new Map<string, Artwork[]>();
+    for (const code of FEATURED_COLLECTION_CODES) {
+      byCollection.set(code, []);
     }
 
-    const availableCollections = collections.filter(
-      (c) => !shownCollections.includes(c)
-    );
-    const collectionsToUse =
-      availableCollections.length > 0 ? availableCollections : collections;
-
-    const selectedCollection =
-      collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
-    const artworksInCollection = collectionMap.get(selectedCollection)!;
-
-    const selected =
-      artworksInCollection[Math.floor(Math.random() * artworksInCollection.length)];
-    setHeroArtwork(selected);
-
-    if (selected?.collection) {
-      try {
-        const stored = window.sessionStorage.getItem("eth_fund_collections");
-        const prev: string[] = stored ? JSON.parse(stored) : [];
-        if (!prev.includes(selected.collection)) {
-          window.sessionStorage.setItem(
-            "eth_fund_collections",
-            JSON.stringify([...prev, selected.collection])
-          );
+    for (const artwork of shuffled) {
+      const code = extractCollectionCode(artwork.sku);
+      if (code && byCollection.has(code)) {
+        const list = byCollection.get(code)!;
+        if (list.length < ARTWORKS_PER_COLLECTION) {
+          list.push(artwork);
         }
-      } catch {
-        // ignore
       }
     }
-  }, [featuredArtworks]);
 
-  const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
+    // Flatten and shuffle again for final display order
+    const selected = Array.from(byCollection.values()).flat();
+    const finalShuffled = shuffleArray(selected, dailySeed + 1);
+
+    return finalShuffled.map(mapArtworkToItem);
+  }, [artworks, dailySeed]);
+
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
@@ -279,34 +239,15 @@ export default function EthereumArtFundPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
-                  {heroArtwork?.src ? (
-                    heroArtworkHref ? (
-                      <Link
-                        href={heroArtworkHref}
-                        aria-label={`View details for ${heroArtwork.title}`}
-                        className="block w-full h-full"
-                      >
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </Link>
-                    ) : (
-                      <div className="w-full h-full">
-                        <ProgressiveImage
-                          src={heroArtwork.src}
-                          alt={heroArtwork.title}
-                          fill
-                          eager
-                          className="object-cover object-center"
-                          sizes="(max-width: 1024px) 100vw, 50vw"
-                        />
-                      </div>
-                    )
+                  {heroImageUrl ? (
+                    <ProgressiveImage
+                      src={heroImageUrl}
+                      alt="Featured artwork"
+                      fill
+                      eager
+                      className="object-cover object-center"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
                   ) : (
                     <div
                       className="w-full h-full"

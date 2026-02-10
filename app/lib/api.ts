@@ -1,5 +1,13 @@
 import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
-import { getApiUrl } from "@/app/lib/apiUrl";
+
+// Use direct art.artigt.com URL on Netlify to avoid:
+// 1. Netlify API route 403 errors on deploy previews
+// 2. Cloudflare bot challenges when proxying server-side
+// Browsers can handle Cloudflare challenges, but Netlify's proxy cannot
+const API_BASE_URL =
+  typeof window !== "undefined" && window.location.hostname.includes("netlify.app")
+    ? "https://art.artigt.com/api/public"
+    : "/api";
 
 export interface Artwork {
   artwork_id: number;
@@ -73,48 +81,77 @@ function setCached<T>(key: string, data: T, ttlMs = DEFAULT_TTL_MS) {
   });
 }
 
+type FetchOptions = {
+  ttlMs?: number;
+  retries?: number;
+  baseUrl?: string;
+};
+
 async function fetchAPI<T>(
   endpoint: string,
-  ttlMs = DEFAULT_TTL_MS
+  options?: FetchOptions
 ): Promise<T> {
-  const url = getApiUrl(`/api${endpoint}`);
-  const cached = getCached<T>(url);
+  const {
+    ttlMs = DEFAULT_TTL_MS,
+    retries = 2,
+    baseUrl = API_BASE_URL,
+  } = options ?? {};
+  const normalizedBase = baseUrl.endsWith("/")
+    ? baseUrl.slice(0, -1)
+    : baseUrl;
+  const normalizedEndpoint = endpoint.startsWith("/")
+    ? endpoint
+    : `/${endpoint}`;
+  const cacheKey = `${normalizedBase}${normalizedEndpoint}`;
+  const cached = getCached<T>(cacheKey);
   if (cached) return cached;
 
-  if (pendingRequests.has(url)) {
-    return pendingRequests.get(url) as Promise<T>;
+  if (pendingRequests.has(cacheKey)) {
+    return pendingRequests.get(cacheKey) as Promise<T>;
   }
 
   const requestPromise = (async () => {
-    try {
-      const response = await fetch(url);
+    for (let attempt = 0; attempt <= retries; attempt += 1) {
+      try {
+        const response = await fetch(cacheKey);
 
-      if (!response.ok) {
-        throw new APIError(
-          `API request failed: ${response.statusText}`,
-          response.status
-        );
-      }
+        if (!response.ok) {
+          if (response.status >= 500 && attempt < retries) {
+            await new Promise((resolve) =>
+              setTimeout(resolve, 1000 * (attempt + 1))
+            );
+            continue;
+          }
+          throw new APIError(
+            `API request failed: ${response.statusText}`,
+            response.status
+          );
+        }
 
-      const data = (await response.json()) as T;
-      setCached(url, data, ttlMs);
-      return data;
-    } catch (error) {
-      if (error instanceof APIError) {
-        throw error;
+        const data = (await response.json()) as T;
+        setCached(cacheKey, data, ttlMs);
+        return data;
+      } catch (error) {
+        if (attempt === retries) {
+          if (error instanceof APIError) {
+            throw error;
+          }
+          throw new APIError(
+            "Failed to connect to artwork database. Please try again later."
+          );
+        }
       }
-      throw new APIError(
-        "Failed to connect to artwork database. Please try again later."
-      );
     }
+
+    throw new APIError("Max retries exceeded");
   })();
 
-  pendingRequests.set(url, requestPromise);
+  pendingRequests.set(cacheKey, requestPromise);
 
   try {
     return await requestPromise;
   } finally {
-    pendingRequests.delete(url);
+    pendingRequests.delete(cacheKey);
   }
 }
 
@@ -134,9 +171,14 @@ function buildQueryString(filters?: ArtworkFilters): string {
   return queryString ? `?${queryString}` : "";
 }
 
-export async function getArtworks(filters?: ArtworkFilters): Promise<Artwork[]> {
+export async function getArtworks(
+  filters?: ArtworkFilters,
+  options?: { baseUrl?: string }
+): Promise<Artwork[]> {
   const queryString = buildQueryString(filters);
-  const data = await fetchAPI<Artwork[]>(`/artworks${queryString}`);
+  const data = await fetchAPI<Artwork[]>(`/artworks${queryString}`, {
+    baseUrl: options?.baseUrl,
+  });
   return normalizeArtworks(data);
 }
 
@@ -148,12 +190,85 @@ export async function getArtwork(id: number): Promise<Artwork> {
 export async function getArtworkBySku(sku: string): Promise<Artwork | null> {
   const encodedSku = encodeURIComponent(sku);
   try {
-    const results = await fetchAPI<Artwork[]>(`/artworks?sku=${encodedSku}`);
-    if (!Array.isArray(results)) return null;
+    const results = await fetchAPI<Artwork[]>(`/artworks/sku/${encodedSku}`);
     const normalized = normalizeArtworks(results);
     return normalized[0] || null;
   } catch {
     return null;
+  }
+}
+
+export async function getArtworksBySkus(
+  skus: string[]
+): Promise<Record<string, Artwork | null>> {
+  if (skus.length === 0) return {};
+
+  try {
+    const param = skus.map(encodeURIComponent).join(",");
+    const data = await fetchAPI<Record<string, Artwork>>(
+      `/artworks/batch?skus=${param}`
+    );
+
+    const result: Record<string, Artwork | null> = {};
+    for (const sku of skus) {
+      const raw = data[sku] ?? null;
+      result[sku] = raw ? normalizeArtwork(raw as Artwork) : null;
+    }
+    return result;
+  } catch {
+    // Fallback: return nulls for all SKUs
+    const result: Record<string, Artwork | null> = {};
+    for (const sku of skus) {
+      result[sku] = null;
+    }
+    return result;
+  }
+}
+
+export interface HomePageData {
+  bySkus: Record<string, Artwork | null>;
+  artworks: Artwork[];
+}
+
+export async function getHomePageData(
+  skus: string[],
+  filters?: { versions?: string; limit?: number }
+): Promise<HomePageData> {
+  const params = new URLSearchParams();
+
+  if (skus.length > 0) {
+    params.set("skus", skus.map(encodeURIComponent).join(","));
+  }
+  if (filters?.versions) {
+    params.set("versions", filters.versions);
+  }
+  if (filters?.limit) {
+    params.set("limit", filters.limit.toString());
+  }
+
+  const query = params.toString();
+
+  try {
+    const data = await fetchAPI<{
+      bySkus: Record<string, Artwork>;
+      artworks?: Artwork[];
+    }>(`/artworks/batch?${query}`);
+
+    const bySkus: Record<string, Artwork | null> = {};
+    for (const sku of skus) {
+      const raw = data.bySkus?.[sku] ?? null;
+      bySkus[sku] = raw ? normalizeArtwork(raw) : null;
+    }
+
+    const artworks = data.artworks ? normalizeArtworks(data.artworks) : [];
+
+    return { bySkus, artworks };
+  } catch {
+    const bySkus: Record<string, Artwork | null> = {};
+    for (const sku of skus) {
+      bySkus[sku] = null;
+    }
+    return { bySkus, artworks: [] };
   }
 }
 

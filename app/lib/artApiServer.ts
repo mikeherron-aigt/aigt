@@ -31,24 +31,58 @@ const normalizeArtwork = (artwork: Artwork): Artwork => ({
 const normalizeArtworks = (artworks: Artwork[]): Artwork[] =>
   artworks.map(normalizeArtwork);
 
-async function fetchServer<T>(endpoint: string) {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    next: { revalidate: 0 }, // Disable cache during development
-    cache: 'no-store',
-    headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; AIGT-App/1.0)",
-    },
-  });
+async function fetchServer<T>(endpoint: string, timeoutMs: number = 10000) {
+  const url = `${API_BASE_URL}${endpoint}`;
 
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.statusText}`);
+  try {
+    // Create an AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    const response = await fetch(url, {
+      next: { revalidate: 300 },
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AIGTBot/1.0; +https://www.artigt.com)',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://www.artigt.com',
+      },
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(
+        `API request failed: ${response.status} ${response.statusText} - ${errorText}\nURL: ${url}`
+      );
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.error(`Request timeout after ${timeoutMs}ms for ${url}`);
+      throw new Error(`Request timeout: ${url}`);
+    }
+    console.error(`Error fetching ${url}:`, error);
+    throw error;
   }
-
-  return (await response.json()) as T;
 }
 
 export async function getCollections(): Promise<Collection[]> {
-  return fetchServer<Collection[]>("/collections");
+  try {
+    return await fetchServer<Collection[]>("/collections");
+  } catch (error) {
+    // During build, if the API is unavailable or returns 403, log the error
+    // but return an empty array to prevent build failure
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Failed to fetch collections during build:', error);
+      return [];
+    }
+    // In development, throw the error so issues are visible
+    throw error;
+  }
 }
 
 export async function getCollectionArtworks(
@@ -61,6 +95,20 @@ export async function getCollectionArtworks(
     `/collections/${encodedName}/artworks${query}`
   );
   return normalizeArtworks(data);
+}
+
+/**
+ * Fetch a small pool of artworks from a collection for display purposes.
+ * Instead of loading the entire collection (which can be 2000+ items),
+ * this returns at most `poolSize` artworks, enabling lightweight random
+ * selection on the caller side.
+ */
+export async function getCollectionArtworkPool(
+  collectionName: string,
+  poolSize: number = 24
+): Promise<Artwork[]> {
+  const all = await getCollectionArtworks(collectionName, "v02");
+  return all.slice(0, poolSize);
 }
 
 export interface ArtworkFilters {
@@ -108,6 +156,61 @@ export async function getArtworks(filters?: ArtworkFilters): Promise<Artwork[]> 
 export async function getArtwork(id: number): Promise<Artwork> {
   const data = await fetchServer<Artwork>(`/artworks/${id}`);
   return normalizeArtwork(data);
+}
+
+const FEATURED_COLLECTION_CODES = ["AG", "CD", "MM", "DW"] as const;
+const ARTWORKS_PER_COLLECTION = 3;
+
+function extractCollectionCode(sku: string): string | null {
+  const match = sku.match(/^\d{4}-[A-Z]+-([A-Z]+)-\d+$/);
+  return match ? match[1] : null;
+}
+
+export interface HomePageData {
+  bySkus: Record<string, Artwork | null>;
+  featuredArtworks: Artwork[];
+}
+
+/**
+ * Fetches all data needed for the homepage in two parallel upstream requests:
+ * 1. All artworks (unfiltered) — for specific SKU lookup (hero, governance, etc.)
+ * 2. v02 artworks — grouped by collection, 10 from each of AG, CD, MM, DW
+ */
+export async function getHomePageData(skus: string[]): Promise<HomePageData> {
+  const [allArtworks, v02Artworks] = await Promise.all([
+    fetchServer<Artwork[]>("/artworks"),
+    fetchServer<Artwork[]>("/artworks?versions=v02"),
+  ]);
+
+  // Build SKU lookup from the unfiltered list
+  const skuSet = new Set(skus);
+  const bySkus: Record<string, Artwork | null> = {};
+  for (const sku of skus) bySkus[sku] = null;
+  for (const artwork of allArtworks) {
+    if (skuSet.has(artwork.sku)) {
+      bySkus[artwork.sku] = normalizeArtwork(artwork);
+    }
+  }
+
+  // Featured artworks: up to 3 per collection from AG, CD, MM, DW, shuffled
+  const byCollection = new Map<string, Artwork[]>();
+  for (const code of FEATURED_COLLECTION_CODES) {
+    byCollection.set(code, []);
+  }
+  for (const artwork of normalizeArtworks(v02Artworks)) {
+    const code = extractCollectionCode(artwork.sku);
+    if (code && byCollection.has(code)) {
+      const list = byCollection.get(code)!;
+      if (list.length < ARTWORKS_PER_COLLECTION) list.push(artwork);
+    }
+  }
+  const featuredArtworks = Array.from(byCollection.values()).flat();
+  for (let i = featuredArtworks.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [featuredArtworks[i], featuredArtworks[j]] = [featuredArtworks[j], featuredArtworks[i]];
+  }
+
+  return { bySkus, featuredArtworks };
 }
 
 export async function getArtworkBySku(sku: string): Promise<Artwork | null> {

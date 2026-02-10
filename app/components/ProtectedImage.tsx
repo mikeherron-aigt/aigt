@@ -40,6 +40,8 @@ export const ProtectedImage = forwardRef<HTMLImageElement, ProtectedImageProps>(
     },
     ref
   ) {
+    if (!src) return null;
+
     const normalizedSrc =
       typeof src === "string" ? normalizeArtworkImageUrl(src) : src;
 

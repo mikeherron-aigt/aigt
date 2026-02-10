@@ -17,8 +17,7 @@ export async function GET(
 
   try {
     const response = await fetch(endpoint, {
-      next: { revalidate: 0 }, // Disable cache during development
-      cache: 'no-store'
+      next: { revalidate: 300 },
     });
 
     if (!response.ok) {
@@ -30,7 +29,7 @@ export async function GET(
 
     const data = await response.json();
     return NextResponse.json(data, {
-      headers: { "Cache-Control": "public, max-age=300" },
+      headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=600" },
     });
   } catch {
     return NextResponse.json(
