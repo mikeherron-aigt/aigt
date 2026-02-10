@@ -32,6 +32,11 @@ const getCollectionFeaturedImage = (collectionName: string): string | null => {
 export default async function CollectionsPage() {
   const collections = await getCollections();
 
+  // If no collections are available (e.g., API error during build), show fallback UI
+  if (collections.length === 0) {
+    console.warn('No collections available - API may be unreachable');
+  }
+
   // Fetch a small pool (max 24) per collection instead of the entire catalog
   // Use Promise.allSettled to prevent one failed collection from blocking others
   const results = await Promise.allSettled(
@@ -95,8 +100,15 @@ export default async function CollectionsPage() {
 
             <h2 className="section-heading">Featured Collections</h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mt-8">
-              {collectionsWithImages.map((collection) => {
+            {collectionsWithImages.length === 0 ? (
+              <div className="mt-8">
+                <p className="governance-description">
+                  Collections are temporarily unavailable. Please check back soon.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mt-8">
+                {collectionsWithImages.map((collection) => {
                 const slug = slugify(collection.collection_name);
                 const description = collectionDescriptions[collection.collection_name];
                 const collectionHref = `/collections/${slug}`;
@@ -147,7 +159,8 @@ export default async function CollectionsPage() {
                   </article>
                 );
               })}
-            </div>
+              </div>
+            )}
           </div>
         </section>
 

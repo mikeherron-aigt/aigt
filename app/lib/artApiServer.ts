@@ -71,7 +71,18 @@ async function fetchServer<T>(endpoint: string, timeoutMs: number = 10000) {
 }
 
 export async function getCollections(): Promise<Collection[]> {
-  return fetchServer<Collection[]>("/collections");
+  try {
+    return await fetchServer<Collection[]>("/collections");
+  } catch (error) {
+    // During build, if the API is unavailable or returns 403, log the error
+    // but return an empty array to prevent build failure
+    if (process.env.NODE_ENV === 'production') {
+      console.error('Failed to fetch collections during build:', error);
+      return [];
+    }
+    // In development, throw the error so issues are visible
+    throw error;
+  }
 }
 
 export async function getCollectionArtworks(
