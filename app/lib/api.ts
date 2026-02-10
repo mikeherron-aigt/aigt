@@ -83,7 +83,6 @@ type FetchOptions = {
 async function fetchAPI<T>(
   endpoint: string,
   options?: FetchOptions
-  ttlMs = DEFAULT_TTL_MS
 ): Promise<T> {
   const {
     ttlMs = DEFAULT_TTL_MS,
@@ -108,8 +107,6 @@ async function fetchAPI<T>(
     for (let attempt = 0; attempt <= retries; attempt += 1) {
       try {
         const response = await fetch(cacheKey);
-    try {
-      const response = await fetch(url);
 
         if (!response.ok) {
           if (response.status >= 500 && attempt < retries) {
@@ -123,12 +120,6 @@ async function fetchAPI<T>(
             response.status
           );
         }
-      if (!response.ok) {
-        throw new APIError(
-          `API request failed: ${response.statusText}`,
-          response.status
-        );
-      }
 
         const data = (await response.json()) as T;
         setCached(cacheKey, data, ttlMs);
@@ -146,17 +137,6 @@ async function fetchAPI<T>(
     }
 
     throw new APIError("Max retries exceeded");
-      const data = (await response.json()) as T;
-      setCached(url, data, ttlMs);
-      return data;
-    } catch (error) {
-      if (error instanceof APIError) {
-        throw error;
-      }
-      throw new APIError(
-        "Failed to connect to artwork database. Please try again later."
-      );
-    }
   })();
 
   pendingRequests.set(cacheKey, requestPromise);

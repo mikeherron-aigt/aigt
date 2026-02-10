@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   const offset = params.get("offset");
   const sku = params.get("sku");
 
-  if (version) filters.version = version;
+  if (version) filters.versions = version;
   if (collection) filters.collection = collection;
   if (year) {
     const parsedYear = Number.parseInt(year, 10);
