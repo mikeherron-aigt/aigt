@@ -110,68 +110,54 @@ export default function AboutPage() {
   const { artworks } = useArtworks({ versions: "v02" });
   const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
 
-  // Get featured works from all collections (v02, no untitled)
   const featuredWorks = useMemo(() => {
     return artworks
       .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
       .map(mapArtworkToItem);
   }, [artworks]);
 
-  // Select a random hero artwork on page load (changes only on refresh)
-  // Cycles through all collections before repeating
   useEffect(() => {
     if (featuredWorks.length === 0) return;
 
-    // Group artworks by collection
     const collectionMap = new Map<string, ArtworkItem[]>();
     featuredWorks.forEach((artwork) => {
-      const collection = artwork.collection || 'unknown';
-      if (!collectionMap.has(collection)) {
-        collectionMap.set(collection, []);
-      }
+      const collection = artwork.collection || "unknown";
+      if (!collectionMap.has(collection)) collectionMap.set(collection, []);
       collectionMap.get(collection)!.push(artwork);
     });
 
     const collections = Array.from(collectionMap.keys());
     if (collections.length === 0) return;
 
-    // Get shown collections from sessionStorage
     let shownCollections: string[] = [];
     try {
-      const stored = window.sessionStorage.getItem('about_collections');
-      if (stored) {
-        shownCollections = JSON.parse(stored);
-      }
+      const stored = window.sessionStorage.getItem("about_collections");
+      if (stored) shownCollections = JSON.parse(stored);
     } catch {
-      // Ignore errors
+      // ignore
     }
 
-    // Find collections that haven't been shown yet
-    const availableCollections = collections.filter(c => !shownCollections.includes(c));
-
-    // If all collections have been shown, reset
+    const availableCollections = collections.filter((c) => !shownCollections.includes(c));
     const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
 
-    // Pick a random collection from available ones
     const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
     const artworksInCollection = collectionMap.get(selectedCollection)!;
 
-    // Pick a random artwork from that collection
     const selected = artworksInCollection[Math.floor(Math.random() * artworksInCollection.length)];
     setHeroArtwork(selected);
 
-    // Save selected collection to history
     if (selected?.collection) {
       try {
-        const stored = window.sessionStorage.getItem('about_collections');
-        const shownCollections: string[] = stored ? JSON.parse(stored) : [];
-
-        if (!shownCollections.includes(selected.collection)) {
-          const updated = [...shownCollections, selected.collection];
-          window.sessionStorage.setItem('about_collections', JSON.stringify(updated));
+        const stored = window.sessionStorage.getItem("about_collections");
+        const previouslyShown: string[] = stored ? JSON.parse(stored) : [];
+        if (!previouslyShown.includes(selected.collection)) {
+          window.sessionStorage.setItem(
+            "about_collections",
+            JSON.stringify([...previouslyShown, selected.collection])
+          );
         }
       } catch {
-        // Ignore errors
+        // ignore
       }
     }
   }, [featuredWorks]);
@@ -183,7 +169,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
       <main>
-        {/* Hero Section with Image Collage */}
+        {/* Hero Section */}
         <section className="w-full" style={{ backgroundColor: "#f5f5f5" }}>
           <div className="max-w-[1440px] mx-auto relative">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
@@ -208,8 +194,8 @@ export default function AboutPage() {
 
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden">
-                {heroArtwork && (
-                  heroArtworkHref ? (
+                {heroArtwork &&
+                  (heroArtworkHref ? (
                     <Link
                       href={heroArtworkHref}
                       aria-label={`View details for ${heroArtwork.title}`}
@@ -233,12 +219,11 @@ export default function AboutPage() {
                       priority
                       sizes="(max-width: 1024px) 100vw, 601px"
                     />
-                  )
-                )}
+                  ))}
               </div>
             </div>
 
-            {/* Decorative Elements - Positioned at bottom of image */}
+            {/* Decorative Elements */}
             <div
               className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none"
               style={{ top: "0", height: "calc(100% - 242px)" }}
@@ -250,7 +235,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Design Bar - Full Width */}
+        {/* Design Bar */}
         <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
           <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{ width: "calc(50vw + 112px)" }} />
           <div className="absolute top-0 h-full bg-ledger-stone" style={{ left: "calc(50vw + 105px)", right: "0" }} />
@@ -272,28 +257,29 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* About John Dowling Section */}
+        {/* About John Dowling Section (FIXED ALIGNMENT) */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-[37px] items-center">
-              <div className="flex flex-col gap-8">
-                <div className="flex justify-center lg:justify-start">
-                  <div className="relative w-[310px] h-[310px] rounded-full overflow-hidden">
-                    <Image
-                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620"
-                      alt="John Dowling Jr."
-                      fill
-                      className="object-cover aigt-protected-image"
-                      sizes="310px"
-                    />
-                  </div>
+              {/* Left: Portrait + Centered Headings that match portrait width */}
+              <div className="flex flex-col gap-8 items-center lg:items-start">
+                <div className="relative w-[310px] h-[310px] rounded-full overflow-hidden">
+                  <Image
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620"
+                    alt="John Dowling Jr."
+                    fill
+                    className="object-cover aigt-protected-image"
+                    sizes="310px"
+                  />
                 </div>
-                <div className="flex flex-col gap-4">
-                  <h2 className="text-center lg:text-left">About John Dowling Jr.</h2>
-                  <h3 className="text-center lg:text-left">A Legacy Being Stewarded in Real Time</h3>
+
+                <div className="w-[310px] flex flex-col gap-4 text-center lg:text-left">
+                  <h2 className="m-0">About John Dowling Jr.</h2>
+                  <h3 className="m-0">A Legacy Being Stewarded in Real Time</h3>
                 </div>
               </div>
 
+              {/* Right: Copy */}
               <div className="flex flex-col gap-4 p-10 bg-paper-white">
                 <p>
                   John Dowling is an accomplished painter, photographer, and writer whose four decade career has produced
@@ -370,22 +356,17 @@ export default function AboutPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-[51px] lg:gap-y-[95px]">
               {teamMembers.map((member) => {
-                const photo = (
-                  <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6 hover:opacity-80 transition-opacity cursor-pointer">
-                    <Image
-                      src={member.imageUrl}
-                      alt={member.name}
-                      fill
-                      className="object-cover aigt-protected-image"
-                      sizes="102px"
-                    />
-                  </div>
-                );
-
                 return (
                   <div key={member.name} className="flex flex-col items-center text-center">
-                    {/* Photo */}
-                    {photo}
+                    <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6 hover:opacity-80 transition-opacity cursor-pointer">
+                      <Image
+                        src={member.imageUrl}
+                        alt={member.name}
+                        fill
+                        className="object-cover aigt-protected-image"
+                        sizes="102px"
+                      />
+                    </div>
 
                     <h3 className="text-[20px] lg:text-[22px] font-normal leading-normal m-0 mb-2">{member.name}</h3>
 
@@ -395,7 +376,6 @@ export default function AboutPage() {
                       {member.title}
                     </p>
 
-                    {/* LinkedIn Icon */}
                     {member.linkedinUrl && (
                       <a
                         href={member.linkedinUrl}
