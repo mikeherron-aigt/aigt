@@ -169,6 +169,10 @@ export default function PhilanthropyPage() {
     height: "1100px",
     overflow: "visible",
     pointerEvents: "auto",
+    zIndex: 50,
+    outline: "2px solid red",
+zIndex: 9999,
+pointerEvents: "auto",
 
   }}
 >
