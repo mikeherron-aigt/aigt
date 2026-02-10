@@ -1,48 +1,36 @@
 'use client';
 
+import Link from "next/link";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useArtworks } from "@/app/hooks/useArtworks";
+import type { Artwork } from "@/app/lib/api";
+import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
 import Image from "next/image";
+import { slugify } from "@/app/lib/slug";
 
-import { useState, useRef, useEffect } from "react";
+const JOHN_DOWLING_PROFILE_URL = "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620";
 
 interface ArtworkItem {
   src: string;
   title: string;
   artist: string;
   year: string;
+  collection?: string;
 }
 
-const featuredWorks: ArtworkItem[] = [
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F270bfbf622d44bb58da3863d2d4a1416?format=webp&width=800",
-    title: "80s Series #2",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0b223e89165544369065645eb9e01981?format=webp&width=800",
-    title: "80s Series #25",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F412947b95d6b487f8e94d9db43269338?format=webp&width=800",
-    title: "80s Series #14",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F41a3331c307447f9a770facf2b3f3f7b?format=webp&width=800",
-    title: "80s Series #53",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F08edb5409851472b964e3c762012ec12?format=webp&width=800",
-    title: "80s Series #38",
-    artist: "John Dowling Jr.",
-    year: "Contemporary"
-  }
-];
+const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  src: artwork.image_url,
+  title: artwork.title,
+  artist: artwork.artist,
+  year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
+  collection: artwork.collection_name,
+});
+
+const getArtworkHref = (artwork: { title: string; collection?: string }) => {
+  if (!artwork.collection) return null;
+  return `/collections/${slugify(artwork.collection)}/${slugify(artwork.title)}`;
+};
 
 export default function EthereumArtFundPage() {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -51,10 +39,80 @@ export default function EthereumArtFundPage() {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
+  const { artworks } = useArtworks({ versions: "v02" });
+
+  // Get featured works from all collections (v02, no untitled)
+  const featuredWorks = useMemo(() => {
+    return artworks
+      .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
+      .map(mapArtworkToItem);
+  }, [artworks]);
+
+  // Select a random hero artwork on page load (changes only on refresh)
+  // Cycles through all collections before repeating
+  useEffect(() => {
+    if (featuredWorks.length === 0) return;
+
+    // Group artworks by collection
+    const collectionMap = new Map<string, ArtworkItem[]>();
+    featuredWorks.forEach((artwork) => {
+      const collection = artwork.collection || 'unknown';
+      if (!collectionMap.has(collection)) {
+        collectionMap.set(collection, []);
+      }
+      collectionMap.get(collection)!.push(artwork);
+    });
+
+    const collections = Array.from(collectionMap.keys());
+    if (collections.length === 0) return;
+
+    // Get shown collections from sessionStorage
+    let shownCollections: string[] = [];
+    try {
+      const stored = window.sessionStorage.getItem('eth_fund_collections');
+      if (stored) {
+        shownCollections = JSON.parse(stored);
+      }
+    } catch {
+      // Ignore errors
+    }
+
+    // Find collections that haven't been shown yet
+    const availableCollections = collections.filter(c => !shownCollections.includes(c));
+
+    // If all collections have been shown, reset
+    const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
+
+    // Pick a random collection from available ones
+    const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
+    const artworksInCollection = collectionMap.get(selectedCollection)!;
+
+    // Pick a random artwork from that collection
+    const selected = artworksInCollection[Math.floor(Math.random() * artworksInCollection.length)];
+    setHeroArtwork(selected);
+
+    // Save selected collection to history
+    if (selected?.collection) {
+      try {
+        const stored = window.sessionStorage.getItem('eth_fund_collections');
+        const shownCollections: string[] = stored ? JSON.parse(stored) : [];
+
+        if (!shownCollections.includes(selected.collection)) {
+          const updated = [...shownCollections, selected.collection];
+          window.sessionStorage.setItem('eth_fund_collections', JSON.stringify(updated));
+        }
+      } catch {
+        // Ignore errors
+      }
+    }
+  }, [featuredWorks]);
+
+  const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
-    if ((e.target as HTMLElement).closest('button')) return;
+    if ((e.target as HTMLElement).closest('button, a')) return;
     setIsDragging(true);
     setStartX(e.pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -73,6 +131,7 @@ export default function EthereumArtFundPage() {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!sliderRef.current) return;
+    if ((e.target as HTMLElement).closest('a')) return;
     setIsDragging(true);
     setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
     setScrollLeft(sliderRef.current.scrollLeft);
@@ -169,14 +228,40 @@ export default function EthereumArtFundPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
-                  <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F5a13615e39cb4a898e26aab1d64089af?format=webp&width=800"
-                    alt="Abstract colorful digital art representing Ethereum-native cultural assets"
-                    fill
-                    className="object-cover object-center"
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
+                  {heroArtwork?.src ? (
+                    heroArtworkHref ? (
+                      <Link
+                        href={heroArtworkHref}
+                        aria-label={`View details for ${heroArtwork.title}`}
+                        className="block w-full h-full"
+                      >
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </Link>
+                    ) : (
+                      <div className="w-full h-full">
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </div>
+                    )
+                  ) : (
+                    <div
+                      className="w-full h-full"
+                      style={{ backgroundColor: "var(--gallery-plaster)" }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -282,14 +367,14 @@ export default function EthereumArtFundPage() {
         <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid lg:grid-cols-[278px_1fr] gap-12 lg:gap-[120px] items-start">
-              {/* Left: Image */}
+              {/* Left: Image - John Dowling Jr. Profile Photo */}
               <div className="flex justify-center lg:justify-start">
                 <div className="relative w-[278px] h-[278px] rounded-full overflow-hidden">
                   <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620"
+                    src={JOHN_DOWLING_PROFILE_URL}
                     alt="John Dowling Jr."
                     fill
-                    className="object-cover"
+                    className="object-cover aigt-protected-image"
                     sizes="278px"
                   />
                 </div>
@@ -341,21 +426,32 @@ export default function EthereumArtFundPage() {
                   >
                     {[...featuredWorks, ...featuredWorks].map((artwork, index) => (
                       <div key={index} className="artwork-card">
-                        <button
-                          className="artwork-card-button"
-                          onClick={() => openModal(artwork)}
-                          aria-label={`View full-size image of ${artwork.title} by ${artwork.artist}`}
-                        >
-                          <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
-                            <Image
-                              src={artwork.src}
-                              alt={artwork.title}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                            />
-                          </div>
-                        </button>
+                        {(() => {
+                          const artworkHref = getArtworkHref(artwork);
+                          const imageContent = (
+                            <div className="artwork-image-wrapper" style={{ aspectRatio: '247 / 206' }}>
+                              <ProgressiveImage
+                                src={artwork.src}
+                                alt={artwork.title}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 20vw"
+                              />
+                            </div>
+                          );
+
+                          return artworkHref ? (
+                            <Link
+                              href={artworkHref}
+                              className="artwork-card-button"
+                              aria-label={`View details for ${artwork.title}`}
+                            >
+                              {imageContent}
+                            </Link>
+                          ) : (
+                            <div className="artwork-card-button">{imageContent}</div>
+                          );
+                        })()}
                         <div className="artwork-info">
                           <h3>{artwork.title}</h3>
                           <p className="artwork-details">{artwork.artist}</p>
@@ -585,7 +681,7 @@ export default function EthereumArtFundPage() {
             </button>
 
             <div className="image-modal-image-container">
-              <Image
+              <ProtectedImage
                 src={selectedImage.src}
                 alt={selectedImage.title}
                 fill

@@ -1,4 +1,6 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { slugify } from "@/app/lib/slug";
 
 const artworkCards = [
   {
@@ -27,6 +29,8 @@ const artworkGrid = Array.from({ length: 24 }, (_, index) => ({
   ...artworkCards[index % artworkCards.length],
   id: index + 1,
 }));
+
+const collectionSlug = slugify("Cosmic Dreams");
 
 export default function CollectionPage() {
   return (
@@ -75,13 +79,15 @@ export default function CollectionPage() {
             {artworkGrid.map((artwork) => (
               <article key={artwork.id} className="collection-card">
                 <div className="collection-card-image">
-                  <Image
-                    src={artwork.image}
-                    alt={artwork.title}
-                    width={320}
-                    height={240}
-                    className="collection-card-img"
-                  />
+                  <Link href={`/collections/${collectionSlug}/${slugify(artwork.title)}`}>
+                    <ProtectedImage
+                      src={artwork.image}
+                      alt={artwork.title}
+                      width={320}
+                      height={240}
+                      className="collection-card-img"
+                    />
+                  </Link>
                 </div>
                 <p className="collection-card-title">{artwork.title}</p>
               </article>

@@ -1,48 +1,33 @@
 'use client';
 
-import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useArtworks } from "@/app/hooks/useArtworks";
+import type { Artwork } from "@/app/lib/api";
+import { ProgressiveImage } from "@/app/components/ProgressiveImage";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { slugify } from "@/app/lib/slug";
 
 interface ArtworkItem {
   src: string;
   title: string;
   artist: string;
   year: string;
+  collection?: string;
 }
 
-const featuredWorks: ArtworkItem[] = [
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F270bfbf622d44bb58da3863d2d4a1416?format=webp&width=800",
-    title: "80s Series #2",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F0b223e89165544369065645eb9e01981?format=webp&width=800",
-    title: "80s Series #25",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F412947b95d6b487f8e94d9db43269338?format=webp&width=800",
-    title: "80s Series #14",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F41a3331c307447f9a770facf2b3f3f7b?format=webp&width=800",
-    title: "80s Series #53",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-  },
-  {
-    src: "https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F08edb5409851472b964e3c762012ec12?format=webp&width=800",
-    title: "80s Series #38",
-    artist: "John Dowling Jr.",
-    year: "Contemporary",
-  },
-];
+const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  src: artwork.image_url,
+  title: artwork.title,
+  artist: artwork.artist,
+  year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
+  collection: artwork.collection_name,
+});
+
+const getArtworkHref = (artwork: { title: string; collection?: string }) => {
+  if (!artwork.collection) return null;
+  return `/collections/${slugify(artwork.collection)}/${slugify(artwork.title)}`;
+};
 
 export default function BlueChipArtFundPage() {
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -53,6 +38,91 @@ export default function BlueChipArtFundPage() {
 
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
+  const [focusArtwork, setFocusArtwork] = useState<ArtworkItem | null>(null);
+  const { artworks } = useArtworks({ versions: "v02" });
+
+  const featuredWorks = useMemo(() => {
+    return artworks
+      .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
+      .map(mapArtworkToItem);
+  }, [artworks]);
+
+  // Select random hero artworks on page load (changes only on refresh)
+  // Cycles through all collections before repeating
+  useEffect(() => {
+    if (featuredWorks.length === 0) return;
+
+    // Group artworks by collection
+    const collectionMap = new Map<string, ArtworkItem[]>();
+    featuredWorks.forEach((artwork) => {
+      const collection = artwork.collection || 'unknown';
+      if (!collectionMap.has(collection)) {
+        collectionMap.set(collection, []);
+      }
+      collectionMap.get(collection)!.push(artwork);
+    });
+
+    const collections = Array.from(collectionMap.keys());
+    if (collections.length === 0) return;
+
+    // Get shown collections from sessionStorage
+    let shownCollections: string[] = [];
+    try {
+      const stored = window.sessionStorage.getItem('blue_chip_collections');
+      if (stored) {
+        shownCollections = JSON.parse(stored);
+      }
+    } catch {
+      // Ignore errors
+    }
+
+    // Find collections that haven't been shown yet
+    const availableCollections = collections.filter(c => !shownCollections.includes(c));
+
+    // If all collections have been shown, reset
+    const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
+
+    // Pick two different collections if possible
+    const selectedCollection1 = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
+    const remainingCollections = collectionsToUse.filter(c => c !== selectedCollection1);
+    const selectedCollection2 = remainingCollections.length > 0
+      ? remainingCollections[Math.floor(Math.random() * remainingCollections.length)]
+      : selectedCollection1;
+
+    const artworksInCollection1 = collectionMap.get(selectedCollection1)!;
+    const artworksInCollection2 = collectionMap.get(selectedCollection2)!;
+
+    const hero = artworksInCollection1[Math.floor(Math.random() * artworksInCollection1.length)];
+    const focus = artworksInCollection2[Math.floor(Math.random() * artworksInCollection2.length)];
+
+    setHeroArtwork(hero);
+    setFocusArtwork(focus);
+
+    // Save selected collections to history
+    try {
+      const stored = window.sessionStorage.getItem('blue_chip_collections');
+      const shownCollections: string[] = stored ? JSON.parse(stored) : [];
+      const collectionsToAdd: string[] = [];
+
+      if (hero?.collection && !shownCollections.includes(hero.collection)) {
+        collectionsToAdd.push(hero.collection);
+      }
+      if (focus?.collection && !shownCollections.includes(focus.collection)) {
+        collectionsToAdd.push(focus.collection);
+      }
+
+      if (collectionsToAdd.length > 0) {
+        const updated = [...shownCollections, ...collectionsToAdd];
+        window.sessionStorage.setItem('blue_chip_collections', JSON.stringify(updated));
+      }
+    } catch {
+      // Ignore errors
+    }
+  }, [featuredWorks]);
+
+  const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
+  const focusArtworkHref = focusArtwork ? getArtworkHref(focusArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!sliderRef.current) return;
@@ -157,14 +227,40 @@ export default function BlueChipArtFundPage() {
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden bg-gallery-plaster">
                 <div className="absolute inset-0">
-                  <Image
-                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F97494ca48242488c963375b90301c8d2?format=webp&width=800&height=1200"
-                    alt="Quiet, refined interior space evoking long-term art stewardship"
-                    fill
-                    className="object-cover object-center"
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
+                  {heroArtwork?.src ? (
+                    heroArtworkHref ? (
+                      <Link
+                        href={heroArtworkHref}
+                        aria-label={`View details for ${heroArtwork.title}`}
+                        className="block w-full h-full"
+                      >
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </Link>
+                    ) : (
+                      <div className="w-full h-full">
+                        <ProgressiveImage
+                          src={heroArtwork.src}
+                          alt={heroArtwork.title}
+                          fill
+                          eager
+                          className="object-cover object-center"
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                        />
+                      </div>
+                    )
+                  ) : (
+                    <div
+                      className="w-full h-full"
+                      style={{ backgroundColor: "var(--gallery-plaster)" }}
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -190,7 +286,305 @@ export default function BlueChipArtFundPage() {
           </div>
         </div>
 
-        {/* ...everything else unchanged... */}
+        {/* Two Column Content Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-[80px]">
+          <div className="max-w-[1440px] mx-auto relative">
+            <div className="grid lg:grid-cols-[1fr_40%] gap-0">
+              {/* Left Column */}
+              <div className="px-4 sm:px-8 lg:px-[80px] flex items-center">
+                <div className="max-w-[579px]">
+                  <h2 className="governance-title" style={{ marginBottom: "24px" }}>
+                    Institutional Stewardship for Established Art
+                  </h2>
+                  <p className="governance-description">
+                    The Blue Chip Art Fund is designed for artworks with established cultural significance and enduring historical
+                    relevance.
+                  </p>
+                  <p className="governance-description">
+                    The fund applies institutional governance, professional custody standards, and long-horizon ownership to works
+                    that warrant preservation across generations rather than participation in evolving market structures.
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="px-4 sm:px-8 lg:p-[80px_40px]" style={{ backgroundColor: "#f5f5f5" }}>
+                <h3 className="governance-title" style={{ marginBottom: "24px", fontSize: "28px", lineHeight: "36px" }}>
+                  Preservation-First Stewardship
+                </h3>
+                <p className="governance-description" style={{ marginBottom: "16px" }}>
+                  Prioritizing long-duration ownership over liquidity
+                </p>
+                <p className="governance-description" style={{ marginBottom: "16px" }}>
+                  Maintaining museum-quality custody and care standards
+                </p>
+                <p className="governance-description" style={{ marginBottom: "16px" }}>
+                  Preserving provenance, context, and historical integrity
+                </p>
+                <p className="governance-description">Minimizing turnover to support long-term cultural value</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* A Distinct Mandate Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
+              <h2 className="governance-title text-center">A Distinct Mandate</h2>
+              <p className="governance-subtitle text-center max-w-[735px]">
+                The Blue Chip Art Fund is differentiated by its preservation-first mandate and long-term ownership horizon.
+              </p>
+              <p className="governance-description text-center max-w-[995px]">
+                The Blue Chip Art Fund operates with the explicit objective of long-term stewardship. It prioritizes permanence,
+                stability, and cultural continuity over liquidity or market responsiveness.
+              </p>
+              <p className="governance-description text-center max-w-[995px]">
+                Acquisitions are made with the expectation of extended holding periods, limited turnover, and careful custodial
+                management designed to preserve both physical condition and historical context.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="stewardship-card">
+                <h3 className="stewardship-card-title text-center">Long-Horizon Ownership</h3>
+              </div>
+              <div className="stewardship-card">
+                <h3 className="stewardship-card-title text-center">Preservation-First Stewardship</h3>
+              </div>
+              <div className="stewardship-card">
+                <h3 className="stewardship-card-title text-center">Selective and Infrequent Acquisition</h3>
+              </div>
+              <div className="stewardship-card">
+                <h3 className="stewardship-card-title text-center">Institutional Custody and Care</h3>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Curatorial and Acquisition Focus Section */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="grid lg:grid-cols-[417px_1fr] gap-[28.8px] lg:gap-[72px] items-start">
+              {/* Left: Image */}
+              <div className="flex justify-center lg:justify-start">
+                <div className="relative w-full max-w-[417px] aspect-square overflow-hidden">
+                  {focusArtwork?.src ? (
+                    focusArtworkHref ? (
+                      <Link
+                        href={focusArtworkHref}
+                        aria-label={`View details for ${focusArtwork.title}`}
+                        className="block w-full h-full"
+                      >
+                        <ProgressiveImage
+                          src={focusArtwork.src}
+                          alt={focusArtwork.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 417px"
+                        />
+                      </Link>
+                    ) : (
+                      <div className="w-full h-full">
+                        <ProgressiveImage
+                          src={focusArtwork.src}
+                          alt={focusArtwork.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 1024px) 100vw, 417px"
+                        />
+                      </div>
+                    )
+                  ) : (
+                    <div
+                      className="w-full h-full"
+                      style={{ backgroundColor: "var(--gallery-plaster)" }}
+                    />
+                  )}
+                </div>
+              </div>
+
+              {/* Right: Content */}
+              <div className="max-w-[579px] w-full lg:pl-0">
+                <h2 className="governance-title" style={{ marginBottom: "24px" }}>
+                  Curatorial and Acquisition Focus
+                </h2>
+                <p className="governance-description">
+                  The Blue Chip Art Fund is focused on the acquisition and long-term stewardship of artworks with established
+                  cultural, historical, and institutional significance.
+                </p>
+                <p className="governance-description">
+                  Works are selected based on enduring relevance, provenance integrity, and suitability for extended custodial care.
+                  The fund prioritizes pieces that have demonstrated lasting influence within art history rather than short-term
+                  market momentum.
+                </p>
+                <p className="governance-description">
+                  Acquisition activity remains selective and deliberate, with an emphasis on quality, context, and preservation over
+                  volume.
+                </p>
+                <p className="governance-description">Areas of focus to include:</p>
+                <ul className="governance-description" style={{ paddingLeft: "20px", listStyle: "disc", marginTop: "8px" }}>
+                  <li>Historically significant modern and contemporary works</li>
+                  <li>Artists with sustained institutional recognition</li>
+                  <li>Works with documented exhibition and publication history</li>
+                  <li>Pieces suitable for museum-quality custody and conservation</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How the Blue Chip Art Fund Operates */}
+        <section className="w-full py-12 sm:py-16 lg:py-20" style={{ backgroundColor: "#f5f5f5" }}>
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <div className="flex flex-col items-center gap-4 mb-12 lg:mb-16 max-w-[995px] mx-auto">
+              <h2 className="governance-title text-center">How the Blue Chip Art Fund Operates</h2>
+              <p className="governance-subtitle text-center max-w-[817px]">
+                An overview of stewardship priorities, acquisition discipline, and long-term custodial care.
+              </p>
+              <p className="governance-description text-center max-w-[995px]">
+                The Blue Chip Art Fund operates through selective acquisition, long-duration ownership, institutional custody
+                standards, and governance designed to minimize turnover while preserving cultural value.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              <div className="practice-card">
+                <div className="practice-card-content">
+                  <h3 className="practice-card-title">Long-Term Ownership</h3>
+                  <p className="practice-card-description">
+                    The fund is designed for extended holding periods, with no expectation of short-term liquidity.
+                  </p>
+                </div>
+              </div>
+
+              <div className="practice-card">
+                <div className="practice-card-content">
+                  <h3 className="practice-card-title">Lower Risk Profile</h3>
+                  <p className="practice-card-description">
+                    By focusing on historically established works, the fund emphasizes stability over market volatility.
+                  </p>
+                </div>
+              </div>
+
+              <div className="practice-card">
+                <div className="practice-card-content">
+                  <h3 className="practice-card-title">Selective Acquisition</h3>
+                  <p className="practice-card-description">
+                    Growth occurs infrequently and only when works meet strict cultural and custodial criteria.
+                  </p>
+                </div>
+              </div>
+
+              <div className="practice-card">
+                <div className="practice-card-content">
+                  <h3 className="practice-card-title">Institutional Custody</h3>
+                  <p className="practice-card-description">
+                    Works are maintained under professional standards appropriate for museum-quality art.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Participation and Alignment */}
+        <section className="w-full bg-white py-12 sm:py-16 lg:py-20">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
+            <h2 className="governance-title" style={{ marginBottom: "16px" }}>
+              Participation and Alignment
+            </h2>
+            <p className="governance-description max-w-[1038px]" style={{ marginBottom: "48px" }}>
+              Participation in the Blue Chip Art Fund is designed for those aligned with long-term stewardship and
+              preservation-first ownership.
+            </p>
+
+            <div className="flex flex-col gap-6">
+              <div
+                className="stewardship-card"
+                style={{
+                  padding: "40px",
+                  width: "100%",
+                  maxWidth: "1199px",
+                  minHeight: "auto",
+                  backgroundColor: "#f5f5f5",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  gap: 0,
+                }}
+              >
+                <h3 className="stewardship-card-title" style={{ textAlign: "left", width: "100%" }}>
+                  For Long-Term Stewards
+                </h3>
+                <p className="stewardship-card-description" style={{ marginTop: "16px" }}>
+                  Participation in the Blue Chip Art Fund is designed for individuals and institutions aligned with long-duration
+                  ownership and cultural stewardship.
+                </p>
+                <p className="stewardship-card-description">
+                  The fund is intended for those who value continuity, preservation, and measured decision-making over short-term
+                  market responsiveness.
+                </p>
+              </div>
+
+              <div
+                className="stewardship-card"
+                style={{
+                  padding: "40px",
+                  width: "100%",
+                  maxWidth: "1199px",
+                  minHeight: "auto",
+                  backgroundColor: "#f5f5f5",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  gap: 0,
+                }}
+              >
+                <h3 className="stewardship-card-title" style={{ textAlign: "left", width: "100%" }}>
+                  Preservation, Not Liquidity
+                </h3>
+                <p className="stewardship-card-description" style={{ marginTop: "16px" }}>
+                  The Blue Chip Art Fund is not structured to prioritize liquidity, frequent transactions, or short-term price
+                  discovery.
+                </p>
+                <p className="stewardship-card-description">
+                  Acquisitions are made with the expectation of extended holding periods, minimal turnover, and stewardship
+                  practices designed to preserve artistic, historical, and cultural integrity across generations.
+                </p>
+              </div>
+
+              <div
+                className="stewardship-card"
+                style={{
+                  padding: "40px",
+                  width: "100%",
+                  maxWidth: "1199px",
+                  minHeight: "auto",
+                  backgroundColor: "#f5f5f5",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  gap: 0,
+                }}
+              >
+                <h3 className="stewardship-card-title" style={{ textAlign: "left", width: "100%" }}>
+                  Deliberate Engagement
+                </h3>
+                <p className="stewardship-card-description" style={{ marginTop: "16px" }}>
+                  Art Investment Group Trust engages prospective participants through direct, considered discussion.
+                </p>
+                <p className="stewardship-card-description">
+                  Participation begins with alignment around intent, stewardship philosophy, and long-term commitment rather than
+                  transaction-driven timelines.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Private Conversations Section */}
         <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{ backgroundColor: "#ffffff" }}>
@@ -254,7 +648,7 @@ export default function BlueChipArtFundPage() {
             </button>
 
             <div className="image-modal-image-container">
-              <Image src={selectedImage.src} alt={selectedImage.title} fill className="object-contain" sizes="90vw" />
+              <ProtectedImage src={selectedImage.src} alt={selectedImage.title} fill className="object-contain" sizes="90vw" />
             </div>
 
             <div className="image-modal-info">

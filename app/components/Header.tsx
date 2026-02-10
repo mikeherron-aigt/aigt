@@ -177,9 +177,9 @@ export default function Header() {
               )}
             </div>
 
-            <a href="/#gallery" className="nav-link">
-              Gallery
-            </a>
+            <Link href="/collections" className="nav-link">
+              Collections
+            </Link>
 
             {/* Stewardship Dropdown */}
             <div
@@ -321,13 +321,13 @@ export default function Header() {
                     </div>
                   </div>
 
-                  <a
-                    href="/#gallery"
+                  <Link
+                    href="/collections"
                     className="nav-link text-base"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Gallery
-                  </a>
+                    Collections
+                  </Link>
 
                   <div className="flex flex-col gap-3">
                     <span className="nav-link text-base" style={{ opacity: 0.9 }}>

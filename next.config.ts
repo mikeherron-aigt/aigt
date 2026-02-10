@@ -1,11 +1,25 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['*'],
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "cdn.builder.io" },
-      { protocol: "https", hostname: "api.builder.io" },
-      { protocol: "https", hostname: "media.licdn.com" },
+      {
+        protocol: 'https',
+        hostname: 'cdn.builder.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'api.builder.io',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.licdn.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'image.artigt.com',
+      },
     ],
   },
 
