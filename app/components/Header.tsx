@@ -328,6 +328,13 @@ export default function Header() {
                       >
                         Blue Chip Art Fund
                       </Link>
+                      <Link
+                        href="/rwa-tech-fund"
+                        className="nav-link text-base"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        RWA Tech Fund
+                      </Link>
                     </div>
                   </div>
 
