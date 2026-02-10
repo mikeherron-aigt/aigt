@@ -5,10 +5,6 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Proxy API calls directly to backend to avoid 403 errors on deploy previews
-# This bypasses Next.js API routes and goes directly to art.artigt.com
-[[redirects]]
-  from = "/api/*"
-  to = "https://art.artigt.com/api/public/:splat"
-  status = 200
-  force = true
+# Note: API calls are made directly from the browser to art.artigt.com on Netlify
+# to avoid both Netlify API route 403 errors and Cloudflare bot challenges
+# See app/lib/api.ts for the client-side logic

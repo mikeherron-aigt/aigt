@@ -1,6 +1,13 @@
 import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
 
-const API_BASE_URL = "/api";
+// Use direct art.artigt.com URL on Netlify to avoid:
+// 1. Netlify API route 403 errors on deploy previews
+// 2. Cloudflare bot challenges when proxying server-side
+// Browsers can handle Cloudflare challenges, but Netlify's proxy cannot
+const API_BASE_URL =
+  typeof window !== "undefined" && window.location.hostname.includes("netlify.app")
+    ? "https://art.artigt.com/api/public"
+    : "/api";
 
 export interface Artwork {
   artwork_id: number;
