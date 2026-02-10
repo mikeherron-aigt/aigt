@@ -1,16 +1,12 @@
 import type { NextConfig } from "next";
 
-// Disable image optimization on Netlify to avoid 403 errors on deploy previews
-// Netlify's Image Optimization is only available on paid plans for deploy previews
-const isNetlify = process.env.NETLIFY === "true" || process.env.NETLIFY_DEV === "true" || !!process.env.DEPLOY_PRIME_URL;
-
+// Disable image optimization to prevent proxy URL issues
+// The backend returns image-proxy URLs which cause 400 errors with Next.js image optimization
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: isNetlify,
+    unoptimized: true, // Disable image optimization to bypass proxy URL issues
     formats: ["image/webp"],
     minimumCacheTTL: 86400,
-    loader: isNetlify ? 'custom' : undefined,
-    loaderFile: isNetlify ? './app/lib/imageLoader.ts' : undefined,
     remotePatterns: [
       {
         protocol: "https",
