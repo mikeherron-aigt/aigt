@@ -58,7 +58,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     // Ocean (sphere)
     const globeGeom = new THREE.SphereGeometry(RADIUS, 128, 96);
-    const globeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const globeMat = new THREE.MeshBasicMaterial({ color: 0xfafafa });
     const globeMesh = new THREE.Mesh(globeGeom, globeMat);
     scene.add(globeMesh);
 
