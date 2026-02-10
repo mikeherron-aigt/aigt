@@ -8,6 +8,9 @@ import type { Artwork } from "@/app/lib/api";
 import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 
+// Force dynamic rendering to avoid build-time API calls
+export const dynamic = 'force-dynamic';
+
 interface TeamMember {
   name: string;
   title: string;
