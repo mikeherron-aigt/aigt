@@ -68,14 +68,11 @@ export const ProtectedImage = forwardRef<HTMLImageElement, ProtectedImageProps>(
 
     const resolvedLoading = priority ? loading ?? "eager" : loading;
 
-    // Note:
-    // Next/Image will serve images from your own origin via /_next/image by default.
-    // That usually eliminates browser-side CORS issues and dramatically improves performance.
     return (
       <Image
         {...props}
-        // @ts-expect-error - Next Image does not accept HTMLImageElement ref typing cleanly
-        ref={ref}
+        // Next/Image does not type ref as HTMLImageElement cleanly, so we cast.
+        ref={ref as any}
         src={normalizedSrc}
         alt={alt}
         fill={fill}
