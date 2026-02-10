@@ -37,6 +37,12 @@ async function fetchServer<T>(endpoint: string) {
   try {
     const response = await fetch(url, {
       next: { revalidate: 300 },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; AIGTBot/1.0; +https://www.artigt.com)',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://www.artigt.com',
+      },
     });
 
     if (!response.ok) {
