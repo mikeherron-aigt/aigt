@@ -11,31 +11,39 @@ const ensureAbsoluteImageUrl = (url: string): string => {
 export function normalizeArtworkImageUrl(url: string): string {
   if (!url) return url;
 
+  const originalUrl = url;
+  let wasProxyUrl = false;
+
   // If the URL is using the image-proxy pattern, extract the actual image URL
   // This handles URLs like: https://art.artigt.com/api/public/image-proxy?url=https://image.artigt.com/...
   if (url.includes('/image-proxy?url=') || url.includes('/image-proxy%3Furl=')) {
+    wasProxyUrl = true;
+    console.log('[IMAGE URL] Processing proxy URL:', url);
     try {
       // Handle both regular and already-encoded URLs
       const decodedUrl = decodeURIComponent(url);
       const urlObj = new URL(decodedUrl);
       const actualImageUrl = urlObj.searchParams.get('url');
       if (actualImageUrl) {
-        console.log('Unwrapping image-proxy URL:', url, '->', actualImageUrl);
+        console.log('[IMAGE URL] Unwrapped to:', actualImageUrl);
         url = actualImageUrl;
+      } else {
+        console.warn('[IMAGE URL] No url parameter found in:', decodedUrl);
       }
     } catch (e) {
       // If URL parsing fails, try a simpler extraction method
+      console.warn('[IMAGE URL] URL parsing failed:', e);
       const match = url.match(/[?&]url=([^&]+)/);
       if (match) {
         try {
           const extractedUrl = decodeURIComponent(match[1]);
-          console.log('Extracted URL via regex:', url, '->', extractedUrl);
+          console.log('[IMAGE URL] Extracted via regex:', extractedUrl);
           url = extractedUrl;
         } catch (decodeError) {
-          console.error('Failed to decode extracted URL:', decodeError);
+          console.error('[IMAGE URL] Decode failed:', decodeError);
         }
       } else {
-        console.error('Failed to parse image-proxy URL:', e);
+        console.error('[IMAGE URL] Regex match failed');
       }
     }
   }
@@ -51,6 +59,9 @@ export function normalizeArtworkImageUrl(url: string): string {
     /__v\d+\b/i.test(filename) || /__primary__/i.test(filename) || /__full__/i.test(filename);
 
   if (!looksLikeArtwork) {
+    if (wasProxyUrl) {
+      console.warn('[IMAGE URL] Unwrapped proxy but not artwork pattern:', url);
+    }
     return url;
   }
 
@@ -79,7 +90,14 @@ export function normalizeArtworkImageUrl(url: string): string {
   const querySuffix = remaining ? `?${remaining}` : "";
   const hashSuffix = hash ? `#${hash}` : "";
 
-  return ensureAbsoluteImageUrl(`${updated}${querySuffix}${hashSuffix}`);
+  const finalUrl = ensureAbsoluteImageUrl(`${updated}${querySuffix}${hashSuffix}`);
+
+  // Log transformation for debugging
+  if (wasProxyUrl || originalUrl !== finalUrl) {
+    console.log('[IMAGE URL] Final:', originalUrl, '->', finalUrl);
+  }
+
+  return finalUrl;
 }
 
 /**
