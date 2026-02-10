@@ -68,11 +68,11 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
 
     const DOT_COLOR = new THREE.Color('#A1A69D');
     const DOT_RADIUS = RADIUS + 0.8; // close to surface, but avoids shimmer
-    const DOT_SIZE = 0.9;
+    const DOT_SIZE = 1.8;
 
     // Performance knobs
     // If you want even smoother, set STEP to 3. Visual difference is small, perf gain is real.
-    const STEP = 3;
+    const STEP = 2;
     const THRESHOLD = 70;
 
     const buildDots = async () => {
@@ -150,7 +150,7 @@ export default function InteractiveGlobe({ width = 1100, height = 1100 }: Props)
         size: DOT_SIZE,
         vertexColors: true,
         transparent: true,
-        opacity: 0.85,
+        opacity: 1.0,
         depthTest: true,
         depthWrite: false,
         sizeAttenuation: true,
