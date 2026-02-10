@@ -19,7 +19,10 @@ export async function GET(request: Request) {
   const endpoint = `${API_BASE_URL}/artworks${query ? `?${query}` : ""}`;
 
   try {
-    const response = await fetch(endpoint, { next: { revalidate: 300 } });
+    const response = await fetch(endpoint, {
+      next: { revalidate: 0 }, // Disable cache during development
+      cache: 'no-store'
+    });
 
     if (!response.ok) {
       return NextResponse.json(

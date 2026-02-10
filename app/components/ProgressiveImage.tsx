@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
+import { analyzeImageResolution } from "@/app/lib/imageUrl";
 
 type ProgressiveImageProps = {
   src: string;
@@ -28,7 +29,7 @@ export function ProgressiveImage({
   const [hasError, setHasError] = useState(false);
   const currentSrcRef = useRef(src);
 
-  // Reset state when src changes
+  // Reset state when src prop changes
   if (currentSrcRef.current !== src) {
     currentSrcRef.current = src;
     setIsLoaded(false);
@@ -38,18 +39,35 @@ export function ProgressiveImage({
   // Callback ref to check if image is already loaded (cached) when element mounts
   const imgRef = useCallback((img: HTMLImageElement | null) => {
     if (img && img.complete && img.naturalWidth > 0 && !isLoaded && !hasError) {
+      // Analyze resolution for cached images
+      const resInfo = analyzeImageResolution(img);
+      if (resInfo) {
+        console.log(
+          `[Image] ${alt}: ${resInfo.width}x${resInfo.height} (${resInfo.megapixels}MP) - ${resInfo.estimatedQuality} quality - ${resInfo.isHighRes ? "HIGH RES" : "STANDARD"}`
+        );
+      }
       setIsLoaded(true);
     }
-  }, [isLoaded, hasError]);
+  }, [isLoaded, hasError, alt]);
 
-  const handleLoad = useCallback(() => {
+  const handleLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    // Analyze resolution when image loads
+    const img = e.currentTarget;
+    const resInfo = analyzeImageResolution(img);
+    if (resInfo) {
+      console.log(
+        `[Image] ${alt}: ${resInfo.width}x${resInfo.height} (${resInfo.megapixels}MP) - ${resInfo.estimatedQuality} quality - ${resInfo.isHighRes ? "HIGH RES" : "STANDARD"}`
+      );
+    }
     setIsLoaded(true);
-  }, []);
+  }, [alt]);
 
   const handleError = useCallback(() => {
+    // Do not fall back to v01 - only use v02 images
+    console.log(`[Image] v02 image failed to load: ${src}`);
     setHasError(true);
     setIsLoaded(true);
-  }, []);
+  }, [src]);
 
   return (
     <>

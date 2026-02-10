@@ -16,7 +16,10 @@ export async function GET(
   }`;
 
   try {
-    const response = await fetch(endpoint, { next: { revalidate: 300 } });
+    const response = await fetch(endpoint, {
+      next: { revalidate: 0 }, // Disable cache during development
+      cache: 'no-store'
+    });
 
     if (!response.ok) {
       return NextResponse.json(

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Script from "next/script";
-import { useRef, useState, useEffect, useMemo, useCallback, type CSSProperties } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { useArtworks } from "@/app/hooks/useArtworks";
 import { getArtworkBySku, type Artwork } from "@/app/lib/api";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
@@ -44,25 +44,21 @@ const getArtworkHref = (artwork: { title: string; collection?: string; collectio
   return `/collections/${slugify(collectionName)}/${slugify(artwork.title)}`;
 };
 
-type HeroImageRotatorProps = {
+type StaticHeroImageProps = {
   images: string[];
   links?: (string | null)[];
-  intervalMs?: number;
-  transitionMs?: number;
   className?: string;
   alt?: string;
 };
 
 const heroAltText = "Cultural artwork representing the trust's collection";
 
-function HeroImageRotator({
+function StaticHeroImage({
   images,
   links,
-  intervalMs = 9000,
-  transitionMs = 1200,
   className = "",
   alt = heroAltText,
-}: HeroImageRotatorProps) {
+}: StaticHeroImageProps) {
   const normalizedItems = useMemo(
     () =>
       images
@@ -78,91 +74,11 @@ function HeroImageRotator({
     [images, links]
   );
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isReady, setIsReady] = useState(false);
-  const loadStatusRef = useRef(new Map<string, "loaded" | "failed">());
-  const intervalRef = useRef<number | null>(null);
-  const isMountedRef = useRef(false);
-
-  const preload = useCallback(
-    (index: number) =>
-      new Promise<void>((resolve) => {
-        const src = normalizedItems[index]?.src;
-        if (!src) {
-          resolve();
-          return;
-        }
-
-        const status = loadStatusRef.current.get(src);
-        if (status === "loaded" || status === "failed") {
-          resolve();
-          return;
-        }
-
-        let settled = false;
-        const finalize = (nextStatus: "loaded" | "failed") => {
-          if (settled) return;
-          settled = true;
-          loadStatusRef.current.set(src, nextStatus);
-          resolve();
-        };
-
-        const img = new Image();
-        img.onload = () => finalize("loaded");
-        img.onerror = () => finalize("failed");
-        img.src = src;
-
-        if ("decode" in img) {
-          img.decode().then(
-            () => finalize("loaded"),
-            () => finalize("failed")
-          );
-        }
-      }),
-    [normalizedItems]
-  );
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    setActiveIndex(0);
-    setIsReady(false);
-
-    if (intervalRef.current) window.clearTimeout(intervalRef.current);
-
-    if (normalizedItems.length === 0) {
-      return () => {
-        isMountedRef.current = false;
-      };
-    }
-
-    const scheduleNext = (currentIndex: number) => {
-      if (!isMountedRef.current || normalizedItems.length <= 1) return;
-
-      intervalRef.current = window.setTimeout(async () => {
-        const nextIndex = (currentIndex + 1) % normalizedItems.length;
-        await preload(nextIndex);
-        if (!isMountedRef.current) return;
-        setActiveIndex(nextIndex);
-        scheduleNext(nextIndex);
-      }, intervalMs);
-    };
-
-    const start = async () => {
-      await preload(0);
-      if (!isMountedRef.current) return;
-      setIsReady(true);
-      if (normalizedItems.length > 1) {
-        scheduleNext(0);
-      }
-    };
-
-    start();
-
-    return () => {
-      isMountedRef.current = false;
-      if (intervalRef.current) window.clearTimeout(intervalRef.current);
-    };
-  }, [normalizedItems, intervalMs, preload]);
+  // Pick a random image on mount (changes only on page refresh)
+  const selectedIndex = useMemo(() => {
+    if (normalizedItems.length === 0) return 0;
+    return Math.floor(Math.random() * normalizedItems.length);
+  }, [normalizedItems.length]);
 
   if (normalizedItems.length === 0) {
     return (
@@ -172,51 +88,33 @@ function HeroImageRotator({
     );
   }
 
+  const item = normalizedItems[selectedIndex];
+  const image = (
+    <ProtectedImage
+      src={item.src}
+      alt={alt}
+      fill
+      className="object-cover object-center"
+      priority
+      sizes="(max-width: 1024px) 100vw, 50vw"
+    />
+  );
+
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <div className="absolute inset-0 bg-gallery-plaster" />
-      {normalizedItems.map((item, index) => {
-        const wrapperStyle: CSSProperties = {
-          opacity: index === activeIndex ? 1 : 0,
-          transition: `opacity ${transitionMs}ms ease-in-out`,
-          zIndex: index === activeIndex ? 2 : 1,
-          willChange: "opacity",
-          pointerEvents: index === activeIndex ? "auto" : "none",
-        };
-
-        const image = (
-          <ProtectedImage
-            src={item.src}
-            alt={alt}
-            fill
-            className="object-cover object-center"
-            priority={index === 0}
-            sizes="(max-width: 1024px) 100vw, 50vw"
-          />
-        );
-
-        return item.href ? (
-          <Link
-            key={`${item.src}-${index}`}
-            href={item.href}
-            aria-label={`View details for ${alt}`}
-            className="absolute inset-0"
-            style={wrapperStyle}
-          >
-            {image}
-          </Link>
-        ) : (
-          <div
-            key={`${item.src}-${index}`}
-            className="absolute inset-0"
-            style={wrapperStyle}
-          >
-            {image}
-          </div>
-        );
-      })}
-      {!isReady && (
-        <div className="absolute inset-0 bg-gallery-plaster" />
+      {item.href ? (
+        <Link
+          href={item.href}
+          aria-label={`View details for ${alt}`}
+          className="absolute inset-0"
+        >
+          {image}
+        </Link>
+      ) : (
+        <div className="absolute inset-0">
+          {image}
+        </div>
       )}
     </div>
   );
@@ -233,11 +131,9 @@ export default function Home() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [subtitlesEnabled, setSubtitlesEnabled] = useState(false);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
-  const { artworks, loading: artworksLoading, error: artworksError, refetch: refetchArtworks } = useArtworks(
-    {
-      version: "v02",
-    }
-  );
+  const { artworks, loading: artworksLoading, error: artworksError, refetch: refetchArtworks } = useArtworks({
+    versions: "v02",
+  });
   const [backupArtworks, setBackupArtworks] = useState<Artwork[]>([]);
 
   useEffect(() => {
@@ -584,11 +480,9 @@ export default function Home() {
             </div>
 
             {/* Image Column */}
-            <HeroImageRotator
+            <StaticHeroImage
               images={heroImageList}
               links={heroImageLinks}
-              intervalMs={7000}
-              transitionMs={1200}
               className="h-[400px] sm:h-[500px] lg:h-[680px] bg-gallery-plaster"
             />
           </div>

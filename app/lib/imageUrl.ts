@@ -33,3 +33,123 @@ export function normalizeArtworkImageUrl(url: string): string {
 
   return `${updated}${querySuffix}${hashSuffix}`;
 }
+
+/**
+ * Generate a fallback URL that reverts v02 back to v01
+ * Used when v02 image fails to load
+ */
+export function getImageFallbackUrl(url: string): string | null {
+  if (!url) return null;
+
+  // Only provide fallback for v02 images that might have v01 versions
+  if (!/__v02\b/i.test(url)) {
+    return null;
+  }
+
+  // Revert v02 back to v01
+  return url.replace(/__v02\b/gi, "__v01");
+}
+
+/**
+ * Image resolution type based on dimensions
+ */
+export type ImageResolution = "thumbnail" | "standard" | "high" | "ultra" | "unknown";
+
+/**
+ * Image resolution metadata
+ */
+export interface ImageResolutionInfo {
+  isHighRes: boolean;
+  resolution: ImageResolution;
+  width: number;
+  height: number;
+  megapixels: number;
+  estimatedQuality: "low" | "medium" | "high" | "ultra";
+}
+
+/**
+ * Detect if an image URL suggests high resolution based on naming patterns
+ * This is a quick check before the image loads
+ */
+export function isHighResolutionUrl(url: string): boolean {
+  if (!url) return false;
+
+  const lowerUrl = url.toLowerCase();
+
+  // Check for explicit high-res indicators in the URL
+  if (
+    /__full__/i.test(url) ||
+    /__large__/i.test(url) ||
+    /__hd__/i.test(url) ||
+    /__4k__/i.test(url) ||
+    /full/i.test(lowerUrl) ||
+    /large/i.test(lowerUrl) ||
+    /hd/i.test(lowerUrl)
+  ) {
+    return true;
+  }
+
+  // Check for low-res indicators (if present, it's NOT high-res)
+  if (
+    /__thumb__/i.test(url) ||
+    /__thumbnail__/i.test(url) ||
+    /__small__/i.test(url) ||
+    /__preview__/i.test(url) ||
+    /thumb/i.test(lowerUrl) ||
+    /thumbnail/i.test(lowerUrl) ||
+    /small/i.test(lowerUrl)
+  ) {
+    return false;
+  }
+
+  // Default to unknown (assume high-res for artwork images)
+  return /__v\d+\b/i.test(url);
+}
+
+/**
+ * Get image resolution category based on dimensions
+ */
+export function getImageResolution(width: number, height: number): ImageResolution {
+  const maxDimension = Math.max(width, height);
+
+  if (maxDimension < 500) return "thumbnail";
+  if (maxDimension < 1920) return "standard";
+  if (maxDimension < 3840) return "high";
+  return "ultra";
+}
+
+/**
+ * Analyze loaded image and return detailed resolution information
+ */
+export function analyzeImageResolution(
+  img: HTMLImageElement
+): ImageResolutionInfo | null {
+  if (!img.complete || !img.naturalWidth || !img.naturalHeight) {
+    return null;
+  }
+
+  const width = img.naturalWidth;
+  const height = img.naturalHeight;
+  const megapixels = (width * height) / 1000000;
+  const resolution = getImageResolution(width, height);
+
+  // Determine if it's considered high-res
+  // High-res threshold: > 1920px in either dimension or > 2MP
+  const isHighRes = Math.max(width, height) > 1920 || megapixels > 2;
+
+  // Estimate quality based on megapixels
+  let estimatedQuality: "low" | "medium" | "high" | "ultra";
+  if (megapixels < 1) estimatedQuality = "low";
+  else if (megapixels < 3) estimatedQuality = "medium";
+  else if (megapixels < 12) estimatedQuality = "high";
+  else estimatedQuality = "ultra";
+
+  return {
+    isHighRes,
+    resolution,
+    width,
+    height,
+    megapixels: parseFloat(megapixels.toFixed(2)),
+    estimatedQuality,
+  };
+}

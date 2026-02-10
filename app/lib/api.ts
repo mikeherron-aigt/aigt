@@ -21,7 +21,7 @@ export interface Collection {
 }
 
 export interface ArtworkFilters {
-  version?: string;
+  versions?: string;
   collection?: string;
   year?: number;
   limit?: number;
@@ -142,7 +142,7 @@ function buildQueryString(filters?: ArtworkFilters): string {
 
   const params = new URLSearchParams();
 
-  if (filters.version) params.append("version", filters.version);
+  if (filters.versions) params.append("versions", filters.versions);
   if (filters.collection) params.append("collection", filters.collection);
   if (filters.year) params.append("year", filters.year.toString());
   if (filters.limit) params.append("limit", filters.limit.toString());
@@ -191,7 +191,7 @@ export async function getCollectionArtworks(
 }
 
 export async function getArtworksByVersion(version: string): Promise<Artwork[]> {
-  return getArtworks({ version });
+  return getArtworks({ versions: version });
 }
 
 export async function getArtworksByYear(year: number): Promise<Artwork[]> {

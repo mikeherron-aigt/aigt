@@ -33,7 +33,8 @@ const normalizeArtworks = (artworks: Artwork[]): Artwork[] =>
 
 async function fetchServer<T>(endpoint: string) {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    next: { revalidate: 300 },
+    next: { revalidate: 0 }, // Disable cache during development
+    cache: 'no-store',
     headers: {
       "User-Agent": "Mozilla/5.0 (compatible; AIGT-App/1.0)",
     },
@@ -63,7 +64,7 @@ export async function getCollectionArtworks(
 }
 
 export interface ArtworkFilters {
-  version?: string;
+  versions?: string;
   collection?: string;
   year?: number;
   limit?: number;
@@ -76,7 +77,7 @@ function buildQueryString(filters?: ArtworkFilters): string {
 
   const params = new URLSearchParams();
 
-  if (filters.version) params.append("version", filters.version);
+  if (filters.versions) params.append("versions", filters.versions);
   if (filters.collection) params.append("collection", filters.collection);
   if (filters.year) params.append("year", filters.year.toString());
   if (filters.sku) params.append("sku", filters.sku);

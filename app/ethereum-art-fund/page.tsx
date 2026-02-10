@@ -64,7 +64,7 @@ export default function EthereumArtFundPage() {
   const [scrollLeft, setScrollLeft] = useState(0);
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { artworks } = useArtworks({ version: "v02" });
+  const { artworks } = useArtworks({ versions: "v02" });
 
   // Get featured works from all collections (v02, no untitled)
   const featuredWorks = useMemo(() => {
@@ -73,27 +73,14 @@ export default function EthereumArtFundPage() {
       .map(mapArtworkToItem);
   }, [artworks]);
 
-  // Select 3 specific hero artworks for cycling (deterministic selection by sorting)
-  // Falls back to static images if API data is unavailable
-  const heroArtworks = useMemo(() => {
-    if (featuredWorks.length === 0) return FALLBACK_HERO_ARTWORKS;
-    // Sort by title for consistent selection, then pick first 3
-    const sorted = [...featuredWorks].sort((a, b) => a.title.localeCompare(b.title));
-    return sorted.slice(0, 3);
+  // Select a random hero artwork on page load (changes only on refresh)
+  const heroArtwork = useMemo(() => {
+    const artworkPool = featuredWorks.length > 0 ? featuredWorks : FALLBACK_HERO_ARTWORKS;
+    if (artworkPool.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * artworkPool.length);
+    return artworkPool[randomIndex];
   }, [featuredWorks]);
 
-  // Cycle through hero artworks
-  const [heroIndex, setHeroIndex] = useState(0);
-
-  useEffect(() => {
-    if (heroArtworks.length <= 1) return;
-    const interval = setInterval(() => {
-      setHeroIndex((prev) => (prev + 1) % heroArtworks.length);
-    }, 6000); // Cycle every 6 seconds
-    return () => clearInterval(interval);
-  }, [heroArtworks.length]);
-
-  const heroArtwork = heroArtworks[heroIndex];
   const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
 
   const handleMouseDown = (e: React.MouseEvent) => {

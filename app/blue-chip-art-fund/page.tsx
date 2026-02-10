@@ -63,35 +63,27 @@ export default function BlueChipArtFundPage() {
 
   const [selectedImage, setSelectedImage] = useState<ArtworkItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { artworks } = useArtworks({ version: "v02" });
+  const { artworks } = useArtworks({ versions: "v02" });
   const featuredWorks = useMemo(() => {
     return artworks
       .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
       .map(mapArtworkToItem);
   }, [artworks]);
 
-  // Select 3 specific hero artworks for cycling (deterministic selection by sorting)
-  // Falls back to static images if API data is unavailable
-  const heroArtworks = useMemo(() => {
-    if (featuredWorks.length === 0) return FALLBACK_HERO_ARTWORKS;
-    // Sort by title for consistent selection, then pick first 3
-    const sorted = [...featuredWorks].sort((a, b) => a.title.localeCompare(b.title));
-    return sorted.slice(0, 3);
+  // Select random hero artworks on page load (changes only on refresh)
+  const { heroArtwork, focusArtwork } = useMemo(() => {
+    const artworkPool = featuredWorks.length > 0 ? featuredWorks : FALLBACK_HERO_ARTWORKS;
+    if (artworkPool.length === 0) return { heroArtwork: null, focusArtwork: null };
+
+    const randomIndex1 = Math.floor(Math.random() * artworkPool.length);
+    const randomIndex2 = (randomIndex1 + 1) % artworkPool.length;
+
+    return {
+      heroArtwork: artworkPool[randomIndex1],
+      focusArtwork: artworkPool[randomIndex2],
+    };
   }, [featuredWorks]);
 
-  // Cycle through hero artworks
-  const [heroIndex, setHeroIndex] = useState(0);
-
-  useEffect(() => {
-    if (heroArtworks.length <= 1) return;
-    const interval = setInterval(() => {
-      setHeroIndex((prev) => (prev + 1) % heroArtworks.length);
-    }, 6000); // Cycle every 6 seconds
-    return () => clearInterval(interval);
-  }, [heroArtworks.length]);
-
-  const heroArtwork = heroArtworks[heroIndex];
-  const focusArtwork = heroArtworks[(heroIndex + 1) % heroArtworks.length] || heroArtwork;
   const heroArtworkHref = heroArtwork ? getArtworkHref(heroArtwork) : null;
   const focusArtworkHref = focusArtwork ? getArtworkHref(focusArtwork) : null;
 
