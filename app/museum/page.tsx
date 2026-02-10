@@ -211,14 +211,14 @@ export default function MuseumPage() {
                 <div className="relative w-[250px] h-[250px] lg:w-[300px] lg:h-[300px] rounded-full overflow-hidden mb-6">
                   <Image
                     src="/ashley.png"
-                    alt="Ashley Murison, Museum Director & Chief of Staff"
+                    alt="Ashley Murison, Museum Executive Director & Chief of Staff"
                     fill
                     className="object-cover"
                     sizes="300px"
                   />
                 </div>
                 <h3 className="mb-2">Ashley Murison</h3>
-                <p className="text-ledger-stone text-sm">Museum Director & Chief of Staff</p>
+                <p className="text-ledger-stone text-sm">Museum Executive Director & Chief of Staff</p>
               </div>
               
               {/* Right: Gray Box with text */}

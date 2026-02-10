@@ -1,9 +1,15 @@
 "use client";
 
-import React, { forwardRef } from "react";
+import React, { forwardRef, useCallback } from "react";
+import Image from "next/image";
 import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
 
-type ProtectedImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
+type ProtectedImageProps = Omit<
+  React.ComponentProps<typeof Image>,
+  "src" | "alt"
+> & {
+  src: string;
+  alt: string;
   disableContextMenu?: boolean;
   disableDrag?: boolean;
   fill?: boolean;
@@ -17,6 +23,8 @@ export const ProtectedImage = forwardRef<HTMLImageElement, ProtectedImageProps>(
       disableDrag = true,
       onContextMenu,
       onDragStart,
+      onError,
+      onLoad,
       draggable,
       fill = false,
       priority = false,
@@ -24,38 +32,68 @@ export const ProtectedImage = forwardRef<HTMLImageElement, ProtectedImageProps>(
       style,
       loading,
       src,
+      alt,
+      sizes,
+      width,
+      height,
       ...props
     },
     ref
   ) {
-    const normalizedSrc = typeof src === "string" ? normalizeArtworkImageUrl(src) : src;
-    const mergedClassName = [className, "aigt-protected-image"].filter(Boolean).join(" ");
+    const normalizedSrc =
+      typeof src === "string" ? normalizeArtworkImageUrl(src) : src;
+
+    const handleLoad = useCallback(
+      (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        onLoad?.(event as any);
+      },
+      [onLoad]
+    );
+
+    const handleError = useCallback(
+      (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        onError?.(event as any);
+      },
+      [onError]
+    );
+
+    const mergedClassName = [className, "aigt-protected-image"]
+      .filter(Boolean)
+      .join(" ");
+
     const mergedStyle: React.CSSProperties = {
-      ...(fill
-        ? { position: "absolute", inset: 0, width: "100%", height: "100%" }
-        : null),
       WebkitTouchCallout: disableContextMenu ? "none" : undefined,
       ...style,
     };
+
     const resolvedLoading = priority ? loading ?? "eager" : loading;
 
     return (
-      <img
-        ref={ref}
+      <Image
         {...props}
+        // Next/Image does not type ref as HTMLImageElement cleanly, so we cast.
+        ref={ref as any}
         src={normalizedSrc}
+        alt={alt}
+        fill={fill}
+        width={fill ? undefined : width}
+        height={fill ? undefined : height}
+        sizes={sizes}
+        priority={priority}
+        loading={resolvedLoading as any}
         className={mergedClassName}
         style={mergedStyle}
-        loading={resolvedLoading}
         draggable={disableDrag ? false : draggable}
         onContextMenu={(event) => {
           if (disableContextMenu) event.preventDefault();
-          onContextMenu?.(event);
+          onContextMenu?.(event as any);
         }}
         onDragStart={(event) => {
           if (disableDrag) event.preventDefault();
-          onDragStart?.(event);
+          onDragStart?.(event as any);
         }}
+        onLoad={handleLoad as any}
+        onError={handleError as any}
       />
     );
   }

@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getArtworkBySku, type Artwork } from "@/app/lib/api";
+import { useEffect, useMemo, useState } from "react";
+import { useArtworks } from "@/app/hooks/useArtworks";
+import type { Artwork } from "@/app/lib/api";
 import { slugify } from "@/app/lib/slug";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
 
 interface TeamMember {
   name: string;
@@ -88,27 +90,86 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
+interface ArtworkItem {
+  src: string;
+  title: string;
+  artist: string;
+  year: string;
+  collection?: string;
+}
+
+const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  src: artwork.image_url,
+  title: artwork.title,
+  artist: artwork.artist,
+  year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
+  collection: artwork.collection_name,
+});
+
 export default function AboutPage() {
-  const [heroArtwork, setHeroArtwork] = useState<Artwork | null>(null);
+  const { artworks } = useArtworks({ versions: "v02" });
+  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
+
+  const featuredWorks = useMemo(() => {
+    return artworks
+      .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
+      .map(mapArtworkToItem);
+  }, [artworks]);
 
   useEffect(() => {
-    let isMounted = true;
-    getArtworkBySku("2025-JD-CD-0001").then((artwork) => {
-      if (isMounted) setHeroArtwork(artwork);
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    if (featuredWorks.length === 0) return;
 
-  const heroArtworkHref = heroArtwork
-    ? `/collections/${slugify(heroArtwork.collection_name)}/${slugify(heroArtwork.title)}`
+    const collectionMap = new Map<string, ArtworkItem[]>();
+    featuredWorks.forEach((artwork) => {
+      const collection = artwork.collection || "unknown";
+      if (!collectionMap.has(collection)) collectionMap.set(collection, []);
+      collectionMap.get(collection)!.push(artwork);
+    });
+
+    const collections = Array.from(collectionMap.keys());
+    if (collections.length === 0) return;
+
+    let shownCollections: string[] = [];
+    try {
+      const stored = window.sessionStorage.getItem("about_collections");
+      if (stored) shownCollections = JSON.parse(stored);
+    } catch {
+      // ignore
+    }
+
+    const availableCollections = collections.filter((c) => !shownCollections.includes(c));
+    const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
+
+    const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
+    const artworksInCollection = collectionMap.get(selectedCollection)!;
+
+    const selected = artworksInCollection[Math.floor(Math.random() * artworksInCollection.length)];
+    setHeroArtwork(selected);
+
+    if (selected?.collection) {
+      try {
+        const stored = window.sessionStorage.getItem("about_collections");
+        const previouslyShown: string[] = stored ? JSON.parse(stored) : [];
+        if (!previouslyShown.includes(selected.collection)) {
+          window.sessionStorage.setItem(
+            "about_collections",
+            JSON.stringify([...previouslyShown, selected.collection])
+          );
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }, [featuredWorks]);
+
+  const heroArtworkHref = heroArtwork?.collection
+    ? `/collections/${slugify(heroArtwork.collection)}/${slugify(heroArtwork.title)}`
     : null;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f5f5f5" }}>
       <main>
-        {/* Hero Section with Image Collage */}
+        {/* Hero Section */}
         <section className="w-full" style={{ backgroundColor: "#f5f5f5" }}>
           <div className="max-w-[1440px] mx-auto relative">
             <div className="grid lg:grid-cols-[1fr_40%] gap-0">
@@ -133,35 +194,36 @@ export default function AboutPage() {
 
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden">
-                {heroArtworkHref ? (
-                  <Link
-                    href={heroArtworkHref}
-                    aria-label={`View details for ${heroArtwork?.title ?? "featured artwork"}`}
-                    className="absolute inset-0"
-                  >
-                    <Image
-                      src="https://image.artigt.com/JD/CD/2025-JD-CD-0001/2025-JD-CD-0001__full__v02.webp"
-                      alt="Art collage representing stewardship and accountability"
+                {heroArtwork &&
+                  (heroArtworkHref ? (
+                    <Link
+                      href={heroArtworkHref}
+                      aria-label={`View details for ${heroArtwork.title}`}
+                      className="absolute inset-0"
+                    >
+                      <ProtectedImage
+                        src={heroArtwork.src}
+                        alt={heroArtwork.title}
+                        fill
+                        className="object-cover object-center"
+                        priority
+                        sizes="(max-width: 1024px) 100vw, 601px"
+                      />
+                    </Link>
+                  ) : (
+                    <ProtectedImage
+                      src={heroArtwork.src}
+                      alt={heroArtwork.title}
                       fill
-                      className="object-cover object-center aigt-protected-image"
+                      className="object-cover object-center"
                       priority
                       sizes="(max-width: 1024px) 100vw, 601px"
                     />
-                  </Link>
-                ) : (
-                  <Image
-                    src="https://image.artigt.com/JD/CD/2025-JD-CD-0001/2025-JD-CD-0001__full__v02.webp"
-                    alt="Art collage representing stewardship and accountability"
-                    fill
-                    className="object-cover object-center aigt-protected-image"
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 601px"
-                  />
-                )}
+                  ))}
               </div>
             </div>
 
-            {/* Decorative Elements - Positioned at bottom of image */}
+            {/* Decorative Elements */}
             <div
               className="absolute lg:left-[calc(60%-32px)] w-8 bg-white hidden lg:block pointer-events-none"
               style={{ top: "0", height: "calc(100% - 242px)" }}
@@ -173,7 +235,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Design Bar - Full Width */}
+        {/* Design Bar */}
         <div className="w-full h-[36px] relative hidden lg:flex lg:justify-center">
           <div className="absolute top-0 left-0 h-full bg-gallery-plaster" style={{ width: "calc(50vw + 112px)" }} />
           <div className="absolute top-0 h-full bg-ledger-stone" style={{ left: "calc(50vw + 105px)", right: "0" }} />
@@ -195,28 +257,29 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* About John Dowling Section */}
+        {/* About John Dowling Section (CENTERED UNDER IMAGE ON MOBILE) */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-24">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="grid lg:grid-cols-2 gap-8 lg:gap-[37px] items-center">
-              <div className="flex flex-col gap-8">
-                <div className="flex justify-center lg:justify-start">
-                  <div className="relative w-[310px] h-[310px] rounded-full overflow-hidden">
-                    <Image
-                      src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620"
-                      alt="John Dowling Jr."
-                      fill
-                      className="object-cover aigt-protected-image"
-                      sizes="310px"
-                    />
-                  </div>
+              {/* Left */}
+              <div className="flex flex-col gap-8 items-center lg:items-start">
+                <div className="relative w-[310px] h-[310px] rounded-full overflow-hidden">
+                  <Image
+                    src="https://cdn.builder.io/api/v1/image/assets%2F5031849ff5814a4cae6f958ac9f10229%2F2a84950d36374b0fbc5643367302bc6a?format=webp&width=620"
+                    alt="John Dowling Jr."
+                    fill
+                    className="object-cover aigt-protected-image"
+                    sizes="310px"
+                  />
                 </div>
-                <div className="flex flex-col gap-4">
-                  <h2 className="text-center lg:text-left">About John Dowling Jr.</h2>
-                  <h3 className="text-center lg:text-left">A Legacy Being Stewarded in Real Time</h3>
+
+                <div className="w-[310px] flex flex-col gap-4 text-center lg:text-left">
+                  <h2 className="m-0">About John Dowling Jr.</h2>
+                  <h3 className="m-0">A Legacy Being Stewarded in Real Time</h3>
                 </div>
               </div>
 
+              {/* Right */}
               <div className="flex flex-col gap-4 p-10 bg-paper-white">
                 <p>
                   John Dowling is an accomplished painter, photographer, and writer whose four decade career has produced
@@ -276,7 +339,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Team Section */}
+        {/* Team Section (UPDATED ROLE STYLING) */}
         <section className="w-full bg-white py-12 sm:py-16 lg:py-[120px]">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-4 mb-12 sm:mb-16 lg:mb-20 max-w-[995px] mx-auto">
@@ -293,38 +356,41 @@ export default function AboutPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 lg:gap-x-[51px] lg:gap-y-[95px]">
               {teamMembers.map((member) => {
-                const photo = (
-                  <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6 hover:opacity-80 transition-opacity cursor-pointer">
-                    <Image
-                      src={member.imageUrl}
-                      alt={member.name}
-                      fill
-                      className="object-cover aigt-protected-image"
-                      sizes="102px"
-                    />
-                  </div>
-                );
-
                 return (
                   <div key={member.name} className="flex flex-col items-center text-center">
-                    {/* Photo */}
-                    {photo}
+                    <div className="relative w-[102px] h-[102px] rounded-full overflow-hidden mb-6 hover:opacity-80 transition-opacity cursor-pointer">
+                      <Image
+                        src={member.imageUrl}
+                        alt={member.name}
+                        fill
+                        className="object-cover aigt-protected-image"
+                        sizes="102px"
+                      />
+                    </div>
 
-                    <h3 className="text-[20px] lg:text-[22px] font-normal leading-normal m-0 mb-2">{member.name}</h3>
+                    <h3 className="text-[20px] lg:text-[22px] font-normal leading-snug m-0 mb-3">
+                      {member.name}
+                    </h3>
 
-                    <p className="font-bold text-[14px] mt-1 mb-0.5">Board Member</p>
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="uppercase tracking-[0.08em] text-[11px] font-medium text-archive-slate">
+                        Board Member
+                      </span>
 
-                    <p className="text-[14px] lg:text-[16px] leading-none m-0" style={{ whiteSpace: "pre-line" }}>
-                      {member.title}
-                    </p>
+                      <span
+                        className="text-[14px] lg:text-[15px] leading-snug text-archive-slate text-center"
+                        style={{ whiteSpace: "pre-line" }}
+                      >
+                        {member.title}
+                      </span>
+                    </div>
 
-                    {/* LinkedIn Icon */}
                     {member.linkedinUrl && (
                       <a
                         href={member.linkedinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center justify-center w-5 h-5 transition-colors"
+                        className="mt-4 inline-flex items-center justify-center w-5 h-5 transition-colors"
                         style={{ color: "var(--archive-slate, #555)" }}
                         onMouseEnter={(e) => (e.currentTarget.style.color = "#0A66C2")}
                         onMouseLeave={(e) => (e.currentTarget.style.color = "var(--archive-slate, #555)")}

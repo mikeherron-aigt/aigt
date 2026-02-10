@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Script from "next/script";
-import { useRef, useState, useEffect, useMemo, useCallback, type CSSProperties } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import { useArtworks } from "@/app/hooks/useArtworks";
 import { getArtworkBySku, type Artwork } from "@/app/lib/api";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
@@ -25,6 +25,8 @@ const HERO_SKUS = [
   "2025-JD-DW-0008",
   "2025-JD-CD-0347",
   "2024-JD-AG-0020",
+  "2025-JD-CD-0091",
+  "2025-JD-MM-0018",
 ];
 const GOVERNANCE_SKU = "2025-JD-DW-0019";
 const MEDIUMS_SKU = "2024-JD-AG-0025";
@@ -44,25 +46,27 @@ const getArtworkHref = (artwork: { title: string; collection?: string; collectio
   return `/collections/${slugify(collectionName)}/${slugify(artwork.title)}`;
 };
 
-type HeroImageRotatorProps = {
+type StaticHeroImageProps = {
   images: string[];
   links?: (string | null)[];
-  intervalMs?: number;
-  transitionMs?: number;
   className?: string;
   alt?: string;
 };
 
 const heroAltText = "Cultural artwork representing the trust's collection";
 
-function HeroImageRotator({
+// Helper function to extract collection from SKU
+const extractCollectionFromSku = (sku: string): string | null => {
+  const match = sku.match(/^\d{4}-[A-Z]+-([A-Z]+)-\d+$/);
+  return match ? match[1] : null;
+};
+
+function StaticHeroImage({
   images,
   links,
-  intervalMs = 9000,
-  transitionMs = 1200,
   className = "",
   alt = heroAltText,
-}: HeroImageRotatorProps) {
+}: StaticHeroImageProps) {
   const normalizedItems = useMemo(
     () =>
       images
@@ -78,91 +82,83 @@ function HeroImageRotator({
     [images, links]
   );
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isReady, setIsReady] = useState(false);
-  const loadStatusRef = useRef(new Map<string, "loaded" | "failed">());
-  const intervalRef = useRef<number | null>(null);
-  const isMountedRef = useRef(false);
+  // Pick a random image on mount (changes only on page refresh)
+  // Avoid repeating images from the last 6 refreshes and avoid same collection as previous
+  const selectedIndex = useMemo(() => {
+    if (normalizedItems.length === 0) return 0;
 
-  const preload = useCallback(
-    (index: number) =>
-      new Promise<void>((resolve) => {
-        const src = normalizedItems[index]?.src;
-        if (!src) {
-          resolve();
-          return;
+    // Get history of last 6 selections from sessionStorage
+    let recentHistory: string[] = [];
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = window.sessionStorage.getItem('hero_history');
+        if (stored) {
+          recentHistory = JSON.parse(stored);
         }
-
-        const status = loadStatusRef.current.get(src);
-        if (status === "loaded" || status === "failed") {
-          resolve();
-          return;
-        }
-
-        let settled = false;
-        const finalize = (nextStatus: "loaded" | "failed") => {
-          if (settled) return;
-          settled = true;
-          loadStatusRef.current.set(src, nextStatus);
-          resolve();
-        };
-
-        const img = new Image();
-        img.onload = () => finalize("loaded");
-        img.onerror = () => finalize("failed");
-        img.src = src;
-
-        if ("decode" in img) {
-          img.decode().then(
-            () => finalize("loaded"),
-            () => finalize("failed")
-          );
-        }
-      }),
-    [normalizedItems]
-  );
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    setActiveIndex(0);
-    setIsReady(false);
-
-    if (intervalRef.current) window.clearTimeout(intervalRef.current);
-
-    if (normalizedItems.length === 0) {
-      return () => {
-        isMountedRef.current = false;
-      };
+      } catch {
+        // Ignore storage errors
+      }
     }
 
-    const scheduleNext = (currentIndex: number) => {
-      if (!isMountedRef.current || normalizedItems.length <= 1) return;
+    // Get previous collection (most recent from history)
+    const previousCollection = recentHistory.length > 0
+      ? extractCollectionFromSku(recentHistory[0])
+      : null;
 
-      intervalRef.current = window.setTimeout(async () => {
-        const nextIndex = (currentIndex + 1) % normalizedItems.length;
-        await preload(nextIndex);
-        if (!isMountedRef.current) return;
-        setActiveIndex(nextIndex);
-        scheduleNext(nextIndex);
-      }, intervalMs);
-    };
+    // Get available indices (exclude recent history and previous collection)
+    const availableIndices: number[] = [];
 
-    const start = async () => {
-      await preload(0);
-      if (!isMountedRef.current) return;
-      setIsReady(true);
-      if (normalizedItems.length > 1) {
-        scheduleNext(0);
+    HERO_SKUS.forEach((sku, index) => {
+      if (index < normalizedItems.length) {
+        // Exclude if this SKU was shown in the last 6 refreshes
+        if (recentHistory.includes(sku)) {
+          return;
+        }
+
+        // Exclude if from the same collection as the most recent
+        const collection = extractCollectionFromSku(sku);
+        if (collection && collection === previousCollection) {
+          return;
+        }
+
+        availableIndices.push(index);
       }
-    };
+    });
 
-    start();
+    // If no valid alternatives (all were recently shown), allow any except the immediate previous
+    const indicesToUse = availableIndices.length > 0
+      ? availableIndices
+      : HERO_SKUS.map((sku, index) => {
+          // At minimum, don't repeat the immediate previous image
+          if (recentHistory.length > 0 && sku === recentHistory[0]) {
+            return -1;
+          }
+          return index < normalizedItems.length ? index : -1;
+        }).filter(i => i >= 0);
 
-    return () => {
-      isMountedRef.current = false;
-      if (intervalRef.current) window.clearTimeout(intervalRef.current);
-    };
-  }, [normalizedItems, intervalMs, preload]);
+    // Pick a random index from available options
+    const randomIdx = Math.floor(Math.random() * indicesToUse.length);
+    return indicesToUse[randomIdx];
+  }, [normalizedItems.length]);
+
+  // Save selection to history after component mounts (side effect)
+  useEffect(() => {
+    if (typeof window === 'undefined' || selectedIndex >= HERO_SKUS.length) return;
+
+    try {
+      const selectedSku = HERO_SKUS[selectedIndex];
+      const stored = window.sessionStorage.getItem('hero_history');
+      const recentHistory: string[] = stored ? JSON.parse(stored) : [];
+
+      // Only update if this isn't already the most recent
+      if (recentHistory[0] !== selectedSku) {
+        const updatedHistory = [selectedSku, ...recentHistory].slice(0, 6);
+        window.sessionStorage.setItem('hero_history', JSON.stringify(updatedHistory));
+      }
+    } catch {
+      // Ignore storage errors
+    }
+  }, [selectedIndex]);
 
   if (normalizedItems.length === 0) {
     return (
@@ -172,51 +168,33 @@ function HeroImageRotator({
     );
   }
 
+  const item = normalizedItems[selectedIndex];
+  const image = (
+    <ProtectedImage
+      src={item.src}
+      alt={alt}
+      fill
+      className="object-cover object-center"
+      priority
+      sizes="(max-width: 1024px) 100vw, 50vw"
+    />
+  );
+
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <div className="absolute inset-0 bg-gallery-plaster" />
-      {normalizedItems.map((item, index) => {
-        const wrapperStyle: CSSProperties = {
-          opacity: index === activeIndex ? 1 : 0,
-          transition: `opacity ${transitionMs}ms ease-in-out`,
-          zIndex: index === activeIndex ? 2 : 1,
-          willChange: "opacity",
-          pointerEvents: index === activeIndex ? "auto" : "none",
-        };
-
-        const image = (
-          <ProtectedImage
-            src={item.src}
-            alt={alt}
-            fill
-            className="object-cover object-center"
-            priority={index === 0}
-            sizes="(max-width: 1024px) 100vw, 50vw"
-          />
-        );
-
-        return item.href ? (
-          <Link
-            key={`${item.src}-${index}`}
-            href={item.href}
-            aria-label={`View details for ${alt}`}
-            className="absolute inset-0"
-            style={wrapperStyle}
-          >
-            {image}
-          </Link>
-        ) : (
-          <div
-            key={`${item.src}-${index}`}
-            className="absolute inset-0"
-            style={wrapperStyle}
-          >
-            {image}
-          </div>
-        );
-      })}
-      {!isReady && (
-        <div className="absolute inset-0 bg-gallery-plaster" />
+      {item.href ? (
+        <Link
+          href={item.href}
+          aria-label={`View details for ${alt}`}
+          className="absolute inset-0"
+        >
+          {image}
+        </Link>
+      ) : (
+        <div className="absolute inset-0">
+          {image}
+        </div>
       )}
     </div>
   );
@@ -587,11 +565,9 @@ export default function Home() {
             </div>
 
             {/* Image Column */}
-            <HeroImageRotator
+            <StaticHeroImage
               images={heroImageList}
               links={heroImageLinks}
-              intervalMs={7000}
-              transitionMs={1200}
               className="h-[400px] sm:h-[500px] lg:h-[680px] bg-gallery-plaster"
             />
           </div>

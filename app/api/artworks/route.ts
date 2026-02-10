@@ -19,7 +19,9 @@ export async function GET(request: Request) {
   const endpoint = `${API_BASE_URL}/artworks${query ? `?${query}` : ""}`;
 
   try {
-    const response = await fetch(endpoint, { next: { revalidate: 300 } });
+    const response = await fetch(endpoint, {
+      next: { revalidate: 300 },
+    });
 
     if (!response.ok) {
       return NextResponse.json(

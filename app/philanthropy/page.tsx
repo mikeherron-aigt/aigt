@@ -168,7 +168,8 @@ export default function PhilanthropyPage() {
     width: "1100px",
     height: "1100px",
     overflow: "visible",
-    pointerEvents: "none", // default: pass through
+    pointerEvents: "auto",
+zIndex: 20,
   }}
 >
   <div style={{ width: "100%", height: "100%", pointerEvents: "auto" }}>

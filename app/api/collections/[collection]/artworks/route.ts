@@ -16,7 +16,9 @@ export async function GET(
   }`;
 
   try {
-    const response = await fetch(endpoint, { next: { revalidate: 300 } });
+    const response = await fetch(endpoint, {
+      next: { revalidate: 300 },
+    });
 
     if (!response.ok) {
       return NextResponse.json(

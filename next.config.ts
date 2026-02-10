@@ -1,24 +1,27 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['*'],
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'cdn.builder.io',
+        protocol: "https",
+        hostname: "cdn.builder.io",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'api.builder.io',
+        protocol: "https",
+        hostname: "api.builder.io",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'media.licdn.com',
+        protocol: "https",
+        hostname: "media.licdn.com",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'image.artigt.com',
+        protocol: "https",
+        hostname: "image.artigt.com",
+        pathname: "/**",
       },
     ],
   },
@@ -36,19 +39,11 @@ const nextConfig: NextConfig = {
     },
   ],
 
-  /**
-   * CSP issue fix:
-   * - Prevents eval-based source maps / tooling in production bundles.
-   * - Helps strict CSP sites where 'unsafe-eval' is not allowed.
-   */
   productionBrowserSourceMaps: false,
 
   webpack: (config, { dev }) => {
     if (!dev) {
-      // safest for strict CSP (no eval / no prod source maps)
       config.devtool = false;
-      // If you prefer keeping sourcemaps, use:
-      // config.devtool = "source-map";
     }
     return config;
   },

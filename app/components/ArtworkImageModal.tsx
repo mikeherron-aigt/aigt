@@ -112,20 +112,17 @@ export default function ArtworkImageModal({
     );
   }
 
-  const sizedImageUrl = (url: string, width: number) => {
-    const normalized = normalizeArtworkImageUrl(url);
-    try {
-      const parsed = new URL(normalized);
-      parsed.searchParams.set("format", "webp");
-      parsed.searchParams.set("width", String(width));
-      return parsed.toString();
-    } catch {
-      return normalized;
-    }
+  // Route images through the same-origin proxy to avoid CORS issues
+  // for raw <img> tags and CSS background-image usage.
+  const proxiedImageUrl = (url: string, width?: number) => {
+    const canonical = normalizeArtworkImageUrl(url);
+    const params = new URLSearchParams({ url: canonical });
+    if (width) params.set("w", String(width));
+    return `/api/img?${params.toString()}`;
   };
 
-  const smallImageUrl = sizedImageUrl(src, 1200);
-  const largeImageUrl = sizedImageUrl(src, 2400);
+  const smallImageUrl = proxiedImageUrl(src, 1200);
+  const largeImageUrl = proxiedImageUrl(src, 2400);
   const imageAlt = alt || title;
 
   // Calculate zoom panel size based on image dimensions

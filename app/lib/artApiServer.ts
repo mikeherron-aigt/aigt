@@ -59,8 +59,22 @@ export async function getCollectionArtworks(
   return normalizeArtworks(data);
 }
 
+/**
+ * Fetch a small pool of artworks from a collection for display purposes.
+ * Instead of loading the entire collection (which can be 2000+ items),
+ * this returns at most `poolSize` artworks, enabling lightweight random
+ * selection on the caller side.
+ */
+export async function getCollectionArtworkPool(
+  collectionName: string,
+  poolSize: number = 24
+): Promise<Artwork[]> {
+  const all = await getCollectionArtworks(collectionName, "v02");
+  return all.slice(0, poolSize);
+}
+
 export interface ArtworkFilters {
-  version?: string;
+  versions?: string;
   collection?: string;
   year?: number;
   limit?: number;
@@ -73,7 +87,7 @@ function buildQueryString(filters?: ArtworkFilters): string {
 
   const params = new URLSearchParams();
 
-  if (filters.version) params.append("version", filters.version);
+  if (filters.versions) params.append("versions", filters.versions);
   if (filters.collection) params.append("collection", filters.collection);
   if (filters.year) params.append("year", filters.year.toString());
   if (filters.sku) params.append("sku", filters.sku);

@@ -22,7 +22,7 @@ export interface Collection {
 }
 
 export interface ArtworkFilters {
-  version?: string;
+  versions?: string;
   collection?: string;
   year?: number;
   limit?: number;
@@ -83,6 +83,7 @@ type FetchOptions = {
 async function fetchAPI<T>(
   endpoint: string,
   options?: FetchOptions
+  ttlMs = DEFAULT_TTL_MS
 ): Promise<T> {
   const {
     ttlMs = DEFAULT_TTL_MS,
@@ -107,6 +108,8 @@ async function fetchAPI<T>(
     for (let attempt = 0; attempt <= retries; attempt += 1) {
       try {
         const response = await fetch(cacheKey);
+    try {
+      const response = await fetch(url);
 
         if (!response.ok) {
           if (response.status >= 500 && attempt < retries) {
@@ -120,6 +123,12 @@ async function fetchAPI<T>(
             response.status
           );
         }
+      if (!response.ok) {
+        throw new APIError(
+          `API request failed: ${response.statusText}`,
+          response.status
+        );
+      }
 
         const data = (await response.json()) as T;
         setCached(cacheKey, data, ttlMs);
@@ -137,6 +146,17 @@ async function fetchAPI<T>(
     }
 
     throw new APIError("Max retries exceeded");
+      const data = (await response.json()) as T;
+      setCached(url, data, ttlMs);
+      return data;
+    } catch (error) {
+      if (error instanceof APIError) {
+        throw error;
+      }
+      throw new APIError(
+        "Failed to connect to artwork database. Please try again later."
+      );
+    }
   })();
 
   pendingRequests.set(cacheKey, requestPromise);
@@ -153,7 +173,7 @@ function buildQueryString(filters?: ArtworkFilters): string {
 
   const params = new URLSearchParams();
 
-  if (filters.version) params.append("version", filters.version);
+  if (filters.versions) params.append("versions", filters.versions);
   if (filters.collection) params.append("collection", filters.collection);
   if (filters.year) params.append("year", filters.year.toString());
   if (filters.limit) params.append("limit", filters.limit.toString());
@@ -206,7 +226,7 @@ export async function getCollectionArtworks(
 }
 
 export async function getArtworksByVersion(version: string): Promise<Artwork[]> {
-  return getArtworks({ version });
+  return getArtworks({ versions: version });
 }
 
 export async function getArtworksByYear(year: number): Promise<Artwork[]> {
