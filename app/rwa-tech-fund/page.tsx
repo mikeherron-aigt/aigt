@@ -51,7 +51,7 @@ export default function RWATechFundPage() {
                 <div className="relative w-full aspect-[4/5] rounded-[22px] overflow-hidden bg-white shadow-[0_18px_60px_rgba(0,0,0,0.10)]">
                   {/* Replace with your real asset in /public/images */}
                   <Image
-                    src="/images/rwa-tech-hero.jpg"
+                    src="/rwa-tech-hero.png"
                     alt="Abstract architectural light and structure"
                     fill
                     priority
