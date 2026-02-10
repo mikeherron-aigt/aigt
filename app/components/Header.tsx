@@ -172,6 +172,16 @@ export default function Header() {
                     >
                       Blue Chip Art Fund
                     </Link>
+
+<Link
+                      href="/rwa-tech-fund"
+                      className="nav-link text-base"
+                      role="menuitem"
+                      onClick={() => setIsOfferingsOpen(false)}
+                    >
+                      RWA Tech Fund
+                    </Link>
+                    
                   </div>
                 </div>
               )}
