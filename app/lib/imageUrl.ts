@@ -11,6 +11,20 @@ const ensureAbsoluteImageUrl = (url: string): string => {
 export function normalizeArtworkImageUrl(url: string): string {
   if (!url) return url;
 
+  // If the URL is using the image-proxy pattern, extract the actual image URL
+  if (url.includes('/api/public/image-proxy?url=')) {
+    try {
+      const urlObj = new URL(url);
+      const actualImageUrl = urlObj.searchParams.get('url');
+      if (actualImageUrl) {
+        url = actualImageUrl;
+      }
+    } catch (e) {
+      // If URL parsing fails, continue with original URL
+      console.error('Failed to parse image-proxy URL:', e);
+    }
+  }
+
   const [withoutHash, hash = ""] = url.split("#");
   const [base, query = ""] = withoutHash.split("?");
 
