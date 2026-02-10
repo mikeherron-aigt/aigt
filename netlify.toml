@@ -5,13 +5,10 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Fallback: If you need to bypass Next.js API routes and go directly to backend
-# (Uncomment these redirects ONLY if the plugin approach fails)
-#
-# [[redirects]]
-#   from = "/api/external/*"
-#   to = "https://art.artigt.com/api/public/:splat"
-#   status = 200
-#   force = true
-#
-# Then update your frontend to use /api/external/* instead of /api/*
+# Proxy API calls directly to backend to avoid 403 errors on deploy previews
+# This bypasses Next.js API routes and goes directly to art.artigt.com
+[[redirects]]
+  from = "/api/*"
+  to = "https://art.artigt.com/api/public/:splat"
+  status = 200
+  force = true
