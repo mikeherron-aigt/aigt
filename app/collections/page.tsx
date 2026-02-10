@@ -4,38 +4,41 @@ import { slugify } from "@/app/lib/slug";
 import { ProgressiveImage } from "@/app/components/ProgressiveImage";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 
-export const dynamic = "force-dynamic";
+// Cache the rendered page for 5 minutes.
+// This is a big win on Netlify because it avoids re-fetching huge data for every visit.
+export const revalidate = 300;
 
 const collectionDescriptions: Record<string, string> = {
   // Add collection descriptions here, keyed by collection name.
-  // Example: "Cosmic Dreams": "A short description of the collection."
 };
 
-const isValidArtwork = (title: string) =>
-  !title.toLowerCase().includes("untitled");
+const isValidArtwork = (title: string) => !title.toLowerCase().includes("untitled");
 
 export default async function CollectionsPage() {
   const collections = await getCollections();
 
-  const collectionsWithImages = await Promise.all(
+  const results = await Promise.allSettled(
     collections.map(async (collection) => {
-      try {
-        const artworks = await getCollectionArtworks(
-          collection.collection_name,
-          "v02"
-        );
-        const featured = artworks.find((artwork) => isValidArtwork(artwork.title));
-        return { ...collection, featured };
-      } catch {
-        return { ...collection, featured: null };
-      }
+      const artworks = await getCollectionArtworks(collection.collection_name, "v02");
+      const featured = artworks.find((artwork) => isValidArtwork(artwork.title)) || null;
+      return { ...collection, featured };
     })
   );
+
+  const collectionsWithImages = results.map((r, idx) => {
+    if (r.status === "fulfilled") return r.value;
+    // If a single collection fails, do not break the page
+    return { ...collections[idx], featured: null };
+  });
+
   const heroCollection =
     collectionsWithImages.find((collection) => collection.featured) ||
     collectionsWithImages[0];
+
   const heroArtworkHref = heroCollection?.featured
-    ? `/collections/${slugify(heroCollection.collection_name)}/${slugify(heroCollection.featured.title)}`
+    ? `/collections/${slugify(heroCollection.collection_name)}/${slugify(
+        heroCollection.featured.title
+      )}`
     : null;
 
   return (
@@ -58,6 +61,7 @@ export default async function CollectionsPage() {
                         fill
                         className="object-cover"
                         sizes="(max-width: 1024px) 100vw, 80vw"
+                        priority
                       />
                     </Link>
                   ) : (
@@ -67,6 +71,7 @@ export default async function CollectionsPage() {
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 80vw"
+                      priority
                     />
                   )
                 ) : (
@@ -76,15 +81,19 @@ export default async function CollectionsPage() {
                   />
                 )}
               </div>
+
               <div className="collection-hero-card relative z-10">
                 <h2 className="collection-hero-title">A Structured Body of Work</h2>
                 <p className="collection-hero-text">
-                  The collections below represent the primary pillars of John’s catalog. Each collection is intentionally defined and stewarded as a distinct body of work. Together, they form a coherent system rather than a series of isolated pieces.
+                  The collections below represent the primary pillars of John’s catalog. Each collection
+                  is intentionally defined and stewarded as a distinct body of work. Together, they form
+                  a coherent system rather than a series of isolated pieces.
                 </p>
               </div>
             </div>
 
             <h2 className="section-heading">Featured Collections</h2>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mt-8">
               {collectionsWithImages.map((collection) => {
                 const slug = slugify(collection.collection_name);
@@ -119,6 +128,7 @@ export default async function CollectionsPage() {
                         )}
                       </div>
                     </Link>
+
                     <div className="artwork-info">
                       <h3 className="artwork-title">
                         <Link
@@ -128,9 +138,7 @@ export default async function CollectionsPage() {
                           {collection.collection_name}
                         </Link>
                       </h3>
-                      <p className="artwork-details">
-                        {collection.artwork_count} artworks
-                      </p>
+                      <p className="artwork-details">{collection.artwork_count} artworks</p>
                       {description ? (
                         <p className="collection-description">{description}</p>
                       ) : null}
@@ -142,25 +150,36 @@ export default async function CollectionsPage() {
           </div>
         </section>
 
-        <section className="w-full py-12 sm:py-16 lg:py-[80px]" style={{ backgroundColor: "#ffffff" }}>
+        <section
+          className="w-full py-12 sm:py-16 lg:py-[80px]"
+          style={{ backgroundColor: "#ffffff" }}
+        >
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-[80px]">
             <div className="flex flex-col items-center gap-10 sm:gap-12 lg:gap-10">
               <h2 className="footer-tagline">
                 Governed platforms for the long-term stewardship of culturally significant art.
               </h2>
+
               <div className="private-conversations text-center flex flex-col items-center">
-                <h3 className="private-conversations-title">
-                  Private Conversations
-                </h3>
+                <h3 className="private-conversations-title">Private Conversations</h3>
                 <p className="private-conversations-text max-w-[789px]">
-                  Art Investment Group Trust engages with collectors, institutions, and qualified participants through direct, considered dialogue. We believe the stewardship of important art begins with thoughtful conversation, not transactions.
+                  Art Investment Group Trust engages with collectors, institutions, and qualified
+                  participants through direct, considered dialogue. We believe the stewardship of
+                  important art begins with thoughtful conversation, not transactions.
                 </p>
                 <p className="private-conversations-text max-w-[789px]">
-                  These conversations are exploratory by design. They allow space to discuss long-term intent, governance alignment, and the role each participant seeks to play in preserving cultural value across generations.
+                  These conversations are exploratory by design. They allow space to discuss long-term
+                  intent, governance alignment, and the role each participant seeks to play in preserving
+                  cultural value across generations.
                 </p>
               </div>
+
               <div className="flex justify-center">
-                <Link href="/request-access" className="footer-cta-primary" style={{ textDecoration: "none", display: "inline-flex" }}>
+                <Link
+                  href="/request-access"
+                  className="footer-cta-primary"
+                  style={{ textDecoration: "none", display: "inline-flex" }}
+                >
                   Schedule a Discussion
                 </Link>
               </div>
