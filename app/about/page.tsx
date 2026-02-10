@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getArtworkBySku, type Artwork } from "@/app/lib/api";
+import { useEffect, useMemo, useState } from "react";
+import { useArtworks } from "@/app/hooks/useArtworks";
+import type { Artwork } from "@/app/lib/api";
 import { slugify } from "@/app/lib/slug";
+import { ProtectedImage } from "@/app/components/ProtectedImage";
 
 interface TeamMember {
   name: string;
@@ -88,21 +90,94 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
+interface ArtworkItem {
+  src: string;
+  title: string;
+  artist: string;
+  year: string;
+  collection?: string;
+}
+
+const mapArtworkToItem = (artwork: Artwork): ArtworkItem => ({
+  src: artwork.image_url,
+  title: artwork.title,
+  artist: artwork.artist,
+  year: artwork.year_created ? artwork.year_created.toString() : "Contemporary",
+  collection: artwork.collection_name,
+});
+
 export default function AboutPage() {
-  const [heroArtwork, setHeroArtwork] = useState<Artwork | null>(null);
+  const { artworks } = useArtworks({ versions: "v02" });
+  const [heroArtwork, setHeroArtwork] = useState<ArtworkItem | null>(null);
 
+  // Get featured works from all collections (v02, no untitled)
+  const featuredWorks = useMemo(() => {
+    return artworks
+      .filter((artwork) => !artwork.title.toLowerCase().includes("untitled"))
+      .map(mapArtworkToItem);
+  }, [artworks]);
+
+  // Select a random hero artwork on page load (changes only on refresh)
+  // Cycles through all collections before repeating
   useEffect(() => {
-    let isMounted = true;
-    getArtworkBySku("2025-JD-CD-0001").then((artwork) => {
-      if (isMounted) setHeroArtwork(artwork);
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    if (featuredWorks.length === 0) return;
 
-  const heroArtworkHref = heroArtwork
-    ? `/collections/${slugify(heroArtwork.collection_name)}/${slugify(heroArtwork.title)}`
+    // Group artworks by collection
+    const collectionMap = new Map<string, ArtworkItem[]>();
+    featuredWorks.forEach((artwork) => {
+      const collection = artwork.collection || 'unknown';
+      if (!collectionMap.has(collection)) {
+        collectionMap.set(collection, []);
+      }
+      collectionMap.get(collection)!.push(artwork);
+    });
+
+    const collections = Array.from(collectionMap.keys());
+    if (collections.length === 0) return;
+
+    // Get shown collections from sessionStorage
+    let shownCollections: string[] = [];
+    try {
+      const stored = window.sessionStorage.getItem('about_collections');
+      if (stored) {
+        shownCollections = JSON.parse(stored);
+      }
+    } catch {
+      // Ignore errors
+    }
+
+    // Find collections that haven't been shown yet
+    const availableCollections = collections.filter(c => !shownCollections.includes(c));
+
+    // If all collections have been shown, reset
+    const collectionsToUse = availableCollections.length > 0 ? availableCollections : collections;
+
+    // Pick a random collection from available ones
+    const selectedCollection = collectionsToUse[Math.floor(Math.random() * collectionsToUse.length)];
+    const artworksInCollection = collectionMap.get(selectedCollection)!;
+
+    // Pick a random artwork from that collection
+    const selected = artworksInCollection[Math.floor(Math.random() * artworksInCollection.length)];
+    setHeroArtwork(selected);
+
+    // Save selected collection to history
+    if (selected?.collection) {
+      try {
+        const stored = window.sessionStorage.getItem('about_collections');
+        const shownCollections: string[] = stored ? JSON.parse(stored) : [];
+
+        if (!shownCollections.includes(selected.collection)) {
+          const updated = [...shownCollections, selected.collection];
+          window.sessionStorage.setItem('about_collections', JSON.stringify(updated));
+        }
+      } catch {
+        // Ignore errors
+      }
+    }
+  }, [featuredWorks]);
+
+  const heroArtworkHref = heroArtwork?.collection
+    ? `/collections/${slugify(heroArtwork.collection)}/${slugify(heroArtwork.title)}`
     : null;
 
   return (
@@ -133,30 +208,32 @@ export default function AboutPage() {
 
               {/* Image Column */}
               <div className="relative h-[400px] sm:h-[500px] lg:h-[680px] overflow-hidden">
-                {heroArtworkHref ? (
-                  <Link
-                    href={heroArtworkHref}
-                    aria-label={`View details for ${heroArtwork?.title ?? "featured artwork"}`}
-                    className="absolute inset-0"
-                  >
-                    <Image
-                      src="https://image.artigt.com/JD/CD/2025-JD-CD-0001/2025-JD-CD-0001__full__v02.webp"
-                      alt="Art collage representing stewardship and accountability"
+                {heroArtwork && (
+                  heroArtworkHref ? (
+                    <Link
+                      href={heroArtworkHref}
+                      aria-label={`View details for ${heroArtwork.title}`}
+                      className="absolute inset-0"
+                    >
+                      <ProtectedImage
+                        src={heroArtwork.src}
+                        alt={heroArtwork.title}
+                        fill
+                        className="object-cover object-center"
+                        priority
+                        sizes="(max-width: 1024px) 100vw, 601px"
+                      />
+                    </Link>
+                  ) : (
+                    <ProtectedImage
+                      src={heroArtwork.src}
+                      alt={heroArtwork.title}
                       fill
-                      className="object-cover object-center aigt-protected-image"
+                      className="object-cover object-center"
                       priority
                       sizes="(max-width: 1024px) 100vw, 601px"
                     />
-                  </Link>
-                ) : (
-                  <Image
-                    src="https://image.artigt.com/JD/CD/2025-JD-CD-0001/2025-JD-CD-0001__full__v02.webp"
-                    alt="Art collage representing stewardship and accountability"
-                    fill
-                    className="object-cover object-center aigt-protected-image"
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 601px"
-                  />
+                  )
                 )}
               </div>
             </div>
