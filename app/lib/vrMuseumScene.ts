@@ -148,7 +148,18 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   const texLoader = new THREE.TextureLoader();
 
   function toAbsoluteUrl(path: string) {
-    return new URL(path, window.location.origin).toString();
+    const raw = (path ?? '').trim();
+
+    // If someone accidentally passes "//file.png", treat it as "/file.png"
+    const safe = raw.startsWith('//') ? raw.slice(1) : raw;
+
+    // If it's already a full URL, return it
+    if (/^https?:\/\//i.test(safe)) return safe;
+
+    // Force exactly one leading slash
+    const normalized = safe.startsWith('/') ? safe : `/${safe}`;
+
+    return new URL(normalized, window.location.origin).toString();
   }
 
   function loadArtworkTexture(url: string): Promise<THREE.Texture> {
@@ -364,8 +375,13 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     camera.updateProjectionMatrix();
   }
 
-  const ro = new ResizeObserver(() => resize());
-  ro.observe(container);
+  let ro: ResizeObserver | null = null;
+  if (typeof ResizeObserver !== 'undefined') {
+    ro = new ResizeObserver(() => resize());
+    ro.observe(container);
+  } else {
+    window.addEventListener('resize', resize);
+  }
   resize();
 
   // Animation loop
@@ -390,7 +406,9 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
 
   function dispose() {
     disposed = true;
-    ro.disconnect();
+
+    if (ro) ro.disconnect();
+    else window.removeEventListener('resize', resize);
 
     renderer.domElement.removeEventListener('pointerdown', onPointerDown);
     renderer.domElement.removeEventListener('pointermove', onPointerMove);
@@ -405,8 +423,8 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
       if (mat) {
         const mats = Array.isArray(mat) ? mat : [mat];
         for (const m of mats) {
-          if (m.map) m.map.dispose?.();
-          m.dispose?.();
+          if ((m as any).map) (m as any).map.dispose?.();
+          (m as any).dispose?.();
         }
       }
     });
