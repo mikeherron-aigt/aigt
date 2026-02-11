@@ -14,7 +14,11 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   let disposed = false;
 
   // Renderer
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+  const renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    alpha: true,
+    powerPreference: 'high-performance',
+  });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -32,14 +36,12 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   // Scene + Camera
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0b0b);
-
-  // A tiny bit of fog helps depth and realism without looking “gamey”
   scene.fog = new THREE.Fog(0x0b0b0b, 6, 34);
 
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 120);
   camera.position.set(0, 1.55, 6.6);
 
-  // Lighting: keep it museum calm
+  // Lighting: museum calm
   const ambient = new THREE.AmbientLight(0xffffff, 0.55);
   scene.add(ambient);
 
@@ -59,11 +61,15 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   fill.position.set(-6, 6, -2);
   scene.add(fill);
 
+  // Subtle rim light for depth
+  const rim = new THREE.PointLight(0xffffff, 0.22, 40);
+  rim.position.set(0, 2.8, 10);
+  scene.add(rim);
+
   // Room
   const room = new THREE.Group();
   scene.add(room);
 
-  // Walls (slight roughness variation gives a nice “painted” feel)
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#f2f2f2'),
     roughness: 0.92,
@@ -76,7 +82,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     metalness: 0.0,
   });
 
-  // Floor: simple reflective trick (not real reflections yet, but looks good)
   const floorMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#101010'),
     roughness: 0.22,
@@ -116,7 +121,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   rightWall.rotation.y = -Math.PI / 2;
   room.add(rightWall);
 
-  // Simple “baseboard” detail (tiny bevel makes everything look more real)
+  // Baseboards
   const baseboardMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#e8e8e8'),
     roughness: 0.75,
@@ -142,10 +147,16 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   // Artwork loading
   const texLoader = new THREE.TextureLoader();
 
+  function toAbsoluteUrl(path: string) {
+    return new URL(path, window.location.origin).toString();
+  }
+
   function loadArtworkTexture(url: string): Promise<THREE.Texture> {
+    const abs = toAbsoluteUrl(url);
+
     return new Promise((resolve, reject) => {
       texLoader.load(
-        url,
+        abs,
         (tex) => {
           tex.colorSpace = THREE.SRGBColorSpace;
           tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
@@ -154,7 +165,10 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
           resolve(tex);
         },
         undefined,
-        (err) => reject(err)
+        (err) => {
+          console.warn('[VR MUSEUM] Failed to load texture:', abs, err);
+          reject(err);
+        }
       );
     });
   }
@@ -188,11 +202,9 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     try {
       texture = await loadArtworkTexture(artwork.imageUrl);
     } catch {
-      // If a file path is wrong, show a fallback dark panel so the scene still runs
       texture = null;
     }
 
-    // Determine aspect
     let aspect = 4 / 5;
     if (texture?.image && (texture.image as any).width && (texture.image as any).height) {
       const w = (texture.image as any).width as number;
@@ -211,7 +223,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     group.position.copy(position);
     group.rotation.y = rotationY;
 
-    // Outer frame
     const frameT = 0.08;
     const depth = 0.08;
 
@@ -219,25 +230,24 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     outer.castShadow = true;
     group.add(outer);
 
-    // Inner matte
     const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, depth * 0.6), frameInnerMat);
     matte.position.z = depth * 0.1;
     group.add(matte);
 
-    // Artwork plane
     const artMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#111111'),
-      roughness: 0.55,
+      color: texture ? new THREE.Color('#ffffff') : new THREE.Color('#2b2b2b'),
+      roughness: 0.6,
       metalness: 0.0,
       map: texture ?? undefined,
+      emissive: texture ? new THREE.Color('#000000') : new THREE.Color('#0a0a0a'),
+      emissiveIntensity: texture ? 0 : 0.35,
     });
 
     const art = new THREE.Mesh(new THREE.PlaneGeometry(artW, artH), artMat);
     art.position.z = depth * 0.41;
     group.add(art);
 
-    // Subtle “art light” per piece (this helps a lot)
-    const spot = new THREE.SpotLight(0xffffff, 0.55, 6.5, Math.PI / 7, 0.6, 1.2);
+    const spot = new THREE.SpotLight(0xffffff, 0.85, 7.5, Math.PI / 7, 0.55, 1.1);
     spot.position.set(0, 3.6, 1.2);
     spot.target = art;
     spot.castShadow = true;
@@ -248,11 +258,10 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     framesGroup.add(group);
   }
 
-  // Layout: place artworks along right wall, then left wall
+  // Layout
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const y = 2.05;
 
-  // Right wall: x = +roomW/2 - small offset, z from near to far
   for (let i = 0; i < Math.min(artworks.length, 6); i++) {
     const z = 9 - i * 5.2;
     placements.push({
@@ -261,7 +270,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     });
   }
 
-  // Left wall for extras
   for (let i = 6; i < artworks.length; i++) {
     const idx = i - 6;
     const z = 9 - idx * 5.2;
@@ -271,7 +279,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     });
   }
 
-  // Start building frames async
   (async () => {
     for (let i = 0; i < artworks.length; i++) {
       if (disposed) return;
@@ -289,7 +296,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     }
   })();
 
-  // Controls: lightweight “drag look + scroll dolly”
+  // Controls: drag look + wheel move (clamped)
   let isDragging = false;
   let lastX = 0;
   let lastY = 0;
@@ -299,7 +306,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   const maxPitch = 0.45;
 
   const basePos = camera.position.clone();
-  let dollyZ = 0;
 
   function onPointerDown(e: PointerEvent) {
     isDragging = true;
@@ -330,9 +336,17 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   }
 
   function onWheel(e: WheelEvent) {
-    // Smooth-ish dolly
-    dollyZ += e.deltaY * 0.0025;
-    dollyZ = Math.max(-18, Math.min(8, dollyZ));
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
+    forward.y = 0;
+    forward.normalize();
+
+    const step = e.deltaY * 0.004;
+    basePos.addScaledVector(forward, step);
+
+    const margin = 0.9;
+    basePos.x = THREE.MathUtils.clamp(basePos.x, -roomW / 2 + margin, roomW / 2 - margin);
+    basePos.z = THREE.MathUtils.clamp(basePos.z, -roomD / 2 + margin, roomD / 2 - margin);
   }
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -341,7 +355,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
   renderer.domElement.addEventListener('wheel', onWheel, { passive: true });
 
-  // ResizeObserver so it fits the embed perfectly
+  // Resize
   function resize() {
     const w = container.clientWidth;
     const h = container.clientHeight;
@@ -360,19 +374,13 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   function animate() {
     if (disposed) return;
 
-    const dt = Math.min(clock.getDelta(), 0.05);
+    clock.getDelta();
 
-    // Apply camera rotation
     camera.rotation.order = 'YXZ';
     camera.rotation.y = yaw;
     camera.rotation.x = pitch;
 
-    // Apply dolly
     camera.position.copy(basePos);
-    camera.position.z += dollyZ;
-
-    // Tiny motion damping for “weight”
-
 
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
@@ -380,7 +388,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
 
   requestAnimationFrame(animate);
 
-  // Dispose
   function dispose() {
     disposed = true;
     ro.disconnect();
@@ -391,7 +398,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     renderer.domElement.removeEventListener('pointercancel', onPointerUp);
     renderer.domElement.removeEventListener('wheel', onWheel as any);
 
-    // Try to clean up GPU resources
     scene.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if ((mesh as any).geometry) (mesh as any).geometry.dispose?.();
