@@ -112,6 +112,7 @@ export default async function ArtworkDetailPage({
                     <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
                       {item.image_url ? (
                         <ProgressiveImage
+                          key={item.image_url}
                           src={item.image_url}
                           alt={item.title}
                           fill
