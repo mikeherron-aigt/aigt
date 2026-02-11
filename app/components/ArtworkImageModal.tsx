@@ -28,9 +28,20 @@ export default function ArtworkImageModal({
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const prevSrcRef = useRef<string | undefined>(src);
 
   const ZOOM_SCALE = 2.5;
   const LENS_SIZE = 150; // Size of the lens indicator in pixels
+
+  // Reset image state when src changes
+  useEffect(() => {
+    if (prevSrcRef.current !== src) {
+      prevSrcRef.current = src;
+      setImageError(false);
+      setIsOpen(false);
+      setIsZooming(false);
+    }
+  }, [src]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -167,6 +178,7 @@ export default function ArtworkImageModal({
                 </div>
               ) : (
                 <img
+                  key={src}
                   ref={imageRef}
                   src={smallImageUrl}
                   alt={imageAlt}
@@ -247,6 +259,7 @@ export default function ArtworkImageModal({
                 </div>
               ) : (
                 <img
+                  key={src}
                   src={smallImageUrl}
                   alt={imageAlt}
                   className="artwork-detail-image aigt-protected-image"

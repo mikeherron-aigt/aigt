@@ -66,6 +66,7 @@ export default async function ArtworkDetailPage({
             <div className="grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-16 items-start">
               <div className="artwork-detail-image-container">
                 <ArtworkImageModal
+                  key={artwork.artwork_id}
                   src={artwork.image_url}
                   alt={artwork.title}
                   title={artwork.title}
