@@ -147,42 +147,51 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   // Artwork loading
   const texLoader = new THREE.TextureLoader();
 
-  function toAbsoluteUrl(path: string) {
-    const raw = (path ?? '').trim();
+ function toAbsoluteUrl(path: string) {
+  let p = (path ?? '').trim();
 
-    // If someone accidentally passes "//file.png", treat it as "/file.png"
-    const safe = raw.startsWith('//') ? raw.slice(1) : raw;
+  // "/file.png/" -> "/file.png"
+  if (p.endsWith('/')) p = p.slice(0, -1);
 
-    // If it's already a full URL, return it
-    if (/^https?:\/\//i.test(safe)) return safe;
+  // "//file.png" -> "/file.png" (prevents protocol-relative host bug)
+  if (p.startsWith('//')) p = p.slice(1);
 
-    // Force exactly one leading slash
-    const normalized = safe.startsWith('/') ? safe : `/${safe}`;
+  // Full URLs should pass through unchanged
+  if (/^https?:\/\//i.test(p)) return p;
 
-    return new URL(normalized, window.location.origin).toString();
-  }
+  // Force exactly one leading slash for public assets
+  if (!p.startsWith('/')) p = `/${p}`;
+
+  return new URL(p, window.location.origin).toString();
+}
+
 
   function loadArtworkTexture(url: string): Promise<THREE.Texture> {
-    const abs = toAbsoluteUrl(url);
+  const abs = toAbsoluteUrl(url);
+  const busted = abs.includes('?') ? `${abs}&v=1` : `${abs}?v=1`;
 
-    return new Promise((resolve, reject) => {
-      texLoader.load(
-        abs,
-        (tex) => {
-          tex.colorSpace = THREE.SRGBColorSpace;
-          tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
-          tex.wrapS = THREE.ClampToEdgeWrapping;
-          tex.wrapT = THREE.ClampToEdgeWrapping;
-          resolve(tex);
-        },
-        undefined,
-        (err) => {
-          console.warn('[VR MUSEUM] Failed to load texture:', abs, err);
-          reject(err);
-        }
-      );
-    });
-  }
+  // Safe even on same-origin
+  texLoader.setCrossOrigin('anonymous');
+
+  return new Promise((resolve, reject) => {
+    texLoader.load(
+      busted,
+      (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        resolve(tex);
+      },
+      undefined,
+      (err) => {
+        console.warn('[VR MUSEUM] Texture failed:', busted, err);
+        reject(err);
+      }
+    );
+  });
+}
+
 
   // Frames
   const framesGroup = new THREE.Group();
