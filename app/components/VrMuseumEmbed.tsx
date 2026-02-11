@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { createVrMuseumScene, type VrMuseumSceneHandle } from '@/app/lib/vrMuseumScene';
 
 export type MuseumArtwork = {
   id: string;
   title: string;
   artist: string;
   year?: string;
-  imageUrl: string; // must be a public path like "/vr-museum/artworks/file.jpg"
+  imageUrl: string;
 };
+
+type VrMuseumSceneHandle = { dispose: () => void };
 
 export default function VrMuseumEmbed({ artworks }: { artworks: MuseumArtwork[] }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
@@ -17,14 +18,23 @@ export default function VrMuseumEmbed({ artworks }: { artworks: MuseumArtwork[] 
 
   useEffect(() => {
     if (!mountRef.current) return;
+    if (typeof window === 'undefined') return;
 
-    // Create and mount the scene
-    handleRef.current = createVrMuseumScene({
-      container: mountRef.current,
-      artworks,
-    });
+    let cancelled = false;
+
+    (async () => {
+      // Lazy import so this never runs/loads on the server
+      const mod = await import('@/app/lib/vrMuseumScene');
+      if (cancelled) return;
+
+      handleRef.current = mod.createVrMuseumScene({
+        container: mountRef.current!,
+        artworks,
+      });
+    })();
 
     return () => {
+      cancelled = true;
       handleRef.current?.dispose();
       handleRef.current = null;
     };
@@ -32,7 +42,6 @@ export default function VrMuseumEmbed({ artworks }: { artworks: MuseumArtwork[] 
 
   return (
     <div ref={mountRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {/* The scene will inject a canvas here */}
       <div
         style={{
           position: 'absolute',
