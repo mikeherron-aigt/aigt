@@ -20,6 +20,13 @@ export async function GET(request: NextRequest) {
   const rawUrl = searchParams.get("url");
   const width = searchParams.get("w");
 
+  // DEBUG: Log incoming request
+  console.log("[/api/img] Incoming request:", {
+    rawUrl,
+    width,
+    fullUrl: request.url,
+  });
+
   if (!rawUrl) {
     return NextResponse.json({ error: "Missing url parameter" }, { status: 400 });
   }
@@ -43,11 +50,14 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const upstreamUrl = parsed.toString();
+  console.log("[/api/img] Fetching upstream:", upstreamUrl);
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
-    const upstream = await fetch(parsed.toString(), {
+    const upstream = await fetch(upstreamUrl, {
       signal: controller.signal,
       cache: "no-store", // Disable Next.js Data Cache to prevent cache key collisions
       headers: {
@@ -56,22 +66,40 @@ export async function GET(request: NextRequest) {
     });
     clearTimeout(timeoutId);
 
+    console.log("[/api/img] Upstream response:", {
+      status: upstream.status,
+      contentType: upstream.headers.get("content-type"),
+      contentLength: upstream.headers.get("content-length"),
+    });
+
     if (!upstream.ok) {
+      console.log("[/api/img] Upstream error:", upstream.status);
       return new NextResponse(null, { status: upstream.status });
     }
 
     const contentType = upstream.headers.get("content-type") || "image/webp";
     const body = await upstream.arrayBuffer();
 
+    // DEBUG: Log response details
+    console.log("[/api/img] Returning image:", {
+      size: body.byteLength,
+      contentType,
+      // First 32 bytes as hex for debugging
+      preview: Buffer.from(body.slice(0, 32)).toString("hex"),
+    });
+
     return new NextResponse(body, {
       status: 200,
       headers: {
         "Content-Type": contentType,
         "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${CACHE_SECONDS * 2}`,
+        "X-Image-Size": String(body.byteLength),
+        "X-Upstream-Url": upstreamUrl,
       },
     });
   } catch (err) {
     clearTimeout(timeoutId);
+    console.error("[/api/img] Error:", err);
     if (err instanceof Error && err.name === "AbortError") {
       return NextResponse.json(
         { error: "Upstream image request timed out" },
