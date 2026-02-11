@@ -9,13 +9,6 @@
 # to avoid both Netlify API route 403 errors and Cloudflare bot challenges
 # See app/lib/api.ts for the client-side logic
 
-# Override cache headers for image proxy to prevent stale images
-[[headers]]
-  for = "/api/img"
-  [headers.values]
-    Cache-Control = "public, max-age=60, must-revalidate"
-    Vary = "Accept-Encoding"
-
 # General API routes - keep at 5 minutes
 [[headers]]
   for = "/api/*"
