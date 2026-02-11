@@ -10,6 +10,31 @@ type CreateArgs = {
   artworks: MuseumArtwork[];
 };
 
+function normalizeImageUrl(url: string) {
+  if (!url) return url;
+
+  // If already absolute or data/blob, leave it
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('data:') ||
+    url.startsWith('blob:')
+  ) {
+    return url;
+  }
+
+  // Ensure leading slash for public assets
+  if (!url.startsWith('/')) return `/${url}`;
+  return url;
+}
+
+function toAbsoluteUrl(url: string) {
+  const u = normalizeImageUrl(url);
+
+  // For absolute urls, new URL keeps them; for "/x.png" it uses origin
+  return new URL(u, window.location.origin).toString();
+}
+
 export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
 
@@ -41,9 +66,8 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 120);
   camera.position.set(0, 1.55, 6.6);
 
-  // Lighting: museum calm
-  const ambient = new THREE.AmbientLight(0xffffff, 0.55);
-  scene.add(ambient);
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
 
   const key = new THREE.DirectionalLight(0xffffff, 0.85);
   key.position.set(4, 9, 6);
@@ -61,7 +85,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   fill.position.set(-6, 6, -2);
   scene.add(fill);
 
-  // Subtle rim light for depth
   const rim = new THREE.PointLight(0xffffff, 0.22, 40);
   rim.position.set(0, 2.8, 10);
   scene.add(rim);
@@ -146,52 +169,31 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
 
   // Artwork loading
   const texLoader = new THREE.TextureLoader();
-
- function toAbsoluteUrl(path: string) {
-  let p = (path ?? '').trim();
-
-  // "/file.png/" -> "/file.png"
-  if (p.endsWith('/')) p = p.slice(0, -1);
-
-  // "//file.png" -> "/file.png" (prevents protocol-relative host bug)
-  if (p.startsWith('//')) p = p.slice(1);
-
-  // Full URLs should pass through unchanged
-  if (/^https?:\/\//i.test(p)) return p;
-
-  // Force exactly one leading slash for public assets
-  if (!p.startsWith('/')) p = `/${p}`;
-
-  return new URL(p, window.location.origin).toString();
-}
-
+  texLoader.crossOrigin = 'anonymous';
 
   function loadArtworkTexture(url: string): Promise<THREE.Texture> {
-  const abs = toAbsoluteUrl(url);
-  const busted = abs.includes('?') ? `${abs}&v=1` : `${abs}?v=1`;
+    const abs = toAbsoluteUrl(url);
 
-  // Safe even on same-origin
-  texLoader.setCrossOrigin('anonymous');
+    console.log('[VR MUSEUM] Loading texture:', { original: url, normalized: normalizeImageUrl(url), abs });
 
-  return new Promise((resolve, reject) => {
-    texLoader.load(
-      busted,
-      (tex) => {
-        tex.colorSpace = THREE.SRGBColorSpace;
-        tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
-        tex.wrapS = THREE.ClampToEdgeWrapping;
-        tex.wrapT = THREE.ClampToEdgeWrapping;
-        resolve(tex);
-      },
-      undefined,
-      (err) => {
-        console.warn('[VR MUSEUM] Texture failed:', busted, err);
-        reject(err);
-      }
-    );
-  });
-}
-
+    return new Promise((resolve, reject) => {
+      texLoader.load(
+        abs,
+        (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+          tex.wrapS = THREE.ClampToEdgeWrapping;
+          tex.wrapT = THREE.ClampToEdgeWrapping;
+          resolve(tex);
+        },
+        undefined,
+        (err) => {
+          console.warn('[VR MUSEUM] FAILED texture:', abs, err);
+          reject(err);
+        }
+      );
+    });
+  }
 
   // Frames
   const framesGroup = new THREE.Group();
@@ -316,7 +318,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     }
   })();
 
-  // Controls: drag look + wheel move (clamped)
+  // Controls
   let isDragging = false;
   let lastX = 0;
   let lastY = 0;
@@ -384,27 +386,20 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     camera.updateProjectionMatrix();
   }
 
-  let ro: ResizeObserver | null = null;
-  if (typeof ResizeObserver !== 'undefined') {
-    ro = new ResizeObserver(() => resize());
-    ro.observe(container);
-  } else {
-    window.addEventListener('resize', resize);
-  }
+  const ro = new ResizeObserver(() => resize());
+  ro.observe(container);
   resize();
 
-  // Animation loop
+  // Loop
   const clock = new THREE.Clock();
 
   function animate() {
     if (disposed) return;
-
     clock.getDelta();
 
     camera.rotation.order = 'YXZ';
     camera.rotation.y = yaw;
     camera.rotation.x = pitch;
-
     camera.position.copy(basePos);
 
     renderer.render(scene, camera);
@@ -415,9 +410,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
 
   function dispose() {
     disposed = true;
-
-    if (ro) ro.disconnect();
-    else window.removeEventListener('resize', resize);
+    ro.disconnect();
 
     renderer.domElement.removeEventListener('pointerdown', onPointerDown);
     renderer.domElement.removeEventListener('pointermove', onPointerMove);
@@ -432,8 +425,8 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
       if (mat) {
         const mats = Array.isArray(mat) ? mat : [mat];
         for (const m of mats) {
-          if ((m as any).map) (m as any).map.dispose?.();
-          (m as any).dispose?.();
+          if (m.map) m.map.dispose?.();
+          m.dispose?.();
         }
       }
     });
