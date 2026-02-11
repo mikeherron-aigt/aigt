@@ -1,8 +1,5 @@
-
-import dynamic from 'next/dynamic';
-
-const VrMuseumClient = dynamic(() => import('./VrMuseumClient'), { ssr: false });
+import VrMuseumClientShell from './VrMuseumClientShell';
 
 export default function VrMuseumPage() {
-  return <VrMuseumClient />;
+  return <VrMuseumClientShell />;
 }
