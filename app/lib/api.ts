@@ -5,7 +5,9 @@ import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
 // 2. Cloudflare bot challenges when proxying server-side
 // Browsers can handle Cloudflare challenges, but Netlify's proxy cannot
 const API_BASE_URL =
-  typeof window !== "undefined" && window.location.hostname.includes("netlify.app")
+  typeof window !== "undefined" &&
+  (window.location.hostname.includes("netlify.app") ||
+   window.location.hostname === "artinvestmentgrouptrust.com")
     ? "https://art.artigt.com/api/public"
     : "/api";
 

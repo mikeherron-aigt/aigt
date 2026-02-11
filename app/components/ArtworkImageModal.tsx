@@ -220,17 +220,51 @@ export default function ArtworkImageModal({
               )}
             </div>
           ) : (
-            <div style={{ position: "relative", width: "100%", height: "72vh" }}>
-              <ProtectedImage
-                src={src}
-                alt={imageAlt}
-                className="artwork-detail-image"
-                loading="eager"
-                decoding="async"
-                fill
-                sizes="(max-width: 1024px) 100vw, 60vw"
-                style={{ objectFit: "contain" }}
-              />
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "60vh",
+                minHeight: "300px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              {imageError ? (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "100%",
+                    height: "100%",
+                    color: "#8a8a8a",
+                    fontSize: "14px",
+                  }}
+                >
+                  Image unavailable
+                </div>
+              ) : (
+                <img
+                  src={smallImageUrl}
+                  alt={imageAlt}
+                  className="artwork-detail-image aigt-protected-image"
+                  draggable={false}
+                  onError={() => setImageError(true)}
+                  style={{
+                    display: "block",
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    width: "auto",
+                    height: "auto",
+                    objectFit: "contain",
+                    margin: "0 auto",
+                  }}
+                  onContextMenu={(e) => e.preventDefault()}
+                  onDragStart={(e) => e.preventDefault()}
+                />
+              )}
             </div>
           )}
         </button>
