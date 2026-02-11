@@ -193,6 +193,7 @@ export default async function CollectionPage({
                         <div className="artwork-image-wrapper" style={{ aspectRatio: "247 / 206" }}>
                           {artwork.image_url ? (
                             <ProgressiveImage
+                              key={artwork.image_url}
                               src={artwork.image_url}
                               alt={artwork.title}
                               fill

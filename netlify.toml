@@ -8,3 +8,9 @@
 # Note: API calls are made directly from the browser to art.artigt.com on Netlify
 # to avoid both Netlify API route 403 errors and Cloudflare bot challenges
 # See app/lib/api.ts for the client-side logic
+
+# General API routes - keep at 5 minutes
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, stale-while-revalidate=600"

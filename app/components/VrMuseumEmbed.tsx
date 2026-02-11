@@ -1,86 +1,58 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 export type MuseumArtwork = {
   id: string;
   title: string;
   artist: string;
+  collection: string;
   year?: string;
-  imageUrl: string; // should be "/filename.png" (one leading slash)
+  medium?: string;
+  description?: string;
+  imageUrl: string; // should be "/filename.png" (one leading slash) or an absolute URL
 };
 
-type VrMuseumSceneHandle = { dispose: () => void };
+// Dynamic import keeps Three.js / R3F out of the server bundle entirely
+const VrMuseumScene = dynamic(() => import('./vr-museum/VrMuseumScene'), { ssr: false });
 
-export default function VrMuseumEmbed({ artworks }: { artworks: MuseumArtwork[] }) {
-  const mountRef = useRef<HTMLDivElement | null>(null);
-  const handleRef = useRef<VrMuseumSceneHandle | null>(null);
+interface VrMuseumEmbedProps {
+  artworks: MuseumArtwork[];
+  onArtworkClick?: (artwork: MuseumArtwork) => void;
+}
 
-  const [error, setError] = useState<string | null>(null);
-
-  // Create a stable dependency that changes only when the actual artwork set changes
-  const artworksKey = useMemo(() => {
-    return artworks
-      .map((a) => `${a.id}:${(a.imageUrl || '').trim()}`)
-      .sort()
-      .join('|');
-  }, [artworks]);
-
-  useEffect(() => {
-    const el = mountRef.current;
-    if (!el) return;
-    if (typeof window === 'undefined') return;
-
-    let cancelled = false;
-
-    // Always clear any previous scene first
-    try {
-      handleRef.current?.dispose();
-    } catch {}
-    handleRef.current = null;
-
-    // Clear any leftover canvases (just in case something went sideways)
-    while (el.firstChild) el.removeChild(el.firstChild);
-
-    setError(null);
-
-    (async () => {
-      try {
-        const mod = await import('@/app/lib/vrMuseumScene');
-        if (cancelled) return;
-
-        handleRef.current = mod.createVrMuseumScene({
-          container: el,
-          artworks,
-        });
-      } catch (e: any) {
-        if (cancelled) return;
-        console.error('[VR MUSEUM] Init failed:', e);
-        setError(e?.message ? String(e.message) : 'VR museum failed to load');
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      try {
-        handleRef.current?.dispose();
-      } catch {}
-      handleRef.current = null;
-
-      // Clean up DOM on unmount
-      if (el) {
-        while (el.firstChild) el.removeChild(el.firstChild);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [artworksKey]);
+export default function VrMuseumEmbed({ artworks, onArtworkClick }: VrMuseumEmbedProps) {
+  const [sceneError, setSceneError] = useState<string | null>(null);
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      <div ref={mountRef} style={{ width: '100%', height: '100%', position: 'relative' }} />
+    <div style={{ width: '100%', height: '100%', position: 'relative', background: '#0b0b0b' }}>
+      {!sceneError && (
+        <Suspense fallback={<MuseumLoadingState />}>
+          <VrMuseumScene artworks={artworks} onArtworkClick={onArtworkClick} />
+        </Suspense>
+      )}
 
-      {/* Overlay hint */}
-      {!error && (
+      {/* Crosshair — center aiming reticle for E key interaction */}
+      {!sceneError && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.5)',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        />
+      )}
+
+      {/* Navigation hint overlay */}
+      {!sceneError && (
         <div
           style={{
             position: 'absolute',
@@ -97,12 +69,12 @@ export default function VrMuseumEmbed({ artworks }: { artworks: MuseumArtwork[] 
             pointerEvents: 'none',
           }}
         >
-          Drag to look. Scroll to move.
+          WASD to move · Drag to look · E or click artwork for details
         </div>
       )}
 
       {/* Error state */}
-      {error && (
+      {sceneError && (
         <div
           style={{
             position: 'absolute',
@@ -120,14 +92,31 @@ export default function VrMuseumEmbed({ artworks }: { artworks: MuseumArtwork[] 
           <div style={{ maxWidth: 720 }}>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>VR museum failed to load</div>
             <div style={{ fontSize: 12, opacity: 0.85, lineHeight: 1.5 }}>
-              {error}
-              <div style={{ marginTop: 10, opacity: 0.85 }}>
-                Quick check: your imageUrl values should look like <code>/2025-JD-CD-0001.png</code> (one leading slash).
-              </div>
+              {sceneError}
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function MuseumLoadingState() {
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#0b0b0b',
+        color: 'rgba(255,255,255,0.35)',
+        fontSize: 13,
+        letterSpacing: '0.04em',
+      }}
+    >
+      Loading gallery…
     </div>
   );
 }

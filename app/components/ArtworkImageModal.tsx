@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
 
@@ -28,9 +28,20 @@ export default function ArtworkImageModal({
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const prevSrcRef = useRef<string | undefined>(src);
 
   const ZOOM_SCALE = 2.5;
   const LENS_SIZE = 150; // Size of the lens indicator in pixels
+
+  // Reset image state when src changes
+  useEffect(() => {
+    if (prevSrcRef.current !== src) {
+      prevSrcRef.current = src;
+      setImageError(false);
+      setIsOpen(false);
+      setIsZooming(false);
+    }
+  }, [src]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -109,17 +120,24 @@ export default function ArtworkImageModal({
     );
   }
 
-  // Route images through the same-origin proxy to avoid CORS issues
-  // for raw <img> tags and CSS background-image usage.
-  const proxiedImageUrl = (url: string, width?: number) => {
-    const canonical = normalizeArtworkImageUrl(url);
-    const params = new URLSearchParams({ url: canonical });
-    if (width) params.set("w", String(width));
-    return `/api/img?${params.toString()}`;
-  };
+  // Use direct normalized URLs instead of proxy to avoid cache issues
+  // Next.js Image optimization is disabled, so direct URLs work fine
+  const smallImageUrl = useMemo(() => {
+    const canonical = normalizeArtworkImageUrl(src);
+    // Add width hint to upstream server
+    const url = new URL(canonical);
+    url.searchParams.set('width', '1200');
+    return url.toString();
+  }, [src]);
 
-  const smallImageUrl = proxiedImageUrl(src, 1200);
-  const largeImageUrl = proxiedImageUrl(src, 2400);
+  const largeImageUrl = useMemo(() => {
+    const canonical = normalizeArtworkImageUrl(src);
+    // Add width hint to upstream server
+    const url = new URL(canonical);
+    url.searchParams.set('width', '2400');
+    return url.toString();
+  }, [src]);
+
   const imageAlt = alt || title;
 
   // Calculate zoom panel size based on image dimensions
@@ -167,6 +185,7 @@ export default function ArtworkImageModal({
                 </div>
               ) : (
                 <img
+                  key={src}
                   ref={imageRef}
                   src={smallImageUrl}
                   alt={imageAlt}
@@ -247,6 +266,7 @@ export default function ArtworkImageModal({
                 </div>
               ) : (
                 <img
+                  key={src}
                   src={smallImageUrl}
                   alt={imageAlt}
                   className="artwork-detail-image aigt-protected-image"

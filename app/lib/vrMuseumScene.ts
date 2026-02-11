@@ -26,10 +26,12 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   // ---------------------------
   // Helpers: URL normalization
   // ---------------------------
+  // Three.js TextureLoader works best with simple root-relative paths like "/file.png".
+  // Avoid new URL() / absolute URL construction — it can break on Netlify preview deploys.
   function normalizeImageUrl(url: string) {
     if (!url) return url;
 
-    // Already absolute or special scheme
+    // Already absolute or special scheme — leave as-is
     if (
       url.startsWith('http://') ||
       url.startsWith('https://') ||
@@ -41,14 +43,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
 
     // Public assets should be "/file.png"
     return url.startsWith('/') ? url : `/${url}`;
-  }
-
-  function toAbsoluteUrl(url: string) {
-    const normalized = normalizeImageUrl(url);
-    // window.location.origin will be:
-    // - https://<your-preview>.netlify.app on preview
-    // - https://artinvestmentgrouptrust.com on prod
-    return new URL(normalized, window.location.origin).toString();
   }
 
   // ---------------------------
@@ -202,31 +196,25 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   // texLoader.crossOrigin = 'anonymous';
 
   function loadArtworkTexture(url: string): Promise<THREE.Texture> {
-    const abs = toAbsoluteUrl(url);
+    const src = normalizeImageUrl(url);
 
-    console.log('[VR MUSEUM] Loading texture:', {
-      original: url,
-      normalized: normalizeImageUrl(url),
-      abs,
-    });
+    console.log('[VR MUSEUM] Loading texture:', src);
 
     return new Promise((resolve, reject) => {
       texLoader.load(
-        abs,
+        src,
         (tex) => {
+          console.log('[VR MUSEUM] SUCCESS loaded:', src);
           tex.colorSpace = THREE.SRGBColorSpace;
           tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
           tex.wrapS = THREE.ClampToEdgeWrapping;
           tex.wrapT = THREE.ClampToEdgeWrapping;
-
-          // This often helps when textures look “washed” or “too dark” on planes
           tex.needsUpdate = true;
-
           resolve(tex);
         },
         undefined,
         (err) => {
-          console.warn('[VR MUSEUM] FAILED texture:', abs, err);
+          console.error('[VR MUSEUM] FAILED to load:', src, err);
           reject(err);
         }
       );
@@ -294,21 +282,19 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     outer.castShadow = true;
     group.add(outer);
 
-    // Matte
-    const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, depth * 0.6), frameInnerMat);
-    matte.position.z = depth * 0.1;
+    // Matte — thin slab sitting just past the outer frame's front face
+    const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.005), frameInnerMat);
+    matte.position.z = depth / 2 + 0.004;
     group.add(matte);
 
-    // IMPORTANT:
-    // Use MeshBasicMaterial for the artwork so it is NOT affected by lighting/tone mapping.
-    // This is the #1 fix for “textures load but look black” issues in controlled lighting scenes.
+    // Artwork plane — clearly in front of both frame and matte
     const artMat = new THREE.MeshBasicMaterial({
       color: texture ? 0xffffff : 0x2b2b2b,
       map: texture ?? undefined,
     });
 
     const art = new THREE.Mesh(new THREE.PlaneGeometry(artW, artH), artMat);
-    art.position.z = depth * 0.41;
+    art.position.z = depth / 2 + 0.01;
     group.add(art);
 
     // Optional: keep a subtle spot for realism on the frame/matte (won’t affect the art plane)
