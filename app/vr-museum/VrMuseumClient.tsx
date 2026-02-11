@@ -6,7 +6,7 @@ import VrMuseumEmbed, { type MuseumArtwork } from '@/app/components/VrMuseumEmbe
 export default function VrMuseumClient() {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Your images are in /public, so they are served from "/filename.webp"
+  // Your images are in /public, so they are served from "/filename.png"
   const artworks: MuseumArtwork[] = useMemo(
     () => [
       {
@@ -14,42 +14,42 @@ export default function VrMuseumClient() {
         title: 'Collection Piece',
         artist: 'John',
         year: '2025',
-        imageUrl: '/2025-JD-CD-0001.webp',
+        imageUrl: '/2025-JD-CD-0001.png',
       },
       {
         id: '2025-JD-CD-0016',
         title: 'Collection Piece',
         artist: 'John',
         year: '2025',
-        imageUrl: '/2025-JD-CD-0016.webp',
+        imageUrl: '/2025-JD-CD-0016.png',
       },
       {
         id: '2025-JD-CD-0095',
         title: 'Collection Piece',
         artist: 'John',
         year: '2025',
-        imageUrl: '/2025-JD-CD-0095.webp',
+        imageUrl: '/2025-JD-CD-0095.png',
       },
       {
         id: '2025-JD-CD-0137',
         title: 'Collection Piece',
         artist: 'John',
         year: '2025',
-        imageUrl: '/2025-JD-CD-0137.webp',
+        imageUrl: '/2025-JD-CD-0137.png',
       },
       {
         id: '2025-JD-DW-0018',
         title: 'Dreams and Wonders',
         artist: 'John',
         year: '2025',
-        imageUrl: '/2025-JD-DW-0018.webp',
+        imageUrl: '/2025-JD-DW-0018.png',
       },
       {
         id: '2025-JD-DW-0028',
         title: 'Dreams and Wonders',
         artist: 'John',
         year: '2025',
-        imageUrl: '/2025-JD-DW-0028.webp',
+        imageUrl: '/2025-JD-DW-0028.png',
       },
     ],
     []
