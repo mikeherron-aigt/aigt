@@ -372,7 +372,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     camera.position.z += dollyZ;
 
     // Tiny motion damping for “weight”
-    basePos.lerp(camera.position, 0.08 * (dt * 60));
+
 
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
