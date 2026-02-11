@@ -120,19 +120,24 @@ export default function ArtworkImageModal({
     );
   }
 
-  // Route images through the same-origin proxy to avoid CORS issues
-  // for raw <img> tags and CSS background-image usage.
-  const proxiedImageUrl = useCallback((url: string, width?: number) => {
-    const canonical = normalizeArtworkImageUrl(url);
-    const params = new URLSearchParams({ url: canonical });
-    if (width) params.set("w", String(width));
-    // Add src as cache-busting param to prevent wrong image from cache
-    params.set("t", encodeURIComponent(canonical));
-    return `/api/img?${params.toString()}`;
-  }, []);
+  // Use direct normalized URLs instead of proxy to avoid cache issues
+  // Next.js Image optimization is disabled, so direct URLs work fine
+  const smallImageUrl = useMemo(() => {
+    const canonical = normalizeArtworkImageUrl(src);
+    // Add width hint to upstream server
+    const url = new URL(canonical);
+    url.searchParams.set('width', '1200');
+    return url.toString();
+  }, [src]);
 
-  const smallImageUrl = useMemo(() => proxiedImageUrl(src, 1200), [src, proxiedImageUrl]);
-  const largeImageUrl = useMemo(() => proxiedImageUrl(src, 2400), [src, proxiedImageUrl]);
+  const largeImageUrl = useMemo(() => {
+    const canonical = normalizeArtworkImageUrl(src);
+    // Add width hint to upstream server
+    const url = new URL(canonical);
+    url.searchParams.set('width', '2400');
+    return url.toString();
+  }, [src]);
+
   const imageAlt = alt || title;
 
   // Calculate zoom panel size based on image dimensions
