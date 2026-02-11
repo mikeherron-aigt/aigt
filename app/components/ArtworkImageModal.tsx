@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { ProtectedImage } from "@/app/components/ProtectedImage";
 import { normalizeArtworkImageUrl } from "@/app/lib/imageUrl";
 
@@ -122,15 +122,17 @@ export default function ArtworkImageModal({
 
   // Route images through the same-origin proxy to avoid CORS issues
   // for raw <img> tags and CSS background-image usage.
-  const proxiedImageUrl = (url: string, width?: number) => {
+  const proxiedImageUrl = useCallback((url: string, width?: number) => {
     const canonical = normalizeArtworkImageUrl(url);
     const params = new URLSearchParams({ url: canonical });
     if (width) params.set("w", String(width));
+    // Add src as cache-busting param to prevent wrong image from cache
+    params.set("t", encodeURIComponent(canonical));
     return `/api/img?${params.toString()}`;
-  };
+  }, []);
 
-  const smallImageUrl = proxiedImageUrl(src, 1200);
-  const largeImageUrl = proxiedImageUrl(src, 2400);
+  const smallImageUrl = useMemo(() => proxiedImageUrl(src, 1200), [src, proxiedImageUrl]);
+  const largeImageUrl = useMemo(() => proxiedImageUrl(src, 2400), [src, proxiedImageUrl]);
   const imageAlt = alt || title;
 
   // Calculate zoom panel size based on image dimensions
