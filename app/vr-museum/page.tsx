@@ -9,38 +9,53 @@ export default function VrMuseumPage() {
   // Put John’s images in /public/vr-museum/artworks/...
   // Then reference them as "/vr-museum/artworks/filename.jpg"
   const artworks: MuseumArtwork[] = useMemo(
-    () => [
-      {
-        id: 'john-001',
-        title: 'Dreams and Wonders I',
-        artist: 'John',
-        year: '2025',
-        imageUrl: '/vr-museum/artworks/john-1.jpg',
-      },
-      {
-        id: 'john-002',
-        title: 'Dreams and Wonders II',
-        artist: 'John',
-        year: '2025',
-        imageUrl: '/vr-museum/artworks/john-2.jpg',
-      },
-      {
-        id: 'john-003',
-        title: 'A Miracle in the Making',
-        artist: 'John',
-        year: '2024',
-        imageUrl: '/vr-museum/artworks/john-3.jpg',
-      },
-      {
-        id: 'john-004',
-        title: 'Study',
-        artist: 'John',
-        year: '2024',
-        imageUrl: '/vr-museum/artworks/john-4.jpg',
-      },
-    ],
-    []
-  );
+  () => [
+    {
+      id: '2025-JD-CD-0001',
+      title: 'Collection Piece',
+      artist: 'John',
+      year: '2025',
+      imageUrl: '/2025-JD-CD-0001.webp',
+    },
+    {
+      id: '2025-JD-CD-0016',
+      title: 'Collection Piece',
+      artist: 'John',
+      year: '2025',
+      imageUrl: '/2025-JD-CD-0016.webp',
+    },
+    {
+      id: '2025-JD-CD-0095',
+      title: 'Collection Piece',
+      artist: 'John',
+      year: '2025',
+      imageUrl: '/2025-JD-CD-0095.webp',
+    },
+    {
+      id: '2025-JD-CD-0137',
+      title: 'Collection Piece',
+      artist: 'John',
+      year: '2025',
+      imageUrl: '/2025-JD-CD-0137.webp',
+    },
+    {
+      id: '2025-JD-DW-0018',
+      title: 'Dreams and Wonders',
+      artist: 'John',
+      year: '2025',
+      imageUrl: '/2025-JD-DW-0018.webp',
+    },
+    {
+      id: '2025-JD-DW-0028',
+      title: 'Dreams and Wonders',
+      artist: 'John',
+      year: '2025',
+      imageUrl: '/2025-JD-DW-0028.webp',
+    },
+  ],
+  []
+);
+
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
