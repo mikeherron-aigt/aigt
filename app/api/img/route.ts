@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
   try {
     const upstream = await fetch(parsed.toString(), {
       signal: controller.signal,
-      next: { revalidate: CACHE_SECONDS },
+      cache: "no-store", // Disable Next.js Data Cache to prevent cache key collisions
       headers: {
         "User-Agent": "Mozilla/5.0 (compatible; AIGT-App/1.0)",
       },
