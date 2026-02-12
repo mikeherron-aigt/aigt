@@ -3,6 +3,8 @@ import type { MuseumArtwork } from '@/app/components/VrMuseumEmbed';
 
 export type VrMuseumSceneHandle = {
   dispose: () => void;
+  focusArtwork?: (id: string) => void;
+  clearFocus?: () => void;
 };
 
 type CreateArgs = {
@@ -483,5 +485,9 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     }
   }
 
-  return { dispose };
-}
+ return {
+  dispose,
+  focusArtwork: () => {},
+  clearFocus: () => {},
+};
+
