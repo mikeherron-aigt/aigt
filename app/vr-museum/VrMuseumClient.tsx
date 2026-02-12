@@ -169,7 +169,7 @@ export default function VrMuseumClient() {
                 type="button"
                 onClick={toggleFullscreen}
                 style={{
-                  position: 'absolute',
+                  position: 'fixed',
                   top: 16,
                   right: 16,
                   padding: '8px 14px',
@@ -199,45 +199,24 @@ export default function VrMuseumClient() {
               />
 
               {/* Fullscreen artwork overlay */}
-              {selectedArtwork && (
-                <div
-                  role="dialog"
-                  aria-modal="true"
-                  onClick={(e) => {
-                    // Clicking the matte closes, clicking the card does not
-                    if (e.target === e.currentTarget) closeOverlay();
-                  }}
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    zIndex: 20,
-                    background: 'rgba(0,0,0,0.88)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 24,
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={closeOverlay}
-                    style={{
-                      position: 'absolute',
-                      top: 18,
-                      right: 18,
-                      width: 40,
-                      height: 40,
-                      borderRadius: 999,
-                      border: '1px solid rgba(255,255,255,0.18)',
-                      background: 'rgba(20,20,20,0.7)',
-                      color: 'rgba(255,255,255,0.85)',
-                      cursor: 'pointer',
-                      backdropFilter: 'blur(10px)',
-                      display: 'grid',
-                      placeItems: 'center',
-                    }}
-                    aria-label="Close"
-                  >
+           {selectedArtwork && (
+  <div
+    role="dialog"
+    aria-modal="true"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) closeOverlay();
+    }}
+    style={{
+      position: 'fixed',
+      inset: 0,
+      zIndex: 9999,
+      background: 'rgba(0,0,0,0.88)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+    }}
+  >
                     ✕
                   </button>
 
