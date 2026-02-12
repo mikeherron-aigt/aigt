@@ -34,6 +34,10 @@ function easeInOutCubic(t: number) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
+function easeOutCubic(t: number) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
 function mulberry32(seed: number) {
   let t = seed >>> 0;
   return () => {
@@ -247,7 +251,7 @@ export function createVrMuseumScene({
   // Ortho inspection camera (not parented to rig)
   const orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 400);
 
-  // We will render and raycast using this
+  // Render and raycast using this
   let activeCamera: THREE.Camera = camera;
 
   // Start pose
@@ -318,12 +322,10 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    // Distance does not affect scale for ortho, but keep it safely away from the wall.
     const dist = 10;
-
     orthoCamera.position.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
 
-    // Align camera up with the artwork up so it is not rotated
+    // Align camera up with artwork up so it is not rotated
     const artUp = new THREE.Vector3(0, 1, 0)
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
@@ -377,13 +379,9 @@ export function createVrMuseumScene({
     const dist = clamp(neededDist, 1.25, 4.5);
 
     focusTo.pos.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
-    // Aim to end closer to the artwork’s vertical center so ortho snap is subtle
-const targetY = worldPos.y;
 
-// Blend between eye height and artwork center. Increase to make the camera end higher.
-const yBlend = 0.75; // 0 = keep at 1.55, 1 = fully match artwork center
-focusTo.pos.y = lerp(1.55, targetY, yBlend);
-
+    // End at exact artwork center height for pixel-perfect final framing
+    focusTo.pos.y = worldPos.y;
 
     const lookDir = worldPos.clone().sub(focusTo.pos);
     lookDir.y = 0;
@@ -393,7 +391,6 @@ focusTo.pos.y = lerp(1.55, targetY, yBlend);
     focusTo.pitch = 0;
     focusTo.fov = targetFov;
 
-    // Ensure we are rendering with perspective during the animation
     activeCamera = camera;
   }
 
@@ -910,7 +907,6 @@ focusTo.pos.y = lerp(1.55, targetY, yBlend);
         const id = (hit.userData?.__artworkId as string) ?? '';
         const rec = clickableMeshes.find((m) => m.artwork.id === id);
         if (rec) {
-          // Zoom only (no modal)
           startFocusOnRecord(rec, { duration: 1.35 });
         }
       }
@@ -985,9 +981,17 @@ focusTo.pos.y = lerp(1.55, targetY, yBlend);
     if (focusActive) {
       focusTime += dt;
       const t = clamp(focusTime / focusDuration, 0, 1);
+
       const e = easeInOutCubic(t);
 
-      yawObj.position.lerpVectors(focusFrom.pos, focusTo.pos, e);
+      // Y rises earlier to land pixel-perfect by the end
+      const eY = easeOutCubic(clamp(t * 1.05, 0, 1));
+
+      yawObj.position.set(
+        lerp(focusFrom.pos.x, focusTo.pos.x, e),
+        lerp(focusFrom.pos.y, focusTo.pos.y, eY),
+        lerp(focusFrom.pos.z, focusTo.pos.z, e)
+      );
 
       yaw = lerp(focusFrom.yaw, focusTo.yaw, e);
       pitch = lerp(focusFrom.pitch, focusTo.pitch, e);
@@ -1005,7 +1009,6 @@ focusTo.pos.y = lerp(1.55, targetY, yBlend);
         focusTargetRec = null;
 
         if (rec) {
-          // Switch to orthographic for perfect flat alignment
           enterOrthoInspect(rec);
         }
       }
