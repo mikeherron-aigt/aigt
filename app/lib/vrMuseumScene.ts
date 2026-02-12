@@ -113,7 +113,7 @@ ctx.drawImage(image, -w / 2, -h / 2, w, h);
 
 ctx.restore();
 
-    }
+    
   }
   ctx.globalAlpha = 1;
 
