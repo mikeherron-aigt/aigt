@@ -15,18 +15,24 @@ type CreateArgs = {
 
 /**
  * VR Museum Scene
- * Adds:
- * - Click raycast on artwork planes
- * - Camera focus animation that fits artwork to viewport (aspect aware)
- * - Clear focus to return to previous camera pose
- * - Higher realism defaults that still keep load manageable
+ * Fixes:
+ * - Click raycast on artworks
+ * - Smooth camera focus that fits the artwork to viewport (aspect aware)
+ * - Lighting: brighter wall wash, no mysterious hotspot
+ * - Removes floor shadow "blobs" by disabling spotlight shadows
+ * - Keeps artwork as MeshBasicMaterial so color stays true
  */
 export function createVrMuseumScene({ container, artworks, onArtworkClick }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
 
   function normalizeImageUrl(url: string) {
     if (!url) return url;
-    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
+    if (
+      url.startsWith('http://') ||
+      url.startsWith('https://') ||
+      url.startsWith('data:') ||
+      url.startsWith('blob:')
+    ) {
       return url;
     }
     return url.startsWith('/') ? url : `/${url}`;
@@ -43,23 +49,17 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(container.clientWidth, container.clientHeight, false);
-
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.02;
+  renderer.toneMappingExposure = 1.08;
 
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  // A little realism without going crazy
-  // Works across Three versions and avoids TS typing mismatch
-(renderer as any).physicallyCorrectLights = true;
-
-// Newer Three builds sometimes use this flag instead
-if ('useLegacyLights' in renderer) {
-  (renderer as any).useLegacyLights = false;
-}
-
+  // Support older typings
+  (renderer as any).physicallyCorrectLights = true;
+  if ('useLegacyLights' in renderer) (renderer as any).useLegacyLights = false;
 
   renderer.domElement.style.width = '100%';
   renderer.domElement.style.height = '100%';
@@ -73,7 +73,10 @@ if ('useLegacyLights' in renderer) {
   // ---------------------------
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0b0b);
-  scene.fog = new THREE.Fog(0x0b0b0b, 8, 38);
+
+  // Fog was making it feel muddy. Remove it for clarity.
+  // If you want a touch of atmosphere later, add back a very subtle fog.
+  // scene.fog = new THREE.Fog(0x0b0b0b, 14, 70);
 
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 120);
   camera.position.set(0, 1.55, 6.6);
@@ -81,30 +84,31 @@ if ('useLegacyLights' in renderer) {
   // ---------------------------
   // Lighting
   // ---------------------------
-  // Keep it museum-neutral. The artwork plane is MeshBasicMaterial so it stays true.
-  const ambient = new THREE.AmbientLight(0xffffff, 0.35);
+  // Gallery style: bright, neutral wash. No mystery point light hotspot.
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x1a1a1a, 0.75);
+  scene.add(hemi);
+
+  const ambient = new THREE.AmbientLight(0xffffff, 0.45);
   scene.add(ambient);
 
   const key = new THREE.DirectionalLight(0xffffff, 1.15);
-  key.position.set(4, 9, 6);
+  key.position.set(5, 10, 6);
   key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048);
   key.shadow.camera.near = 0.5;
-  key.shadow.camera.far = 60;
-  key.shadow.camera.left = -16;
-  key.shadow.camera.right = 16;
-  key.shadow.camera.top = 16;
-  key.shadow.camera.bottom = -16;
+  key.shadow.camera.far = 70;
+  key.shadow.camera.left = -18;
+  key.shadow.camera.right = 18;
+  key.shadow.camera.top = 18;
+  key.shadow.camera.bottom = -18;
   scene.add(key);
 
-  const fill = new THREE.DirectionalLight(0xffffff, 0.35);
-  fill.position.set(-7, 7, -1);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.55);
+  fill.position.set(-7, 7, -4);
   scene.add(fill);
 
-  // A subtle ceiling bounce
-  const rim = new THREE.PointLight(0xffffff, 0.25, 60);
-  rim.position.set(0, 3.5, 10);
-  scene.add(rim);
+  // No rim point light. It created the hot spot.
+  // If you want a subtle ceiling bounce later, we can add a wide area-like light.
 
   // ---------------------------
   // Room geometry/materials
@@ -114,20 +118,22 @@ if ('useLegacyLights' in renderer) {
 
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#f2f2f2'),
-    roughness: 0.92,
+    roughness: 0.94,
     metalness: 0.0,
   });
 
   const ceilingMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#f0f0f0'),
-    roughness: 0.96,
+    roughness: 0.98,
     metalness: 0.0,
   });
 
+  // Floor: your blobs were amplified by glossy + very dark.
+  // Make it a soft charcoal matte instead.
   const floorMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#101010'),
-    roughness: 0.22,
-    metalness: 0.05,
+    color: new THREE.Color('#1b1b1b'),
+    roughness: 0.78,
+    metalness: 0.0,
   });
 
   const roomW = 14;
@@ -166,7 +172,7 @@ if ('useLegacyLights' in renderer) {
   // Baseboards
   const baseboardMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#e8e8e8'),
-    roughness: 0.75,
+    roughness: 0.8,
     metalness: 0.0,
   });
 
@@ -228,7 +234,6 @@ if ('useLegacyLights' in renderer) {
     metalness: 0.0,
   });
 
-  // Store clickable art planes by id
   const artMeshById = new Map<string, THREE.Mesh>();
   const artworkById = new Map<string, MuseumArtwork>();
 
@@ -250,7 +255,6 @@ if ('useLegacyLights' in renderer) {
       texture = null;
     }
 
-    // Aspect from loaded texture if available
     let aspect = 4 / 5;
     if (texture?.image && (texture.image as any).width && (texture.image as any).height) {
       const w = (texture.image as any).width as number;
@@ -272,18 +276,15 @@ if ('useLegacyLights' in renderer) {
     const frameT = 0.08;
     const depth = 0.08;
 
-    // Outer frame
     const outer = new THREE.Mesh(new THREE.BoxGeometry(artW + frameT, artH + frameT, depth), frameOuterMat);
     outer.castShadow = true;
-    outer.receiveShadow = false;
     group.add(outer);
 
-    // Matte
     const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.005), frameInnerMat);
     matte.position.z = depth / 2 + 0.004;
     group.add(matte);
 
-    // Artwork plane (kept Basic so it never gets crushed by lighting)
+    // Artwork plane: stays bright and true regardless of scene lighting
     const artMat = new THREE.MeshBasicMaterial({
       color: texture ? 0xffffff : 0x2b2b2b,
       map: texture ?? undefined,
@@ -291,47 +292,33 @@ if ('useLegacyLights' in renderer) {
 
     const art = new THREE.Mesh(new THREE.PlaneGeometry(artW, artH), artMat);
     art.position.z = depth / 2 + 0.011;
-    art.userData = {
-      kind: 'artwork',
-      artworkId: artwork.id,
-      width: artW,
-      height: artH,
-    };
+    art.userData = { artworkId: artwork.id, width: artW, height: artH };
     group.add(art);
 
     artMeshById.set(artwork.id, art);
 
-    // Subtle spotlight for frame realism (does not affect MeshBasic art)
-    const spot = new THREE.SpotLight(0xffffff, 1.2, 10, Math.PI / 7, 0.55, 1.1);
-    spot.position.set(0, 3.6, 1.2);
+    // Gallery wash for the wall/frame, NO SHADOWS to avoid blobs.
+    const spot = new THREE.SpotLight(0xffffff, 0.9, 10, Math.PI / 8, 0.65, 1.0);
+    spot.position.set(0, 3.9, 1.45);
     spot.target = art;
-    spot.castShadow = true;
-    spot.shadow.mapSize.set(1024, 1024);
+    spot.castShadow = false;
     group.add(spot);
     group.add(spot.target);
 
     framesGroup.add(group);
   }
 
-  // Layout
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const y = 2.05;
 
   for (let i = 0; i < Math.min(artworks.length, 6); i++) {
     const z = 9 - i * 5.2;
-    placements.push({
-      pos: new THREE.Vector3(roomW / 2 - 0.06, y, z),
-      rotY: -Math.PI / 2,
-    });
+    placements.push({ pos: new THREE.Vector3(roomW / 2 - 0.06, y, z), rotY: -Math.PI / 2 });
   }
-
   for (let i = 6; i < artworks.length; i++) {
     const idx = i - 6;
     const z = 9 - idx * 5.2;
-    placements.push({
-      pos: new THREE.Vector3(-roomW / 2 + 0.06, y, z),
-      rotY: Math.PI / 2,
-    });
+    placements.push({ pos: new THREE.Vector3(-roomW / 2 + 0.06, y, z), rotY: Math.PI / 2 });
   }
 
   (async () => {
@@ -356,7 +343,7 @@ if ('useLegacyLights' in renderer) {
   })();
 
   // ---------------------------
-  // Controls: drag look + wheel move
+  // Controls + camera state
   // ---------------------------
   let isDragging = false;
   let lastX = 0;
@@ -368,30 +355,108 @@ if ('useLegacyLights' in renderer) {
 
   const basePos = camera.position.clone();
 
-  // Track click vs drag
   let pointerDownX = 0;
   let pointerDownY = 0;
   let pointerDownTime = 0;
 
-  // Focus state
-  let isFocused = false;
+  const camTargetPos = basePos.clone();
+  const camTargetLook = new THREE.Vector3(0, 1.5, 0);
 
-  // Store "return" pose
   const returnPose = {
-    pos: camera.position.clone(),
+    pos: basePos.clone(),
     yaw,
     pitch,
   };
 
-  // Animated camera target
-  const camTargetPos = new THREE.Vector3().copy(basePos);
-  const camTargetLook = new THREE.Vector3(0, 1.5, 0);
+  let isFocused = false;
+
+  const focusAnim = {
+    active: false,
+    t: 0,
+    yawFrom: 0,
+    yawTo: 0,
+    pitchFrom: 0,
+    pitchTo: 0,
+    posFrom: basePos.clone(),
+    posTo: basePos.clone(),
+  };
+
+  function easeInOut(t: number) {
+    return t * t * (3 - 2 * t);
+  }
+
+  function computeFitDistance(planeW: number, planeH: number) {
+    const vFov = THREE.MathUtils.degToRad(camera.fov);
+    const aspect = camera.aspect;
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+
+    const distV = (planeH * 0.5) / Math.tan(vFov / 2);
+    const distH = (planeW * 0.5) / Math.tan(hFov / 2);
+
+    return Math.max(distV, distH) * 1.12;
+  }
+
+  function focusArtwork(artworkId: string) {
+    const art = artMeshById.get(artworkId);
+    if (!art) return;
+
+    // Store return
+    returnPose.pos.copy(basePos);
+    returnPose.yaw = yaw;
+    returnPose.pitch = pitch;
+
+    const center = new THREE.Vector3();
+    art.getWorldPosition(center);
+
+    // Normal points outward from the art plane
+    const normal = new THREE.Vector3(0, 0, 1);
+    normal.applyQuaternion(art.getWorldQuaternion(new THREE.Quaternion()));
+    normal.normalize();
+
+    const planeW = Number(art.userData?.width ?? 1.2);
+    const planeH = Number(art.userData?.height ?? 1.5);
+
+    const dist = computeFitDistance(planeW, planeH);
+
+    const targetPos = new THREE.Vector3().copy(center).addScaledVector(normal, dist);
+
+    // Compute look direction
+    const dir = new THREE.Vector3().subVectors(center, targetPos).normalize();
+    const targetYaw = Math.atan2(dir.x, dir.z);
+    const targetPitch = THREE.MathUtils.clamp(Math.asin(dir.y), minPitch, maxPitch);
+
+    focusAnim.active = true;
+    focusAnim.t = 0;
+    focusAnim.yawFrom = yaw;
+    focusAnim.yawTo = targetYaw;
+    focusAnim.pitchFrom = pitch;
+    focusAnim.pitchTo = targetPitch;
+    focusAnim.posFrom.copy(basePos);
+    focusAnim.posTo.copy(targetPos);
+
+    camTargetLook.copy(center);
+    isFocused = true;
+  }
+
+  function clearFocus() {
+    if (!isFocused) return;
+
+    focusAnim.active = true;
+    focusAnim.t = 0;
+    focusAnim.yawFrom = yaw;
+    focusAnim.yawTo = returnPose.yaw;
+    focusAnim.pitchFrom = pitch;
+    focusAnim.pitchTo = returnPose.pitch;
+    focusAnim.posFrom.copy(basePos);
+    focusAnim.posTo.copy(returnPose.pos);
+
+    isFocused = false;
+  }
 
   function onPointerDown(e: PointerEvent) {
     isDragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
-
     pointerDownX = e.clientX;
     pointerDownY = e.clientY;
     pointerDownTime = performance.now();
@@ -421,16 +486,15 @@ if ('useLegacyLights' in renderer) {
     } catch {}
     renderer.domElement.style.cursor = 'grab';
 
-    // If focused, ignore click-to-select (selection UI will handle close)
     if (isFocused) return;
 
     const moved = Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY);
     const dt = performance.now() - pointerDownTime;
 
-    // Only treat as click if short and low movement
+    // Treat as click only if it was not a drag
     if (moved > 6 || dt > 450) return;
 
-    // Raycast for artwork
+    // Raycast
     const rect = renderer.domElement.getBoundingClientRect();
     const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
@@ -438,9 +502,7 @@ if ('useLegacyLights' in renderer) {
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(new THREE.Vector2(nx, ny), camera);
 
-    const clickable = Array.from(artMeshById.values());
-    const hits = raycaster.intersectObjects(clickable, true);
-
+    const hits = raycaster.intersectObjects(Array.from(artMeshById.values()), true);
     if (!hits.length) return;
 
     const hit = hits[0].object as THREE.Mesh;
@@ -448,12 +510,8 @@ if ('useLegacyLights' in renderer) {
     if (!artworkId) return;
 
     const artwork = artworkById.get(artworkId);
-    if (!artwork) return;
+    if (artwork) onArtworkClick?.(artwork);
 
-    // Inform React
-    onArtworkClick?.(artwork);
-
-    // Focus camera
     focusArtwork(artworkId);
   }
 
@@ -466,13 +524,11 @@ if ('useLegacyLights' in renderer) {
     forward.normalize();
 
     const step = e.deltaY * 0.004;
-    basePos.addScaledVector(forward, step);
+    camTargetPos.copy(basePos).addScaledVector(forward, step);
 
     const margin = 0.9;
-    basePos.x = THREE.MathUtils.clamp(basePos.x, -roomW / 2 + margin, roomW / 2 - margin);
-    basePos.z = THREE.MathUtils.clamp(basePos.z, -roomD / 2 + margin, roomD / 2 - margin);
-
-    camTargetPos.copy(basePos);
+    camTargetPos.x = THREE.MathUtils.clamp(camTargetPos.x, -roomW / 2 + margin, roomW / 2 - margin);
+    camTargetPos.z = THREE.MathUtils.clamp(camTargetPos.z, -roomD / 2 + margin, roomD / 2 - margin);
   }
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -480,100 +536,6 @@ if ('useLegacyLights' in renderer) {
   renderer.domElement.addEventListener('pointerup', onPointerUp);
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
   renderer.domElement.addEventListener('wheel', onWheel, { passive: true });
-
-  // ---------------------------
-  // Focus helpers
-  // ---------------------------
-  function computeFitDistance(planeW: number, planeH: number) {
-    // Fit plane in viewport with a little margin
-    const vFov = THREE.MathUtils.degToRad(camera.fov);
-    const aspect = camera.aspect;
-
-    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
-
-    const distV = (planeH * 0.5) / Math.tan(vFov / 2);
-    const distH = (planeW * 0.5) / Math.tan(hFov / 2);
-
-    return Math.max(distV, distH) * 1.08; // margin factor
-  }
-
-  function focusArtwork(artworkId: string) {
-    const art = artMeshById.get(artworkId);
-    if (!art) return;
-
-    // Store return pose
-    returnPose.pos.copy(camera.position);
-    returnPose.yaw = yaw;
-    returnPose.pitch = pitch;
-
-    // Determine center and normal
-    const center = new THREE.Vector3();
-    art.getWorldPosition(center);
-
-    const normal = new THREE.Vector3(0, 0, 1);
-    normal.applyQuaternion(art.getWorldQuaternion(new THREE.Quaternion()));
-    normal.normalize();
-
-    const planeW = Number(art.userData?.width ?? 1.2);
-    const planeH = Number(art.userData?.height ?? 1.5);
-
-    const dist = computeFitDistance(planeW, planeH);
-
-    // Camera target position is along the normal, in front of the plane
-    camTargetPos.copy(center).addScaledVector(normal, dist);
-    camTargetLook.copy(center);
-
-    // Compute yaw/pitch to face the artwork
-    const dir = new THREE.Vector3().subVectors(camTargetLook, camTargetPos).normalize();
-    const targetYaw = Math.atan2(dir.x, dir.z);
-    const targetPitch = Math.asin(dir.y);
-
-    yaw = yaw; // keep current during transition, animate below
-    pitch = pitch;
-
-    // Lock focus and set a separate animated yaw/pitch targets
-    focusAnim.yawFrom = yaw;
-    focusAnim.pitchFrom = pitch;
-    focusAnim.yawTo = targetYaw;
-    focusAnim.pitchTo = THREE.MathUtils.clamp(targetPitch, minPitch, maxPitch);
-
-    focusAnim.t = 0;
-    focusAnim.active = true;
-
-    isFocused = true;
-  }
-
-  function clearFocus() {
-    if (!isFocused) return;
-
-    // Return camera target to stored pose
-    camTargetPos.copy(returnPose.pos);
-    camTargetLook.copy(returnPose.pos).add(new THREE.Vector3(0, 0, -1)); // not used directly
-
-    focusAnim.yawFrom = yaw;
-    focusAnim.pitchFrom = pitch;
-    focusAnim.yawTo = returnPose.yaw;
-    focusAnim.pitchTo = returnPose.pitch;
-
-    focusAnim.t = 0;
-    focusAnim.active = true;
-
-    isFocused = false;
-  }
-
-  const focusAnim = {
-    active: false,
-    t: 0,
-    yawFrom: 0,
-    yawTo: 0,
-    pitchFrom: 0,
-    pitchTo: 0,
-  };
-
-  function easeInOut(t: number) {
-    // smoothstep-ish
-    return t * t * (3 - 2 * t);
-  }
 
   // ---------------------------
   // Resize
@@ -597,28 +559,25 @@ if ('useLegacyLights' in renderer) {
 
   function animate() {
     if (disposed) return;
+
     const dt = clock.getDelta();
 
-    // Camera rotation update
-    camera.rotation.order = 'YXZ';
-
-    // Focus animation (position + yaw/pitch easing)
     if (focusAnim.active) {
       focusAnim.t = Math.min(1, focusAnim.t + dt / 0.55);
       const k = easeInOut(focusAnim.t);
 
-      // Interpolate yaw/pitch
       yaw = THREE.MathUtils.lerp(focusAnim.yawFrom, focusAnim.yawTo, k);
       pitch = THREE.MathUtils.lerp(focusAnim.pitchFrom, focusAnim.pitchTo, k);
 
-      if (focusAnim.t >= 1) {
-        focusAnim.active = false;
-      }
+      basePos.lerpVectors(focusAnim.posFrom, focusAnim.posTo, k);
+
+      if (focusAnim.t >= 1) focusAnim.active = false;
+    } else {
+      // free move lerp
+      basePos.lerp(camTargetPos, 0.14);
     }
 
-    // Position easing for smoother motion
-    basePos.lerp(camTargetPos, 0.14);
-
+    camera.rotation.order = 'YXZ';
     camera.rotation.y = yaw;
     camera.rotation.x = pitch;
     camera.position.copy(basePos);
@@ -657,15 +616,8 @@ if ('useLegacyLights' in renderer) {
     });
 
     renderer.dispose();
-
-    if (renderer.domElement.parentElement === container) {
-      container.removeChild(renderer.domElement);
-    }
+    if (renderer.domElement.parentElement === container) container.removeChild(renderer.domElement);
   }
 
-  return {
-    dispose,
-    focusArtwork,
-    clearFocus,
-  };
+  return { dispose, focusArtwork, clearFocus };
 }
