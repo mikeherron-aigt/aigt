@@ -225,7 +225,90 @@ export function createVrMuseumScene({
   renderer.domElement.style.height = '100%';
   renderer.domElement.style.display = 'block';
   renderer.domElement.style.cursor = 'grab';
+
+  // Ensure the container can host overlays
+  if (!container.style.position) container.style.position = 'relative';
+
   container.appendChild(renderer.domElement);
+
+  // Museum placard overlay
+  const placard = document.createElement('div');
+  placard.style.position = 'absolute';
+  placard.style.top = '50%';
+  placard.style.right = '36px';
+  placard.style.transform = 'translateY(-50%)';
+  placard.style.width = '320px';
+  placard.style.maxWidth = '34vw';
+  placard.style.pointerEvents = 'none';
+  placard.style.opacity = '0';
+  placard.style.transition = 'opacity 220ms ease';
+  placard.style.fontFamily =
+    'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
+  placard.style.color = '#111';
+
+  placard.style.background = 'rgba(255,255,255,0.92)';
+  placard.style.border = '1px solid rgba(0,0,0,0.10)';
+  placard.style.borderRadius = '14px';
+  placard.style.boxShadow = '0 10px 28px rgba(0,0,0,0.14)';
+  placard.style.backdropFilter = 'blur(8px)';
+  placard.style.padding = '18px 18px 16px 18px';
+  placard.style.lineHeight = '1.25';
+
+  placard.innerHTML = `
+    <div style="font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: rgba(0,0,0,.55); margin-bottom: 10px;">
+      Museum Label
+    </div>
+
+    <div data-artist style="font-size: 18px; font-weight: 650; margin-bottom: 6px;">
+      Artist Name
+    </div>
+
+    <div data-title style="font-size: 15px; color: rgba(0,0,0,.86); margin-bottom: 10px;">
+      <span style="font-style: italic;">Artwork Title</span>
+    </div>
+
+    <div style="height:1px; background: rgba(0,0,0,.08); margin: 12px 0;"></div>
+
+    <div style="display:grid; grid-template-columns: 92px 1fr; gap: 8px 12px; font-size: 13px; color: rgba(0,0,0,.78);">
+      <div style="color: rgba(0,0,0,.50);">Collection</div>
+      <div data-collection>Collection Name</div>
+
+      <div style="color: rgba(0,0,0,.50);">Title</div>
+      <div data-title2>Artwork Title</div>
+
+      <div style="color: rgba(0,0,0,.50);">Catalog ID</div>
+      <div data-id>ABC-0001</div>
+    </div>
+  `;
+  container.appendChild(placard);
+
+  const placardArtist = placard.querySelector('[data-artist]') as HTMLDivElement | null;
+  const placardTitle = placard.querySelector('[data-title]') as HTMLDivElement | null;
+  const placardTitle2 = placard.querySelector('[data-title2]') as HTMLDivElement | null;
+  const placardCollection = placard.querySelector('[data-collection]') as HTMLDivElement | null;
+  const placardId = placard.querySelector('[data-id]') as HTMLDivElement | null;
+
+  function showPlacard(artwork: MuseumArtwork) {
+    const anyA: any = artwork as any;
+    const artist = anyA.artist ?? anyA.artistName ?? 'Unknown Artist';
+    const title = anyA.title ?? 'Untitled';
+    const collection = anyA.collection ?? anyA.collectionName ?? 'Collection';
+    const catalogId = anyA.sku ?? anyA.catalogId ?? artwork.id ?? 'ID';
+
+    if (placardArtist) placardArtist.textContent = String(artist);
+    if (placardTitle) placardTitle.innerHTML = `<span style="font-style: italic;">${String(
+      title
+    )}</span>`;
+    if (placardTitle2) placardTitle2.textContent = String(title);
+    if (placardCollection) placardCollection.textContent = String(collection);
+    if (placardId) placardId.textContent = String(catalogId);
+
+    placard.style.opacity = '1';
+  }
+
+  function hidePlacard() {
+    placard.style.opacity = '0';
+  }
 
   // Scene
   const scene = new THREE.Scene();
@@ -322,26 +405,40 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    const dist = 10;
-    orthoCamera.position.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
+    // "Right" direction in the artwork plane
+    const artRight = new THREE.Vector3(1, 0, 0)
+      .applyQuaternion(rec.frameGroup.quaternion)
+      .normalize();
 
-    // Align camera up with artwork up so it is not rotated
+    // Shift the view so the artwork sits left, leaving room for the placard on the right
+    const sideShift = rec.artW * 0.55;
+
+    // Distance does not affect scale in ortho, but keep it far enough for clipping safety
+    const dist = 10;
+
+    const target = worldPos.clone().add(artRight.clone().multiplyScalar(sideShift));
+
+    orthoCamera.position.copy(target).add(normalOut.clone().multiplyScalar(dist));
+
     const artUp = new THREE.Vector3(0, 1, 0)
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
     orthoCamera.up.copy(artUp);
-    orthoCamera.lookAt(worldPos);
+    orthoCamera.lookAt(target);
 
     updateOrthoFrustumToArtwork(rec);
 
     activeCamera = orthoCamera;
+
+    showPlacard(rec.artwork);
   }
 
   function exitOrthoInspect() {
     inspecting = false;
     inspectRec = null;
     activeCamera = camera;
+    hidePlacard();
   }
 
   function cancelFocusAndInspect() {
@@ -379,8 +476,7 @@ export function createVrMuseumScene({
     const dist = clamp(neededDist, 1.25, 4.5);
 
     focusTo.pos.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
-
-    // End at exact artwork center height for pixel-perfect final framing
+    // End at exact artwork center height
     focusTo.pos.y = worldPos.y;
 
     const lookDir = worldPos.clone().sub(focusTo.pos);
@@ -906,9 +1002,7 @@ export function createVrMuseumScene({
         const hit = hits[0].object;
         const id = (hit.userData?.__artworkId as string) ?? '';
         const rec = clickableMeshes.find((m) => m.artwork.id === id);
-        if (rec) {
-          startFocusOnRecord(rec, { duration: 1.35 });
-        }
+        if (rec) startFocusOnRecord(rec, { duration: 1.35 });
       }
     }
   }
@@ -983,8 +1077,6 @@ export function createVrMuseumScene({
       const t = clamp(focusTime / focusDuration, 0, 1);
 
       const e = easeInOutCubic(t);
-
-      // Y rises earlier to land pixel-perfect by the end
       const eY = easeOutCubic(clamp(t * 1.05, 0, 1));
 
       yawObj.position.set(
@@ -1008,9 +1100,7 @@ export function createVrMuseumScene({
         const rec = focusTargetRec;
         focusTargetRec = null;
 
-        if (rec) {
-          enterOrthoInspect(rec);
-        }
+        if (rec) enterOrthoInspect(rec);
       }
     }
 
@@ -1045,6 +1135,8 @@ export function createVrMuseumScene({
     });
 
     renderer.dispose();
+
+    if (placard.parentElement === container) container.removeChild(placard);
 
     if (renderer.domElement.parentElement === container) {
       container.removeChild(renderer.domElement);
