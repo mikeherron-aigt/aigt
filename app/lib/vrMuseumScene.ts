@@ -377,7 +377,13 @@ export function createVrMuseumScene({
     const dist = clamp(neededDist, 1.25, 4.5);
 
     focusTo.pos.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
-    focusTo.pos.y = 1.55;
+    // Aim to end closer to the artwork’s vertical center so ortho snap is subtle
+const targetY = worldPos.y;
+
+// Blend between eye height and artwork center. Increase to make the camera end higher.
+const yBlend = 0.75; // 0 = keep at 1.55, 1 = fully match artwork center
+focusTo.pos.y = lerp(1.55, targetY, yBlend);
+
 
     const lookDir = worldPos.clone().sub(focusTo.pos);
     lookDir.y = 0;
