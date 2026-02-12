@@ -17,10 +17,20 @@ type ArtMeshRecord = {
   artwork: MuseumArtwork;
   clickable: THREE.Object3D;
   frameGroup: THREE.Group;
+  artW: number;
+  artH: number;
 };
 
 function clamp(v: number, min: number, max: number) {
   return Math.max(min, Math.min(max, v));
+}
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+function easeInOutCubic(t: number) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 function mulberry32(seed: number) {
@@ -67,7 +77,6 @@ function createStampedFloorTexture(
   const stampsY = opts?.stampsY ?? 6;
   const seed = opts?.seed ?? 424242;
 
-  // Higher defaults than before, because feathering likes overlap + jitter
   const overlapPct = opts?.overlapPct ?? 0.30;
   const jitterPct = opts?.jitterPct ?? 0.06;
   const alpha = opts?.alpha ?? 0.95;
@@ -93,7 +102,6 @@ function createStampedFloorTexture(
   const drawW = cellW + overlapW;
   const drawH = cellH + overlapH;
 
-  // Feather amount in pixels inside the stamp
   const featherPx = Math.max(18, Math.floor(Math.min(drawW, drawH) * 0.08));
 
   const featherStamp = (
@@ -164,7 +172,7 @@ function createStampedFloorTexture(
 
   ctx.globalAlpha = 1;
 
-  // Add subtle grain/noise to break any remaining boundaries without hiding wood
+  // Subtle grain/noise so nothing looks too procedurally perfect
   const img = ctx.getImageData(0, 0, size, size);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4) {
@@ -183,6 +191,7 @@ function createStampedFloorTexture(
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   tex.magFilter = THREE.LinearFilter;
   tex.needsUpdate = true;
+
   return tex;
 }
 
@@ -217,8 +226,7 @@ export function createVrMuseumScene({
   // Scene
   const scene = new THREE.Scene();
 
-  // IMPORTANT: Do NOT use hamptons.jpg as scene.background.
-  // Backgrounds are camera-relative and will move when you look around.
+  // Background color (not camera-relative)
   scene.background = new THREE.Color('#cfe7ff');
 
   // Room sizing
@@ -245,6 +253,69 @@ export function createVrMuseumScene({
   const minPitch = -0.55;
   const maxPitch = 0.45;
 
+  // Focus animation state
+  const clock = new THREE.Clock();
+
+  let focusActive = false;
+  let focusTime = 0;
+  let focusDuration = 1.35;
+
+  const focusFrom = {
+    pos: new THREE.Vector3(),
+    yaw: 0,
+    pitch: 0,
+    fov: 55,
+  };
+
+  const focusTo = {
+    pos: new THREE.Vector3(),
+    yaw: 0,
+    pitch: 0,
+    fov: 35,
+  };
+
+  function startFocusOnRecord(rec: ArtMeshRecord, opts?: { duration?: number }) {
+    focusActive = true;
+    focusTime = 0;
+    focusDuration = opts?.duration ?? 1.35;
+
+    focusFrom.pos.copy(yawObj.position);
+    focusFrom.yaw = yaw;
+    focusFrom.pitch = pitch;
+    focusFrom.fov = camera.fov;
+
+    // World position of artwork center
+    const worldPos = new THREE.Vector3();
+    rec.frameGroup.getWorldPosition(worldPos);
+
+    // The plane normal that points out from the wall
+    const normalOut = new THREE.Vector3(0, 0, 1)
+      .applyQuaternion(rec.frameGroup.quaternion)
+      .normalize();
+
+    // Distance needed for artwork to fill screen (based on vertical FOV + artH)
+    const targetFov = 35;
+    const vFovRad = (targetFov * Math.PI) / 180;
+    const fillPct = 0.92;
+    const neededDist = (rec.artH / 2) / Math.tan(vFovRad / 2) / fillPct;
+
+    // Clamp so we do not clip into the wall or end too far away
+    const dist = clamp(neededDist, 1.25, 4.5);
+
+    // Target position in front of the art
+    focusTo.pos.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
+    focusTo.pos.y = 1.55;
+
+    // Target yaw to face the art
+    const lookDir = worldPos.clone().sub(focusTo.pos);
+    lookDir.y = 0;
+    lookDir.normalize();
+
+    focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
+    focusTo.pitch = 0;
+    focusTo.fov = targetFov;
+  }
+
   // Materials
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
@@ -260,7 +331,7 @@ export function createVrMuseumScene({
 
   // Floor
   const floorMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#ffffff'), // keep texture untinted
+    color: new THREE.Color('#ffffff'),
     roughness: 0.58,
     metalness: 0.02,
   });
@@ -491,7 +562,7 @@ export function createVrMuseumScene({
   vista.renderOrder = -10;
   scene.add(vista);
 
-  // Optional outside depth, pushed down
+  // Optional outside depth
   const outsideGroup = new THREE.Group();
   scene.add(outsideGroup);
 
@@ -652,6 +723,8 @@ export function createVrMuseumScene({
       artwork,
       clickable: artPlane,
       frameGroup: g,
+      artW,
+      artH,
     });
   }
 
@@ -703,6 +776,8 @@ export function createVrMuseumScene({
   let dragMoved = false;
 
   function onPointerDown(e: PointerEvent) {
+    focusActive = false;
+
     isDragging = true;
     dragMoved = false;
     lastX = e.clientX;
@@ -752,12 +827,17 @@ export function createVrMuseumScene({
         const hit = hits[0].object;
         const id = (hit.userData?.__artworkId as string) ?? '';
         const rec = clickableMeshes.find((m) => m.artwork.id === id);
-        if (rec) onArtworkClick?.(rec.artwork);
+        if (rec) {
+          startFocusOnRecord(rec, { duration: 1.35 });
+          onArtworkClick?.(rec.artwork);
+        }
       }
     }
   }
 
   function onWheel(e: WheelEvent) {
+    focusActive = false;
+
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObj.quaternion);
     forward.y = 0;
     forward.normalize();
@@ -792,37 +872,47 @@ export function createVrMuseumScene({
   function focusArtwork(id: string) {
     const rec = clickableMeshes.find((m) => m.artwork.id === id);
     if (!rec) return;
-
-    const worldPos = new THREE.Vector3();
-    rec.frameGroup.getWorldPosition(worldPos);
-
-    const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(rec.frameGroup.quaternion);
-    const targetPos = worldPos.clone().add(forward.clone().multiplyScalar(2.6));
-    targetPos.y = 1.55;
-
-    yawObj.position.copy(targetPos);
-
-    const lookDir = worldPos.clone().sub(targetPos);
-    lookDir.y = 0;
-    lookDir.normalize();
-
-    yaw = Math.atan2(-lookDir.x, -lookDir.z);
-    pitch = 0;
-
-    yawObj.rotation.y = yaw;
-    pitchObj.rotation.x = pitch;
+    startFocusOnRecord(rec, { duration: 1.35 });
   }
 
   function clearFocus() {
+    focusActive = false;
+
     yawObj.position.set(0, 1.55, 6.6);
     yaw = 0;
     pitch = 0;
+
     yawObj.rotation.y = yaw;
     pitchObj.rotation.x = pitch;
+
+    camera.fov = 55;
+    camera.updateProjectionMatrix();
   }
 
   function animate() {
     if (disposed) return;
+
+    const dt = clock.getDelta();
+
+    if (focusActive) {
+      focusTime += dt;
+      const t = clamp(focusTime / focusDuration, 0, 1);
+      const e = easeInOutCubic(t);
+
+      yawObj.position.lerpVectors(focusFrom.pos, focusTo.pos, e);
+
+      yaw = lerp(focusFrom.yaw, focusTo.yaw, e);
+      pitch = lerp(focusFrom.pitch, focusTo.pitch, e);
+
+      yawObj.rotation.y = yaw;
+      pitchObj.rotation.x = pitch;
+
+      camera.fov = lerp(focusFrom.fov, focusTo.fov, e);
+      camera.updateProjectionMatrix();
+
+      if (t >= 1) focusActive = false;
+    }
+
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   }
