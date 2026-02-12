@@ -3,8 +3,6 @@ import type { MuseumArtwork } from '@/app/components/VrMuseumEmbed';
 
 export type VrMuseumSceneHandle = {
   dispose: () => void;
-
-  // Keep these so VrMuseumEmbed can compile even if this scene does not do zoom yet
   focusArtwork?: (id: string) => void;
   clearFocus?: () => void;
 };
@@ -16,25 +14,18 @@ type CreateArgs = {
 };
 
 /**
- * VR Museum Scene (Jeff baseline + compatibility)
+ * VR Museum Scene (Room dialed in: stark white walls + light wood floor w texture)
  *
- * Goals:
- * - Always load images correctly from Netlify preview OR production
- * - Never crash the app if an image fails
- * - Avoid the “black box” issue by using MeshBasicMaterial for the art plane
- * - Keep the calm museum room look
- * - Support onArtworkClick callback for opening the modal
- * - Keep focusArtwork/clearFocus available as no-ops so the app builds cleanly
+ * Notes:
+ * - Floor uses procedural CanvasTexture (no extra network requests)
+ * - Artwork planes use MeshBasicMaterial so they never go dark
+ * - Click raycast calls onArtworkClick so your modal logic still works
  */
 export function createVrMuseumScene({ container, artworks, onArtworkClick }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
 
-  // ---------------------------
-  // Helpers: URL normalization
-  // ---------------------------
   function normalizeImageUrl(url: string) {
     if (!url) return url;
-
     if (
       url.startsWith('http://') ||
       url.startsWith('https://') ||
@@ -43,8 +34,154 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     ) {
       return url;
     }
-
     return url.startsWith('/') ? url : `/${url}`;
+  }
+
+  // ---------------------------
+  // Procedural wood textures
+  // ---------------------------
+  function makeWoodTexture(size = 1024) {
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      // Fallback solid texture
+      const fallback = new THREE.DataTexture(new Uint8Array([210, 197, 170, 255]), 1, 1);
+      fallback.colorSpace = THREE.SRGBColorSpace;
+      fallback.needsUpdate = true;
+      return { map: fallback, roughnessMap: null as THREE.Texture | null, normalMap: null as THREE.Texture | null };
+    }
+
+    // Base tone
+    ctx.fillStyle = '#d8c8aa';
+    ctx.fillRect(0, 0, size, size);
+
+    // Planks
+    const plankCount = 10;
+    const plankW = size / plankCount;
+
+    // Slight per-plank variation + grain
+    for (let i = 0; i < plankCount; i++) {
+      const x0 = Math.floor(i * plankW);
+      const w = Math.ceil(plankW + 1);
+
+      const tint = 0.92 + Math.random() * 0.16; // subtle
+      ctx.fillStyle = `rgba(${Math.floor(216 * tint)}, ${Math.floor(200 * tint)}, ${Math.floor(
+        170 * tint
+      )}, 1)`;
+      ctx.fillRect(x0, 0, w, size);
+
+      // grain lines (horizontal-ish flow)
+      ctx.globalAlpha = 0.10;
+      ctx.strokeStyle = '#8a6f4a';
+      ctx.lineWidth = 1;
+
+      for (let g = 0; g < 140; g++) {
+        const y = Math.random() * size;
+        ctx.beginPath();
+        const wobble = (Math.random() - 0.5) * 16;
+        ctx.moveTo(x0 + 2, y);
+        ctx.bezierCurveTo(
+          x0 + w * 0.35,
+          y + wobble,
+          x0 + w * 0.65,
+          y - wobble,
+          x0 + w - 2,
+          y
+        );
+        ctx.stroke();
+      }
+
+      // seams
+      ctx.globalAlpha = 0.18;
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(x0, 0, 2, size);
+      ctx.globalAlpha = 1;
+    }
+
+    // Add a very soft vignette / variation to avoid flatness
+    const grad = ctx.createRadialGradient(size * 0.5, size * 0.5, size * 0.1, size * 0.5, size * 0.5, size * 0.75);
+    grad.addColorStop(0, 'rgba(255,255,255,0.08)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.06)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+
+    const map = new THREE.CanvasTexture(canvas);
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.wrapS = THREE.RepeatWrapping;
+    map.wrapT = THREE.RepeatWrapping;
+    map.repeat.set(4, 10);
+    map.anisotropy = 8;
+    map.needsUpdate = true;
+
+    // Roughness map (separate canvas)
+    const rCanvas = document.createElement('canvas');
+    rCanvas.width = size;
+    rCanvas.height = size;
+    const rCtx = rCanvas.getContext('2d');
+    if (!rCtx) return { map, roughnessMap: null as THREE.Texture | null, normalMap: null as THREE.Texture | null };
+
+    // Start moderately rough
+    rCtx.fillStyle = 'rgb(170,170,170)';
+    rCtx.fillRect(0, 0, size, size);
+
+    // Plank seams slightly rougher
+    rCtx.fillStyle = 'rgb(210,210,210)';
+    for (let i = 0; i < plankCount; i++) {
+      const x0 = Math.floor(i * plankW);
+      rCtx.fillRect(x0, 0, 2, size);
+    }
+
+    // Random micro variation
+    rCtx.globalAlpha = 0.08;
+    rCtx.fillStyle = 'black';
+    for (let i = 0; i < 2000; i++) {
+      const x = Math.random() * size;
+      const y = Math.random() * size;
+      const s = 1 + Math.random() * 2;
+      rCtx.fillRect(x, y, s, s);
+    }
+    rCtx.globalAlpha = 1;
+
+    const roughnessMap = new THREE.CanvasTexture(rCanvas);
+    roughnessMap.colorSpace = THREE.NoColorSpace;
+    roughnessMap.wrapS = THREE.RepeatWrapping;
+    roughnessMap.wrapT = THREE.RepeatWrapping;
+    roughnessMap.repeat.copy(map.repeat);
+    roughnessMap.anisotropy = 8;
+    roughnessMap.needsUpdate = true;
+
+    // Very subtle normal map
+    const nCanvas = document.createElement('canvas');
+    nCanvas.width = size;
+    nCanvas.height = size;
+    const nCtx = nCanvas.getContext('2d');
+    if (!nCtx) return { map, roughnessMap, normalMap: null as THREE.Texture | null };
+
+    // Flat normal base (128,128,255)
+    nCtx.fillStyle = 'rgb(128,128,255)';
+    nCtx.fillRect(0, 0, size, size);
+
+    // Fake seam normals by drawing thin vertical lines offset in red/green
+    nCtx.globalAlpha = 0.12;
+    for (let i = 0; i < plankCount; i++) {
+      const x0 = Math.floor(i * plankW);
+      nCtx.fillStyle = 'rgb(118,138,255)'; // tiny tilt
+      nCtx.fillRect(x0, 0, 2, size);
+    }
+    nCtx.globalAlpha = 1;
+
+    const normalMap = new THREE.CanvasTexture(nCanvas);
+    normalMap.colorSpace = THREE.NoColorSpace;
+    normalMap.wrapS = THREE.RepeatWrapping;
+    normalMap.wrapT = THREE.RepeatWrapping;
+    normalMap.repeat.copy(map.repeat);
+    normalMap.anisotropy = 8;
+    normalMap.needsUpdate = true;
+
+    return { map, roughnessMap, normalMap };
   }
 
   // ---------------------------
@@ -60,7 +197,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.08;
 
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -76,36 +213,39 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   // Scene + Camera
   // ---------------------------
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0b0b0b);
-  scene.fog = new THREE.Fog(0x0b0b0b, 6, 34);
+  scene.background = new THREE.Color('#111111');
+  scene.fog = new THREE.Fog(new THREE.Color('#111111'), 14, 55);
 
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 120);
-  camera.position.set(0, 1.55, 6.6);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 140);
+  camera.position.set(0, 1.6, 6.6);
 
   // ---------------------------
-  // Lighting (room only)
+  // Lighting (bright museum)
   // ---------------------------
-  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xf3f3f3, 0.75);
+  scene.add(hemi);
 
-  const key = new THREE.DirectionalLight(0xffffff, 0.85);
-  key.position.set(4, 9, 6);
+  const key = new THREE.DirectionalLight(0xffffff, 1.0);
+  key.position.set(4.5, 10, 7);
   key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048);
   key.shadow.camera.near = 0.5;
-  key.shadow.camera.far = 40;
-  key.shadow.camera.left = -14;
-  key.shadow.camera.right = 14;
-  key.shadow.camera.top = 14;
-  key.shadow.camera.bottom = -14;
+  key.shadow.camera.far = 60;
+  key.shadow.camera.left = -18;
+  key.shadow.camera.right = 18;
+  key.shadow.camera.top = 18;
+  key.shadow.camera.bottom = -18;
+  key.shadow.normalBias = 0.03;
   scene.add(key);
 
-  const fill = new THREE.DirectionalLight(0xffffff, 0.25);
-  fill.position.set(-6, 6, -2);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.35);
+  fill.position.set(-6, 6, -3);
   scene.add(fill);
 
-  const rim = new THREE.PointLight(0xffffff, 0.22, 40);
-  rim.position.set(0, 2.8, 10);
-  scene.add(rim);
+  // Subtle ceiling bounce, helps whiteness feel real
+  const bounce = new THREE.PointLight(0xffffff, 0.20, 50);
+  bounce.position.set(0, 3.8, 0);
+  scene.add(bounce);
 
   // ---------------------------
   // Room geometry/materials
@@ -113,22 +253,29 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   const room = new THREE.Group();
   scene.add(room);
 
+  // Stark white, but slightly warm so it feels physical
   const wallMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#f2f2f2'),
+    color: new THREE.Color('#ffffff'),
     roughness: 0.92,
     metalness: 0.0,
   });
 
   const ceilingMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#f0f0f0'),
+    color: new THREE.Color('#ffffff'),
     roughness: 0.96,
     metalness: 0.0,
   });
 
+  const { map: woodMap, roughnessMap: woodRoughness, normalMap: woodNormal } = makeWoodTexture(1024);
+
   const floorMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#101010'),
-    roughness: 0.22,
-    metalness: 0.05,
+    color: new THREE.Color('#ffffff'),
+    map: woodMap,
+    roughness: 0.75,
+    roughnessMap: woodRoughness ?? undefined,
+    normalMap: woodNormal ?? undefined,
+    normalScale: new THREE.Vector2(0.25, 0.25),
+    metalness: 0.0,
   });
 
   const roomW = 14;
@@ -164,10 +311,10 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   rightWall.rotation.y = -Math.PI / 2;
   room.add(rightWall);
 
-  // Baseboards
+  // Baseboards, clean white
   const baseboardMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#e8e8e8'),
-    roughness: 0.75,
+    color: new THREE.Color('#ffffff'),
+    roughness: 0.80,
     metalness: 0.0,
   });
 
@@ -188,7 +335,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   addBaseboardAlongWall(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
 
   // ---------------------------
-  // Texture loading (robust)
+  // Artwork textures
   // ---------------------------
   const texLoader = new THREE.TextureLoader();
 
@@ -219,19 +366,17 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   room.add(framesGroup);
 
   const frameOuterMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#141414'),
+    color: new THREE.Color('#111111'),
     roughness: 0.35,
-    metalness: 0.15,
+    metalness: 0.10,
   });
 
   const frameInnerMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#f6f6f6'),
+    color: new THREE.Color('#ffffff'),
     roughness: 0.95,
     metalness: 0.0,
   });
 
-  // This is the part you were confused about
-  // We store a mapping from the clickable art mesh to the artwork data
   const artworkByMesh = new WeakMap<THREE.Object3D, MuseumArtwork>();
 
   async function addFramedArtwork(opts: {
@@ -250,7 +395,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
       texture = null;
     }
 
-    // Aspect
     let aspect = 4 / 5;
     if (texture?.image && (texture.image as any).width && (texture.image as any).height) {
       const w = (texture.image as any).width as number;
@@ -276,7 +420,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     outer.castShadow = true;
     group.add(outer);
 
-    const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.005), frameInnerMat);
+    const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.006), frameInnerMat);
     matte.position.z = depth / 2 + 0.004;
     group.add(matte);
 
@@ -285,26 +429,16 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
       map: texture ?? undefined,
     });
 
-    const art = new THREE.Mesh(new THREE.PlaneGeometry(artW, artH), artMat);
-    art.position.z = depth / 2 + 0.01;
-    group.add(art);
+    const artMesh = new THREE.Mesh(new THREE.PlaneGeometry(artW, artH), artMat);
+    artMesh.position.z = depth / 2 + 0.012;
+    group.add(artMesh);
 
-    // Map this mesh to the artwork so clicks can open the modal
-    artworkByMesh.set(art, artwork);
-
-    // Keep Jeff’s spot light behavior (optional)
-    const spot = new THREE.SpotLight(0xffffff, 0.6, 7.5, Math.PI / 7, 0.55, 1.1);
-    spot.position.set(0, 3.6, 1.2);
-    spot.target = art;
-    spot.castShadow = true;
-    spot.shadow.mapSize.set(1024, 1024);
-    group.add(spot);
-    group.add(spot.target);
+    artworkByMesh.set(artMesh, artwork);
 
     framesGroup.add(group);
   }
 
-  // Layout (right wall then left wall)
+  // Layout: right wall first, then left wall
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const y = 2.05;
 
@@ -347,7 +481,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   })();
 
   // ---------------------------
-  // Controls: drag look + wheel move + click to open modal
+  // Controls: drag look + wheel move + click
   // ---------------------------
   let isDragging = false;
   let lastX = 0;
@@ -359,7 +493,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   const basePos = camera.position.clone();
 
-  // For click detection
   let pointerDownX = 0;
   let pointerDownY = 0;
   let pointerDownTime = 0;
@@ -369,7 +502,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   function onPointerDown(e: PointerEvent) {
     isDragging = true;
-
     lastX = e.clientX;
     lastY = e.clientY;
 
@@ -401,19 +533,16 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     } catch {}
     renderer.domElement.style.cursor = 'grab';
 
-    // Treat as click if it was quick and did not move much
     const moved = Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY);
     const dt = performance.now() - pointerDownTime;
     if (moved > 6 || dt > 450) return;
 
-    // Raycast
     const rect = renderer.domElement.getBoundingClientRect();
     ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     ndc.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
 
     raycaster.setFromCamera(ndc, camera);
 
-    // Intersect everything under framesGroup, then find the first object that maps to an artwork
     const hits = raycaster.intersectObjects(framesGroup.children, true);
     if (!hits.length) return;
 
@@ -503,6 +632,8 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
         const mats = Array.isArray(mat) ? mat : [mat];
         for (const m of mats) {
           if ((m as any).map) (m as any).map.dispose?.();
+          if ((m as any).roughnessMap) (m as any).roughnessMap.dispose?.();
+          if ((m as any).normalMap) (m as any).normalMap.dispose?.();
           m.dispose?.();
         }
       }
