@@ -1,35 +1,34 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import VrMuseumEmbed, { type MuseumArtwork } from '@/app/components/VrMuseumEmbed';
+import VrMuseumEmbed, { type MuseumArtwork, type VrMuseumEmbedHandle } from '@/app/components/VrMuseumEmbed';
 
 export default function VrMuseumClient() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedArtwork, setSelectedArtwork] = useState<MuseumArtwork | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
+  const embedRef = useRef<VrMuseumEmbedHandle | null>(null);
 
   // Listen for fullscreen changes
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
+    const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      containerRef.current.requestFullscreen();
-    }
+    if (document.fullscreenElement) document.exitFullscreen();
+    else containerRef.current.requestFullscreen();
   };
 
-  // Your images are in /public, so they are served from "/filename.png"
+  const closeOverlay = () => {
+    setSelectedArtwork(null);
+    embedRef.current?.clearFocus?.();
+  };
+
   const artworks: MuseumArtwork[] = useMemo(
     () => [
       {
@@ -143,7 +142,7 @@ export default function VrMuseumClient() {
                   Virtual Museum
                 </h1>
                 <p className="mt-2 text-[14px] sm:text-[15px] text-black/70 max-w-[780px] leading-relaxed">
-                  Prototype gallery experience. Embedded scene with a simple expand control.
+                  Prototype gallery experience. Click a work to focus and view details.
                 </p>
               </div>
 
@@ -166,7 +165,6 @@ export default function VrMuseumClient() {
                 background: '#0b0b0b',
               }}
             >
-              {/* Fullscreen toggle button */}
               <button
                 type="button"
                 onClick={toggleFullscreen}
@@ -191,100 +189,159 @@ export default function VrMuseumClient() {
                 {isFullscreen ? '✕ Exit' : '⛶ Fullscreen'}
               </button>
 
-              <VrMuseumEmbed artworks={artworks} onArtworkClick={setSelectedArtwork} />
+              <VrMuseumEmbed
+                ref={embedRef}
+                artworks={artworks}
+                onArtworkClick={(art) => {
+                  setSelectedArtwork(art);
+                  embedRef.current?.focusArtwork?.(art.id);
+                }}
+              />
 
-              {/* Artwork detail panel — slides in from the right on click */}
+              {/* Fullscreen artwork overlay */}
               {selectedArtwork && (
                 <div
+                  role="dialog"
+                  aria-modal="true"
+                  onClick={(e) => {
+                    // Clicking the matte closes, clicking the card does not
+                    if (e.target === e.currentTarget) closeOverlay();
+                  }}
                   style={{
                     position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    bottom: 16,
-                    width: 280,
-                    background: 'rgba(10,10,10,0.88)',
-                    backdropFilter: 'blur(18px)',
-                    WebkitBackdropFilter: 'blur(18px)',
-                    borderRadius: 16,
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    padding: '20px 18px',
+                    inset: 0,
+                    zIndex: 20,
+                    background: 'rgba(0,0,0,0.88)',
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: 14,
-                    color: '#fff',
-                    boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
-                    zIndex: 10,
-                    overflowY: 'auto',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 24,
                   }}
                 >
-                  {/* Close button */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedArtwork(null)}
-                      style={{
-                        background: 'rgba(255,255,255,0.1)',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        borderRadius: '50%',
-                        width: 28,
-                        height: 28,
-                        cursor: 'pointer',
-                        color: 'rgba(255,255,255,0.7)',
-                        fontSize: 14,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                      aria-label="Close detail panel"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {/* Artwork thumbnail */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={selectedArtwork.imageUrl}
-                    alt={selectedArtwork.title}
+                  <button
+                    type="button"
+                    onClick={closeOverlay}
                     style={{
-                      width: '100%',
-                      borderRadius: 10,
-                      objectFit: 'cover',
-                      aspectRatio: '4/5',
-                      background: '#1a1a1a',
+                      position: 'absolute',
+                      top: 18,
+                      right: 18,
+                      width: 40,
+                      height: 40,
+                      borderRadius: 999,
+                      border: '1px solid rgba(255,255,255,0.18)',
+                      background: 'rgba(20,20,20,0.7)',
+                      color: 'rgba(255,255,255,0.85)',
+                      cursor: 'pointer',
+                      backdropFilter: 'blur(10px)',
+                      display: 'grid',
+                      placeItems: 'center',
                     }}
-                  />
+                    aria-label="Close"
+                  >
+                    ✕
+                  </button>
 
-                  {/* Artwork info */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.35 }}>
-                      {selectedArtwork.title}
+                  <div
+                    style={{
+                      width: 'min(1180px, 92vw)',
+                      display: 'grid',
+                      gridTemplateColumns: 'minmax(0, 1fr) 340px',
+                      gap: 22,
+                      alignItems: 'start',
+                    }}
+                  >
+                    <div
+                      style={{
+                        borderRadius: 18,
+                        background: 'rgba(10,10,10,0.65)',
+                        border: '1px solid rgba(255,255,255,0.10)',
+                        padding: 18,
+                        boxShadow: '0 18px 70px rgba(0,0,0,0.65)',
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={selectedArtwork.imageUrl}
+                        alt={selectedArtwork.title}
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          maxHeight: '76vh',
+                          objectFit: 'contain',
+                          borderRadius: 12,
+                          display: 'block',
+                          margin: '0 auto',
+                          background: '#0b0b0b',
+                        }}
+                      />
                     </div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', display: 'flex', gap: 8 }}>
-                      <span>{selectedArtwork.artist}</span>
-                      {selectedArtwork.year && (
-                        <>
-                          <span style={{ opacity: 0.35 }}>·</span>
-                          <span>{selectedArtwork.year}</span>
-                        </>
-                      )}
-                    </div>
-                    {selectedArtwork.medium && (
-                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', fontStyle: 'italic' }}>
-                        {selectedArtwork.medium}
+
+                    <div
+                      style={{
+                        borderRadius: 18,
+                        background: 'rgba(12,12,12,0.72)',
+                        border: '1px solid rgba(255,255,255,0.10)',
+                        padding: 18,
+                        color: '#fff',
+                        boxShadow: '0 18px 70px rgba(0,0,0,0.55)',
+                        backdropFilter: 'blur(14px)',
+                      }}
+                    >
+                      <div style={{ fontSize: 18, fontWeight: 650, lineHeight: 1.25 }}>
+                        {selectedArtwork.title}
                       </div>
-                    )}
-                    {selectedArtwork.description && (
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, marginTop: 4 }}>
-                        {selectedArtwork.description}
-                      </p>
-                    )}
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 2, fontFamily: 'monospace' }}>
-                      {selectedArtwork.collection}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 2, fontFamily: 'monospace' }}>
-                      {selectedArtwork.id}
+
+                      <div style={{ marginTop: 10, fontSize: 13, color: 'rgba(255,255,255,0.70)' }}>
+                        {selectedArtwork.artist}
+                        {selectedArtwork.year ? `, ${selectedArtwork.year}` : ''}
+                      </div>
+
+                      <div style={{ marginTop: 16, display: 'grid', gap: 12 }}>
+                        <div>
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: 'rgba(255,255,255,0.45)',
+                              letterSpacing: 0.6,
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            Collection
+                          </div>
+                          <div style={{ marginTop: 4, fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
+                            {selectedArtwork.collection || 'Unassigned'}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div
+                            style={{
+                              fontSize: 11,
+                              color: 'rgba(255,255,255,0.45)',
+                              letterSpacing: 0.6,
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            Catalog ID
+                          </div>
+                          <div
+                            style={{
+                              marginTop: 4,
+                              fontSize: 13,
+                              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+                              color: 'rgba(255,255,255,0.80)',
+                            }}
+                          >
+                            {selectedArtwork.id}
+                          </div>
+                        </div>
+                      </div>
+
+                      {selectedArtwork.description && (
+                        <p style={{ marginTop: 16, fontSize: 12, lineHeight: 1.7, color: 'rgba(255,255,255,0.70)' }}>
+                          {selectedArtwork.description}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
