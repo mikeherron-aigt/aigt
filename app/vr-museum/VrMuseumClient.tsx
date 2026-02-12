@@ -39,6 +39,7 @@ export default function VrMuseumClient() {
         artist: 'John',
         year: '2025',
         imageUrl: 'https://image.artigt.com/JD/CD/2025-JD-CD-0001/2025-JD-CD-0001__full__v02.webp',
+        noFlip: true, // This anchor plane already faces outward
       },
       {
         id: 'CD-0016',
@@ -60,6 +61,7 @@ export default function VrMuseumClient() {
         id: 'CD-0137',
         title: 'When the Moon Remembers Us',
         collection: 'Cosmic Dreams',
+        anchor: 'ARTWORK_19',
         artist: 'John',
         year: '2025',
         imageUrl: 'https://image.artigt.com/JD/CD/2025-JD-CD-0137/2025-JD-CD-0137__full__v02.webp',
@@ -70,6 +72,7 @@ export default function VrMuseumClient() {
         collection: 'Dreams & Wonders',
         artist: 'John',
         year: '2025',
+        anchor: 'ARTWORK_16',
         imageUrl: 'https://image.artigt.com/JD/DW/2025-JD-DW-0018/2025-JD-DW-0018__full__v02.webp',
       },
       {

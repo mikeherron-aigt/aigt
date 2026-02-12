@@ -12,6 +12,10 @@ export type MuseumArtwork = {
   medium?: string;
   description?: string;
   imageUrl: string; // should be "/filename.png" (one leading slash) or an absolute URL
+  /** Override default sequential assignment — e.g. "ARTWORK_07" */
+  anchor?: string;
+  /** Skip the 180° Y-flip (if anchor plane already faces outward) */
+  noFlip?: boolean;
 };
 
 // Dynamic import keeps Three.js / R3F out of the server bundle entirely
@@ -67,6 +71,7 @@ export default function VrMuseumEmbed({ artworks, onArtworkClick }: VrMuseumEmbe
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(255,255,255,0.12)',
             pointerEvents: 'none',
+            zIndex: 1,
           }}
         >
           WASD to move · Drag to look · E or click artwork for details
