@@ -10,7 +10,7 @@ export type VrMuseumSceneHandle = {
 type CreateArgs = {
   container: HTMLDivElement;
   artworks: MuseumArtwork[];
-  // Keep this arg so VrMuseumEmbed does not break, but we will not call it.
+  // Kept for compatibility with your embed, but intentionally not used here (no modal).
   onArtworkClick?: (artwork: MuseumArtwork) => void;
 };
 
@@ -152,7 +152,6 @@ function createStampedFloorTexture(
     return t;
   };
 
-  // Stamp tiles
   for (let y = 0; y < stampsY; y++) {
     for (let x = 0; x < stampsX; x++) {
       const cx = x * cellW + cellW / 2;
@@ -199,8 +198,7 @@ function createStampedFloorTexture(
 export function createVrMuseumScene({
   container,
   artworks,
-  // Intentionally unused to disable modal behavior from the scene.
-  onArtworkClick: _onArtworkClick,
+  onArtworkClick: _onArtworkClick, // intentionally unused
 }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
 
@@ -237,7 +235,7 @@ export function createVrMuseumScene({
   const room = new THREE.Group();
   scene.add(room);
 
-  // Camera rig
+  // Camera rig (yaw body, pitch head)
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 220);
 
   const yawObj = new THREE.Object3D();
@@ -245,6 +243,12 @@ export function createVrMuseumScene({
   yawObj.add(pitchObj);
   pitchObj.add(camera);
   scene.add(yawObj);
+
+  // Ortho inspection camera (not parented to rig)
+  const orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 400);
+
+  // We will render and raycast using this
+  let activeCamera: THREE.Camera = camera;
 
   // Start pose
   yawObj.position.set(0, 1.55, 6.6);
@@ -259,6 +263,7 @@ export function createVrMuseumScene({
   let focusActive = false;
   let focusTime = 0;
   let focusDuration = 1.35;
+  let focusTargetRec: ArtMeshRecord | null = null;
 
   const focusFrom = {
     pos: new THREE.Vector3(),
@@ -274,8 +279,80 @@ export function createVrMuseumScene({
     fov: 35,
   };
 
+  // Inspection state
+  let inspecting = false;
+  let inspectRec: ArtMeshRecord | null = null;
+
+  function updateOrthoFrustumToArtwork(rec: ArtMeshRecord) {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    const aspect = w / Math.max(1, h);
+
+    const fillPct = 0.98;
+
+    const halfHNeeded = (rec.artH / 2) / fillPct;
+    const halfWNeeded = (rec.artW / 2) / fillPct;
+
+    const halfHFromW = halfWNeeded / Math.max(0.0001, aspect);
+
+    const halfH = Math.max(halfHNeeded, halfHFromW);
+    const halfW = halfH * aspect;
+
+    orthoCamera.left = -halfW;
+    orthoCamera.right = halfW;
+    orthoCamera.top = halfH;
+    orthoCamera.bottom = -halfH;
+    orthoCamera.near = 0.01;
+    orthoCamera.far = 400;
+    orthoCamera.updateProjectionMatrix();
+  }
+
+  function enterOrthoInspect(rec: ArtMeshRecord) {
+    inspecting = true;
+    inspectRec = rec;
+
+    const worldPos = new THREE.Vector3();
+    rec.frameGroup.getWorldPosition(worldPos);
+
+    const normalOut = new THREE.Vector3(0, 0, 1)
+      .applyQuaternion(rec.frameGroup.quaternion)
+      .normalize();
+
+    // Distance does not affect scale for ortho, but keep it safely away from the wall.
+    const dist = 10;
+
+    orthoCamera.position.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
+
+    // Align camera up with the artwork up so it is not rotated
+    const artUp = new THREE.Vector3(0, 1, 0)
+      .applyQuaternion(rec.frameGroup.quaternion)
+      .normalize();
+
+    orthoCamera.up.copy(artUp);
+    orthoCamera.lookAt(worldPos);
+
+    updateOrthoFrustumToArtwork(rec);
+
+    activeCamera = orthoCamera;
+  }
+
+  function exitOrthoInspect() {
+    inspecting = false;
+    inspectRec = null;
+    activeCamera = camera;
+  }
+
+  function cancelFocusAndInspect() {
+    focusActive = false;
+    focusTargetRec = null;
+    if (inspecting) exitOrthoInspect();
+  }
+
   function startFocusOnRecord(rec: ArtMeshRecord, opts?: { duration?: number }) {
+    cancelFocusAndInspect();
+
     focusActive = true;
+    focusTargetRec = rec;
     focusTime = 0;
     focusDuration = opts?.duration ?? 1.35;
 
@@ -291,6 +368,7 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
+    // Distance needed for artwork to fill screen (based on vertical FOV + artH)
     const targetFov = 35;
     const vFovRad = (targetFov * Math.PI) / 180;
     const fillPct = 0.92;
@@ -308,6 +386,9 @@ export function createVrMuseumScene({
     focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
     focusTo.pitch = 0;
     focusTo.fov = targetFov;
+
+    // Ensure we are rendering with perspective during the animation
+    activeCamera = camera;
   }
 
   // Materials
@@ -746,6 +827,7 @@ export function createVrMuseumScene({
   (async () => {
     for (let i = 0; i < artworks.length; i++) {
       if (disposed) return;
+
       const p =
         placements[i] ??
         ({
@@ -770,7 +852,7 @@ export function createVrMuseumScene({
   let dragMoved = false;
 
   function onPointerDown(e: PointerEvent) {
-    focusActive = false;
+    cancelFocusAndInspect();
 
     isDragging = true;
     dragMoved = false;
@@ -812,7 +894,7 @@ export function createVrMuseumScene({
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
 
       const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
+      raycaster.setFromCamera(new THREE.Vector2(x, y), activeCamera);
 
       const targets = clickableMeshes.map((m) => m.clickable);
       const hits = raycaster.intersectObjects(targets, true);
@@ -822,7 +904,7 @@ export function createVrMuseumScene({
         const id = (hit.userData?.__artworkId as string) ?? '';
         const rec = clickableMeshes.find((m) => m.artwork.id === id);
         if (rec) {
-          // Zoom only. No modal callback here.
+          // Zoom only (no modal)
           startFocusOnRecord(rec, { duration: 1.35 });
         }
       }
@@ -830,7 +912,7 @@ export function createVrMuseumScene({
   }
 
   function onWheel(e: WheelEvent) {
-    focusActive = false;
+    cancelFocusAndInspect();
 
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObj.quaternion);
     forward.y = 0;
@@ -854,9 +936,13 @@ export function createVrMuseumScene({
   function resize() {
     const w = container.clientWidth;
     const h = container.clientHeight;
+
     renderer.setSize(w, h, false);
-    camera.aspect = w / h;
+
+    camera.aspect = w / Math.max(1, h);
     camera.updateProjectionMatrix();
+
+    if (inspectRec) updateOrthoFrustumToArtwork(inspectRec);
   }
 
   const ro = new ResizeObserver(() => resize());
@@ -870,7 +956,7 @@ export function createVrMuseumScene({
   }
 
   function clearFocus() {
-    focusActive = false;
+    cancelFocusAndInspect();
 
     yawObj.position.set(0, 1.55, 6.6);
     yaw = 0;
@@ -881,6 +967,8 @@ export function createVrMuseumScene({
 
     camera.fov = 55;
     camera.updateProjectionMatrix();
+
+    activeCamera = camera;
   }
 
   function animate() {
@@ -904,10 +992,20 @@ export function createVrMuseumScene({
       camera.fov = lerp(focusFrom.fov, focusTo.fov, e);
       camera.updateProjectionMatrix();
 
-      if (t >= 1) focusActive = false;
+      if (t >= 1) {
+        focusActive = false;
+
+        const rec = focusTargetRec;
+        focusTargetRec = null;
+
+        if (rec) {
+          // Switch to orthographic for perfect flat alignment
+          enterOrthoInspect(rec);
+        }
+      }
     }
 
-    renderer.render(scene, camera);
+    renderer.render(scene, activeCamera);
     requestAnimationFrame(animate);
   }
 
