@@ -226,36 +226,49 @@ export function createVrMuseumScene({
   renderer.domElement.style.display = 'block';
   renderer.domElement.style.cursor = 'grab';
 
+  // Prevent the browser from treating wheel/touchpad over the museum as page scroll
+  // Also improves touch behavior on some browsers
+  renderer.domElement.style.overscrollBehavior = 'contain';
+  (renderer.domElement.style as any).touchAction = 'none';
+
   // Ensure the container can host overlays
   if (!container.style.position) container.style.position = 'relative';
 
   container.appendChild(renderer.domElement);
 
-  // Museum placard overlay
+  // Museum placard overlay (wall plaque style)
   const placard = document.createElement('div');
   placard.style.position = 'absolute';
   placard.style.top = '50%';
-  placard.style.right = '36px';
+  placard.style.right = '34px';
   placard.style.transform = 'translateY(-50%)';
-  placard.style.width = '320px';
-  placard.style.maxWidth = '34vw';
+  placard.style.width = '340px';
+  placard.style.maxWidth = '36vw';
   placard.style.pointerEvents = 'none';
   placard.style.opacity = '0';
   placard.style.transition = 'opacity 220ms ease';
+
   placard.style.fontFamily =
     'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
-  placard.style.color = '#111';
+  placard.style.color = '#1b1b1b';
 
-  placard.style.background = 'rgba(255,255,255,0.92)';
-  placard.style.border = '1px solid rgba(0,0,0,0.10)';
-  placard.style.borderRadius = '14px';
-  placard.style.boxShadow = '0 10px 28px rgba(0,0,0,0.14)';
-  placard.style.backdropFilter = 'blur(8px)';
+  // Plaque look: square corners, no drop shadow, subtle inset bevel
+  placard.style.borderRadius = '0px';
+  placard.style.border = '1px solid rgba(0,0,0,0.30)';
+
+  // Warm museum tone + faint brushed texture
+  placard.style.backgroundImage =
+    'linear-gradient(180deg, rgba(246,244,238,0.98) 0%, rgba(236,233,224,0.98) 100%), repeating-linear-gradient(90deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.00) 3px, rgba(0,0,0,0.00) 6px)';
+
   placard.style.padding = '18px 18px 16px 18px';
   placard.style.lineHeight = '1.25';
 
+  // Inner bevel / engraved feel
+  placard.style.boxShadow =
+    'inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -2px 6px rgba(0,0,0,0.12)';
+
   placard.innerHTML = `
-    <div style="font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: rgba(0,0,0,.55); margin-bottom: 10px;">
+    <div style="font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: rgba(0,0,0,.55); margin-bottom: 12px;">
       Museum Label
     </div>
 
@@ -267,16 +280,16 @@ export function createVrMuseumScene({
       <span style="font-style: italic;">Artwork Title</span>
     </div>
 
-    <div style="height:1px; background: rgba(0,0,0,.08); margin: 12px 0;"></div>
+    <div style="height:1px; background: rgba(0,0,0,.18); margin: 12px 0;"></div>
 
     <div style="display:grid; grid-template-columns: 92px 1fr; gap: 8px 12px; font-size: 13px; color: rgba(0,0,0,.78);">
-      <div style="color: rgba(0,0,0,.50);">Collection</div>
+      <div style="color: rgba(0,0,0,.55);">Collection</div>
       <div data-collection>Collection Name</div>
 
-      <div style="color: rgba(0,0,0,.50);">Title</div>
+      <div style="color: rgba(0,0,0,.55);">Title</div>
       <div data-title2>Artwork Title</div>
 
-      <div style="color: rgba(0,0,0,.50);">Catalog ID</div>
+      <div style="color: rgba(0,0,0,.55);">Catalog ID</div>
       <div data-id>ABC-0001</div>
     </div>
   `;
@@ -370,16 +383,38 @@ export function createVrMuseumScene({
   let inspecting = false;
   let inspectRec: ArtMeshRecord | null = null;
 
-  function updateOrthoFrustumToArtwork(rec: ArtMeshRecord) {
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    const aspect = w / Math.max(1, h);
+  // Layout knobs for inspect view
+  const PLAQUE_SAFE_W_PX = 380; // reserve space for plaque on the right
+  const VIEW_MARGIN_PX = 34; // additional breathing room
+  const ART_SIDE_SHIFT_FRAC = 0.40; // how far left the artwork is placed (0.30..0.48)
 
-    const fillPct = 0.98;
+  function getVisibleAspectForArt() {
+    const w = Math.max(1, container.clientWidth);
+    const h = Math.max(1, container.clientHeight);
+
+    // Effective area the artwork can occupy (leave right side for plaque)
+    const usableW = Math.max(1, w - PLAQUE_SAFE_W_PX - VIEW_MARGIN_PX);
+    const usableH = Math.max(1, h - VIEW_MARGIN_PX);
+
+    return {
+      aspect: usableW / usableH,
+      usableW,
+      usableH,
+      w,
+      h,
+    };
+  }
+
+  function updateOrthoFrustumToArtwork(rec: ArtMeshRecord) {
+    const { aspect } = getVisibleAspectForArt();
+
+    // Ensure full artwork fits in usable area
+    const fillPct = 0.96;
 
     const halfHNeeded = (rec.artH / 2) / fillPct;
     const halfWNeeded = (rec.artW / 2) / fillPct;
 
+    // In ortho, width = height * aspect
     const halfHFromW = halfWNeeded / Math.max(0.0001, aspect);
 
     const halfH = Math.max(halfHNeeded, halfHFromW);
@@ -405,32 +440,29 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    // "Right" direction in the artwork plane
     const artRight = new THREE.Vector3(1, 0, 0)
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
-
-    // Shift the view so the artwork sits left, leaving room for the placard on the right
-    const sideShift = rec.artW * 0.55;
-
-    // Distance does not affect scale in ortho, but keep it far enough for clipping safety
-    const dist = 10;
-
-    const target = worldPos.clone().add(artRight.clone().multiplyScalar(sideShift));
-
-    orthoCamera.position.copy(target).add(normalOut.clone().multiplyScalar(dist));
 
     const artUp = new THREE.Vector3(0, 1, 0)
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
+    // Shift target to the right so the artwork appears left on screen
+    const sideShift = rec.artW * ART_SIDE_SHIFT_FRAC;
+
+    // Distance does not affect scale in ortho, keep it safe for clipping
+    const dist = 10;
+
+    const target = worldPos.clone().add(artRight.clone().multiplyScalar(sideShift));
+
+    orthoCamera.position.copy(target).add(normalOut.clone().multiplyScalar(dist));
     orthoCamera.up.copy(artUp);
     orthoCamera.lookAt(target);
 
     updateOrthoFrustumToArtwork(rec);
 
     activeCamera = orthoCamera;
-
     showPlacard(rec.artwork);
   }
 
@@ -1007,7 +1039,12 @@ export function createVrMuseumScene({
     }
   }
 
+  // Wheel movement inside museum only when cursor is over renderer
   function onWheel(e: WheelEvent) {
+    // Stop the browser from scrolling the page while interacting with the museum
+    e.preventDefault();
+    e.stopPropagation();
+
     cancelFocusAndInspect();
 
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObj.quaternion);
@@ -1026,7 +1063,9 @@ export function createVrMuseumScene({
   renderer.domElement.addEventListener('pointermove', onPointerMove);
   renderer.domElement.addEventListener('pointerup', onPointerUp);
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
-  renderer.domElement.addEventListener('wheel', onWheel, { passive: true });
+
+  // IMPORTANT: passive must be false or preventDefault will be ignored
+  renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
 
   // Resize
   function resize() {
