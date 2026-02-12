@@ -27,6 +27,16 @@ function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
+function mulberry32(seed: number) {
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6d2b79f5;
+    let x = Math.imul(t ^ (t >>> 15), 1 | t);
+    x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 function normalizeImageUrl(url: string) {
   if (!url) return url;
   if (
@@ -38,6 +48,160 @@ function normalizeImageUrl(url: string) {
     return url;
   }
   return url.startsWith('/') ? url : `/${url}`;
+}
+
+/**
+ * Build a single large floor texture by stamping the source image into a canvas.
+ * This avoids visible tiling seams from RepeatWrapping.
+ */
+function createStampedFloorTexture(
+  image: HTMLImageElement,
+  opts?: {
+    size?: number; // canvas size (power of two recommended)
+    stamps?: number; // how many tiles across/down
+    seed?: number;
+    overlapPct?: number; // overlap between stamps
+    toneJitter?: number; // small brightness variation per stamp
+    jitterPct?: number; // small positional jitter
+  }
+) {
+  const size = opts?.size ?? 2048;
+  const stamps = opts?.stamps ?? 6;
+  const seed = opts?.seed ?? 424242;
+  const overlapPct = opts?.overlapPct ?? 0.10;
+  const toneJitter = opts?.toneJitter ?? 0.10;
+  const jitterPct = opts?.jitterPct ?? 0.06;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas 2D context unavailable');
+
+  // Base warm fill
+  ctx.fillStyle = '#d3b78b';
+  ctx.fillRect(0, 0, size, size);
+
+  const rnd = mulberry32(seed);
+  const cell = size / stamps;
+  const overlap = cell * overlapPct;
+
+  // Helper to draw a stamp with soft edges so overlaps blend
+  const drawFeatheredStamp = (
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    dx: number,
+    dy: number,
+    dw: number,
+    dh: number
+  ) => {
+    // Draw stamp into an offscreen canvas so we can feather its alpha
+    const oc = document.createElement('canvas');
+    oc.width = Math.max(1, Math.floor(dw));
+    oc.height = Math.max(1, Math.floor(dh));
+    const octx = oc.getContext('2d');
+    if (!octx) return;
+
+    octx.drawImage(image, sx, sy, sw, sh, 0, 0, oc.width, oc.height);
+
+    // Feather alpha at the edges
+    const feather = Math.floor(Math.min(oc.width, oc.height) * 0.06);
+    octx.globalCompositeOperation = 'destination-in';
+
+    // left
+    {
+      const g = octx.createLinearGradient(0, 0, feather, 0);
+      g.addColorStop(0, 'rgba(255,255,255,0)');
+      g.addColorStop(1, 'rgba(255,255,255,1)');
+      octx.fillStyle = g;
+      octx.fillRect(0, 0, feather, oc.height);
+    }
+    // right
+    {
+      const g = octx.createLinearGradient(oc.width - feather, 0, oc.width, 0);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      octx.fillStyle = g;
+      octx.fillRect(oc.width - feather, 0, feather, oc.height);
+    }
+    // top
+    {
+      const g = octx.createLinearGradient(0, 0, 0, feather);
+      g.addColorStop(0, 'rgba(255,255,255,0)');
+      g.addColorStop(1, 'rgba(255,255,255,1)');
+      octx.fillStyle = g;
+      octx.fillRect(0, 0, oc.width, feather);
+    }
+    // bottom
+    {
+      const g = octx.createLinearGradient(0, oc.height - feather, 0, oc.height);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      octx.fillStyle = g;
+      octx.fillRect(0, oc.height - feather, oc.width, feather);
+    }
+
+    octx.globalCompositeOperation = 'source-over';
+
+    // Draw into final canvas
+    ctx.drawImage(oc, dx, dy, dw, dh);
+  };
+
+  for (let y = 0; y < stamps; y++) {
+    for (let x = 0; x < stamps; x++) {
+      const cx = x * cell + cell / 2;
+      const cy = y * cell + cell / 2;
+
+      // Rotation in 90 degree steps helps hide obvious repetition
+      const rotSteps = Math.floor(rnd() * 4);
+      const rot = rotSteps * (Math.PI / 2);
+
+      // Slight per-stamp brightness variation
+      const b = 1 - toneJitter / 2 + rnd() * toneJitter;
+
+      // small jitter
+      const jx = (rnd() - 0.5) * cell * jitterPct;
+      const jy = (rnd() - 0.5) * cell * jitterPct;
+
+      const w = cell + overlap * 2;
+      const h = cell + overlap * 2;
+
+      ctx.save();
+      ctx.translate(cx + jx, cy + jy);
+      ctx.rotate(rot);
+
+      // Stamp the full source image into each cell.
+      // If your source has obvious borders, we can crop here instead.
+      const dx = -w / 2;
+      const dy = -h / 2;
+
+      // Draw with feathering so overlaps blend
+      drawFeatheredStamp(0, 0, image.width, image.height, dx, dy, w, h);
+
+      // Multiply subtle tone tint
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = `rgba(${Math.floor(255 * b)},${Math.floor(255 * b)},${Math.floor(
+        255 * b
+      )},0.22)`;
+      ctx.fillRect(dx, dy, w, h);
+      ctx.globalCompositeOperation = 'source-over';
+
+      ctx.restore();
+    }
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.ClampToEdgeWrapping;
+  tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.anisotropy = 16;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.needsUpdate = true;
+  return tex;
 }
 
 export function createVrMuseumScene({
@@ -124,32 +288,37 @@ export function createVrMuseumScene({
   floor.receiveShadow = true;
   room.add(floor);
 
-  const floorLoader = new THREE.TextureLoader();
-  floorLoader.load(
-    '/floor.png',
-    (t) => {
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.wrapS = THREE.RepeatWrapping;
-      t.wrapT = THREE.RepeatWrapping;
+  // Seam-free stamped floor from /floor.png
+  const floorImg = new Image();
+  floorImg.src = '/floor.png';
+  floorImg.crossOrigin = 'anonymous';
+  floorImg.onload = () => {
+    if (disposed) return;
 
-      // Adjust these to scale the wood pattern
-      t.repeat.set(roomW / 2.2, roomD / 2.6);
+    const stamped = createStampedFloorTexture(floorImg, {
+      size: 2048,
+      stamps: 6,
+      seed: 424242,
+      overlapPct: 0.12,
+      toneJitter: 0.10,
+      jitterPct: 0.05,
+    });
 
-      t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 16);
-      t.minFilter = THREE.LinearMipmapLinearFilter;
-      t.magFilter = THREE.LinearFilter;
-      t.needsUpdate = true;
+    // Scale the stamped texture across the floor by adjusting UV repeat on the material map
+    // Because this is ClampToEdge, we "zoom" by using repeat < 1 and offsets.
+    // Easier: set repeat to 1 and adjust texture transform via the floor geometry UVs.
+    // For now, keep it 1:1 and tune how the stamp looks using stamps/size above.
+    stamped.repeat.set(1, 1);
+    stamped.offset.set(0, 0);
 
-      floorMat.map = t;
-      floorMat.needsUpdate = true;
-    },
-    undefined,
-    () => {
-      floorMat.color = new THREE.Color('#d6d6d6');
-      floorMat.map = null;
-      floorMat.needsUpdate = true;
-    }
-  );
+    floorMat.map = stamped;
+    floorMat.needsUpdate = true;
+  };
+  floorImg.onerror = () => {
+    floorMat.color = new THREE.Color('#d6d6d6');
+    floorMat.map = null;
+    floorMat.needsUpdate = true;
+  };
 
   // Ceiling
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), ceilingMat);
@@ -319,8 +488,7 @@ export function createVrMuseumScene({
     windowWall.add(h);
   }
 
-  // FIX: Stable outside view.
-  // A fixed plane outside the window makes the view consistent and stops the "spinning" feel.
+  // Stable outside view
   const vistaLoader = new THREE.TextureLoader();
   const vistaTex = vistaLoader.load('/hamptons.jpg', (t) => {
     t.colorSpace = THREE.SRGBColorSpace;
@@ -337,7 +505,6 @@ export function createVrMuseumScene({
     toneMapped: false,
   });
 
-  // Oversize plane so it fills the window no matter where you stand
   const vista = new THREE.Mesh(
     new THREE.PlaneGeometry(openingW * 3.0, openingH * 3.0),
     vistaMat
@@ -345,11 +512,11 @@ export function createVrMuseumScene({
 
   const windowCenterY = openingBottom + openingH / 2;
   vista.position.set(0, windowCenterY, backZ - 40);
-  vista.rotation.y = Math.PI; // face inward toward the camera
+  vista.rotation.y = Math.PI;
   vista.renderOrder = -10;
   scene.add(vista);
 
-  // Optional outside depth, pushed DOWN so it does not look like the room floor continues
+  // Optional outside depth, pushed down
   const outsideGroup = new THREE.Group();
   scene.add(outsideGroup);
 
