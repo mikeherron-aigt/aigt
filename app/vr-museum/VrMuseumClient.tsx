@@ -11,7 +11,6 @@ export default function VrMuseumClient() {
   const containerRef = useRef<HTMLDivElement>(null);
   const embedRef = useRef<VrMuseumEmbedHandle | null>(null);
 
-  // Listen for fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -19,9 +18,10 @@ export default function VrMuseumClient() {
   }, []);
 
   const toggleFullscreen = () => {
-    if (!containerRef.current) return;
+    const el = containerRef.current;
+    if (!el) return;
     if (document.fullscreenElement) document.exitFullscreen();
-    else containerRef.current.requestFullscreen();
+    else el.requestFullscreen();
   };
 
   const closeOverlay = () => {
@@ -29,103 +29,50 @@ export default function VrMuseumClient() {
     embedRef.current?.clearFocus?.();
   };
 
+  // ESC closes overlay
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedArtwork) closeOverlay();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [selectedArtwork]);
+
+  // Prevent scroll while overlay is open
+  useEffect(() => {
+    const onWheel = (e: WheelEvent) => {
+      if (selectedArtwork) e.preventDefault();
+    };
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel as any);
+  }, [selectedArtwork]);
+
+  // Replace this with your real data if you have it already
   const artworks: MuseumArtwork[] = useMemo(
     () => [
       {
-        id: 'CD-0001',
-        title: 'The Geometry of Forever',
-        collection: 'Cosmic Dreams',
-        artist: 'John',
-        year: '2025',
-        imageUrl: 'https://image.artigt.com/JD/CD/2025-JD-CD-0001/2025-JD-CD-0001__full__v02.webp',
-      },
-      {
-        id: 'CD-0016',
-        title: 'The Geometry of Her Becoming',
-        collection: 'Cosmic Dreams',
-        artist: 'John',
-        year: '2025',
-        imageUrl: 'https://image.artigt.com/JD/CD/2025-JD-CD-0016/2025-JD-CD-0016__full__v02.webp',
-      },
-      {
-        id: 'CD-0095',
-        title: 'She Was the Forest I Kept Returning To',
-        collection: 'Cosmic Dreams',
-        artist: 'John',
-        year: '2025',
-        imageUrl: 'https://image.artigt.com/JD/CD/2025-JD-CD-0095/2025-JD-CD-0095__full__v02.webp',
-      },
-      {
-        id: 'CD-0137',
-        title: 'When the Moon Remembers Us',
-        collection: 'Cosmic Dreams',
-        artist: 'John',
-        year: '2025',
-        imageUrl: 'https://image.artigt.com/JD/CD/2025-JD-CD-0137/2025-JD-CD-0137__full__v02.webp',
-      },
-      {
-        id: 'DW-0018',
-        title: 'Quantum Shift',
-        collection: 'Dreams & Wonders',
-        artist: 'John',
-        year: '2025',
-        imageUrl: 'https://image.artigt.com/JD/DW/2025-JD-DW-0018/2025-JD-DW-0018__full__v02.webp',
-      },
-      {
-        id: 'AG-0009',
-        title: 'Quantum Multiverse',
-        collection: 'American Graffiti',
-        artist: 'John',
-        year: '2024',
-        imageUrl: 'https://image.artigt.com/JD/AG/2024-JD-AG-0009/2024-JD-AG-0009__full__v02.webp',
-      },
-      {
         id: 'AG-0025',
         title: 'The Orbit of Many Souls',
-        collection: 'American Graffiti',
         artist: 'John',
         year: '2024',
+        collection: 'American Graffiti',
         imageUrl: 'https://image.artigt.com/JD/AG/2024-JD-AG-0025/2024-JD-AG-0025__full__v02.webp',
       },
       {
         id: 'AG-0037',
         title: 'The Molten Geometry of Street Myth',
-        collection: 'American Graffiti',
         artist: 'John',
         year: '2024',
+        collection: 'American Graffiti',
         imageUrl: 'https://image.artigt.com/JD/AG/2024-JD-AG-0037/2024-JD-AG-0037__full__v02.webp',
       },
       {
         id: 'DW-0010',
         title: 'Butterfly Kisses in White',
-        collection: 'Dreams & Wonders',
         artist: 'John',
         year: '2025',
+        collection: 'Dreams & Wonders',
         imageUrl: 'https://image.artigt.com/JD/DW/2025-JD-DW-0010/2025-JD-DW-0010__full__v02.webp',
-      },
-      {
-        id: 'MM-0016',
-        title: 'No Ordinary Love',
-        collection: 'A Miracle in the Making',
-        artist: 'John',
-        year: '2024',
-        imageUrl: 'https://image.artigt.com/JD/MM/2024-JD-MM-0016/2024-JD-MM-0016__full__v02.webp',
-      },
-      {
-        id: 'MM-0018',
-        title: 'Breaking Through the Lattice of Perception',
-        collection: 'A Miracle in the Making',
-        artist: 'John',
-        year: '2024',
-        imageUrl: 'https://image.artigt.com/JD/MM/2024-JD-MM-0018/2024-JD-MM-0018__full__v02.webp',
-      },
-      {
-        id: 'MM-0004',
-        title: 'Mother Nature',
-        collection: 'A Miracle in the Making',
-        artist: 'John',
-        year: '2024',
-        imageUrl: 'https://image.artigt.com/JD/MM/2024-JD-MM-0004/2024-JD-MM-0004__full__v02.webp',
       },
     ],
     []
@@ -169,7 +116,7 @@ export default function VrMuseumClient() {
                 type="button"
                 onClick={toggleFullscreen}
                 style={{
-                  position: 'fixed',
+                  position: 'absolute',
                   top: 16,
                   right: 16,
                   padding: '8px 14px',
@@ -198,115 +145,127 @@ export default function VrMuseumClient() {
                 }}
               />
 
-              {/* Fullscreen artwork overlay */}
-           {selectedArtwork && (
-  <div
-    role="dialog"
-    aria-modal="true"
-    onClick={(e) => {
-      if (e.target === e.currentTarget) closeOverlay();
-    }}
-    style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 9999,
-      background: 'rgba(0,0,0,0.88)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 24,
-    }}
-  >
-    <button
-      type="button"
-      onClick={closeOverlay}
-      style={{
-        position: 'absolute',
-        top: 24,
-        right: 24,
-        width: 44,
-        height: 44,
-        borderRadius: 999,
-        border: '1px solid rgba(255,255,255,0.2)',
-        background: 'rgba(20,20,20,0.8)',
-        color: '#fff',
-        cursor: 'pointer',
-        backdropFilter: 'blur(10px)',
-        fontSize: 18,
-      }}
-      aria-label="Close"
-    >
-      ✕
-    </button>
+              {selectedArtwork && (
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget) closeOverlay();
+                  }}
+                  style={{
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: 9999,
+                    background: 'rgba(0,0,0,0.88)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 24,
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={closeOverlay}
+                    style={{
+                      position: 'absolute',
+                      top: 24,
+                      right: 24,
+                      width: 44,
+                      height: 44,
+                      borderRadius: 999,
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: 'rgba(20,20,20,0.8)',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      backdropFilter: 'blur(10px)',
+                      fontSize: 18,
+                      display: 'grid',
+                      placeItems: 'center',
+                    }}
+                    aria-label="Close"
+                  >
+                    ✕
+                  </button>
 
-    <div
-      style={{
-        width: 'min(1200px, 94vw)',
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 360px',
-        gap: 28,
-        alignItems: 'start',
-      }}
-    >
-      <div
-        style={{
-          borderRadius: 20,
-          background: '#0d0d0d',
-          padding: 20,
-          boxShadow: '0 30px 100px rgba(0,0,0,0.6)',
-        }}
-      >
-        <img
-          src={selectedArtwork.imageUrl}
-          alt={selectedArtwork.title}
-          style={{
-            width: '100%',
-            height: 'auto',
-            maxHeight: '82vh',
-            objectFit: 'contain',
-            borderRadius: 14,
-            display: 'block',
-            margin: '0 auto',
-          }}
-        />
-      </div>
+                  <div
+                    style={{
+                      width: 'min(1200px, 94vw)',
+                      display: 'grid',
+                      gridTemplateColumns: 'minmax(0, 1fr) 360px',
+                      gap: 28,
+                      alignItems: 'start',
+                    }}
+                  >
+                    <div
+                      style={{
+                        borderRadius: 20,
+                        background: '#0d0d0d',
+                        padding: 20,
+                        boxShadow: '0 30px 100px rgba(0,0,0,0.6)',
+                        border: '1px solid rgba(255,255,255,0.10)',
+                      }}
+                    >
+                      <img
+                        src={selectedArtwork.imageUrl}
+                        alt={selectedArtwork.title}
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          maxHeight: '82vh',
+                          objectFit: 'contain',
+                          borderRadius: 14,
+                          display: 'block',
+                          margin: '0 auto',
+                          background: '#0b0b0b',
+                        }}
+                      />
+                    </div>
 
-      <div
-        style={{
-          borderRadius: 20,
-          background: 'rgba(18,18,18,0.85)',
-          padding: 22,
-          color: '#fff',
-          backdropFilter: 'blur(14px)',
-        }}
-      >
-        <h2 style={{ fontSize: 20, fontWeight: 600 }}>
-          {selectedArtwork.title}
-        </h2>
+                    <div
+                      style={{
+                        borderRadius: 20,
+                        background: 'rgba(18,18,18,0.85)',
+                        padding: 22,
+                        color: '#fff',
+                        backdropFilter: 'blur(14px)',
+                        border: '1px solid rgba(255,255,255,0.10)',
+                        boxShadow: '0 30px 100px rgba(0,0,0,0.45)',
+                      }}
+                    >
+                      <div style={{ fontSize: 20, fontWeight: 620, lineHeight: 1.2 }}>
+                        {selectedArtwork.title}
+                      </div>
 
-        <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.7)' }}>
-          {selectedArtwork.artist}
-          {selectedArtwork.year ? `, ${selectedArtwork.year}` : ''}
-        </div>
+                      <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.70)' }}>
+                        {selectedArtwork.artist}
+                        {selectedArtwork.year ? `, ${selectedArtwork.year}` : ''}
+                      </div>
 
-        <div style={{ marginTop: 24 }}>
-          <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1 }}>
-            COLLECTION
-          </div>
-          <div style={{ marginTop: 4 }}>
-            {selectedArtwork.collection || 'Unassigned'}
-          </div>
-        </div>
+                      <div style={{ marginTop: 22 }}>
+                        <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1 }}>COLLECTION</div>
+                        <div style={{ marginTop: 4 }}>{selectedArtwork.collection || 'Unassigned'}</div>
+                      </div>
 
-        <div style={{ marginTop: 20 }}>
-          <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1 }}>
-            CATALOG ID
-          </div>
-          <div style={{ marginTop: 4, fontFamily: 'monospace' }}>
-            {selectedArtwork.id}
+                      <div style={{ marginTop: 18 }}>
+                        <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1 }}>CATALOG ID</div>
+                        <div style={{ marginTop: 4, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>
+                          {selectedArtwork.id}
+                        </div>
+                      </div>
+
+                      {selectedArtwork.description && (
+                        <p style={{ marginTop: 18, fontSize: 12, lineHeight: 1.65, color: 'rgba(255,255,255,0.70)' }}>
+                          {selectedArtwork.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-)}
+  );
+}
