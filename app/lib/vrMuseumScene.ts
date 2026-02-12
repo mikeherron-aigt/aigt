@@ -100,23 +100,19 @@ function createStampedFloorTexture(
       const cy = y * cellH + cellH / 2;
 
       // 90-degree rotations hide repetition without warping texture
-      const rotSteps = Math.floor(rnd() * 4);
-      const rot = rotSteps * (Math.PI / 2);
+    ctx.save();
+ctx.translate(cx + jx, cy + jy);
 
-      // small positional jitter
-      const jx = (rnd() - 0.5) * cellW * jitterPct;
-      const jy = (rnd() - 0.5) * cellH * jitterPct;
+// Keep plank direction consistent (no 90° rotation)
+// Optional variation: mirror flip (does NOT rotate the planks)
+const flipX = rnd() < 0.5 ? -1 : 1;
+const flipY = 1; // keep Y normal to avoid vertical-looking artifacts
+ctx.scale(flipX, flipY);
 
-      const w = cellW + overlapW * 2;
-      const h = cellH + overlapH * 2;
+ctx.drawImage(image, -w / 2, -h / 2, w, h);
 
-      ctx.save();
-      ctx.translate(cx + jx, cy + jy);
-      ctx.rotate(rot);
+ctx.restore();
 
-      ctx.drawImage(image, -w / 2, -h / 2, w, h);
-
-      ctx.restore();
     }
   }
   ctx.globalAlpha = 1;
