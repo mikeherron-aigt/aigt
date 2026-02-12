@@ -10,6 +10,7 @@ export type VrMuseumSceneHandle = {
 type CreateArgs = {
   container: HTMLDivElement;
   artworks: MuseumArtwork[];
+  // Keep this arg so VrMuseumEmbed does not break, but we will not call it.
   onArtworkClick?: (artwork: MuseumArtwork) => void;
 };
 
@@ -90,7 +91,7 @@ function createStampedFloorTexture(
 
   const rnd = mulberry32(seed);
 
-  // Subtle warm base (kept faint so it doesn't wash out detail)
+  // Subtle warm base
   ctx.fillStyle = '#d8c29a';
   ctx.fillRect(0, 0, size, size);
 
@@ -118,14 +119,14 @@ function createStampedFloorTexture(
     const tctx = t.getContext('2d');
     if (!tctx) return null;
 
-    // Draw image (optionally mirrored) on temp canvas
+    // Draw image (optionally mirrored)
     tctx.save();
     tctx.translate(w / 2, h / 2);
     tctx.scale(flipX, 1);
     tctx.drawImage(src, -w / 2, -h / 2, w, h);
     tctx.restore();
 
-    // Multiply an alpha mask with feathered edges
+    // Feather alpha edges
     tctx.globalCompositeOperation = 'destination-in';
 
     const fx = Math.min(0.49, feather / w);
@@ -151,7 +152,7 @@ function createStampedFloorTexture(
     return t;
   };
 
-  // Stamp tiles with jitter and feathering (no 90-degree rotation)
+  // Stamp tiles
   for (let y = 0; y < stampsY; y++) {
     for (let x = 0; x < stampsX; x++) {
       const cx = x * cellW + cellW / 2;
@@ -172,7 +173,7 @@ function createStampedFloorTexture(
 
   ctx.globalAlpha = 1;
 
-  // Subtle grain/noise so nothing looks too procedurally perfect
+  // Subtle grain
   const img = ctx.getImageData(0, 0, size, size);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4) {
@@ -198,7 +199,8 @@ function createStampedFloorTexture(
 export function createVrMuseumScene({
   container,
   artworks,
-  onArtworkClick,
+  // Intentionally unused to disable modal behavior from the scene.
+  onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
 
@@ -225,8 +227,6 @@ export function createVrMuseumScene({
 
   // Scene
   const scene = new THREE.Scene();
-
-  // Background color (not camera-relative)
   scene.background = new THREE.Color('#cfe7ff');
 
   // Room sizing
@@ -237,7 +237,7 @@ export function createVrMuseumScene({
   const room = new THREE.Group();
   scene.add(room);
 
-  // FPS camera rig: yaw (body), pitch (head), camera (eyes)
+  // Camera rig
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 220);
 
   const yawObj = new THREE.Object3D();
@@ -284,29 +284,23 @@ export function createVrMuseumScene({
     focusFrom.pitch = pitch;
     focusFrom.fov = camera.fov;
 
-    // World position of artwork center
     const worldPos = new THREE.Vector3();
     rec.frameGroup.getWorldPosition(worldPos);
 
-    // The plane normal that points out from the wall
     const normalOut = new THREE.Vector3(0, 0, 1)
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    // Distance needed for artwork to fill screen (based on vertical FOV + artH)
     const targetFov = 35;
     const vFovRad = (targetFov * Math.PI) / 180;
     const fillPct = 0.92;
-    const neededDist = (rec.artH / 2) / Math.tan(vFovRad / 2) / fillPct;
 
-    // Clamp so we do not clip into the wall or end too far away
+    const neededDist = (rec.artH / 2) / Math.tan(vFovRad / 2) / fillPct;
     const dist = clamp(neededDist, 1.25, 4.5);
 
-    // Target position in front of the art
     focusTo.pos.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
     focusTo.pos.y = 1.55;
 
-    // Target yaw to face the art
     const lookDir = worldPos.clone().sub(focusTo.pos);
     lookDir.y = 0;
     lookDir.normalize();
@@ -341,7 +335,7 @@ export function createVrMuseumScene({
   floor.receiveShadow = true;
   room.add(floor);
 
-  // Seam-free stamped floor from /floor.png
+  // Stamped floor from /floor.png
   const floorImg = new Image();
   floorImg.src = '/floor.png';
   floorImg.crossOrigin = 'anonymous';
@@ -828,8 +822,8 @@ export function createVrMuseumScene({
         const id = (hit.userData?.__artworkId as string) ?? '';
         const rec = clickableMeshes.find((m) => m.artwork.id === id);
         if (rec) {
+          // Zoom only. No modal callback here.
           startFocusOnRecord(rec, { duration: 1.35 });
-          onArtworkClick?.(rec.artwork);
         }
       }
     }
