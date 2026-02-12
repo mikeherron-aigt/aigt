@@ -52,7 +52,14 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   // A little realism without going crazy
-  renderer.physicallyCorrectLights = true;
+  // Works across Three versions and avoids TS typing mismatch
+(renderer as any).physicallyCorrectLights = true;
+
+// Newer Three builds sometimes use this flag instead
+if ('useLegacyLights' in renderer) {
+  (renderer as any).useLegacyLights = false;
+}
+
 
   renderer.domElement.style.width = '100%';
   renderer.domElement.style.height = '100%';
