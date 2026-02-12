@@ -23,10 +23,6 @@ function clamp(v: number, min: number, max: number) {
   return Math.max(min, Math.min(max, v));
 }
 
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
-}
-
 function mulberry32(seed: number) {
   let t = seed >>> 0;
   return () => {
@@ -52,7 +48,7 @@ function normalizeImageUrl(url: string) {
 
 /**
  * Build a single large floor texture by stamping the source image into a canvas.
- * This avoids visible tiling seams from RepeatWrapping, while keeping wood detail.
+ * Uses feathered-edge stamps so the stamp grid disappears.
  */
 function createStampedFloorTexture(
   image: HTMLImageElement,
@@ -70,8 +66,10 @@ function createStampedFloorTexture(
   const stampsX = opts?.stampsX ?? 6;
   const stampsY = opts?.stampsY ?? 6;
   const seed = opts?.seed ?? 424242;
-  const overlapPct = opts?.overlapPct ?? 0.12;
-  const jitterPct = opts?.jitterPct ?? 0.03;
+
+  // Higher defaults than before, because feathering likes overlap + jitter
+  const overlapPct = opts?.overlapPct ?? 0.30;
+  const jitterPct = opts?.jitterPct ?? 0.06;
   const alpha = opts?.alpha ?? 0.95;
 
   const canvas = document.createElement('canvas');
@@ -92,35 +90,81 @@ function createStampedFloorTexture(
   const overlapW = cellW * overlapPct;
   const overlapH = cellH * overlapPct;
 
-  // Stamp tiles with slight overlap and mirroring (no 90° rotation)
-  ctx.globalAlpha = alpha;
+  const drawW = cellW + overlapW;
+  const drawH = cellH + overlapH;
 
+  // Feather amount in pixels inside the stamp
+  const featherPx = Math.max(18, Math.floor(Math.min(drawW, drawH) * 0.08));
+
+  const featherStamp = (
+    src: HTMLImageElement,
+    w: number,
+    h: number,
+    feather: number,
+    flipX: number
+  ) => {
+    const t = document.createElement('canvas');
+    t.width = Math.max(2, Math.ceil(w));
+    t.height = Math.max(2, Math.ceil(h));
+
+    const tctx = t.getContext('2d');
+    if (!tctx) return null;
+
+    // Draw image (optionally mirrored) on temp canvas
+    tctx.save();
+    tctx.translate(w / 2, h / 2);
+    tctx.scale(flipX, 1);
+    tctx.drawImage(src, -w / 2, -h / 2, w, h);
+    tctx.restore();
+
+    // Multiply an alpha mask with feathered edges
+    tctx.globalCompositeOperation = 'destination-in';
+
+    const fx = Math.min(0.49, feather / w);
+    const fy = Math.min(0.49, feather / h);
+
+    const gx = tctx.createLinearGradient(0, 0, w, 0);
+    gx.addColorStop(0, 'rgba(0,0,0,0)');
+    gx.addColorStop(fx, 'rgba(0,0,0,1)');
+    gx.addColorStop(1 - fx, 'rgba(0,0,0,1)');
+    gx.addColorStop(1, 'rgba(0,0,0,0)');
+    tctx.fillStyle = gx;
+    tctx.fillRect(0, 0, w, h);
+
+    const gy = tctx.createLinearGradient(0, 0, 0, h);
+    gy.addColorStop(0, 'rgba(0,0,0,0)');
+    gy.addColorStop(fy, 'rgba(0,0,0,1)');
+    gy.addColorStop(1 - fy, 'rgba(0,0,0,1)');
+    gy.addColorStop(1, 'rgba(0,0,0,0)');
+    tctx.fillStyle = gy;
+    tctx.fillRect(0, 0, w, h);
+
+    tctx.globalCompositeOperation = 'source-over';
+    return t;
+  };
+
+  // Stamp tiles with jitter and feathering (no 90-degree rotation)
   for (let y = 0; y < stampsY; y++) {
     for (let x = 0; x < stampsX; x++) {
       const cx = x * cellW + cellW / 2;
       const cy = y * cellH + cellH / 2;
 
-      const w = cellW + overlapW;
-      const h = cellH + overlapH;
-
       const jx = (rnd() - 0.5) * cellW * jitterPct;
       const jy = (rnd() - 0.5) * cellH * jitterPct;
 
-      ctx.save();
-      ctx.translate(cx + jx, cy + jy);
-
-      // Keep plank direction consistent. Only mirror flipX sometimes.
       const flipX = rnd() < 0.5 ? -1 : 1;
-      ctx.scale(flipX, 1);
 
-      ctx.drawImage(image, -w / 2, -h / 2, w, h);
-      ctx.restore();
+      const stamp = featherStamp(image, drawW, drawH, featherPx, flipX);
+      if (!stamp) continue;
+
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(stamp, cx + jx - drawW / 2, cy + jy - drawH / 2);
     }
   }
 
   ctx.globalAlpha = 1;
 
-  // Subtle grain/noise to break stamp boundaries without hiding wood
+  // Add subtle grain/noise to break any remaining boundaries without hiding wood
   const img = ctx.getImageData(0, 0, size, size);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4) {
@@ -139,10 +183,8 @@ function createStampedFloorTexture(
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   tex.magFilter = THREE.LinearFilter;
   tex.needsUpdate = true;
-
   return tex;
 }
-
 
 export function createVrMuseumScene({
   container,
@@ -176,7 +218,7 @@ export function createVrMuseumScene({
   const scene = new THREE.Scene();
 
   // IMPORTANT: Do NOT use hamptons.jpg as scene.background.
-  // Backgrounds are camera-relative and will "move" when you look around.
+  // Backgrounds are camera-relative and will move when you look around.
   scene.background = new THREE.Color('#cfe7ff');
 
   // Room sizing
@@ -238,11 +280,11 @@ export function createVrMuseumScene({
 
     const stamped = createStampedFloorTexture(floorImg, {
       size: 2048,
-      stampsX: 5,
-      stampsY: 9, // more variation along long axis
+      stampsX: 6,
+      stampsY: 12,
       seed: 424242,
-      overlapPct: 0.14,
-      jitterPct: 0.03,
+      overlapPct: 0.30,
+      jitterPct: 0.06,
       alpha: 0.95,
     });
 
@@ -441,10 +483,7 @@ export function createVrMuseumScene({
     toneMapped: false,
   });
 
-  const vista = new THREE.Mesh(
-    new THREE.PlaneGeometry(openingW * 3.0, openingH * 3.0),
-    vistaMat
-  );
+  const vista = new THREE.Mesh(new THREE.PlaneGeometry(openingW * 3.0, openingH * 3.0), vistaMat);
 
   const windowCenterY = openingBottom + openingH / 2;
   vista.position.set(0, windowCenterY, backZ - 40);
@@ -641,7 +680,8 @@ export function createVrMuseumScene({
     for (let i = 0; i < artworks.length; i++) {
       if (disposed) return;
       const p =
-        placements[i] ?? ({
+        placements[i] ??
+        ({
           pos: new THREE.Vector3(roomW / 2 - 0.06, artY, 9 - i * 5.2),
           rotY: -Math.PI / 2,
         } as const);
