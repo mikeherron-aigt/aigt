@@ -3,45 +3,32 @@ import type { MuseumArtwork } from '@/app/components/VrMuseumEmbed';
 
 export type VrMuseumSceneHandle = {
   dispose: () => void;
+  focusArtwork: (artworkId: string) => void;
+  clearFocus: () => void;
 };
 
 type CreateArgs = {
   container: HTMLDivElement;
   artworks: MuseumArtwork[];
+  onArtworkClick?: (artwork: MuseumArtwork) => void;
 };
 
 /**
  * VR Museum Scene
- *
- * Goals:
- * - Always load images correctly from Netlify preview OR production
- * - Never crash the app if an image fails
- * - Avoid the “black box” issue by using MeshBasicMaterial for the art plane
- *   (MeshStandardMaterial + lighting + tone mapping can make textures look dark/black)
- * - Keep the calm museum room look
+ * Adds:
+ * - Click raycast on artwork planes
+ * - Camera focus animation that fits artwork to viewport (aspect aware)
+ * - Clear focus to return to previous camera pose
+ * - Higher realism defaults that still keep load manageable
  */
-export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuseumSceneHandle {
+export function createVrMuseumScene({ container, artworks, onArtworkClick }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
 
-  // ---------------------------
-  // Helpers: URL normalization
-  // ---------------------------
-  // Three.js TextureLoader works best with simple root-relative paths like "/file.png".
-  // Avoid new URL() / absolute URL construction — it can break on Netlify preview deploys.
   function normalizeImageUrl(url: string) {
     if (!url) return url;
-
-    // Already absolute or special scheme — leave as-is
-    if (
-      url.startsWith('http://') ||
-      url.startsWith('https://') ||
-      url.startsWith('data:') ||
-      url.startsWith('blob:')
-    ) {
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) {
       return url;
     }
-
-    // Public assets should be "/file.png"
     return url.startsWith('/') ? url : `/${url}`;
   }
 
@@ -55,14 +42,17 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   });
 
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.setSize(container.clientWidth, container.clientHeight, false);
 
-  // These are fine for the room, but we will NOT rely on them for the art textures
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.02;
 
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // A little realism without going crazy
+  renderer.physicallyCorrectLights = true;
 
   renderer.domElement.style.width = '100%';
   renderer.domElement.style.height = '100%';
@@ -76,34 +66,37 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   // ---------------------------
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0b0b);
-  scene.fog = new THREE.Fog(0x0b0b0b, 6, 34);
+  scene.fog = new THREE.Fog(0x0b0b0b, 8, 38);
 
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 120);
   camera.position.set(0, 1.55, 6.6);
 
   // ---------------------------
-  // Lighting (room only)
+  // Lighting
   // ---------------------------
-  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  // Keep it museum-neutral. The artwork plane is MeshBasicMaterial so it stays true.
+  const ambient = new THREE.AmbientLight(0xffffff, 0.35);
+  scene.add(ambient);
 
-  const key = new THREE.DirectionalLight(0xffffff, 0.85);
+  const key = new THREE.DirectionalLight(0xffffff, 1.15);
   key.position.set(4, 9, 6);
   key.castShadow = true;
   key.shadow.mapSize.set(2048, 2048);
   key.shadow.camera.near = 0.5;
-  key.shadow.camera.far = 40;
-  key.shadow.camera.left = -14;
-  key.shadow.camera.right = 14;
-  key.shadow.camera.top = 14;
-  key.shadow.camera.bottom = -14;
+  key.shadow.camera.far = 60;
+  key.shadow.camera.left = -16;
+  key.shadow.camera.right = 16;
+  key.shadow.camera.top = 16;
+  key.shadow.camera.bottom = -16;
   scene.add(key);
 
-  const fill = new THREE.DirectionalLight(0xffffff, 0.25);
-  fill.position.set(-6, 6, -2);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.35);
+  fill.position.set(-7, 7, -1);
   scene.add(fill);
 
-  const rim = new THREE.PointLight(0xffffff, 0.22, 40);
-  rim.position.set(0, 2.8, 10);
+  // A subtle ceiling bounce
+  const rim = new THREE.PointLight(0xffffff, 0.25, 60);
+  rim.position.set(0, 3.5, 10);
   scene.add(rim);
 
   // ---------------------------
@@ -163,7 +156,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   rightWall.rotation.y = -Math.PI / 2;
   room.add(rightWall);
 
-  // Baseboards (small detail)
+  // Baseboards
   const baseboardMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#e8e8e8'),
     roughness: 0.75,
@@ -187,24 +180,16 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   addBaseboardAlongWall(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
 
   // ---------------------------
-  // Texture loading (robust)
+  // Texture loading
   // ---------------------------
   const texLoader = new THREE.TextureLoader();
 
-  // NOTE: setting crossOrigin is fine, but for same-origin "/file.png" it’s not required.
-  // Leaving it alone avoids weird edge cases.
-  // texLoader.crossOrigin = 'anonymous';
-
   function loadArtworkTexture(url: string): Promise<THREE.Texture> {
     const src = normalizeImageUrl(url);
-
-    console.log('[VR MUSEUM] Loading texture:', src);
-
     return new Promise((resolve, reject) => {
       texLoader.load(
         src,
         (tex) => {
-          console.log('[VR MUSEUM] SUCCESS loaded:', src);
           tex.colorSpace = THREE.SRGBColorSpace;
           tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
           tex.wrapS = THREE.ClampToEdgeWrapping;
@@ -213,10 +198,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
           resolve(tex);
         },
         undefined,
-        (err) => {
-          console.error('[VR MUSEUM] FAILED to load:', src, err);
-          reject(err);
-        }
+        (err) => reject(err)
       );
     });
   }
@@ -239,6 +221,10 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     metalness: 0.0,
   });
 
+  // Store clickable art planes by id
+  const artMeshById = new Map<string, THREE.Mesh>();
+  const artworkById = new Map<string, MuseumArtwork>();
+
   async function addFramedArtwork(opts: {
     artwork: MuseumArtwork;
     position: THREE.Vector3;
@@ -248,6 +234,8 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   }) {
     const { artwork, position, rotationY, targetMaxWidth, targetMaxHeight } = opts;
 
+    artworkById.set(artwork.id, artwork);
+
     let texture: THREE.Texture | null = null;
     try {
       texture = await loadArtworkTexture(artwork.imageUrl);
@@ -255,7 +243,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
       texture = null;
     }
 
-    // Aspect
+    // Aspect from loaded texture if available
     let aspect = 4 / 5;
     if (texture?.image && (texture.image as any).width && (texture.image as any).height) {
       const w = (texture.image as any).width as number;
@@ -280,25 +268,34 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     // Outer frame
     const outer = new THREE.Mesh(new THREE.BoxGeometry(artW + frameT, artH + frameT, depth), frameOuterMat);
     outer.castShadow = true;
+    outer.receiveShadow = false;
     group.add(outer);
 
-    // Matte — thin slab sitting just past the outer frame's front face
+    // Matte
     const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.005), frameInnerMat);
     matte.position.z = depth / 2 + 0.004;
     group.add(matte);
 
-    // Artwork plane — clearly in front of both frame and matte
+    // Artwork plane (kept Basic so it never gets crushed by lighting)
     const artMat = new THREE.MeshBasicMaterial({
       color: texture ? 0xffffff : 0x2b2b2b,
       map: texture ?? undefined,
     });
 
     const art = new THREE.Mesh(new THREE.PlaneGeometry(artW, artH), artMat);
-    art.position.z = depth / 2 + 0.01;
+    art.position.z = depth / 2 + 0.011;
+    art.userData = {
+      kind: 'artwork',
+      artworkId: artwork.id,
+      width: artW,
+      height: artH,
+    };
     group.add(art);
 
-    // Optional: keep a subtle spot for realism on the frame/matte (won’t affect the art plane)
-    const spot = new THREE.SpotLight(0xffffff, 0.6, 7.5, Math.PI / 7, 0.55, 1.1);
+    artMeshById.set(artwork.id, art);
+
+    // Subtle spotlight for frame realism (does not affect MeshBasic art)
+    const spot = new THREE.SpotLight(0xffffff, 1.2, 10, Math.PI / 7, 0.55, 1.1);
     spot.position.set(0, 3.6, 1.2);
     spot.target = art;
     spot.castShadow = true;
@@ -309,7 +306,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     framesGroup.add(group);
   }
 
-  // Layout (right wall then left wall)
+  // Layout
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const y = 2.05;
 
@@ -330,7 +327,6 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     });
   }
 
-  // Build async
   (async () => {
     for (let i = 0; i < artworks.length; i++) {
       if (disposed) return;
@@ -365,16 +361,41 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
 
   const basePos = camera.position.clone();
 
+  // Track click vs drag
+  let pointerDownX = 0;
+  let pointerDownY = 0;
+  let pointerDownTime = 0;
+
+  // Focus state
+  let isFocused = false;
+
+  // Store "return" pose
+  const returnPose = {
+    pos: camera.position.clone(),
+    yaw,
+    pitch,
+  };
+
+  // Animated camera target
+  const camTargetPos = new THREE.Vector3().copy(basePos);
+  const camTargetLook = new THREE.Vector3(0, 1.5, 0);
+
   function onPointerDown(e: PointerEvent) {
     isDragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
+
+    pointerDownX = e.clientX;
+    pointerDownY = e.clientY;
+    pointerDownTime = performance.now();
+
     renderer.domElement.setPointerCapture(e.pointerId);
     renderer.domElement.style.cursor = 'grabbing';
   }
 
   function onPointerMove(e: PointerEvent) {
     if (!isDragging) return;
+    if (isFocused) return;
 
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
@@ -392,9 +413,46 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
       renderer.domElement.releasePointerCapture(e.pointerId);
     } catch {}
     renderer.domElement.style.cursor = 'grab';
+
+    // If focused, ignore click-to-select (selection UI will handle close)
+    if (isFocused) return;
+
+    const moved = Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY);
+    const dt = performance.now() - pointerDownTime;
+
+    // Only treat as click if short and low movement
+    if (moved > 6 || dt > 450) return;
+
+    // Raycast for artwork
+    const rect = renderer.domElement.getBoundingClientRect();
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(new THREE.Vector2(nx, ny), camera);
+
+    const clickable = Array.from(artMeshById.values());
+    const hits = raycaster.intersectObjects(clickable, true);
+
+    if (!hits.length) return;
+
+    const hit = hits[0].object as THREE.Mesh;
+    const artworkId = hit.userData?.artworkId as string | undefined;
+    if (!artworkId) return;
+
+    const artwork = artworkById.get(artworkId);
+    if (!artwork) return;
+
+    // Inform React
+    onArtworkClick?.(artwork);
+
+    // Focus camera
+    focusArtwork(artworkId);
   }
 
   function onWheel(e: WheelEvent) {
+    if (isFocused) return;
+
     const forward = new THREE.Vector3();
     camera.getWorldDirection(forward);
     forward.y = 0;
@@ -406,6 +464,8 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     const margin = 0.9;
     basePos.x = THREE.MathUtils.clamp(basePos.x, -roomW / 2 + margin, roomW / 2 - margin);
     basePos.z = THREE.MathUtils.clamp(basePos.z, -roomD / 2 + margin, roomD / 2 - margin);
+
+    camTargetPos.copy(basePos);
   }
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -413,6 +473,100 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   renderer.domElement.addEventListener('pointerup', onPointerUp);
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
   renderer.domElement.addEventListener('wheel', onWheel, { passive: true });
+
+  // ---------------------------
+  // Focus helpers
+  // ---------------------------
+  function computeFitDistance(planeW: number, planeH: number) {
+    // Fit plane in viewport with a little margin
+    const vFov = THREE.MathUtils.degToRad(camera.fov);
+    const aspect = camera.aspect;
+
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+
+    const distV = (planeH * 0.5) / Math.tan(vFov / 2);
+    const distH = (planeW * 0.5) / Math.tan(hFov / 2);
+
+    return Math.max(distV, distH) * 1.08; // margin factor
+  }
+
+  function focusArtwork(artworkId: string) {
+    const art = artMeshById.get(artworkId);
+    if (!art) return;
+
+    // Store return pose
+    returnPose.pos.copy(camera.position);
+    returnPose.yaw = yaw;
+    returnPose.pitch = pitch;
+
+    // Determine center and normal
+    const center = new THREE.Vector3();
+    art.getWorldPosition(center);
+
+    const normal = new THREE.Vector3(0, 0, 1);
+    normal.applyQuaternion(art.getWorldQuaternion(new THREE.Quaternion()));
+    normal.normalize();
+
+    const planeW = Number(art.userData?.width ?? 1.2);
+    const planeH = Number(art.userData?.height ?? 1.5);
+
+    const dist = computeFitDistance(planeW, planeH);
+
+    // Camera target position is along the normal, in front of the plane
+    camTargetPos.copy(center).addScaledVector(normal, dist);
+    camTargetLook.copy(center);
+
+    // Compute yaw/pitch to face the artwork
+    const dir = new THREE.Vector3().subVectors(camTargetLook, camTargetPos).normalize();
+    const targetYaw = Math.atan2(dir.x, dir.z);
+    const targetPitch = Math.asin(dir.y);
+
+    yaw = yaw; // keep current during transition, animate below
+    pitch = pitch;
+
+    // Lock focus and set a separate animated yaw/pitch targets
+    focusAnim.yawFrom = yaw;
+    focusAnim.pitchFrom = pitch;
+    focusAnim.yawTo = targetYaw;
+    focusAnim.pitchTo = THREE.MathUtils.clamp(targetPitch, minPitch, maxPitch);
+
+    focusAnim.t = 0;
+    focusAnim.active = true;
+
+    isFocused = true;
+  }
+
+  function clearFocus() {
+    if (!isFocused) return;
+
+    // Return camera target to stored pose
+    camTargetPos.copy(returnPose.pos);
+    camTargetLook.copy(returnPose.pos).add(new THREE.Vector3(0, 0, -1)); // not used directly
+
+    focusAnim.yawFrom = yaw;
+    focusAnim.pitchFrom = pitch;
+    focusAnim.yawTo = returnPose.yaw;
+    focusAnim.pitchTo = returnPose.pitch;
+
+    focusAnim.t = 0;
+    focusAnim.active = true;
+
+    isFocused = false;
+  }
+
+  const focusAnim = {
+    active: false,
+    t: 0,
+    yawFrom: 0,
+    yawTo: 0,
+    pitchFrom: 0,
+    pitchTo: 0,
+  };
+
+  function easeInOut(t: number) {
+    // smoothstep-ish
+    return t * t * (3 - 2 * t);
+  }
 
   // ---------------------------
   // Resize
@@ -436,9 +590,28 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
 
   function animate() {
     if (disposed) return;
-    clock.getDelta();
+    const dt = clock.getDelta();
 
+    // Camera rotation update
     camera.rotation.order = 'YXZ';
+
+    // Focus animation (position + yaw/pitch easing)
+    if (focusAnim.active) {
+      focusAnim.t = Math.min(1, focusAnim.t + dt / 0.55);
+      const k = easeInOut(focusAnim.t);
+
+      // Interpolate yaw/pitch
+      yaw = THREE.MathUtils.lerp(focusAnim.yawFrom, focusAnim.yawTo, k);
+      pitch = THREE.MathUtils.lerp(focusAnim.pitchFrom, focusAnim.pitchTo, k);
+
+      if (focusAnim.t >= 1) {
+        focusAnim.active = false;
+      }
+    }
+
+    // Position easing for smoother motion
+    basePos.lerp(camTargetPos, 0.14);
+
     camera.rotation.y = yaw;
     camera.rotation.x = pitch;
     camera.position.copy(basePos);
@@ -470,7 +643,7 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
       if (mat) {
         const mats = Array.isArray(mat) ? mat : [mat];
         for (const m of mats) {
-          if (m.map) m.map.dispose?.();
+          if ((m as any).map) (m as any).map.dispose?.();
           m.dispose?.();
         }
       }
@@ -483,5 +656,9 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
     }
   }
 
-  return { dispose };
+  return {
+    dispose,
+    focusArtwork,
+    clearFocus,
+  };
 }
