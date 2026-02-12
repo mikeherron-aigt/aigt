@@ -140,8 +140,8 @@ export default function VrMuseumClient() {
                 ref={embedRef}
                 artworks={artworks}
                 onArtworkClick={(art) => {
-                  setSelectedArtwork(art);
-                  embedRef.current?.focusArtwork?.(art.id);
+                   setTimeout(() => setSelectedArtwork(art), 350);
+                
                 }}
               />
 
