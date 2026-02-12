@@ -41,148 +41,230 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   // Procedural wood textures
   // ---------------------------
   function makeWoodTexture(size = 1024) {
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      // Fallback solid texture
-      const fallback = new THREE.DataTexture(new Uint8Array([210, 197, 170, 255]), 1, 1);
-      fallback.colorSpace = THREE.SRGBColorSpace;
-      fallback.needsUpdate = true;
-      return { map: fallback, roughnessMap: null as THREE.Texture | null, normalMap: null as THREE.Texture | null };
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    const fallback = new THREE.DataTexture(new Uint8Array([216, 200, 170, 255]), 1, 1);
+    fallback.colorSpace = THREE.SRGBColorSpace;
+    fallback.needsUpdate = true;
+    return { map: fallback, roughnessMap: null as THREE.Texture | null, normalMap: null as THREE.Texture | null };
+  }
+
+  // Helper random
+  const rand = (a: number, b: number) => a + Math.random() * (b - a);
+  const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+
+  // Base color (keep your current tone)
+  ctx.fillStyle = '#d8c8aa';
+  ctx.fillRect(0, 0, size, size);
+
+  // Plank sizing in texture space
+  // Planks run along Y direction (long direction), so grain runs along Y too.
+  const plankWidth = Math.floor(size / 10); // 10 boards across
+  const rows = Math.ceil(size / plankWidth);
+
+  // Nominal plank length (in px). We will randomize around this.
+  const nominalLen = Math.floor(size * 0.55);
+
+  // Stagger rule: end joints should be offset by at least ~8% of plank length
+  const minJointOffset = Math.floor(nominalLen * 0.18);
+
+  // Precompute per row start offsets for staggering
+  const rowStartOffset: number[] = [];
+  for (let r = 0; r < rows; r++) {
+    if (r === 0) {
+      rowStartOffset[r] = Math.floor(rand(0, nominalLen * 0.6));
+    } else {
+      // Ensure next row offset differs enough from previous
+      let tries = 0;
+      let off = 0;
+      do {
+        off = Math.floor(rand(0, nominalLen * 0.9));
+        tries++;
+      } while (tries < 20 && Math.abs(off - rowStartOffset[r - 1]) < minJointOffset);
+      rowStartOffset[r] = off;
     }
+  }
 
-    // Base tone
-    ctx.fillStyle = '#d8c8aa';
-    ctx.fillRect(0, 0, size, size);
+  // Draw planks row by row (across X), segments along Y
+  for (let r = 0; r < rows; r++) {
+    const x0 = r * plankWidth;
+    const w = Math.min(plankWidth + 1, size - x0);
 
-    // Planks
-    const plankCount = 10;
-    const plankW = size / plankCount;
+    // Slight per plank strip tone
+    const tint = 0.92 + Math.random() * 0.16;
+    const baseR = Math.floor(216 * tint);
+    const baseG = Math.floor(200 * tint);
+    const baseB = Math.floor(170 * tint);
 
-    // Slight per-plank variation + grain
-    for (let i = 0; i < plankCount; i++) {
-      const x0 = Math.floor(i * plankW);
-      const w = Math.ceil(plankW + 1);
+    // Starting position (stagger)
+    let y = -rowStartOffset[r];
 
-      const tint = 0.92 + Math.random() * 0.16; // subtle
-      ctx.fillStyle = `rgba(${Math.floor(216 * tint)}, ${Math.floor(200 * tint)}, ${Math.floor(
-        170 * tint
-      )}, 1)`;
-      ctx.fillRect(x0, 0, w, size);
+    while (y < size) {
+      // Random length buckets, mimics real bundles
+      const bucket = Math.random();
+      const len =
+        bucket < 0.25 ? nominalLen * 0.65 :
+        bucket < 0.60 ? nominalLen * 0.85 :
+        nominalLen * 1.05;
 
-      // grain lines (horizontal-ish flow)
-      ctx.globalAlpha = 0.10;
-      ctx.strokeStyle = '#8a6f4a';
-      ctx.lineWidth = 1;
+      const h = Math.floor(rand(len * 0.85, len * 1.10));
+      const y0 = Math.floor(y);
+      const hh = Math.min(h, size - y0);
 
-      for (let g = 0; g < 140; g++) {
-        const y = Math.random() * size;
-        ctx.beginPath();
-        const wobble = (Math.random() - 0.5) * 16;
-        ctx.moveTo(x0 + 2, y);
-        ctx.bezierCurveTo(
-          x0 + w * 0.35,
-          y + wobble,
-          x0 + w * 0.65,
-          y - wobble,
-          x0 + w - 2,
-          y
-        );
-        ctx.stroke();
+      if (y0 + hh > 0) {
+        // Plank fill
+        ctx.fillStyle = `rgb(${baseR},${baseG},${baseB})`;
+        ctx.fillRect(x0, y0, w, hh);
+
+        // Subtle tonal wash inside plank
+        ctx.globalAlpha = 0.06;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(x0, y0, w, hh);
+        ctx.globalAlpha = 1;
+
+        // Grain along Y (long direction)
+        ctx.globalAlpha = 0.12;
+        ctx.strokeStyle = '#8a6f4a';
+        ctx.lineWidth = 1;
+
+        const grainCount = Math.floor(hh / 10);
+        for (let g = 0; g < grainCount; g++) {
+          const gx = x0 + rand(2, w - 2);
+          const gy0 = y0 + rand(0, hh);
+          const gy1 = y0 + clamp(gy0 + rand(20, 90), 0, hh);
+
+          ctx.beginPath();
+          // Mostly vertical lines with small waviness
+          const wobble = (Math.random() - 0.5) * 6;
+          ctx.moveTo(gx, gy0);
+          ctx.bezierCurveTo(gx + wobble, (gy0 + gy1) * 0.5, gx - wobble, (gy0 + gy1) * 0.5, gx, gy1);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+
+        // Knots (very subtle)
+        if (Math.random() < 0.25) {
+          const kx = x0 + rand(w * 0.2, w * 0.8);
+          const ky = y0 + rand(hh * 0.2, hh * 0.8);
+          const kr = rand(3, 10);
+          ctx.globalAlpha = 0.10;
+          ctx.fillStyle = '#6f583a';
+          ctx.beginPath();
+          ctx.ellipse(kx, ky, kr, kr * 0.7, rand(0, Math.PI), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        // End joint seam (horizontal line across this plank width)
+        // Only if inside canvas (not for first negative segment)
+        if (y0 > 0) {
+          ctx.globalAlpha = 0.22;
+          ctx.fillStyle = '#000000';
+          ctx.fillRect(x0, y0, w, 2);
+          ctx.globalAlpha = 1;
+        }
       }
 
-      // seams
-      ctx.globalAlpha = 0.18;
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(x0, 0, 2, size);
-      ctx.globalAlpha = 1;
+      y += h;
+      // Force some minimum joint spacing so you do not get tiny pieces
+      y += rand(2, 10);
     }
 
-    // Add a very soft vignette / variation to avoid flatness
-    const grad = ctx.createRadialGradient(size * 0.5, size * 0.5, size * 0.1, size * 0.5, size * 0.5, size * 0.75);
-    grad.addColorStop(0, 'rgba(255,255,255,0.08)');
-    grad.addColorStop(1, 'rgba(0,0,0,0.06)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, size, size);
-
-    const map = new THREE.CanvasTexture(canvas);
-    map.colorSpace = THREE.SRGBColorSpace;
-    map.wrapS = THREE.RepeatWrapping;
-    map.wrapT = THREE.RepeatWrapping;
-    map.repeat.set(4, 10);
-    map.anisotropy = 8;
-    map.needsUpdate = true;
-
-    // Roughness map (separate canvas)
-    const rCanvas = document.createElement('canvas');
-    rCanvas.width = size;
-    rCanvas.height = size;
-    const rCtx = rCanvas.getContext('2d');
-    if (!rCtx) return { map, roughnessMap: null as THREE.Texture | null, normalMap: null as THREE.Texture | null };
-
-    // Start moderately rough
-    rCtx.fillStyle = 'rgb(170,170,170)';
-    rCtx.fillRect(0, 0, size, size);
-
-    // Plank seams slightly rougher
-    rCtx.fillStyle = 'rgb(210,210,210)';
-    for (let i = 0; i < plankCount; i++) {
-      const x0 = Math.floor(i * plankW);
-      rCtx.fillRect(x0, 0, 2, size);
-    }
-
-    // Random micro variation
-    rCtx.globalAlpha = 0.08;
-    rCtx.fillStyle = 'black';
-    for (let i = 0; i < 2000; i++) {
-      const x = Math.random() * size;
-      const y = Math.random() * size;
-      const s = 1 + Math.random() * 2;
-      rCtx.fillRect(x, y, s, s);
-    }
-    rCtx.globalAlpha = 1;
-
-    const roughnessMap = new THREE.CanvasTexture(rCanvas);
-    roughnessMap.colorSpace = THREE.NoColorSpace;
-    roughnessMap.wrapS = THREE.RepeatWrapping;
-    roughnessMap.wrapT = THREE.RepeatWrapping;
-    roughnessMap.repeat.copy(map.repeat);
-    roughnessMap.anisotropy = 8;
-    roughnessMap.needsUpdate = true;
-
-    // Very subtle normal map
-    const nCanvas = document.createElement('canvas');
-    nCanvas.width = size;
-    nCanvas.height = size;
-    const nCtx = nCanvas.getContext('2d');
-    if (!nCtx) return { map, roughnessMap, normalMap: null as THREE.Texture | null };
-
-    // Flat normal base (128,128,255)
-    nCtx.fillStyle = 'rgb(128,128,255)';
-    nCtx.fillRect(0, 0, size, size);
-
-    // Fake seam normals by drawing thin vertical lines offset in red/green
-    nCtx.globalAlpha = 0.12;
-    for (let i = 0; i < plankCount; i++) {
-      const x0 = Math.floor(i * plankW);
-      nCtx.fillStyle = 'rgb(118,138,255)'; // tiny tilt
-      nCtx.fillRect(x0, 0, 2, size);
-    }
-    nCtx.globalAlpha = 1;
-
-    const normalMap = new THREE.CanvasTexture(nCanvas);
-    normalMap.colorSpace = THREE.NoColorSpace;
-    normalMap.wrapS = THREE.RepeatWrapping;
-    normalMap.wrapT = THREE.RepeatWrapping;
-    normalMap.repeat.copy(map.repeat);
-    normalMap.anisotropy = 8;
-    normalMap.needsUpdate = true;
-
-    return { map, roughnessMap, normalMap };
+    // Vertical seam between adjacent planks
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(x0, 0, 2, size);
+    ctx.globalAlpha = 1;
   }
+
+  // Very soft vignette for depth
+  const grad = ctx.createRadialGradient(size * 0.55, size * 0.55, size * 0.12, size * 0.55, size * 0.55, size * 0.85);
+  grad.addColorStop(0, 'rgba(255,255,255,0.06)');
+  grad.addColorStop(1, 'rgba(0,0,0,0.05)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.colorSpace = THREE.SRGBColorSpace;
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.RepeatWrapping;
+
+  // Repeat tuned so planks read like real scale
+  map.repeat.set(3.2, 9.2);
+
+  map.anisotropy = 8;
+  map.needsUpdate = true;
+
+  // Roughness map (seams a bit rougher, plank bodies consistent)
+  const rCanvas = document.createElement('canvas');
+  rCanvas.width = size;
+  rCanvas.height = size;
+  const rCtx = rCanvas.getContext('2d');
+  if (!rCtx) return { map, roughnessMap: null as THREE.Texture | null, normalMap: null as THREE.Texture | null };
+
+  rCtx.fillStyle = 'rgb(175,175,175)';
+  rCtx.fillRect(0, 0, size, size);
+
+  // Micro speckle
+  rCtx.globalAlpha = 0.08;
+  rCtx.fillStyle = 'black';
+  for (let i = 0; i < 2400; i++) {
+    const x = Math.random() * size;
+    const y = Math.random() * size;
+    const s = 1 + Math.random() * 2;
+    rCtx.fillRect(x, y, s, s);
+  }
+  rCtx.globalAlpha = 1;
+
+  const roughnessMap = new THREE.CanvasTexture(rCanvas);
+  roughnessMap.colorSpace = THREE.NoColorSpace;
+  roughnessMap.wrapS = THREE.RepeatWrapping;
+  roughnessMap.wrapT = THREE.RepeatWrapping;
+  roughnessMap.repeat.copy(map.repeat);
+  roughnessMap.anisotropy = 8;
+  roughnessMap.needsUpdate = true;
+
+  // Subtle normal map, mainly from seams
+  const nCanvas = document.createElement('canvas');
+  nCanvas.width = size;
+  nCanvas.height = size;
+  const nCtx = nCanvas.getContext('2d');
+  if (!nCtx) return { map, roughnessMap, normalMap: null as THREE.Texture | null };
+
+  nCtx.fillStyle = 'rgb(128,128,255)';
+  nCtx.fillRect(0, 0, size, size);
+
+  nCtx.globalAlpha = 0.10;
+  // Vertical seams
+  nCtx.fillStyle = 'rgb(118,138,255)';
+  for (let r = 0; r < rows; r++) {
+    const x0 = r * plankWidth;
+    nCtx.fillRect(x0, 0, 2, size);
+  }
+  // Horizontal end joints sprinkled lightly
+  nCtx.fillStyle = 'rgb(138,118,255)';
+  for (let i = 0; i < 160; i++) {
+    const y0 = Math.random() * size;
+    const x0 = Math.random() * size;
+    nCtx.fillRect(x0, y0, rand(40, 160), 1);
+  }
+  nCtx.globalAlpha = 1;
+
+  const normalMap = new THREE.CanvasTexture(nCanvas);
+  normalMap.colorSpace = THREE.NoColorSpace;
+  normalMap.wrapS = THREE.RepeatWrapping;
+  normalMap.wrapT = THREE.RepeatWrapping;
+  normalMap.repeat.copy(map.repeat);
+  normalMap.anisotropy = 8;
+  normalMap.needsUpdate = true;
+
+  return { map, roughnessMap, normalMap };
+}
+
 
   // ---------------------------
   // Renderer
@@ -274,7 +356,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     roughness: 0.75,
     roughnessMap: woodRoughness ?? undefined,
     normalMap: woodNormal ?? undefined,
-    normalScale: new THREE.Vector2(0.25, 0.25),
+    normalScale: new THREE.Vector2(0.22, 0.22),
     metalness: 0.0,
   });
 
