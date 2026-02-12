@@ -14,12 +14,13 @@ type CreateArgs = {
 };
 
 /**
- * VR Museum Scene
- * - Click raycast on artworks
- * - Smooth camera focus that fits the artwork to viewport (aspect aware)
- * - Brighter, museum-like lighting with visible track fixture
- * - Removes mystery hotspot and reduces floor shadow artifacts
- * - Keeps artwork as MeshBasicMaterial so color stays true
+ * VR Museum Scene (Jeff baseline, upgraded)
+ * Goals
+ * - Keep the bright, clean "tan floor + windows" look
+ * - Add more realistic materials and subtle detail (without heavy assets)
+ * - Better lighting and believable shadows (without floor blotches)
+ * - Smooth, slower zoom to clicked artwork (aspect-aware)
+ * - Artwork stays color-true (MeshBasicMaterial)
  */
 export function createVrMuseumScene({ container, artworks, onArtworkClick }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
@@ -51,12 +52,12 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.12;
+  renderer.toneMappingExposure = 1.08;
 
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  // Cross-version: typings may not include this in your installed three
+  // Cross-version and typing-safe
   (renderer as any).physicallyCorrectLights = true;
   if ('useLegacyLights' in renderer) (renderer as any).useLegacyLights = false;
 
@@ -72,9 +73,83 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   // ---------------------------
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0b0b);
+  scene.fog = new THREE.Fog(0x0b0b0b, 8, 42);
 
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 160);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 140);
   camera.position.set(0, 1.55, 6.6);
+
+  // ---------------------------
+  // Subtle procedural textures (cheap realism)
+  // ---------------------------
+  function makeNoiseTexture(size = 256, strength = 18) {
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const ctx = c.getContext('2d');
+    if (!ctx) return null;
+
+    const img = ctx.createImageData(size, size);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = 128 + (Math.random() * strength - strength / 2);
+      img.data[i] = v;
+      img.data[i + 1] = v;
+      img.data[i + 2] = v;
+      img.data[i + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(6, 6);
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  function makeFloorTexture(size = 512) {
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const ctx = c.getContext('2d');
+    if (!ctx) return null;
+
+    // Warm tan base
+    ctx.fillStyle = '#cbb58a';
+    ctx.fillRect(0, 0, size, size);
+
+    // Very soft mottling
+    for (let i = 0; i < 4200; i++) {
+      const x = Math.random() * size;
+      const y = Math.random() * size;
+      const r = 6 + Math.random() * 22;
+      const a = 0.012 + Math.random() * 0.02;
+      ctx.fillStyle = `rgba(0,0,0,${a.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.ellipse(x, y, r, r * 0.75, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Subtle directional grain
+    ctx.globalAlpha = 0.10;
+    for (let y = 0; y < size; y += 4) {
+      const wobble = Math.sin(y * 0.05) * 1.3;
+      ctx.fillStyle = y % 12 === 0 ? 'rgba(0,0,0,0.10)' : 'rgba(255,255,255,0.06)';
+      ctx.fillRect(0 + wobble, y, size, 2);
+    }
+    ctx.globalAlpha = 1;
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(2.6, 5.4);
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  const wallNoise = makeNoiseTexture(256, 14);
+  const floorTex = makeFloorTexture(512);
 
   // ---------------------------
   // Room geometry/materials
@@ -84,21 +159,23 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#f2f2f2'),
-    roughness: 0.94,
+    roughness: 0.92,
     metalness: 0.0,
+    map: wallNoise ?? undefined,
   });
 
   const ceilingMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#f0f0f0'),
-    roughness: 0.98,
+    roughness: 0.97,
     metalness: 0.0,
+    map: wallNoise ?? undefined,
   });
 
-  // Matte charcoal so shadows look natural and no glossy artifacts
   const floorMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#1b1b1b'),
-    roughness: 0.82,
+    color: new THREE.Color('#cbb58a'),
+    roughness: 0.78,
     metalness: 0.0,
+    map: floorTex ?? undefined,
   });
 
   const roomW = 14;
@@ -134,10 +211,10 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   rightWall.rotation.y = -Math.PI / 2;
   room.add(rightWall);
 
-  // Baseboards
+  // Baseboards (small detail)
   const baseboardMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#e8e8e8'),
-    roughness: 0.8,
+    roughness: 0.75,
     metalness: 0.0,
   });
 
@@ -157,31 +234,112 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   addBaseboardAlongWall(roomD, -roomW / 2 + baseboardT / 2, 0, Math.PI / 2);
   addBaseboardAlongWall(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
 
-  // ---------------------------
-  // Lighting
-  // ---------------------------
-  // Base fill so no dead corners
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 0.65);
-  scene.add(hemi);
+  // Crown molding (ceiling detail)
+  const crownMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#ededed'),
+    roughness: 0.85,
+    metalness: 0.0,
+  });
 
-  const ambient = new THREE.AmbientLight(0xffffff, 0.33);
+  const crownH = 0.065;
+  const crownT = 0.05;
+
+  function addCrown(length: number, x: number, z: number, rotY: number) {
+    const geo = new THREE.BoxGeometry(length, crownH, crownT);
+    const mesh = new THREE.Mesh(geo, crownMat);
+    mesh.position.set(x, roomH - crownH / 2, z);
+    mesh.rotation.y = rotY;
+    room.add(mesh);
+  }
+
+  addCrown(roomW, 0, -roomD / 2 + crownT / 2, 0);
+  addCrown(roomW, 0, roomD / 2 - crownT / 2, 0);
+  addCrown(roomD, -roomW / 2 + crownT / 2, 0, Math.PI / 2);
+  addCrown(roomD, roomW / 2 - crownT / 2, 0, Math.PI / 2);
+
+  // ---------------------------
+  // Windows (visual + light contribution)
+  // ---------------------------
+  const windowGroup = new THREE.Group();
+  room.add(windowGroup);
+
+  const windowFrameMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#dedede'),
+    roughness: 0.6,
+    metalness: 0.0,
+  });
+
+  const glassMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#9fd3ff'),
+    roughness: 0.05,
+    metalness: 0.0,
+    transparent: true,
+    opacity: 0.65,
+    emissive: new THREE.Color('#7bc7ff'),
+    emissiveIntensity: 0.18,
+  });
+
+  function addWindow(x: number, y: number, z: number) {
+    const w = 1.55;
+    const h = 1.55;
+
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(w + 0.08, h + 0.08, 0.06), windowFrameMat);
+    frame.position.set(x, y, z);
+    frame.rotation.y = Math.PI;
+    windowGroup.add(frame);
+
+    const glass = new THREE.Mesh(new THREE.PlaneGeometry(w, h), glassMat);
+    glass.position.set(x, y, z + 0.034);
+    glass.rotation.y = Math.PI;
+    windowGroup.add(glass);
+
+    // Mullions
+    const mullionMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#e6e6e6'),
+      roughness: 0.7,
+      metalness: 0.0,
+    });
+
+    const v1 = new THREE.Mesh(new THREE.BoxGeometry(0.04, h, 0.03), mullionMat);
+    v1.position.set(x, y, z + 0.036);
+    v1.rotation.y = Math.PI;
+    windowGroup.add(v1);
+
+    const h1 = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, 0.03), mullionMat);
+    h1.position.set(x, y, z + 0.036);
+    h1.rotation.y = Math.PI;
+    windowGroup.add(h1);
+
+    // Cool daylight spill (no shadows, just fill)
+    const day = new THREE.PointLight(0xbfe6ff, 0.55, 16);
+    day.position.set(x, y, z - 1.4);
+    scene.add(day);
+  }
+
+  // Place windows on the far wall (front wall), matching your screenshot vibe
+  const wz = roomD / 2 - 0.02;
+  addWindow(-3.2, 2.05, wz);
+  addWindow(0.0, 2.05, wz);
+  addWindow(3.2, 2.05, wz);
+
+  // ---------------------------
+  // Lighting (keep brightness, improve believability)
+  // ---------------------------
+  const ambient = new THREE.AmbientLight(0xffffff, 0.58);
   scene.add(ambient);
 
-  // Key light with explicit target so direction feels consistent
-  const key = new THREE.DirectionalLight(0xffffff, 1.25);
-  key.position.set(6, 10, 10);
+  // Key directional with tuned shadows
+  const key = new THREE.DirectionalLight(0xffffff, 0.9);
+  key.position.set(4.5, 9.2, 6.5);
   key.castShadow = true;
-
   key.shadow.mapSize.set(2048, 2048);
   key.shadow.camera.near = 0.5;
-  key.shadow.camera.far = 90;
-  key.shadow.camera.left = -22;
-  key.shadow.camera.right = 22;
-  key.shadow.camera.top = 22;
-  key.shadow.camera.bottom = -22;
-
-  // Shadow tuning to reduce blotchy artifacts on the floor
-  key.shadow.bias = -0.0002;
+  key.shadow.camera.far = 60;
+  key.shadow.camera.left = -18;
+  key.shadow.camera.right = 18;
+  key.shadow.camera.top = 18;
+  key.shadow.camera.bottom = -18;
+  key.shadow.bias = -0.00025;
   key.shadow.normalBias = 0.02;
 
   const keyTarget = new THREE.Object3D();
@@ -191,38 +349,66 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   scene.add(key);
 
-  // Fill opposite
-  const fill = new THREE.DirectionalLight(0xffffff, 0.55);
-  fill.position.set(-8, 6, -6);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.28);
+  fill.position.set(-6.5, 6.2, -2.0);
   scene.add(fill);
 
+  // Gentle ceiling bounce
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x2b2b2b, 0.28);
+  scene.add(hemi);
+
+  // Subtle rim depth (helps corners feel less flat)
+  const rim = new THREE.PointLight(0xffffff, 0.18, 48);
+  rim.position.set(0, 2.8, 10);
+  scene.add(rim);
+
   // ---------------------------
-  // Visible track light fixture (cheap, improves realism)
+  // Ceiling spots (no big bar, just small fixtures)
   // ---------------------------
-  const trackMat = new THREE.MeshStandardMaterial({
+  const fixtureGroup = new THREE.Group();
+  room.add(fixtureGroup);
+
+  const fixtureBodyMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#111111'),
-    roughness: 0.35,
+    roughness: 0.4,
     metalness: 0.25,
   });
 
-  const trackGlowMat = new THREE.MeshStandardMaterial({
+  const fixtureGlowMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
     roughness: 1,
     metalness: 0,
     emissive: new THREE.Color('#ffffff'),
-    emissiveIntensity: 0.35,
+    emissiveIntensity: 0.45,
   });
 
-  const track = new THREE.Mesh(new THREE.BoxGeometry(roomW - 1.5, 0.06, 0.06), trackMat);
-  track.position.set(0, roomH - 0.25, 0);
-  room.add(track);
+  function addCeilingSpot(x: number, z: number) {
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.12, 18), fixtureBodyMat);
+    body.position.set(x, roomH - 0.08, z);
+    body.rotation.x = Math.PI / 2;
+    fixtureGroup.add(body);
 
-  const glow = new THREE.Mesh(new THREE.BoxGeometry(roomW - 1.7, 0.02, 0.02), trackGlowMat);
-  glow.position.set(0, roomH - 0.29, 0);
-  room.add(glow);
+    const glow = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.02, 16), fixtureGlowMat);
+    glow.position.set(x, roomH - 0.13, z);
+    glow.rotation.x = Math.PI / 2;
+    fixtureGroup.add(glow);
+
+    const light = new THREE.SpotLight(0xffffff, 0.45, 18, Math.PI / 7.5, 0.55, 1.1);
+    light.position.set(x, roomH - 0.1, z);
+    light.target.position.set(x, 0, z);
+    light.castShadow = false; // avoids floor blob artifacts
+    scene.add(light);
+    scene.add(light.target);
+  }
+
+  // A few fixtures along center line
+  addCeilingSpot(0, 6);
+  addCeilingSpot(0, 1);
+  addCeilingSpot(0, -4);
+  addCeilingSpot(0, -9);
 
   // ---------------------------
-  // Texture loading
+  // Texture loading (robust)
   // ---------------------------
   const texLoader = new THREE.TextureLoader();
 
@@ -274,7 +460,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     targetMaxHeight: number;
   }) {
     const { artwork, position, rotationY, targetMaxWidth, targetMaxHeight } = opts;
-
     artworkById.set(artwork.id, artwork);
 
     let texture: THREE.Texture | null = null;
@@ -284,6 +469,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
       texture = null;
     }
 
+    // Aspect
     let aspect = 4 / 5;
     if (texture?.image && (texture.image as any).width && (texture.image as any).height) {
       const w = (texture.image as any).width as number;
@@ -305,15 +491,17 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const frameT = 0.08;
     const depth = 0.08;
 
+    // Outer frame
     const outer = new THREE.Mesh(new THREE.BoxGeometry(artW + frameT, artH + frameT, depth), frameOuterMat);
     outer.castShadow = true;
     group.add(outer);
 
+    // Matte
     const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.005), frameInnerMat);
     matte.position.z = depth / 2 + 0.004;
     group.add(matte);
 
-    // Artwork plane: always bright and true (art is the star)
+    // Artwork plane (color-true)
     const artMat = new THREE.MeshBasicMaterial({
       color: texture ? 0xffffff : 0x2b2b2b,
       map: texture ?? undefined,
@@ -323,13 +511,11 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     art.position.z = depth / 2 + 0.011;
     art.userData = { artworkId: artwork.id, width: artW, height: artH };
     group.add(art);
-
     artMeshById.set(artwork.id, art);
 
-    // Wall wash spotlight for realism
-    // No shadows to avoid floor artifacts
-    const spot = new THREE.SpotLight(0xffffff, 1.15, 10, Math.PI / 8, 0.65, 1.0);
-    spot.position.set(0, 3.9, 1.45);
+    // Gentle wash on the frame/matte (no shadows to avoid artifacts)
+    const spot = new THREE.SpotLight(0xffffff, 0.55, 8.5, Math.PI / 7.2, 0.6, 1.1);
+    spot.position.set(0, 3.7, 1.25);
     spot.target = art;
     spot.castShadow = false;
     group.add(spot);
@@ -338,7 +524,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     framesGroup.add(group);
   }
 
-  // Placement: right wall then left wall
+  // Layout (right wall then left wall)
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const y = 2.05;
 
@@ -355,7 +541,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   (async () => {
     for (let i = 0; i < artworks.length; i++) {
       if (disposed) return;
-
       const p =
         placements[i] ??
         ({
@@ -374,7 +559,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   })();
 
   // ---------------------------
-  // Controls + camera state
+  // Controls + camera state (drag look + scroll move + click focus)
   // ---------------------------
   let isDragging = false;
   let lastX = 0;
@@ -391,17 +576,18 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   let pointerDownY = 0;
   let pointerDownTime = 0;
 
+  let isFocused = false;
+
   const returnPose = {
     pos: basePos.clone(),
-    yaw,
-    pitch,
+    yaw: 0,
+    pitch: 0,
   };
-
-  let isFocused = false;
 
   const focusAnim = {
     active: false,
     t: 0,
+    duration: 0.95, // slower zoom
     yawFrom: 0,
     yawTo: 0,
     pitchFrom: 0,
@@ -422,14 +608,15 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const distV = (planeH * 0.5) / Math.tan(vFov / 2);
     const distH = (planeW * 0.5) / Math.tan(hFov / 2);
 
-    return Math.max(distV, distH) * 1.12;
+    // A touch of breathing room
+    return Math.max(distV, distH) * 1.10;
   }
 
   function focusArtwork(artworkId: string) {
     const art = artMeshById.get(artworkId);
     if (!art) return;
 
-    // Store return pose
+    // Store return pose (only on first focus)
     returnPose.pos.copy(basePos);
     returnPose.yaw = yaw;
     returnPose.pitch = pitch;
@@ -437,9 +624,14 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const center = new THREE.Vector3();
     art.getWorldPosition(center);
 
+    // Normal of the artwork plane in world space
     const normal = new THREE.Vector3(0, 0, 1);
     normal.applyQuaternion(art.getWorldQuaternion(new THREE.Quaternion()));
     normal.normalize();
+
+    // Force normal to face the camera so we do not zoom through the wall
+    const cameraSide = new THREE.Vector3().subVectors(camera.position, center).normalize();
+    if (normal.dot(cameraSide) < 0) normal.multiplyScalar(-1);
 
     const planeW = Number(art.userData?.width ?? 1.2);
     const planeH = Number(art.userData?.height ?? 1.5);
@@ -517,7 +709,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const moved = Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY);
     const dt = performance.now() - pointerDownTime;
 
-    // click, not drag
+    // Click, not drag
     if (moved > 6 || dt > 450) return;
 
     const rect = renderer.domElement.getBoundingClientRect();
@@ -534,10 +726,12 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const artworkId = hit.userData?.artworkId as string | undefined;
     if (!artworkId) return;
 
+    // Start the zoom immediately
+    focusArtwork(artworkId);
+
+    // Let the client overlay open (you already delay it in VrMuseumClient)
     const artwork = artworkById.get(artworkId);
     if (artwork) onArtworkClick?.(artwork);
-
-    focusArtwork(artworkId);
   }
 
   function onWheel(e: WheelEvent) {
@@ -588,12 +782,11 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const dt = clock.getDelta();
 
     if (focusAnim.active) {
-      focusAnim.t = Math.min(1, focusAnim.t + dt / 0.55);
+      focusAnim.t = Math.min(1, focusAnim.t + dt / focusAnim.duration);
       const k = easeInOut(focusAnim.t);
 
       yaw = THREE.MathUtils.lerp(focusAnim.yawFrom, focusAnim.yawTo, k);
       pitch = THREE.MathUtils.lerp(focusAnim.pitchFrom, focusAnim.pitchTo, k);
-
       basePos.lerpVectors(focusAnim.posFrom, focusAnim.posTo, k);
 
       if (focusAnim.t >= 1) focusAnim.active = false;
@@ -625,6 +818,10 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     renderer.domElement.removeEventListener('pointercancel', onPointerUp);
     renderer.domElement.removeEventListener('wheel', onWheel as any);
 
+    // Dispose textures we created
+    wallNoise?.dispose?.();
+    floorTex?.dispose?.();
+
     scene.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
       if ((mesh as any).geometry) (mesh as any).geometry.dispose?.();
@@ -640,7 +837,10 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     });
 
     renderer.dispose();
-    if (renderer.domElement.parentElement === container) container.removeChild(renderer.domElement);
+
+    if (renderer.domElement.parentElement === container) {
+      container.removeChild(renderer.domElement);
+    }
   }
 
   return { dispose, focusArtwork, clearFocus };
