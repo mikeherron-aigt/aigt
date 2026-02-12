@@ -492,9 +492,9 @@ export function createVrMuseumScene({
   const texLoader = new THREE.TextureLoader();
   const outsideTex = (() => {
     try {
-      // This will succeed only if you place the file in /public/vr/hamptons.jpg
+      // This will succeed only if you place the file in /vr/hamptons.jpg
       const t = texLoader.load(
-        '/vr/hamptons.jpg',
+        '/hamptons.jpg',
         undefined,
         undefined,
         () => {
