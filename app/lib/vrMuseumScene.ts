@@ -77,6 +77,7 @@ function createStampedFloorTexture(
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
+
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas 2D context unavailable');
 
@@ -91,33 +92,35 @@ function createStampedFloorTexture(
   const overlapW = cellW * overlapPct;
   const overlapH = cellH * overlapPct;
 
-  // Stamp tiles with slight overlap and rotations.
-  // IMPORTANT: no alpha-cutting or heavy blending that would erase wood detail.
+  // Stamp tiles with slight overlap and mirroring (no 90° rotation)
   ctx.globalAlpha = alpha;
+
   for (let y = 0; y < stampsY; y++) {
     for (let x = 0; x < stampsX; x++) {
       const cx = x * cellW + cellW / 2;
       const cy = y * cellH + cellH / 2;
 
-      // 90-degree rotations hide repetition without warping texture
-    ctx.save();
-ctx.translate(cx + jx, cy + jy);
+      const w = cellW + overlapW;
+      const h = cellH + overlapH;
 
-// Keep plank direction consistent (no 90° rotation)
-// Optional variation: mirror flip (does NOT rotate the planks)
-const flipX = rnd() < 0.5 ? -1 : 1;
-const flipY = 1; // keep Y normal to avoid vertical-looking artifacts
-ctx.scale(flipX, flipY);
+      const jx = (rnd() - 0.5) * cellW * jitterPct;
+      const jy = (rnd() - 0.5) * cellH * jitterPct;
 
-ctx.drawImage(image, -w / 2, -h / 2, w, h);
+      ctx.save();
+      ctx.translate(cx + jx, cy + jy);
 
-ctx.restore();
+      // Keep plank direction consistent. Only mirror flipX sometimes.
+      const flipX = rnd() < 0.5 ? -1 : 1;
+      ctx.scale(flipX, 1);
 
-    
+      ctx.drawImage(image, -w / 2, -h / 2, w, h);
+      ctx.restore();
+    }
   }
+
   ctx.globalAlpha = 1;
 
-  // Add subtle grain/noise to break stamp boundaries without hiding wood
+  // Subtle grain/noise to break stamp boundaries without hiding wood
   const img = ctx.getImageData(0, 0, size, size);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4) {
@@ -136,8 +139,10 @@ ctx.restore();
   tex.minFilter = THREE.LinearMipmapLinearFilter;
   tex.magFilter = THREE.LinearFilter;
   tex.needsUpdate = true;
+
   return tex;
 }
+
 
 export function createVrMuseumScene({
   container,
