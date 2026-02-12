@@ -60,14 +60,10 @@ function generateSkyFallbackTexture(size = 1024) {
   const g = ctx.createLinearGradient(0, 0, 0, size);
   g.addColorStop(0, '#bfe5ff');
   g.addColorStop(0.55, '#dff2ff');
-  g.addColorStop(0.72, '#9fd2ff');
   g.addColorStop(1, '#6cb0e6');
 
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, size, size);
-
-  ctx.fillStyle = 'rgba(200,240,255,0.55)';
-  ctx.fillRect(0, size * 0.62, size, size * 0.06);
 
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -86,13 +82,13 @@ function generateCloudAlphaTexture(size = 1024, seed = 1337) {
   ctx.clearRect(0, 0, size, size);
   const rand = mulberry32(seed);
 
-  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  ctx.fillStyle = 'rgba(255,255,255,0.02)';
   ctx.fillRect(0, 0, size, size);
 
   const layers = 5;
   for (let l = 0; l < layers; l++) {
-    const blobs = 80 + Math.floor(rand() * 60);
-    const alpha = 0.04 + l * 0.02;
+    const blobs = 70 + Math.floor(rand() * 70);
+    const alpha = 0.035 + l * 0.02;
     for (let i = 0; i < blobs; i++) {
       const x = rand() * size;
       const y = rand() * size;
@@ -146,7 +142,7 @@ export function createVrMuseumScene({
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.1;
+  renderer.toneMappingExposure = 1.08;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -156,13 +152,10 @@ export function createVrMuseumScene({
   renderer.domElement.style.cursor = 'grab';
   container.appendChild(renderer.domElement);
 
-  // Scene and camera
+  // Scene
   const scene = new THREE.Scene();
 
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 180);
-  camera.position.set(0, 1.55, 6.6);
-
-  // Background image (Option 2)
+  // Background (Hamptons)
   const bgLoader = new THREE.TextureLoader();
   const bgTex = bgLoader.load(
     '/hamptons.jpg',
@@ -188,6 +181,23 @@ export function createVrMuseumScene({
   const room = new THREE.Group();
   scene.add(room);
 
+  // FPS camera rig: yaw object (body) + pitch object (head) + camera (eyes)
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 180);
+
+  const yawObj = new THREE.Object3D();
+  const pitchObj = new THREE.Object3D();
+  yawObj.add(pitchObj);
+  pitchObj.add(camera);
+  scene.add(yawObj);
+
+  // Start position
+  yawObj.position.set(0, 1.55, 6.6);
+
+  let yaw = 0;
+  let pitch = 0;
+  const minPitch = -0.55;
+  const maxPitch = 0.45;
+
   // Materials
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
@@ -201,31 +211,9 @@ export function createVrMuseumScene({
     metalness: 0.0,
   });
 
-  // Floor (your image)
-  const floorLoader = new THREE.TextureLoader();
-  const floorTex = floorLoader.load(
-    '/floor.png',
-    (t) => {
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.wrapS = THREE.RepeatWrapping;
-      t.wrapT = THREE.RepeatWrapping;
-
-      // Adjust scale here if needed
-      t.repeat.set(roomW / 2.0, roomD / 2.2);
-
-      t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 16);
-      t.needsUpdate = true;
-    },
-    undefined,
-    () => {
-      // If it fails, keep a neutral fallback
-    }
-  );
-  floorTex.colorSpace = THREE.SRGBColorSpace;
-
+  // Floor (force your /floor.png and make failure obvious)
   const floorMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    map: floorTex,
     roughness: 0.62,
     metalness: 0.02,
   });
@@ -234,6 +222,32 @@ export function createVrMuseumScene({
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   room.add(floor);
+
+  const floorLoader = new THREE.TextureLoader();
+  floorLoader.load(
+    '/floor.png',
+    (t) => {
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+
+      // If boards look too small/big, tweak these divisors
+      t.repeat.set(roomW / 2.2, roomD / 2.6);
+
+      t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 16);
+      t.needsUpdate = true;
+
+      floorMat.map = t;
+      floorMat.needsUpdate = true;
+    },
+    undefined,
+    () => {
+      // If it fails to load, force a neutral floor (no weird blue)
+      floorMat.color = new THREE.Color('#d6d6d6');
+      floorMat.map = null;
+      floorMat.needsUpdate = true;
+    }
+  );
 
   // Ceiling
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), ceilingMat);
@@ -263,7 +277,6 @@ export function createVrMuseumScene({
     roughness: 0.85,
     metalness: 0.0,
   });
-
   const baseboardH = 0.09;
   const baseboardT = 0.03;
 
@@ -285,14 +298,11 @@ export function createVrMuseumScene({
 
   const backZ = -roomD / 2;
 
-  // Opening size
   const openingW = roomW * 0.86;
   const openingH = roomH * 0.62;
   const openingBottom = 0.55;
-
   const sideW = (roomW - openingW) / 2;
 
-  // Surrounding wall pieces
   const bottomBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, openingBottom), wallMat);
   bottomBand.position.set(0, openingBottom / 2, backZ);
   windowWall.add(bottomBand);
@@ -313,7 +323,7 @@ export function createVrMuseumScene({
 
   addBaseboard(roomW, 0, backZ + baseboardT / 2, 0);
 
-  // Window frame + mullions (FIXED: hollow frame, not a solid slab)
+  // Hollow window frame
   const frameMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#f7f7f7'),
     roughness: 0.55,
@@ -328,7 +338,6 @@ export function createVrMuseumScene({
   frameGroup.position.set(0, openingBottom + openingH / 2, backZ + frameDepth / 2);
   windowWall.add(frameGroup);
 
-  // Top / bottom borders
   const topBorder = new THREE.Mesh(
     new THREE.BoxGeometry(openingW, frameBorder, frameDepth),
     frameMat
@@ -337,15 +346,14 @@ export function createVrMuseumScene({
   topBorder.castShadow = true;
   frameGroup.add(topBorder);
 
-  const bottomBorder = new THREE.Mesh(
+  const bottomBorder2 = new THREE.Mesh(
     new THREE.BoxGeometry(openingW, frameBorder, frameDepth),
     frameMat
   );
-  bottomBorder.position.set(0, -openingH / 2 + frameBorder / 2, 0);
-  bottomBorder.castShadow = true;
-  frameGroup.add(bottomBorder);
+  bottomBorder2.position.set(0, -openingH / 2 + frameBorder / 2, 0);
+  bottomBorder2.castShadow = true;
+  frameGroup.add(bottomBorder2);
 
-  // Left / right borders
   const leftBorder = new THREE.Mesh(
     new THREE.BoxGeometry(frameBorder, openingH, frameDepth),
     frameMat
@@ -354,20 +362,20 @@ export function createVrMuseumScene({
   leftBorder.castShadow = true;
   frameGroup.add(leftBorder);
 
-  const rightBorder = new THREE.Mesh(
+  const rightBorder2 = new THREE.Mesh(
     new THREE.BoxGeometry(frameBorder, openingH, frameDepth),
     frameMat
   );
-  rightBorder.position.set(openingW / 2 - frameBorder / 2, 0, 0);
-  rightBorder.castShadow = true;
-  frameGroup.add(rightBorder);
+  rightBorder2.position.set(openingW / 2 - frameBorder / 2, 0, 0);
+  rightBorder2.castShadow = true;
+  frameGroup.add(rightBorder2);
 
   // Glass
   const glassMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#e8f6ff'),
-    roughness: 0.05,
+    color: new THREE.Color('#ffffff'),
+    roughness: 0.03,
     metalness: 0.0,
-    transmission: 0.95,
+    transmission: 0.96,
     thickness: 0.03,
     transparent: true,
     opacity: 1.0,
@@ -381,7 +389,7 @@ export function createVrMuseumScene({
   glass.position.set(0, openingBottom + openingH / 2, backZ + frameDepth + 0.01);
   windowWall.add(glass);
 
-  // Mullions grid
+  // Mullions
   const cols = 4;
   const rows = 2;
 
@@ -407,12 +415,13 @@ export function createVrMuseumScene({
     windowWall.add(h);
   }
 
-  // Outside depth (parallax sells realism)
+  // Outside depth (IMPORTANT FIX: push it DOWN so it doesn't look like the room floor continues)
   const outsideGroup = new THREE.Group();
   scene.add(outsideGroup);
 
+  const outsideY = -3.0; // <- key: below interior floor line
   const sand = new THREE.Mesh(
-    new THREE.PlaneGeometry(180, 180),
+    new THREE.PlaneGeometry(200, 200),
     new THREE.MeshStandardMaterial({
       color: new THREE.Color('#cdbb95'),
       roughness: 0.98,
@@ -420,24 +429,23 @@ export function createVrMuseumScene({
     })
   );
   sand.rotation.x = -Math.PI / 2;
-  sand.position.set(0, 0.0, backZ - 26);
-  sand.receiveShadow = true;
+  sand.position.set(0, outsideY, backZ - 35);
   outsideGroup.add(sand);
 
   const ocean = new THREE.Mesh(
-    new THREE.PlaneGeometry(260, 260),
+    new THREE.PlaneGeometry(320, 320),
     new THREE.MeshStandardMaterial({
       color: new THREE.Color('#2f6f9a'),
-      roughness: 0.32,
+      roughness: 0.30,
       metalness: 0.10,
     })
   );
   ocean.rotation.x = -Math.PI / 2;
-  ocean.position.set(0, 0.03, backZ - 95);
+  ocean.position.set(0, outsideY - 0.15, backZ - 120);
   outsideGroup.add(ocean);
 
   const haze = new THREE.Mesh(
-    new THREE.PlaneGeometry(240, 90),
+    new THREE.PlaneGeometry(260, 95),
     new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
@@ -445,25 +453,24 @@ export function createVrMuseumScene({
       depthWrite: false,
     })
   );
-  haze.position.set(0, 18, backZ - 130);
+  haze.position.set(0, 18, backZ - 155);
   outsideGroup.add(haze);
 
-  // Moving clouds dome
+  // Subtle moving clouds layer (far away and does NOT move with camera)
   const cloudTex = generateCloudAlphaTexture(1024, 98765);
   cloudTex.repeat.set(2.0, 1.0);
 
-  const cloudDome = new THREE.Mesh(
-    new THREE.SphereGeometry(120, 48, 32),
+  const cloudPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(260, 120),
     new THREE.MeshBasicMaterial({
       map: cloudTex,
       transparent: true,
-      opacity: 0.32,
-      side: THREE.BackSide,
+      opacity: 0.25,
       depthWrite: false,
     })
   );
-  cloudDome.position.copy(camera.position);
-  outsideGroup.add(cloudDome);
+  cloudPlane.position.set(0, 55, backZ - 160);
+  outsideGroup.add(cloudPlane);
 
   // Lighting
   scene.add(new THREE.AmbientLight(0xffffff, 0.62));
@@ -485,14 +492,6 @@ export function createVrMuseumScene({
   const fill = new THREE.DirectionalLight(0xffffff, 0.30);
   fill.position.set(6, 10, 10);
   scene.add(fill);
-
-  // Window light portal (helps daylight feel)
-  const portal = new THREE.Mesh(
-    new THREE.PlaneGeometry(openingW * 0.98, openingH * 0.98),
-    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.07 })
-  );
-  portal.position.set(0, openingBottom + openingH / 2, backZ + 0.02);
-  windowWall.add(portal);
 
   // Art frames
   const texLoader = new THREE.TextureLoader();
@@ -593,7 +592,7 @@ export function createVrMuseumScene({
     });
   }
 
-  // Simple placements (same logic as your earlier file)
+  // Placements
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const artY = 2.05;
 
@@ -639,13 +638,6 @@ export function createVrMuseumScene({
   let lastY = 0;
   let dragMoved = false;
 
-  let yaw = 0;
-  let pitch = 0;
-  const minPitch = -0.55;
-  const maxPitch = 0.45;
-
-  const basePos = camera.position.clone();
-
   function onPointerDown(e: PointerEvent) {
     isDragging = true;
     dragMoved = false;
@@ -669,6 +661,9 @@ export function createVrMuseumScene({
     yaw -= dx * 0.0032;
     pitch -= dy * 0.0032;
     pitch = clamp(pitch, minPitch, maxPitch);
+
+    yawObj.rotation.y = yaw;
+    pitchObj.rotation.x = pitch;
   }
 
   function onPointerUp(e: PointerEvent) {
@@ -699,17 +694,18 @@ export function createVrMuseumScene({
   }
 
   function onWheel(e: WheelEvent) {
-    const forward = new THREE.Vector3();
-    camera.getWorldDirection(forward);
+    // Move forward/back in the direction you're facing (FPS style)
+    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObj.quaternion);
     forward.y = 0;
     forward.normalize();
 
     const step = e.deltaY * 0.004;
-    basePos.addScaledVector(forward, step);
+    yawObj.position.addScaledVector(forward, step);
 
+    // Clamp inside room
     const margin = 0.9;
-    basePos.x = clamp(basePos.x, -roomW / 2 + margin, roomW / 2 - margin);
-    basePos.z = clamp(basePos.z, -roomD / 2 + margin, roomD / 2 - margin);
+    yawObj.position.x = clamp(yawObj.position.x, -roomW / 2 + margin, roomW / 2 - margin);
+    yawObj.position.z = clamp(yawObj.position.z, -roomD / 2 + margin, roomD / 2 - margin);
   }
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -738,39 +734,39 @@ export function createVrMuseumScene({
     const worldPos = new THREE.Vector3();
     rec.frameGroup.getWorldPosition(worldPos);
 
+    // Place viewer a bit in front of the frame
     const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(rec.frameGroup.quaternion);
     const targetPos = worldPos.clone().add(forward.clone().multiplyScalar(2.6));
     targetPos.y = 1.55;
 
-    basePos.copy(targetPos);
+    yawObj.position.copy(targetPos);
 
-    const lookAt = worldPos.clone();
-    lookAt.y = 1.55;
-    camera.lookAt(lookAt);
+    // Face the artwork
+    const lookDir = worldPos.clone().sub(targetPos);
+    lookDir.y = 0;
+    lookDir.normalize();
+    yaw = Math.atan2(-lookDir.x, -lookDir.z);
+    pitch = 0;
 
-    const euler = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
-    yaw = euler.y;
-    pitch = clamp(euler.x, minPitch, maxPitch);
+    yawObj.rotation.y = yaw;
+    pitchObj.rotation.x = pitch;
   }
 
   function clearFocus() {
-    basePos.set(0, 1.55, 6.6);
+    yawObj.position.set(0, 1.55, 6.6);
     yaw = 0;
     pitch = 0;
+    yawObj.rotation.y = yaw;
+    pitchObj.rotation.x = pitch;
   }
 
+  // Loop
   function animate() {
     if (disposed) return;
 
-    // Clouds drift (very subtle)
-    cloudDome.position.copy(basePos);
+    // Subtle cloud drift only
     cloudTex.offset.x = (cloudTex.offset.x + 0.00003) % 1;
     cloudTex.offset.y = (cloudTex.offset.y + 0.00001) % 1;
-
-    camera.rotation.order = 'YXZ';
-    camera.rotation.y = yaw;
-    camera.rotation.x = pitch;
-    camera.position.copy(basePos);
 
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
@@ -778,6 +774,7 @@ export function createVrMuseumScene({
 
   requestAnimationFrame(animate);
 
+  // Dispose
   function dispose() {
     disposed = true;
     ro.disconnect();
@@ -797,7 +794,6 @@ export function createVrMuseumScene({
         const mats = Array.isArray(mat) ? mat : [mat];
         for (const m of mats) {
           if (m.map?.dispose) m.map.dispose();
-          if (m.roughnessMap?.dispose) m.roughnessMap.dispose();
           if (m.dispose) m.dispose();
         }
       }
@@ -812,3 +808,4 @@ export function createVrMuseumScene({
 
   return { dispose, focusArtwork, clearFocus };
 }
+
