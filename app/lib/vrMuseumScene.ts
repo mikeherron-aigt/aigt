@@ -14,19 +14,18 @@ type CreateArgs = {
 };
 
 /**
- * VR Museum Scene (Room-first version)
+ * VR Museum Scene (Jeff baseline + room realism pass)
  *
- * Goals for this pass:
- * - Keep Jeff baseline vibe (bright, tan-ish floor, windows)
+ * What this version does:
+ * - Keeps Jeff-style bright museum look (no dark cave, no mystery hotspot)
  * - Stark white walls
- * - Lighter wood floor with realistic staggered planks and correct grain direction
- * - Big modern window wall on one end with "Hamptons-like" outside
- * - Keep click-to-open details working
- * - No camera zoom/focus yet (focusArtwork exists but is a no-op)
+ * - Light wood floor with a staggered plank pattern and subtle grain
+ * - Big modern window wall at one end with a simple Hamptons-style outdoor backdrop
+ * - Click artwork to open your existing details modal (no camera zoom yet)
  *
  * Notes:
- * - Artwork planes use MeshBasicMaterial so art stays true and bright
- * - Room uses physicallyCorrectLights when available (typed safely)
+ * - Artwork plane stays MeshBasicMaterial so art color is always correct
+ * - Lighting + shadows stay conservative to avoid floor blobs
  */
 export function createVrMuseumScene({ container, artworks, onArtworkClick }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
@@ -39,225 +38,9 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     return url.startsWith('/') ? url : `/${url}`;
   }
 
-  function rand(seed: number) {
-    // Simple deterministic-ish hash for texture generation
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  }
-
-  function lerp(a: number, b: number, t: number) {
-    return a + (b - a) * t;
-  }
-
-  function clamp(v: number, a: number, b: number) {
-    return Math.max(a, Math.min(b, v));
-  }
-
-  function hexToRgb(hex: string) {
-    const h = hex.replace('#', '').trim();
-    const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
-    const n = parseInt(full, 16);
-    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
-  }
-
-  // ------------------------------------------------------------
-  // Procedural wood floor texture with staggered joints
-  // ------------------------------------------------------------
-  function createWoodFloorTextures(opts: {
-    widthMeters: number;
-    depthMeters: number;
-    texW?: number;
-    texH?: number;
-    plankWidthM?: number;
-    minPlankLenM?: number;
-    maxPlankLenM?: number;
-    minJointOffsetM?: number;
-    baseColorHex?: string;
-  }) {
-    const {
-      widthMeters,
-      depthMeters,
-      texW = 4096,
-      texH = 2048,
-      plankWidthM = 0.18, // about 7 inches
-      minPlankLenM = 1.2,
-      maxPlankLenM = 2.6,
-      minJointOffsetM = 0.22, // about 9 inches
-      baseColorHex = '#caa06a', // light oak-ish
-    } = opts;
-
-    const base = hexToRgb(baseColorHex);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = texW;
-    canvas.height = texH;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('2d context missing');
-
-    const bump = document.createElement('canvas');
-    bump.width = texW;
-    bump.height = texH;
-    const bctx = bump.getContext('2d');
-    if (!bctx) throw new Error('2d context missing');
-
-    // Background
-    ctx.fillStyle = `rgb(${base.r},${base.g},${base.b})`;
-    ctx.fillRect(0, 0, texW, texH);
-
-    bctx.fillStyle = 'rgb(128,128,128)';
-    bctx.fillRect(0, 0, texW, texH);
-
-    // Pixels per meter
-    const pxPerM_X = texW / widthMeters;
-    const pxPerM_Y = texH / depthMeters;
-
-    const plankWpx = Math.max(10, Math.floor(plankWidthM * pxPerM_X));
-    const rows = Math.max(1, Math.floor(texW / plankWpx));
-
-    // Helper to draw subtle grain lines aligned with plank length (Y direction)
-    function drawGrainInPlank(x: number, y: number, w: number, h: number, seed: number) {
-      const lines = Math.max(6, Math.floor(w / 10));
-      for (let i = 0; i < lines; i++) {
-        const t = i / lines;
-        const gx = x + Math.floor(t * w) + Math.floor((rand(seed + i * 13.7) - 0.5) * 4);
-        const alpha = 0.06 + rand(seed + i * 9.1) * 0.06;
-
-        // Color texture grain
-        ctx.fillStyle = `rgba(60,40,20,${alpha})`;
-        ctx.fillRect(gx, y + 4, 1, h - 8);
-
-        // Bump texture grain (lighter/darker)
-        const bumpV = 128 + Math.floor((rand(seed + i * 3.3) - 0.5) * 24);
-        bctx.fillStyle = `rgb(${bumpV},${bumpV},${bumpV})`;
-        bctx.fillRect(gx, y + 4, 1, h - 8);
-      }
-
-      // Occasional knot / variation, still aligned lengthwise
-      if (rand(seed + 101.1) > 0.72) {
-        const ky = y + Math.floor(h * (0.2 + rand(seed + 55.5) * 0.6));
-        const kx = x + Math.floor(w * (0.25 + rand(seed + 77.7) * 0.5));
-        const kr = Math.max(6, Math.floor(Math.min(w, h) * 0.06));
-
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(90,60,35,0.18)`;
-        ctx.ellipse(kx, ky, kr * 1.1, kr * 0.75, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        bctx.beginPath();
-        const bv = 128 + Math.floor((rand(seed + 12.2) - 0.5) * 32);
-        bctx.fillStyle = `rgb(${bv},${bv},${bv})`;
-        bctx.ellipse(kx, ky, kr * 1.05, kr * 0.7, 0, 0, Math.PI * 2);
-        bctx.fill();
-      }
-    }
-
-    // Track end-joint positions per row to avoid aligning with previous row too closely
-    const prevRowJoints: number[] = [];
-
-    for (let r = 0; r < rows; r++) {
-      const x0 = r * plankWpx;
-      const w = r === rows - 1 ? texW - x0 : plankWpx;
-
-      // Slight color drift per row (subtle)
-      const drift = (rand(r * 19.3) - 0.5) * 18;
-      const rowColor = {
-        r: clamp(base.r + drift, 0, 255),
-        g: clamp(base.g + drift * 0.7, 0, 255),
-        b: clamp(base.b + drift * 0.45, 0, 255),
-      };
-
-      // Build staggered plank segments along Y
-      let y = 0;
-      const jointsThisRow: number[] = [];
-
-      // Start offset to force random stagger between rows
-      // Ensure at least minJointOffset from previous row's first joint when possible
-      let startLenM = lerp(minPlankLenM, maxPlankLenM, rand(r * 31.7));
-      if (r > 0 && prevRowJoints.length) {
-        // If the first joint would align too closely with previous row, nudge
-        const firstJointPxCandidate = Math.floor(startLenM * pxPerM_Y);
-        const closestPrev = prevRowJoints.reduce((best, j) => (Math.abs(j - firstJointPxCandidate) < Math.abs(best - firstJointPxCandidate) ? j : best), prevRowJoints[0]);
-        const minPx = Math.floor(minJointOffsetM * pxPerM_Y);
-        if (Math.abs(closestPrev - firstJointPxCandidate) < minPx) {
-          startLenM = clamp(startLenM + 0.45, minPlankLenM, maxPlankLenM);
-        }
-      }
-
-      while (y < texH) {
-        // Choose plank length
-        const seed = r * 1000 + y * 0.01;
-        let lenM = lerp(minPlankLenM, maxPlankLenM, rand(seed));
-        if (y === 0) lenM = startLenM;
-
-        let h = Math.floor(lenM * pxPerM_Y);
-        if (h < 40) h = 40;
-        if (y + h > texH) h = texH - y;
-
-        // Slight per-plank color variation
-        const v = (rand(seed + 7.7) - 0.5) * 24;
-        const pr = clamp(rowColor.r + v, 0, 255);
-        const pg = clamp(rowColor.g + v * 0.85, 0, 255);
-        const pb = clamp(rowColor.b + v * 0.65, 0, 255);
-
-        ctx.fillStyle = `rgb(${pr},${pg},${pb})`;
-        ctx.fillRect(x0, y, w, h);
-
-        // Grain and bump
-        drawGrainInPlank(x0, y, w, h, seed + 99.9);
-
-        // Seams: vertical seams between rows (board edges)
-        // Draw a subtle dark line at the right edge of each row
-        if (r > 0) {
-          ctx.fillStyle = 'rgba(30,20,12,0.10)';
-          ctx.fillRect(x0, y, 1, h);
-          bctx.fillStyle = 'rgb(120,120,120)';
-          bctx.fillRect(x0, y, 1, h);
-        }
-
-        // End joint seam
-        if (y + h < texH) {
-          ctx.fillStyle = 'rgba(30,20,12,0.12)';
-          ctx.fillRect(x0, y + h - 1, w, 1);
-          bctx.fillStyle = 'rgb(120,120,120)';
-          bctx.fillRect(x0, y + h - 1, w, 1);
-
-          jointsThisRow.push(y + h);
-        }
-
-        y += h;
-      }
-
-      prevRowJoints.length = 0;
-      prevRowJoints.push(...jointsThisRow);
-    }
-
-    // Very subtle vignette to reduce flat CG look
-    const grad = ctx.createRadialGradient(texW * 0.5, texH * 0.55, texH * 0.1, texW * 0.5, texH * 0.55, texH * 0.85);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(0,0,0,0.06)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, texW, texH);
-
-    const colorTex = new THREE.CanvasTexture(canvas);
-    colorTex.colorSpace = THREE.SRGBColorSpace;
-    colorTex.anisotropy = 8;
-    colorTex.wrapS = THREE.ClampToEdgeWrapping;
-    colorTex.wrapT = THREE.ClampToEdgeWrapping;
-    colorTex.needsUpdate = true;
-
-    const bumpTex = new THREE.CanvasTexture(bump);
-    bumpTex.colorSpace = THREE.NoColorSpace;
-    bumpTex.anisotropy = 8;
-    bumpTex.wrapS = THREE.ClampToEdgeWrapping;
-    bumpTex.wrapT = THREE.ClampToEdgeWrapping;
-    bumpTex.needsUpdate = true;
-
-    return { colorTex, bumpTex };
-  }
-
-  // ------------------------------------------------------------
+  // ---------------------------
   // Renderer
-  // ------------------------------------------------------------
+  // ---------------------------
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
@@ -274,7 +57,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  // Cross-version: typings can differ by three version
+  // Cross-version: typings may not include this in your installed three
   (renderer as any).physicallyCorrectLights = true;
   if ('useLegacyLights' in renderer) (renderer as any).useLegacyLights = false;
 
@@ -285,26 +68,297 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   container.appendChild(renderer.domElement);
 
-  // ------------------------------------------------------------
+  // ---------------------------
   // Scene + Camera
-  // ------------------------------------------------------------
+  // ---------------------------
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf6f7f9);
+  scene.background = new THREE.Color('#e9eaec'); // bright neutral
+  scene.fog = new THREE.Fog(new THREE.Color('#e9eaec'), 26, 110);
 
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 180);
   camera.position.set(0, 1.55, 6.6);
 
-  // ------------------------------------------------------------
-  // Room
-  // ------------------------------------------------------------
-  const room = new THREE.Group();
-  scene.add(room);
-
+  // ---------------------------
+  // Room dimensions
+  // ---------------------------
   const roomW = 14;
   const roomH = 4.2;
   const roomD = 28;
 
-  // Walls: stark white
+  const room = new THREE.Group();
+  scene.add(room);
+
+  // ---------------------------
+  // Procedural textures (floor + outdoor)
+  // ---------------------------
+  function makeFloorTextures() {
+    // Texture resolution (keep reasonable for load time)
+    const texW = 2048;
+    const texH = 2048;
+
+    const colorCanvas = document.createElement('canvas');
+    colorCanvas.width = texW;
+    colorCanvas.height = texH;
+    const colorCtx = colorCanvas.getContext('2d');
+    if (!colorCtx) {
+      // Very defensive fallback so TS and runtime are happy
+      const fallback = new THREE.Texture();
+      fallback.needsUpdate = true;
+      return { colorTex: fallback, bumpTex: fallback };
+    }
+
+    const bumpCanvas = document.createElement('canvas');
+    bumpCanvas.width = texW;
+    bumpCanvas.height = texH;
+    const bumpCtx = bumpCanvas.getContext('2d');
+    if (!bumpCtx) {
+      const fallback = new THREE.Texture();
+      fallback.needsUpdate = true;
+      return { colorTex: new THREE.CanvasTexture(colorCanvas), bumpTex: fallback };
+    }
+
+    // Base tone similar to your reference image
+    colorCtx.fillStyle = '#cfa56b';
+    colorCtx.fillRect(0, 0, texW, texH);
+
+    bumpCtx.fillStyle = 'rgb(128,128,128)';
+    bumpCtx.fillRect(0, 0, texW, texH);
+
+    // Plank sizing in "texture space"
+    const plankWidth = Math.floor(texW / 10); // ~10 planks across
+    const minLen = Math.floor(texH / 6); // long planks
+    const maxLen = Math.floor(texH / 3);
+
+    // Random helper
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+    const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+    // Draw per plank with staggered joints
+    // Grain runs along the long axis (Y in texture). Planks run "depth" direction in the room.
+    const rows = Math.ceil(texW / plankWidth);
+
+    // Keep joints offset by at least ~6 to 10 inches equivalent (in texture, a fraction of plank length)
+    // We simulate by ensuring adjacent row joint positions differ enough.
+    const prevRowJoints: number[] = [];
+
+    for (let r = 0; r < rows; r++) {
+      const x0 = r * plankWidth;
+      const w = plankWidth + 1;
+
+      // Create segments down the plank (staggered lengths)
+      let y = 0;
+
+      // Slight row-to-row tone variance
+      const rowWarm = rand(-0.06, 0.06);
+      const rowLight = rand(-0.07, 0.07);
+
+      const rowJoints: number[] = [];
+
+      // If not first row, start with a random offset so joints do not align
+      if (r > 0) {
+        const offset = rand(minLen * 0.2, minLen * 0.75);
+        y -= offset;
+      }
+
+      while (y < texH) {
+        const segLen = Math.floor(rand(minLen, maxLen));
+        const y0 = y;
+        const y1 = y + segLen;
+
+        // Joint recording (ignore negative start)
+        if (y0 > 0 && y0 < texH) rowJoints.push(y0);
+
+        // Ensure joint offsets from previous row
+        if (r > 0 && y0 > 0 && prevRowJoints.length) {
+          const nearest = prevRowJoints.reduce((best, j) => (Math.abs(j - y0) < Math.abs(best - y0) ? j : best), prevRowJoints[0]);
+          // If too close, nudge length
+          if (Math.abs(nearest - y0) < minLen * 0.22) {
+            // Push joint away a bit
+            y += Math.floor(minLen * 0.22);
+          }
+        }
+
+        // Segment color variation
+        const segVar = rand(-0.10, 0.10);
+        const light = clamp01(0.62 + rowLight + segVar);
+        const warm = clamp01(0.55 + rowWarm + segVar * 0.5);
+
+        // Build a warm wood-ish color in HSL space
+        // Hue around 35 degrees, modest saturation
+        const hue = 32 + rand(-4, 4);
+        const sat = 35 + rand(-8, 8);
+        const lum = 35 + light * 30; // 35..65
+        colorCtx.fillStyle = `hsl(${hue} ${sat}% ${lum}%)`;
+
+        const drawY0 = Math.max(0, y0);
+        const drawH = Math.min(texH, y1) - drawY0;
+        if (drawH > 0) {
+          colorCtx.fillRect(x0, drawY0, w, drawH);
+
+          // Subtle end joint dark line
+          colorCtx.fillStyle = 'rgba(40,24,14,0.10)';
+          colorCtx.fillRect(x0, drawY0, w, 2);
+
+          // Plank edge seam
+          colorCtx.fillStyle = 'rgba(20,12,8,0.09)';
+          colorCtx.fillRect(x0, drawY0, 2, drawH);
+          colorCtx.fillRect(x0 + w - 2, drawY0, 2, drawH);
+
+          // Grain: vertical strokes along Y (long side), not horizontal
+          const grainCount = 140;
+          for (let g = 0; g < grainCount; g++) {
+            const gx = x0 + rand(6, w - 6);
+            const alpha = rand(0.02, 0.07);
+            const gh = Math.floor(drawH * rand(0.35, 0.95));
+            const gy = drawY0 + Math.floor(rand(0, Math.max(1, drawH - gh)));
+
+            colorCtx.fillStyle = `rgba(60,40,20,${alpha})`;
+            colorCtx.fillRect(gx, gy, 1, gh);
+
+            // Bump grain (slight)
+            const bump = 128 + Math.floor(rand(-10, 10));
+            bumpCtx.fillStyle = `rgb(${bump},${bump},${bump})`;
+            bumpCtx.fillRect(gx, gy, 1, gh);
+          }
+
+          // Occasional knots
+          if (Math.random() < 0.18) {
+            const kx = x0 + rand(w * 0.15, w * 0.85);
+            const ky = drawY0 + rand(drawH * 0.15, drawH * 0.85);
+            const kr = rand(6, 16);
+
+            // Knot color
+            colorCtx.beginPath();
+            colorCtx.fillStyle = 'rgba(80,55,35,0.18)';
+            colorCtx.arc(kx, ky, kr, 0, Math.PI * 2);
+            colorCtx.fill();
+
+            // Knot bump
+            bumpCtx.beginPath();
+            bumpCtx.fillStyle = 'rgb(118,118,118)';
+            bumpCtx.arc(kx, ky, kr, 0, Math.PI * 2);
+            bumpCtx.fill();
+          }
+        }
+
+        y += segLen;
+      }
+
+      // Remember joints for next row
+      prevRowJoints.length = 0;
+      prevRowJoints.push(...rowJoints);
+    }
+
+    // Mild vignette to break the too-perfect look
+    const grad = colorCtx.createRadialGradient(texW / 2, texH / 2, texW * 0.1, texW / 2, texH / 2, texW * 0.8);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.06)');
+    colorCtx.fillStyle = grad;
+    colorCtx.fillRect(0, 0, texW, texH);
+
+    const colorTex = new THREE.CanvasTexture(colorCanvas);
+    colorTex.colorSpace = THREE.SRGBColorSpace;
+    colorTex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+    colorTex.wrapS = THREE.RepeatWrapping;
+    colorTex.wrapT = THREE.RepeatWrapping;
+
+    const bumpTex = new THREE.CanvasTexture(bumpCanvas);
+    bumpTex.colorSpace = THREE.NoColorSpace;
+    bumpTex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+    bumpTex.wrapS = THREE.RepeatWrapping;
+    bumpTex.wrapT = THREE.RepeatWrapping;
+
+    // Repeat so planks feel properly sized in world space
+    colorTex.repeat.set(roomW / 3.4, roomD / 7.2);
+    bumpTex.repeat.copy(colorTex.repeat);
+
+    colorTex.needsUpdate = true;
+    bumpTex.needsUpdate = true;
+
+    return { colorTex, bumpTex };
+  }
+
+  function makeOutdoorBackdropTexture() {
+    const w = 2048;
+    const h = 1024;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      const t = new THREE.Texture();
+      t.needsUpdate = true;
+      return t;
+    }
+
+    // Sky gradient
+    const sky = ctx.createLinearGradient(0, 0, 0, h);
+    sky.addColorStop(0, '#bfe3ff');
+    sky.addColorStop(0.55, '#dff2ff');
+    sky.addColorStop(1, '#f7fbff');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h);
+
+    // Distant haze near horizon
+    const haze = ctx.createLinearGradient(0, h * 0.42, 0, h * 0.72);
+    haze.addColorStop(0, 'rgba(255,255,255,0)');
+    haze.addColorStop(1, 'rgba(255,255,255,0.55)');
+    ctx.fillStyle = haze;
+    ctx.fillRect(0, h * 0.35, w, h * 0.55);
+
+    // Sea band
+    ctx.fillStyle = '#7fb6d6';
+    ctx.fillRect(0, h * 0.62, w, h * 0.12);
+
+    // Subtle sea shimmer
+    for (let i = 0; i < 600; i++) {
+      const x = Math.random() * w;
+      const y = h * (0.62 + Math.random() * 0.11);
+      const a = 0.05 + Math.random() * 0.08;
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fillRect(x, y, 30 + Math.random() * 80, 1);
+    }
+
+    // Tree line silhouettes
+    ctx.fillStyle = '#5f7f5f';
+    ctx.fillRect(0, h * 0.56, w, h * 0.06);
+
+    // Tree blobs
+    for (let i = 0; i < 140; i++) {
+      const x = Math.random() * w;
+      const y = h * (0.50 + Math.random() * 0.12);
+      const rx = 30 + Math.random() * 90;
+      const ry = 14 + Math.random() * 38;
+      ctx.beginPath();
+      ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(70,105,70,${0.22 + Math.random() * 0.18})`;
+      ctx.fill();
+    }
+
+    // Bright sun area
+    const sun = ctx.createRadialGradient(w * 0.75, h * 0.18, 10, w * 0.75, h * 0.18, 240);
+    sun.addColorStop(0, 'rgba(255,255,255,0.95)');
+    sun.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sun;
+    ctx.fillRect(0, 0, w, h);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
+    tex.wrapS = THREE.ClampToEdgeWrapping;
+    tex.wrapT = THREE.ClampToEdgeWrapping;
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  const { colorTex: floorColorTex, bumpTex: floorBumpTex } = makeFloorTextures();
+  const outdoorTex = makeOutdoorBackdropTexture();
+
+  // ---------------------------
+  // Materials
+  // ---------------------------
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
     roughness: 0.95,
@@ -313,29 +367,22 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   const ceilingMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#fbfbfb'),
-    roughness: 0.99,
+    roughness: 0.98,
     metalness: 0.0,
   });
 
-  // Floor: wood texture with correct grain direction (along depth)
-  const { colorTex: floorColor, bumpTex: floorBump } = createWoodFloorTextures({
-    widthMeters: roomW,
-    depthMeters: roomD,
-    baseColorHex: '#caa06a',
-    plankWidthM: 0.18,
-    minPlankLenM: 1.2,
-    maxPlankLenM: 2.6,
-    minJointOffsetM: 0.22,
-  });
-
   const floorMat = new THREE.MeshStandardMaterial({
-    map: floorColor,
-    bumpMap: floorBump,
-    bumpScale: 0.025,
+    color: new THREE.Color('#ffffff'),
     roughness: 0.62,
     metalness: 0.02,
+    map: floorColorTex,
+    bumpMap: floorBumpTex,
+    bumpScale: 0.06,
   });
 
+  // ---------------------------
+  // Room geometry
+  // ---------------------------
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
@@ -346,10 +393,12 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   ceiling.rotation.x = Math.PI / 2;
   room.add(ceiling);
 
-  // Walls (we will replace the front wall with a window wall)
-  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
-  backWall.position.set(0, roomH / 2, -roomD / 2);
-  room.add(backWall);
+  // We will make the "back wall" a window wall (glass + mullions + outdoor plane)
+  // and keep the other walls as standard.
+  const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
+  frontWall.position.set(0, roomH / 2, roomD / 2);
+  frontWall.rotation.y = Math.PI;
+  room.add(frontWall);
 
   const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
   leftWall.position.set(-roomW / 2, roomH / 2, 0);
@@ -363,7 +412,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   // Baseboards
   const baseboardMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#f1f1f1'),
+    color: new THREE.Color('#f2f2f2'),
     roughness: 0.85,
     metalness: 0.0,
   });
@@ -379,280 +428,166 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     room.add(mesh);
   }
 
-  addBaseboardAlongWall(roomW, 0, -roomD / 2 + baseboardT / 2, 0);
+  // No baseboard on back wall because it's windows
+  addBaseboardAlongWall(roomW, 0, roomD / 2 - baseboardT / 2, 0);
   addBaseboardAlongWall(roomD, -roomW / 2 + baseboardT / 2, 0, Math.PI / 2);
   addBaseboardAlongWall(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
 
-  // ------------------------------------------------------------
-  // Window wall (front end of the room, z = +roomD/2)
-  // ------------------------------------------------------------
-  const windowWall = new THREE.Group();
-  windowWall.position.set(0, 0, roomD / 2);
-  room.add(windowWall);
+  // ---------------------------
+  // Window wall (back end)
+  // ---------------------------
+  const windowGroup = new THREE.Group();
+  windowGroup.position.set(0, 0, -roomD / 2 + 0.001);
+  room.add(windowGroup);
 
-  // Low wall under windows
-  const sillH = 0.65;
-  const lowWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, sillH), wallMat);
-  lowWall.position.set(0, sillH / 2, -0.001);
-  lowWall.rotation.y = Math.PI; // face inward
-  windowWall.add(lowWall);
+  // Outdoor plane behind glass (slightly behind the window wall so no z-fighting)
+  const outside = new THREE.Mesh(
+    new THREE.PlaneGeometry(roomW + 2.5, roomH + 1.6),
+    new THREE.MeshBasicMaterial({
+      map: outdoorTex,
+    })
+  );
+  outside.position.set(0, roomH / 2, -0.22);
+  windowGroup.add(outside);
 
-  // Side columns
-  const colW = 0.38;
-  const colGeo = new THREE.BoxGeometry(colW, roomH, 0.08);
-  const leftCol = new THREE.Mesh(colGeo, wallMat);
-  leftCol.position.set(-roomW / 2 + colW / 2, roomH / 2, -0.02);
-  windowWall.add(leftCol);
-
-  const rightCol = new THREE.Mesh(colGeo, wallMat);
-  rightCol.position.set(roomW / 2 - colW / 2, roomH / 2, -0.02);
-  windowWall.add(rightCol);
-
-  // Top beam
-  const beamH = 0.28;
-  const beamGeo = new THREE.BoxGeometry(roomW, beamH, 0.08);
-  const topBeam = new THREE.Mesh(beamGeo, wallMat);
-  topBeam.position.set(0, roomH - beamH / 2, -0.02);
-  windowWall.add(topBeam);
-
-  // Window frames
-  const frameMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#dcdcdc'),
-    roughness: 0.65,
-    metalness: 0.05,
-  });
-
-  const mullionMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#cfcfcf'),
-    roughness: 0.7,
-    metalness: 0.05,
-  });
-
+  // Glass
   const glassMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#d8ecff'),
-    roughness: 0.05,
+    color: new THREE.Color('#ffffff'),
+    roughness: 0.08,
     metalness: 0.0,
-    transmission: 0.9,
+    transmission: 1.0,
+    thickness: 0.04,
+    ior: 1.5,
     transparent: true,
-    opacity: 1,
-    ior: 1.45,
-    thickness: 0.02,
+    opacity: 1.0,
   });
 
-  // Glass area dimensions
-  const glassY0 = sillH;
-  const glassY1 = roomH - beamH;
-  const glassH = glassY1 - glassY0;
-  const glassW = roomW - colW * 2;
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), glassMat);
+  glass.position.set(0, roomH / 2, 0);
+  windowGroup.add(glass);
 
-  // Divide into bays like a modern museum wall of windows
-  const bays = 5;
-  const bayGap = 0.02;
-  const bayW = (glassW - (bays - 1) * bayGap) / bays;
-
-  const frameDepth = 0.04;
-
-  for (let i = 0; i < bays; i++) {
-    const xCenter = -glassW / 2 + bayW / 2 + i * (bayW + bayGap);
-
-    // Outer frame for the bay
-    const outer = new THREE.Mesh(new THREE.BoxGeometry(bayW, glassH, frameDepth), frameMat);
-    outer.position.set(xCenter, glassY0 + glassH / 2, -0.035);
-    windowWall.add(outer);
-
-    // Inner glass (slightly in front)
-    const glass = new THREE.Mesh(new THREE.PlaneGeometry(bayW - 0.08, glassH - 0.08), glassMat);
-    glass.position.set(xCenter, glassY0 + glassH / 2, -0.01);
-    glass.rotation.y = Math.PI; // face inward
-    windowWall.add(glass);
-
-    // Mullions (2x2 grid per bay)
-    const mullionW = 0.03;
-    const mullionZ = 0.02;
-
-    const vM = new THREE.Mesh(new THREE.BoxGeometry(mullionW, glassH - 0.1, mullionZ), mullionMat);
-    vM.position.set(xCenter, glassY0 + glassH / 2, -0.02);
-    windowWall.add(vM);
-
-    const hM = new THREE.Mesh(new THREE.BoxGeometry(bayW - 0.1, mullionW, mullionZ), mullionMat);
-    hM.position.set(xCenter, glassY0 + glassH / 2, -0.02);
-    windowWall.add(hM);
-  }
-
-  // Baseboard on the window wall low section
-  addBaseboardAlongWall(roomW, 0, roomD / 2 - baseboardT / 2, 0);
-
-  // ------------------------------------------------------------
-  // Outside scene (Hamptons vibe, lightweight)
-  // ------------------------------------------------------------
-  const outside = new THREE.Group();
-  outside.position.set(0, 0, roomD / 2 + 0.6);
-  scene.add(outside);
-
-  // Sky dome (simple gradient texture)
-  function createSkyTexture() {
-    const c = document.createElement('canvas');
-    c.width = 1024;
-    c.height = 512;
-    const g = c.getContext('2d');
-    if (!g) throw new Error('2d context missing');
-
-    const grd = g.createLinearGradient(0, 0, 0, c.height);
-    grd.addColorStop(0, '#a9d6ff');
-    grd.addColorStop(0.55, '#dff1ff');
-    grd.addColorStop(1, '#ffffff');
-
-    g.fillStyle = grd;
-    g.fillRect(0, 0, c.width, c.height);
-
-    // Soft clouds
-    for (let i = 0; i < 90; i++) {
-      const x = Math.floor(rand(i * 12.7) * c.width);
-      const y = Math.floor(rand(i * 33.1) * c.height * 0.55);
-      const r = 30 + rand(i * 9.9) * 90;
-      g.beginPath();
-      g.fillStyle = `rgba(255,255,255,${0.08 + rand(i * 1.7) * 0.10})`;
-      g.ellipse(x, y, r * 1.3, r * 0.7, 0, 0, Math.PI * 2);
-      g.fill();
-    }
-
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.needsUpdate = true;
-    return tex;
-  }
-
-  const skyTex = createSkyTexture();
-  const skyMat = new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide });
-  const skyDome = new THREE.Mesh(new THREE.SphereGeometry(80, 32, 16), skyMat);
-  skyDome.position.set(0, 18, 18);
-  outside.add(skyDome);
-
-  // Ocean plane far away
-  const oceanMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#7fb6c8'),
-    roughness: 0.22,
-    metalness: 0.02,
+  // Mullions / frame
+  const frameMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#d9dadd'),
+    roughness: 0.55,
+    metalness: 0.1,
   });
-  const ocean = new THREE.Mesh(new THREE.PlaneGeometry(200, 80), oceanMat);
-  ocean.rotation.x = -Math.PI / 2;
-  ocean.position.set(0, 0.02, 48);
-  outside.add(ocean);
 
-  // Dune / ground
-  const duneMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#d6c7a6'),
-    roughness: 0.95,
-    metalness: 0.0,
-  });
-  const dune = new THREE.Mesh(new THREE.PlaneGeometry(200, 80), duneMat);
-  dune.rotation.x = -Math.PI / 2;
-  dune.position.set(0, 0.01, 18);
-  outside.add(dune);
+  const frameDepth = 0.06;
+  const frameThick = 0.08;
 
-  // Tree line as simple "billboard strip" with procedural texture
-  function createTreeLineTexture() {
-    const c = document.createElement('canvas');
-    c.width = 1024;
-    c.height = 256;
-    const g = c.getContext('2d');
-    if (!g) throw new Error('2d context missing');
+  // Outer border
+  const topFrame = new THREE.Mesh(new THREE.BoxGeometry(roomW, frameThick, frameDepth), frameMat);
+  topFrame.position.set(0, roomH - frameThick / 2, 0.02);
+  windowGroup.add(topFrame);
 
-    g.clearRect(0, 0, c.width, c.height);
-    g.fillStyle = 'rgba(0,0,0,0)';
-    g.fillRect(0, 0, c.width, c.height);
+  const bottomFrame = new THREE.Mesh(new THREE.BoxGeometry(roomW, frameThick, frameDepth), frameMat);
+  bottomFrame.position.set(0, frameThick / 2, 0.02);
+  windowGroup.add(bottomFrame);
 
-    for (let i = 0; i < 220; i++) {
-      const x = rand(i * 12.13) * c.width;
-      const h = 40 + rand(i * 91.7) * 160;
-      const w = 18 + rand(i * 7.77) * 42;
-      const y = c.height - h;
+  const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, roomH, frameDepth), frameMat);
+  leftFrame.position.set(-roomW / 2 + frameThick / 2, roomH / 2, 0.02);
+  windowGroup.add(leftFrame);
 
-      const green = 90 + Math.floor(rand(i * 2.17) * 70);
-      g.fillStyle = `rgba(30,${green},40,0.70)`;
-      g.beginPath();
-      g.ellipse(x, y + h * 0.55, w, h * 0.55, 0, 0, Math.PI * 2);
-      g.fill();
+  const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThick, roomH, frameDepth), frameMat);
+  rightFrame.position.set(roomW / 2 - frameThick / 2, roomH / 2, 0.02);
+  windowGroup.add(rightFrame);
 
-      g.fillStyle = `rgba(20,${green - 10},30,0.45)`;
-      g.beginPath();
-      g.ellipse(x + w * 0.2, y + h * 0.62, w * 0.75, h * 0.45, 0, 0, Math.PI * 2);
-      g.fill();
-    }
-
-    const tex = new THREE.CanvasTexture(c);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.needsUpdate = true;
-    return tex;
+  // Vertical mullions
+  const mullionCount = 4; // big contemporary panes
+  for (let i = 1; i < mullionCount; i++) {
+    const x = -roomW / 2 + (roomW / mullionCount) * i;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(frameThick * 0.6, roomH - frameThick * 2, frameDepth * 0.9), frameMat);
+    m.position.set(x, roomH / 2, 0.02);
+    windowGroup.add(m);
   }
 
-  const treeTex = createTreeLineTexture();
-  const treeMat = new THREE.MeshBasicMaterial({ map: treeTex, transparent: true, opacity: 0.95 });
-  const treeStrip = new THREE.Mesh(new THREE.PlaneGeometry(160, 24), treeMat);
-  treeStrip.position.set(0, 12, 28);
-  outside.add(treeStrip);
+  // Horizontal mullions
+  const horizCount = 2;
+  for (let i = 1; i < horizCount + 1; i++) {
+    const y = (roomH / (horizCount + 1)) * i;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(roomW - frameThick * 2, frameThick * 0.55, frameDepth * 0.9), frameMat);
+    m.position.set(0, y, 0.02);
+    windowGroup.add(m);
+  }
 
-  // ------------------------------------------------------------
-  // Lighting (bright, museum-like, natural light from windows)
-  // ------------------------------------------------------------
-  const hemi = new THREE.HemisphereLight(0xffffff, 0xbfd2e6, 0.65);
+  // ---------------------------
+  // Lighting (keep bright + believable)
+  // ---------------------------
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x8fa1b3, 0.7);
   scene.add(hemi);
 
-  const ambient = new THREE.AmbientLight(0xffffff, 0.26);
+  const ambient = new THREE.AmbientLight(0xffffff, 0.28);
   scene.add(ambient);
 
-  // Sun coming in from window wall direction
-  const sun = new THREE.DirectionalLight(0xffffff, 1.35);
-  sun.position.set(0, 10.5, roomD / 2 + 10);
+  // Directional "sun" coming from the window wall into the room
+  const sun = new THREE.DirectionalLight(0xffffff, 1.1);
+  sun.position.set(3, 7.5, -10);
   sun.castShadow = true;
+
   sun.shadow.mapSize.set(2048, 2048);
   sun.shadow.camera.near = 0.5;
-  sun.shadow.camera.far = 120;
+  sun.shadow.camera.far = 90;
   sun.shadow.camera.left = -22;
   sun.shadow.camera.right = 22;
   sun.shadow.camera.top = 22;
   sun.shadow.camera.bottom = -22;
-  sun.shadow.bias = -0.00015;
+
+  sun.shadow.bias = -0.0002;
   sun.shadow.normalBias = 0.02;
 
   const sunTarget = new THREE.Object3D();
-  sunTarget.position.set(0, 1.6, 0);
+  sunTarget.position.set(0, 1.6, 2);
   scene.add(sunTarget);
   sun.target = sunTarget;
-
   scene.add(sun);
 
-  // Subtle fill from behind so corners do not crush
-  const fill = new THREE.DirectionalLight(0xffffff, 0.38);
-  fill.position.set(-8, 6, -8);
+  // Gentle fill opposite
+  const fill = new THREE.DirectionalLight(0xffffff, 0.45);
+  fill.position.set(-8, 6, 10);
   scene.add(fill);
 
-  // Track light fixture (visible, boosts realism)
+  // Ceiling track (subtle, no black bar)
   const trackMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#111111'),
-    roughness: 0.35,
-    metalness: 0.25,
+    color: new THREE.Color('#f3f3f3'),
+    roughness: 0.55,
+    metalness: 0.08,
   });
 
-  const trackGlowMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#ffffff'),
-    roughness: 1,
-    metalness: 0,
-    emissive: new THREE.Color('#ffffff'),
-    emissiveIntensity: 0.25,
-  });
-
-  const track = new THREE.Mesh(new THREE.BoxGeometry(roomW - 1.5, 0.06, 0.06), trackMat);
-  track.position.set(0, roomH - 0.25, 0);
+  const track = new THREE.Mesh(new THREE.BoxGeometry(roomW - 1.8, 0.05, 0.05), trackMat);
+  track.position.set(0, roomH - 0.28, 0);
   room.add(track);
 
-  const glow = new THREE.Mesh(new THREE.BoxGeometry(roomW - 1.7, 0.02, 0.02), trackGlowMat);
-  glow.position.set(0, roomH - 0.29, 0);
-  room.add(glow);
+  // Small spot heads with light cones (no floor shadow artifacts)
+  const headMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#e9e9e9'),
+    roughness: 0.4,
+    metalness: 0.1,
+  });
 
-  // ------------------------------------------------------------
-  // Artworks
-  // ------------------------------------------------------------
+  const heads = new THREE.Group();
+  heads.position.set(0, roomH - 0.33, 0);
+  room.add(heads);
+
+  for (let i = 0; i < 6; i++) {
+    const t = i / 5;
+    const x = THREE.MathUtils.lerp(-roomW * 0.35, roomW * 0.35, t);
+    const head = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.06, 0.12, 16), headMat);
+    head.position.set(x, 0, 0);
+    head.rotation.x = Math.PI / 2;
+    heads.add(head);
+
+    const s = new THREE.SpotLight(0xffffff, 0.55, 10, Math.PI / 7, 0.75, 1.0);
+    s.position.set(x, 0.02, 0);
+    s.target.position.set(x, -2.0, 0);
+    s.castShadow = false;
+    heads.add(s);
+    heads.add(s.target);
+  }
+
+  // ---------------------------
+  // Texture loading (art)
+  // ---------------------------
   const texLoader = new THREE.TextureLoader();
 
   function loadArtworkTexture(url: string): Promise<THREE.Texture> {
@@ -674,6 +609,9 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     });
   }
 
+  // ---------------------------
+  // Frames + artwork placement
+  // ---------------------------
   const framesGroup = new THREE.Group();
   room.add(framesGroup);
 
@@ -684,8 +622,8 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   });
 
   const frameInnerMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#f6f6f6'),
-    roughness: 0.95,
+    color: new THREE.Color('#ffffff'),
+    roughness: 0.98,
     metalness: 0.0,
   });
 
@@ -733,13 +671,13 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
     const outer = new THREE.Mesh(new THREE.BoxGeometry(artW + frameT, artH + frameT, depth), frameOuterMat);
     outer.castShadow = true;
-    outer.receiveShadow = false;
     group.add(outer);
 
     const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.005), frameInnerMat);
     matte.position.z = depth / 2 + 0.004;
     group.add(matte);
 
+    // Artwork plane: always bright and true (art is the star)
     const artMat = new THREE.MeshBasicMaterial({
       color: texture ? 0xffffff : 0x2b2b2b,
       map: texture ?? undefined,
@@ -747,13 +685,13 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
     const art = new THREE.Mesh(new THREE.PlaneGeometry(artW, artH), artMat);
     art.position.z = depth / 2 + 0.011;
-    art.userData = { artworkId: artwork.id };
+    art.userData = { artworkId: artwork.id, width: artW, height: artH };
     group.add(art);
 
     artMeshById.set(artwork.id, art);
 
-    // Soft wall wash spotlight per artwork (no shadows to avoid floor artifacts)
-    const spot = new THREE.SpotLight(0xffffff, 0.9, 10, Math.PI / 8, 0.65, 1.0);
+    // Small wall wash per piece (no shadows)
+    const spot = new THREE.SpotLight(0xffffff, 0.55, 10, Math.PI / 8, 0.7, 1.0);
     spot.position.set(0, 3.9, 1.45);
     spot.target = art;
     spot.castShadow = false;
@@ -763,20 +701,28 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     framesGroup.add(group);
   }
 
-  // Layout: right wall then left wall (like baseline)
+  // Layout: right wall then left wall (keeps window wall clear)
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const y = 2.05;
 
   for (let i = 0; i < Math.min(artworks.length, 6); i++) {
     const z = 9 - i * 5.2;
-    placements.push({ pos: new THREE.Vector3(roomW / 2 - 0.06, y, z), rotY: -Math.PI / 2 });
-  }
-  for (let i = 6; i < artworks.length; i++) {
-    const idx = i - 6;
-    const z = 9 - idx * 5.2;
-    placements.push({ pos: new THREE.Vector3(-roomW / 2 + 0.06, y, z), rotY: Math.PI / 2 });
+    placements.push({
+      pos: new THREE.Vector3(roomW / 2 - 0.06, y, z),
+      rotY: -Math.PI / 2,
+    });
   }
 
+  for (let i = 6; i < Math.min(artworks.length, 12); i++) {
+    const idx = i - 6;
+    const z = 9 - idx * 5.2;
+    placements.push({
+      pos: new THREE.Vector3(-roomW / 2 + 0.06, y, z),
+      rotY: Math.PI / 2,
+    });
+  }
+
+  // Build async
   (async () => {
     for (let i = 0; i < artworks.length; i++) {
       if (disposed) return;
@@ -798,9 +744,9 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     }
   })();
 
-  // ------------------------------------------------------------
-  // Controls: drag look + wheel move (no focus mode)
-  // ------------------------------------------------------------
+  // ---------------------------
+  // Controls: drag look + wheel move
+  // ---------------------------
   let isDragging = false;
   let lastX = 0;
   let lastY = 0;
@@ -810,21 +756,11 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   const maxPitch = 0.45;
 
   const basePos = camera.position.clone();
-  const camTargetPos = basePos.clone();
-
-  let pointerDownX = 0;
-  let pointerDownY = 0;
-  let pointerDownTime = 0;
 
   function onPointerDown(e: PointerEvent) {
     isDragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
-
-    pointerDownX = e.clientX;
-    pointerDownY = e.clientY;
-    pointerDownTime = performance.now();
-
     renderer.domElement.setPointerCapture(e.pointerId);
     renderer.domElement.style.cursor = 'grabbing';
   }
@@ -848,29 +784,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
       renderer.domElement.releasePointerCapture(e.pointerId);
     } catch {}
     renderer.domElement.style.cursor = 'grab';
-
-    const moved = Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY);
-    const dt = performance.now() - pointerDownTime;
-
-    // click, not drag
-    if (moved > 6 || dt > 450) return;
-
-    const rect = renderer.domElement.getBoundingClientRect();
-    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-
-    const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera(new THREE.Vector2(nx, ny), camera);
-
-    const hits = raycaster.intersectObjects(Array.from(artMeshById.values()), true);
-    if (!hits.length) return;
-
-    const hit = hits[0].object as THREE.Mesh;
-    const artworkId = hit.userData?.artworkId as string | undefined;
-    if (!artworkId) return;
-
-    const artwork = artworkById.get(artworkId);
-    if (artwork) onArtworkClick?.(artwork);
   }
 
   function onWheel(e: WheelEvent) {
@@ -880,11 +793,11 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     forward.normalize();
 
     const step = e.deltaY * 0.004;
-    camTargetPos.copy(basePos).addScaledVector(forward, step);
+    basePos.addScaledVector(forward, step);
 
     const margin = 0.9;
-    camTargetPos.x = THREE.MathUtils.clamp(camTargetPos.x, -roomW / 2 + margin, roomW / 2 - margin);
-    camTargetPos.z = THREE.MathUtils.clamp(camTargetPos.z, -roomD / 2 + margin, roomD / 2 - margin);
+    basePos.x = THREE.MathUtils.clamp(basePos.x, -roomW / 2 + margin, roomW / 2 - margin);
+    basePos.z = THREE.MathUtils.clamp(basePos.z, -roomD / 2 + margin, roomD / 2 - margin);
   }
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -893,9 +806,54 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
   renderer.domElement.addEventListener('wheel', onWheel, { passive: true });
 
-  // ------------------------------------------------------------
+  // ---------------------------
+  // Click raycast (open modal)
+  // ---------------------------
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  let didDrag = false;
+  let downX = 0;
+  let downY = 0;
+
+  function onClickPointerDown(e: PointerEvent) {
+    didDrag = false;
+    downX = e.clientX;
+    downY = e.clientY;
+  }
+
+  function onClickPointerMove(e: PointerEvent) {
+    if (Math.abs(e.clientX - downX) > 4 || Math.abs(e.clientY - downY) > 4) didDrag = true;
+  }
+
+  function onClickPointerUp(e: PointerEvent) {
+    if (didDrag) return;
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const y2 = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+
+    mouse.set(x, y2);
+    raycaster.setFromCamera(mouse, camera);
+
+    const artMeshes = Array.from(artMeshById.values());
+    const hits = raycaster.intersectObjects(artMeshes, false);
+    if (!hits.length) return;
+
+    const hit = hits[0].object as THREE.Mesh;
+    const artworkId = (hit.userData as any)?.artworkId as string | undefined;
+    if (!artworkId) return;
+
+    const artwork = artworkById.get(artworkId);
+    if (artwork) onArtworkClick?.(artwork);
+  }
+
+  renderer.domElement.addEventListener('pointerdown', onClickPointerDown);
+  renderer.domElement.addEventListener('pointermove', onClickPointerMove);
+  renderer.domElement.addEventListener('pointerup', onClickPointerUp);
+
+  // ---------------------------
   // Resize
-  // ------------------------------------------------------------
+  // ---------------------------
   function resize() {
     const w = container.clientWidth;
     const h = container.clientHeight;
@@ -908,17 +866,14 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   ro.observe(container);
   resize();
 
-  // ------------------------------------------------------------
+  // ---------------------------
   // Loop
-  // ------------------------------------------------------------
+  // ---------------------------
   const clock = new THREE.Clock();
 
   function animate() {
     if (disposed) return;
-
     clock.getDelta();
-
-    basePos.lerp(camTargetPos, 0.14);
 
     camera.rotation.order = 'YXZ';
     camera.rotation.y = yaw;
@@ -931,20 +886,21 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
   requestAnimationFrame(animate);
 
-  // ------------------------------------------------------------
-  // Handle (zoom removed for now)
-  // ------------------------------------------------------------
+  // ---------------------------
+  // Focus API (no zoom for now)
+  // ---------------------------
   function focusArtwork(_artworkId: string) {
-    // Intentionally no-op for this "room dial-in" pass
+    // Intentionally no-op in this "room dial in" phase.
+    // VrMuseumClient opens the modal and you can add zoom later.
   }
 
   function clearFocus() {
-    // Intentionally no-op
+    // no-op
   }
 
-  // ------------------------------------------------------------
+  // ---------------------------
   // Dispose
-  // ------------------------------------------------------------
+  // ---------------------------
   function dispose() {
     disposed = true;
     ro.disconnect();
@@ -955,33 +911,35 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     renderer.domElement.removeEventListener('pointercancel', onPointerUp);
     renderer.domElement.removeEventListener('wheel', onWheel as any);
 
+    renderer.domElement.removeEventListener('pointerdown', onClickPointerDown);
+    renderer.domElement.removeEventListener('pointermove', onClickPointerMove);
+    renderer.domElement.removeEventListener('pointerup', onClickPointerUp);
+
     scene.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
-
       if ((mesh as any).geometry) (mesh as any).geometry.dispose?.();
 
       const mat = (mesh as any).material;
       if (mat) {
         const mats = Array.isArray(mat) ? mat : [mat];
         for (const m of mats) {
-          const mm = m as any;
-          if (mm.map) mm.map.dispose?.();
-          if (mm.bumpMap) mm.bumpMap.dispose?.();
-          if (mm.normalMap) mm.normalMap.dispose?.();
-          mm.dispose?.();
+          if (m.map) m.map.dispose?.();
+          if ((m as any).bumpMap) (m as any).bumpMap.dispose?.();
+          m.dispose?.();
         }
       }
     });
 
-    // Dispose procedural textures explicitly
-    floorColor.dispose();
-    floorBump.dispose();
-    skyTex.dispose();
-    treeTex.dispose();
-
     renderer.dispose();
-    if (renderer.domElement.parentElement === container) container.removeChild(renderer.domElement);
+
+    if (renderer.domElement.parentElement === container) {
+      container.removeChild(renderer.domElement);
+    }
   }
 
-  return { dispose, focusArtwork, clearFocus };
+  return {
+    dispose,
+    focusArtwork,
+    clearFocus,
+  };
 }
