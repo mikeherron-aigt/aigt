@@ -217,118 +217,96 @@ export default function VrMuseumClient() {
       padding: 24,
     }}
   >
-                    ✕
-                  </button>
+    <button
+      type="button"
+      onClick={closeOverlay}
+      style={{
+        position: 'absolute',
+        top: 24,
+        right: 24,
+        width: 44,
+        height: 44,
+        borderRadius: 999,
+        border: '1px solid rgba(255,255,255,0.2)',
+        background: 'rgba(20,20,20,0.8)',
+        color: '#fff',
+        cursor: 'pointer',
+        backdropFilter: 'blur(10px)',
+        fontSize: 18,
+      }}
+      aria-label="Close"
+    >
+      ✕
+    </button>
 
-                  <div
-                    style={{
-                      width: 'min(1180px, 92vw)',
-                      display: 'grid',
-                      gridTemplateColumns: 'minmax(0, 1fr) 340px',
-                      gap: 22,
-                      alignItems: 'start',
-                    }}
-                  >
-                    <div
-                      style={{
-                        borderRadius: 18,
-                        background: 'rgba(10,10,10,0.65)',
-                        border: '1px solid rgba(255,255,255,0.10)',
-                        padding: 18,
-                        boxShadow: '0 18px 70px rgba(0,0,0,0.65)',
-                      }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={selectedArtwork.imageUrl}
-                        alt={selectedArtwork.title}
-                        style={{
-                          width: '100%',
-                          height: 'auto',
-                          maxHeight: '76vh',
-                          objectFit: 'contain',
-                          borderRadius: 12,
-                          display: 'block',
-                          margin: '0 auto',
-                          background: '#0b0b0b',
-                        }}
-                      />
-                    </div>
+    <div
+      style={{
+        width: 'min(1200px, 94vw)',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) 360px',
+        gap: 28,
+        alignItems: 'start',
+      }}
+    >
+      <div
+        style={{
+          borderRadius: 20,
+          background: '#0d0d0d',
+          padding: 20,
+          boxShadow: '0 30px 100px rgba(0,0,0,0.6)',
+        }}
+      >
+        <img
+          src={selectedArtwork.imageUrl}
+          alt={selectedArtwork.title}
+          style={{
+            width: '100%',
+            height: 'auto',
+            maxHeight: '82vh',
+            objectFit: 'contain',
+            borderRadius: 14,
+            display: 'block',
+            margin: '0 auto',
+          }}
+        />
+      </div>
 
-                    <div
-                      style={{
-                        borderRadius: 18,
-                        background: 'rgba(12,12,12,0.72)',
-                        border: '1px solid rgba(255,255,255,0.10)',
-                        padding: 18,
-                        color: '#fff',
-                        boxShadow: '0 18px 70px rgba(0,0,0,0.55)',
-                        backdropFilter: 'blur(14px)',
-                      }}
-                    >
-                      <div style={{ fontSize: 18, fontWeight: 650, lineHeight: 1.25 }}>
-                        {selectedArtwork.title}
-                      </div>
+      <div
+        style={{
+          borderRadius: 20,
+          background: 'rgba(18,18,18,0.85)',
+          padding: 22,
+          color: '#fff',
+          backdropFilter: 'blur(14px)',
+        }}
+      >
+        <h2 style={{ fontSize: 20, fontWeight: 600 }}>
+          {selectedArtwork.title}
+        </h2>
 
-                      <div style={{ marginTop: 10, fontSize: 13, color: 'rgba(255,255,255,0.70)' }}>
-                        {selectedArtwork.artist}
-                        {selectedArtwork.year ? `, ${selectedArtwork.year}` : ''}
-                      </div>
+        <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.7)' }}>
+          {selectedArtwork.artist}
+          {selectedArtwork.year ? `, ${selectedArtwork.year}` : ''}
+        </div>
 
-                      <div style={{ marginTop: 16, display: 'grid', gap: 12 }}>
-                        <div>
-                          <div
-                            style={{
-                              fontSize: 11,
-                              color: 'rgba(255,255,255,0.45)',
-                              letterSpacing: 0.6,
-                              textTransform: 'uppercase',
-                            }}
-                          >
-                            Collection
-                          </div>
-                          <div style={{ marginTop: 4, fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
-                            {selectedArtwork.collection || 'Unassigned'}
-                          </div>
-                        </div>
+        <div style={{ marginTop: 24 }}>
+          <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1 }}>
+            COLLECTION
+          </div>
+          <div style={{ marginTop: 4 }}>
+            {selectedArtwork.collection || 'Unassigned'}
+          </div>
+        </div>
 
-                        <div>
-                          <div
-                            style={{
-                              fontSize: 11,
-                              color: 'rgba(255,255,255,0.45)',
-                              letterSpacing: 0.6,
-                              textTransform: 'uppercase',
-                            }}
-                          >
-                            Catalog ID
-                          </div>
-                          <div
-                            style={{
-                              marginTop: 4,
-                              fontSize: 13,
-                              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-                              color: 'rgba(255,255,255,0.80)',
-                            }}
-                          >
-                            {selectedArtwork.id}
-                          </div>
-                        </div>
-                      </div>
-
-                      {selectedArtwork.description && (
-                        <p style={{ marginTop: 16, fontSize: 12, lineHeight: 1.7, color: 'rgba(255,255,255,0.70)' }}>
-                          {selectedArtwork.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+        <div style={{ marginTop: 20 }}>
+          <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1 }}>
+            CATALOG ID
+          </div>
+          <div style={{ marginTop: 4, fontFamily: 'monospace' }}>
+            {selectedArtwork.id}
           </div>
         </div>
       </div>
     </div>
-  );
-}
+  </div>
+)}
