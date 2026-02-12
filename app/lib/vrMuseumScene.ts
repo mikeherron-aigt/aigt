@@ -15,11 +15,10 @@ type CreateArgs = {
 
 /**
  * VR Museum Scene
- * Fixes:
  * - Click raycast on artworks
  * - Smooth camera focus that fits the artwork to viewport (aspect aware)
- * - Lighting: brighter wall wash, no mysterious hotspot
- * - Removes floor shadow "blobs" by disabling spotlight shadows
+ * - Brighter, museum-like lighting with visible track fixture
+ * - Removes mystery hotspot and reduces floor shadow artifacts
  * - Keeps artwork as MeshBasicMaterial so color stays true
  */
 export function createVrMuseumScene({ container, artworks, onArtworkClick }: CreateArgs): VrMuseumSceneHandle {
@@ -52,12 +51,12 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
+  renderer.toneMappingExposure = 1.12;
 
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  // Support older typings
+  // Cross-version: typings may not include this in your installed three
   (renderer as any).physicallyCorrectLights = true;
   if ('useLegacyLights' in renderer) (renderer as any).useLegacyLights = false;
 
@@ -74,41 +73,8 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0b0b0b);
 
-  // Fog was making it feel muddy. Remove it for clarity.
-  // If you want a touch of atmosphere later, add back a very subtle fog.
-  // scene.fog = new THREE.Fog(0x0b0b0b, 14, 70);
-
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 120);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 160);
   camera.position.set(0, 1.55, 6.6);
-
-  // ---------------------------
-  // Lighting
-  // ---------------------------
-  // Gallery style: bright, neutral wash. No mystery point light hotspot.
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x1a1a1a, 0.75);
-  scene.add(hemi);
-
-  const ambient = new THREE.AmbientLight(0xffffff, 0.45);
-  scene.add(ambient);
-
-  const key = new THREE.DirectionalLight(0xffffff, 1.15);
-  key.position.set(5, 10, 6);
-  key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
-  key.shadow.camera.near = 0.5;
-  key.shadow.camera.far = 70;
-  key.shadow.camera.left = -18;
-  key.shadow.camera.right = 18;
-  key.shadow.camera.top = 18;
-  key.shadow.camera.bottom = -18;
-  scene.add(key);
-
-  const fill = new THREE.DirectionalLight(0xffffff, 0.55);
-  fill.position.set(-7, 7, -4);
-  scene.add(fill);
-
-  // No rim point light. It created the hot spot.
-  // If you want a subtle ceiling bounce later, we can add a wide area-like light.
 
   // ---------------------------
   // Room geometry/materials
@@ -128,11 +94,10 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     metalness: 0.0,
   });
 
-  // Floor: your blobs were amplified by glossy + very dark.
-  // Make it a soft charcoal matte instead.
+  // Matte charcoal so shadows look natural and no glossy artifacts
   const floorMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#1b1b1b'),
-    roughness: 0.78,
+    roughness: 0.82,
     metalness: 0.0,
   });
 
@@ -191,6 +156,70 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   addBaseboardAlongWall(roomW, 0, roomD / 2 - baseboardT / 2, 0);
   addBaseboardAlongWall(roomD, -roomW / 2 + baseboardT / 2, 0, Math.PI / 2);
   addBaseboardAlongWall(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
+
+  // ---------------------------
+  // Lighting
+  // ---------------------------
+  // Base fill so no dead corners
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 0.65);
+  scene.add(hemi);
+
+  const ambient = new THREE.AmbientLight(0xffffff, 0.33);
+  scene.add(ambient);
+
+  // Key light with explicit target so direction feels consistent
+  const key = new THREE.DirectionalLight(0xffffff, 1.25);
+  key.position.set(6, 10, 10);
+  key.castShadow = true;
+
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.near = 0.5;
+  key.shadow.camera.far = 90;
+  key.shadow.camera.left = -22;
+  key.shadow.camera.right = 22;
+  key.shadow.camera.top = 22;
+  key.shadow.camera.bottom = -22;
+
+  // Shadow tuning to reduce blotchy artifacts on the floor
+  key.shadow.bias = -0.0002;
+  key.shadow.normalBias = 0.02;
+
+  const keyTarget = new THREE.Object3D();
+  keyTarget.position.set(0, 1.6, 0);
+  scene.add(keyTarget);
+  key.target = keyTarget;
+
+  scene.add(key);
+
+  // Fill opposite
+  const fill = new THREE.DirectionalLight(0xffffff, 0.55);
+  fill.position.set(-8, 6, -6);
+  scene.add(fill);
+
+  // ---------------------------
+  // Visible track light fixture (cheap, improves realism)
+  // ---------------------------
+  const trackMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#111111'),
+    roughness: 0.35,
+    metalness: 0.25,
+  });
+
+  const trackGlowMat = new THREE.MeshStandardMaterial({
+    color: new THREE.Color('#ffffff'),
+    roughness: 1,
+    metalness: 0,
+    emissive: new THREE.Color('#ffffff'),
+    emissiveIntensity: 0.35,
+  });
+
+  const track = new THREE.Mesh(new THREE.BoxGeometry(roomW - 1.5, 0.06, 0.06), trackMat);
+  track.position.set(0, roomH - 0.25, 0);
+  room.add(track);
+
+  const glow = new THREE.Mesh(new THREE.BoxGeometry(roomW - 1.7, 0.02, 0.02), trackGlowMat);
+  glow.position.set(0, roomH - 0.29, 0);
+  room.add(glow);
 
   // ---------------------------
   // Texture loading
@@ -284,7 +313,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     matte.position.z = depth / 2 + 0.004;
     group.add(matte);
 
-    // Artwork plane: stays bright and true regardless of scene lighting
+    // Artwork plane: always bright and true (art is the star)
     const artMat = new THREE.MeshBasicMaterial({
       color: texture ? 0xffffff : 0x2b2b2b,
       map: texture ?? undefined,
@@ -297,8 +326,9 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
     artMeshById.set(artwork.id, art);
 
-    // Gallery wash for the wall/frame, NO SHADOWS to avoid blobs.
-    const spot = new THREE.SpotLight(0xffffff, 0.9, 10, Math.PI / 8, 0.65, 1.0);
+    // Wall wash spotlight for realism
+    // No shadows to avoid floor artifacts
+    const spot = new THREE.SpotLight(0xffffff, 1.15, 10, Math.PI / 8, 0.65, 1.0);
     spot.position.set(0, 3.9, 1.45);
     spot.target = art;
     spot.castShadow = false;
@@ -308,6 +338,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     framesGroup.add(group);
   }
 
+  // Placement: right wall then left wall
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const y = 2.05;
 
@@ -354,13 +385,11 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
   const maxPitch = 0.45;
 
   const basePos = camera.position.clone();
+  const camTargetPos = basePos.clone();
 
   let pointerDownX = 0;
   let pointerDownY = 0;
   let pointerDownTime = 0;
-
-  const camTargetPos = basePos.clone();
-  const camTargetLook = new THREE.Vector3(0, 1.5, 0);
 
   const returnPose = {
     pos: basePos.clone(),
@@ -400,7 +429,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const art = artMeshById.get(artworkId);
     if (!art) return;
 
-    // Store return
+    // Store return pose
     returnPose.pos.copy(basePos);
     returnPose.yaw = yaw;
     returnPose.pitch = pitch;
@@ -408,7 +437,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const center = new THREE.Vector3();
     art.getWorldPosition(center);
 
-    // Normal points outward from the art plane
     const normal = new THREE.Vector3(0, 0, 1);
     normal.applyQuaternion(art.getWorldQuaternion(new THREE.Quaternion()));
     normal.normalize();
@@ -417,10 +445,8 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const planeH = Number(art.userData?.height ?? 1.5);
 
     const dist = computeFitDistance(planeW, planeH);
-
     const targetPos = new THREE.Vector3().copy(center).addScaledVector(normal, dist);
 
-    // Compute look direction
     const dir = new THREE.Vector3().subVectors(center, targetPos).normalize();
     const targetYaw = Math.atan2(dir.x, dir.z);
     const targetPitch = THREE.MathUtils.clamp(Math.asin(dir.y), minPitch, maxPitch);
@@ -434,7 +460,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     focusAnim.posFrom.copy(basePos);
     focusAnim.posTo.copy(targetPos);
 
-    camTargetLook.copy(center);
     isFocused = true;
   }
 
@@ -457,6 +482,7 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     isDragging = true;
     lastX = e.clientX;
     lastY = e.clientY;
+
     pointerDownX = e.clientX;
     pointerDownY = e.clientY;
     pointerDownTime = performance.now();
@@ -491,10 +517,9 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     const moved = Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY);
     const dt = performance.now() - pointerDownTime;
 
-    // Treat as click only if it was not a drag
+    // click, not drag
     if (moved > 6 || dt > 450) return;
 
-    // Raycast
     const rect = renderer.domElement.getBoundingClientRect();
     const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     const ny = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
@@ -573,7 +598,6 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
 
       if (focusAnim.t >= 1) focusAnim.active = false;
     } else {
-      // free move lerp
       basePos.lerp(camTargetPos, 0.14);
     }
 
