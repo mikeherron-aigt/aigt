@@ -37,161 +37,17 @@ function mulberry32(seed: number) {
   };
 }
 
-/**
- * Generates a realistic staggered plank floor texture.
- * Planks run along the long axis (room depth).
- * Each row has consistent plank width; lengths vary; end joints stagger.
- */
-function generateStaggeredPlankTextures(opts: {
-  seed: number;
-  textureSize: number; // px
-  roomW: number; // world units
-  roomD: number; // world units
-  plankWidth: number; // world units
-  minPlankLen: number; // world units
-  maxPlankLen: number; // world units
-}) {
-  const { seed, textureSize, roomW, roomD, plankWidth, minPlankLen, maxPlankLen } = opts;
-
-  const rand = mulberry32(seed);
-
-  // Two canvases: color + roughness
-  const colorCanvas = document.createElement('canvas');
-  colorCanvas.width = textureSize;
-  colorCanvas.height = textureSize;
-
-  const roughCanvas = document.createElement('canvas');
-  roughCanvas.width = textureSize;
-  roughCanvas.height = textureSize;
-
-  const cctx = colorCanvas.getContext('2d');
-  const rctx = roughCanvas.getContext('2d');
-  if (!cctx || !rctx) throw new Error('Canvas 2D context unavailable');
-
-  // Background base
-  cctx.fillStyle = '#caa36b';
-  cctx.fillRect(0, 0, textureSize, textureSize);
-
-  rctx.fillStyle = 'rgb(170,170,170)'; // mid roughness base
-  rctx.fillRect(0, 0, textureSize, textureSize);
-
-  // Map world units to texture pixels
-  const pxPerWorldX = textureSize / roomW;
-  const pxPerWorldY = textureSize / roomD;
-
-  // Plank layout along X (rows)
-  const rowPx = Math.max(6, Math.floor(plankWidth * pxPerWorldX));
-  const numRows = Math.ceil(textureSize / rowPx);
-
-  // Subtle per-row variation
-  for (let row = 0; row < numRows; row++) {
-    const x0 = row * rowPx;
-    const x1 = Math.min(textureSize, x0 + rowPx);
-
-    // Row tone variation
-    const hueShift = (rand() - 0.5) * 6; // subtle
-    const lightShift = (rand() - 0.5) * 14;
-
-    // Start offset so joints stagger
-    let y = 0;
-    let prevJoint = -9999;
-
-    // Randomize starting offset for each row (stagger)
-    const startOffsetWorld = lerp(0.15, 0.85, rand()) * maxPlankLen;
-    const startOffsetPx = Math.floor(startOffsetWorld * pxPerWorldY);
-    y -= startOffsetPx;
-
-    while (y < textureSize) {
-      const plankLenWorld = lerp(minPlankLen, maxPlankLen, rand());
-      const plankLenPx = Math.max(10, Math.floor(plankLenWorld * pxPerWorldY));
-
-      const y0 = y;
-      const y1 = y + plankLenPx;
-
-      // Enforce stagger: avoid joints lining up too closely with previous row joint
-      if (Math.abs(y0 - prevJoint) < 14) {
-        y += Math.floor(lerp(0.1, 0.3, rand()) * plankLenPx);
-        continue;
-      }
-      prevJoint = y0;
-
-      // Plank base color per plank
-      const plankRed = 150 + Math.floor((rand() - 0.5) * 16);
-      const plankGreen = 115 + Math.floor((rand() - 0.5) * 14);
-      const plankBlue = 70 + Math.floor((rand() - 0.5) * 12);
-
-      // Apply row shifts
-      const rr = clamp(plankRed + lightShift, 0, 255);
-      const gg = clamp(plankGreen + lightShift, 0, 255);
-      const bb = clamp(plankBlue + lightShift, 0, 255);
-
-      cctx.fillStyle = `rgb(${rr},${gg},${bb})`;
-      cctx.fillRect(x0, y0, x1 - x0, y1 - y0);
-
-      // Grain lines (run along Y axis because boards run along depth)
-      const grainCount = 10 + Math.floor(rand() * 12);
-      for (let g = 0; g < grainCount; g++) {
-        const gx = x0 + Math.floor(rand() * (x1 - x0));
-        const alpha = 0.06 + rand() * 0.08;
-        cctx.fillStyle = `rgba(60,40,20,${alpha})`;
-        cctx.fillRect(gx, y0 + 2, 1, y1 - y0 - 4);
-
-        // Roughness grain (slight contrast)
-        const ra = 0.06 + rand() * 0.1;
-        rctx.fillStyle = `rgba(255,255,255,${ra})`;
-        rctx.fillRect(gx, y0 + 2, 1, y1 - y0 - 4);
-      }
-
-      // Seams (between planks)
-      cctx.fillStyle = 'rgba(25,18,12,0.22)';
-      cctx.fillRect(x0, y0, 1, y1 - y0); // left seam
-      cctx.fillRect(x1 - 1, y0, 1, y1 - y0); // right seam
-      cctx.fillRect(x0, y1 - 1, x1 - x0, 1); // end joint seam
-
-      rctx.fillStyle = 'rgba(0,0,0,0.22)';
-      rctx.fillRect(x0, y0, 1, y1 - y0);
-      rctx.fillRect(x1 - 1, y0, 1, y1 - y0);
-      rctx.fillRect(x0, y1 - 1, x1 - x0, 1);
-
-      y = y1;
-    }
-
-    // Very subtle hue wash per row to break uniformity
-    if (Math.abs(hueShift) > 0.1) {
-      cctx.fillStyle = `rgba(255,190,120,${Math.abs(hueShift) / 400})`;
-      cctx.fillRect(x0, 0, x1 - x0, textureSize);
-    }
+function normalizeImageUrl(url: string) {
+  if (!url) return url;
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('data:') ||
+    url.startsWith('blob:')
+  ) {
+    return url;
   }
-
-  // Soft vignette so floor feels less flat
-  const grad = cctx.createRadialGradient(
-    textureSize * 0.5,
-    textureSize * 0.7,
-    textureSize * 0.1,
-    textureSize * 0.5,
-    textureSize * 0.7,
-    textureSize * 0.9
-  );
-  grad.addColorStop(0, 'rgba(255,255,255,0.06)');
-  grad.addColorStop(1, 'rgba(0,0,0,0.08)');
-  cctx.fillStyle = grad;
-  cctx.fillRect(0, 0, textureSize, textureSize);
-
-  const colorTex = new THREE.CanvasTexture(colorCanvas);
-  colorTex.colorSpace = THREE.SRGBColorSpace;
-  colorTex.wrapS = THREE.ClampToEdgeWrapping;
-  colorTex.wrapT = THREE.ClampToEdgeWrapping;
-  colorTex.anisotropy = 8;
-  colorTex.needsUpdate = true;
-
-  const roughTex = new THREE.CanvasTexture(roughCanvas);
-  roughTex.colorSpace = THREE.NoColorSpace;
-  roughTex.wrapS = THREE.ClampToEdgeWrapping;
-  roughTex.wrapT = THREE.ClampToEdgeWrapping;
-  roughTex.anisotropy = 8;
-  roughTex.needsUpdate = true;
-
-  return { colorTex, roughTex };
+  return url.startsWith('/') ? url : `/${url}`;
 }
 
 function generateSkyFallbackTexture(size = 1024) {
@@ -210,16 +66,8 @@ function generateSkyFallbackTexture(size = 1024) {
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, size, size);
 
-  // Horizon band
   ctx.fillStyle = 'rgba(200,240,255,0.55)';
   ctx.fillRect(0, size * 0.62, size, size * 0.06);
-
-  // Dunes and sea suggestion
-  ctx.fillStyle = 'rgba(60,140,90,0.55)';
-  ctx.fillRect(0, size * 0.64, size, size * 0.1);
-
-  ctx.fillStyle = 'rgba(70,140,200,0.55)';
-  ctx.fillRect(0, size * 0.74, size, size * 0.12);
 
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -238,8 +86,7 @@ function generateCloudAlphaTexture(size = 1024, seed = 1337) {
   ctx.clearRect(0, 0, size, size);
   const rand = mulberry32(seed);
 
-  // Base haze
-  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillStyle = 'rgba(255,255,255,0.03)';
   ctx.fillRect(0, 0, size, size);
 
   const layers = 5;
@@ -260,7 +107,6 @@ function generateCloudAlphaTexture(size = 1024, seed = 1337) {
     }
   }
 
-  // Contrast curve
   const img = ctx.getImageData(0, 0, size, size);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4) {
@@ -282,22 +128,6 @@ function generateCloudAlphaTexture(size = 1024, seed = 1337) {
   return tex;
 }
 
-function normalizeImageUrl(url: string) {
-  if (!url) return url;
-  if (
-    url.startsWith('http://') ||
-    url.startsWith('https://') ||
-    url.startsWith('data:') ||
-    url.startsWith('blob:')
-  ) {
-    return url;
-  }
-  return url.startsWith('/') ? url : `/${url}`;
-}
-
-/**
- * Main scene
- */
 export function createVrMuseumScene({
   container,
   artworks,
@@ -316,7 +146,7 @@ export function createVrMuseumScene({
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 1.1;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -324,42 +154,41 @@ export function createVrMuseumScene({
   renderer.domElement.style.height = '100%';
   renderer.domElement.style.display = 'block';
   renderer.domElement.style.cursor = 'grab';
-
   container.appendChild(renderer.domElement);
 
   // Scene and camera
   const scene = new THREE.Scene();
 
-  // Background: Hamptons image (Option 2)
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 180);
+  camera.position.set(0, 1.55, 6.6);
+
+  // Background image (Option 2)
   const bgLoader = new THREE.TextureLoader();
-  const hamptonsBgTex = bgLoader.load(
+  const bgTex = bgLoader.load(
     '/hamptons.jpg',
     (t) => {
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
       t.needsUpdate = true;
+      scene.background = t;
     },
     undefined,
     () => {
       scene.background = generateSkyFallbackTexture(1024);
     }
   );
-  hamptonsBgTex.colorSpace = THREE.SRGBColorSpace;
-  scene.background = hamptonsBgTex;
-
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 140);
-  camera.position.set(0, 1.55, 6.6);
+  bgTex.colorSpace = THREE.SRGBColorSpace;
+  scene.background = bgTex;
 
   // Room sizing
   const roomW = 14;
   const roomH = 4.2;
   const roomD = 28;
 
-  // Group
   const room = new THREE.Group();
   scene.add(room);
 
-  // Materials (gallery white)
+  // Materials
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
     roughness: 0.94,
@@ -372,47 +201,35 @@ export function createVrMuseumScene({
     metalness: 0.0,
   });
 
-  // Floor: image texture first, fallback to generated planks
+  // Floor (your image)
   const floorLoader = new THREE.TextureLoader();
-  const floorFallback = generateStaggeredPlankTextures({
-    seed: 1337,
-    textureSize: 1024,
-    roomW,
-    roomD,
-    plankWidth: 0.22,
-    minPlankLen: 1.2,
-    maxPlankLen: 2.6,
-  });
-
-  const floorImgTex = floorLoader.load(
+  const floorTex = floorLoader.load(
     '/floor.png',
     (t) => {
       t.colorSpace = THREE.SRGBColorSpace;
       t.wrapS = THREE.RepeatWrapping;
       t.wrapT = THREE.RepeatWrapping;
-      // Tune these to match plank scale
-      t.repeat.set(roomW / 2.2, roomD / 2.6);
-      t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 12);
+
+      // Adjust scale here if needed
+      t.repeat.set(roomW / 2.0, roomD / 2.2);
+
+      t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 16);
       t.needsUpdate = true;
     },
     undefined,
     () => {
-      // keep fallback
+      // If it fails, keep a neutral fallback
     }
   );
+  floorTex.colorSpace = THREE.SRGBColorSpace;
 
   const floorMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    map: floorImgTex ?? floorFallback.colorTex,
-    roughness: 0.58,
+    map: floorTex,
+    roughness: 0.62,
     metalness: 0.02,
   });
 
-  // (Floor loader always returns a Texture object, but if the image fails to load it will stay empty.
-  // This ensures we still have a good floor.)
-  floorMat.roughnessMap = floorFallback.roughTex;
-
-  // Floor
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
@@ -424,7 +241,7 @@ export function createVrMuseumScene({
   ceiling.rotation.x = Math.PI / 2;
   room.add(ceiling);
 
-  // Walls: back wall will be replaced with a window wall
+  // Walls
   const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
   frontWall.position.set(0, roomH / 2, roomD / 2);
   frontWall.rotation.y = Math.PI;
@@ -462,7 +279,7 @@ export function createVrMuseumScene({
   addBaseboard(roomD, -roomW / 2 + baseboardT / 2, 0, Math.PI / 2);
   addBaseboard(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
 
-  // Window wall (back wall at -roomD/2)
+  // Window wall
   const windowWall = new THREE.Group();
   room.add(windowWall);
 
@@ -475,74 +292,105 @@ export function createVrMuseumScene({
 
   const sideW = (roomW - openingW) / 2;
 
-  // Bottom band
-  const bottomH = openingBottom;
-  const bottomBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, bottomH), wallMat);
-  bottomBand.position.set(0, bottomH / 2, backZ);
+  // Surrounding wall pieces
+  const bottomBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, openingBottom), wallMat);
+  bottomBand.position.set(0, openingBottom / 2, backZ);
   windowWall.add(bottomBand);
 
-  // Top band
   const topY0 = openingBottom + openingH;
   const topH = roomH - topY0;
   const topBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, topH), wallMat);
   topBand.position.set(0, topY0 + topH / 2, backZ);
   windowWall.add(topBand);
 
-  // Left band
   const leftBand = new THREE.Mesh(new THREE.PlaneGeometry(sideW, openingH), wallMat);
   leftBand.position.set(-(openingW / 2 + sideW / 2), openingBottom + openingH / 2, backZ);
   windowWall.add(leftBand);
 
-  // Right band
   const rightBand = new THREE.Mesh(new THREE.PlaneGeometry(sideW, openingH), wallMat);
   rightBand.position.set(openingW / 2 + sideW / 2, openingBottom + openingH / 2, backZ);
   windowWall.add(rightBand);
 
   addBaseboard(roomW, 0, backZ + baseboardT / 2, 0);
 
-  // Window frame and mullions
+  // Window frame + mullions (FIXED: hollow frame, not a solid slab)
   const frameMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#f7f7f7'),
-    roughness: 0.6,
+    roughness: 0.55,
     metalness: 0.0,
   });
 
-  const mullionT = 0.04;
   const frameDepth = 0.06;
+  const frameBorder = 0.09;
+  const mullionT = 0.035;
 
-  // Outer frame
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(openingW, openingH, frameDepth), frameMat);
-  frame.position.set(0, openingBottom + openingH / 2, backZ + frameDepth / 2);
-  frame.castShadow = true;
-  frame.receiveShadow = true;
-  windowWall.add(frame);
+  const frameGroup = new THREE.Group();
+  frameGroup.position.set(0, openingBottom + openingH / 2, backZ + frameDepth / 2);
+  windowWall.add(frameGroup);
+
+  // Top / bottom borders
+  const topBorder = new THREE.Mesh(
+    new THREE.BoxGeometry(openingW, frameBorder, frameDepth),
+    frameMat
+  );
+  topBorder.position.set(0, openingH / 2 - frameBorder / 2, 0);
+  topBorder.castShadow = true;
+  frameGroup.add(topBorder);
+
+  const bottomBorder = new THREE.Mesh(
+    new THREE.BoxGeometry(openingW, frameBorder, frameDepth),
+    frameMat
+  );
+  bottomBorder.position.set(0, -openingH / 2 + frameBorder / 2, 0);
+  bottomBorder.castShadow = true;
+  frameGroup.add(bottomBorder);
+
+  // Left / right borders
+  const leftBorder = new THREE.Mesh(
+    new THREE.BoxGeometry(frameBorder, openingH, frameDepth),
+    frameMat
+  );
+  leftBorder.position.set(-openingW / 2 + frameBorder / 2, 0, 0);
+  leftBorder.castShadow = true;
+  frameGroup.add(leftBorder);
+
+  const rightBorder = new THREE.Mesh(
+    new THREE.BoxGeometry(frameBorder, openingH, frameDepth),
+    frameMat
+  );
+  rightBorder.position.set(openingW / 2 - frameBorder / 2, 0, 0);
+  rightBorder.castShadow = true;
+  frameGroup.add(rightBorder);
 
   // Glass
   const glassMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#dff3ff'),
-    roughness: 0.08,
+    color: new THREE.Color('#e8f6ff'),
+    roughness: 0.05,
     metalness: 0.0,
-    transmission: 0.96,
-    thickness: 0.04,
+    transmission: 0.95,
+    thickness: 0.03,
     transparent: true,
     opacity: 1.0,
     ior: 1.45,
   });
 
   const glass = new THREE.Mesh(
-    new THREE.PlaneGeometry(openingW - 0.06, openingH - 0.06),
+    new THREE.PlaneGeometry(openingW - frameBorder * 1.6, openingH - frameBorder * 1.6),
     glassMat
   );
-  glass.position.set(0, openingBottom + openingH / 2, backZ + frameDepth / 2 + 0.01);
+  glass.position.set(0, openingBottom + openingH / 2, backZ + frameDepth + 0.01);
   windowWall.add(glass);
 
-  // Mullions
+  // Mullions grid
   const cols = 4;
   const rows = 2;
 
   for (let c = 1; c < cols; c++) {
     const x = -openingW / 2 + (openingW * c) / cols;
-    const v = new THREE.Mesh(new THREE.BoxGeometry(mullionT, openingH - 0.08, frameDepth), frameMat);
+    const v = new THREE.Mesh(
+      new THREE.BoxGeometry(mullionT, openingH - frameBorder * 1.6, frameDepth),
+      frameMat
+    );
     v.position.set(x, openingBottom + openingH / 2, backZ + frameDepth / 2);
     v.castShadow = true;
     windowWall.add(v);
@@ -550,18 +398,21 @@ export function createVrMuseumScene({
 
   for (let r = 1; r < rows; r++) {
     const y = openingBottom + (openingH * r) / rows;
-    const h = new THREE.Mesh(new THREE.BoxGeometry(openingW - 0.08, mullionT, frameDepth), frameMat);
+    const h = new THREE.Mesh(
+      new THREE.BoxGeometry(openingW - frameBorder * 1.6, mullionT, frameDepth),
+      frameMat
+    );
     h.position.set(0, y, backZ + frameDepth / 2);
     h.castShadow = true;
     windowWall.add(h);
   }
 
-  // Outside depth geometry (parallax)
+  // Outside depth (parallax sells realism)
   const outsideGroup = new THREE.Group();
   scene.add(outsideGroup);
 
   const sand = new THREE.Mesh(
-    new THREE.PlaneGeometry(160, 160),
+    new THREE.PlaneGeometry(180, 180),
     new THREE.MeshStandardMaterial({
       color: new THREE.Color('#cdbb95'),
       roughness: 0.98,
@@ -569,24 +420,24 @@ export function createVrMuseumScene({
     })
   );
   sand.rotation.x = -Math.PI / 2;
-  sand.position.set(0, 0.0, backZ - 22);
+  sand.position.set(0, 0.0, backZ - 26);
   sand.receiveShadow = true;
   outsideGroup.add(sand);
 
   const ocean = new THREE.Mesh(
-    new THREE.PlaneGeometry(240, 240),
+    new THREE.PlaneGeometry(260, 260),
     new THREE.MeshStandardMaterial({
       color: new THREE.Color('#2f6f9a'),
-      roughness: 0.35,
-      metalness: 0.08,
+      roughness: 0.32,
+      metalness: 0.10,
     })
   );
   ocean.rotation.x = -Math.PI / 2;
-  ocean.position.set(0, 0.03, backZ - 85);
+  ocean.position.set(0, 0.03, backZ - 95);
   outsideGroup.add(ocean);
 
   const haze = new THREE.Mesh(
-    new THREE.PlaneGeometry(220, 80),
+    new THREE.PlaneGeometry(240, 90),
     new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
@@ -594,7 +445,7 @@ export function createVrMuseumScene({
       depthWrite: false,
     })
   );
-  haze.position.set(0, 18, backZ - 120);
+  haze.position.set(0, 18, backZ - 130);
   outsideGroup.add(haze);
 
   // Moving clouds dome
@@ -602,11 +453,11 @@ export function createVrMuseumScene({
   cloudTex.repeat.set(2.0, 1.0);
 
   const cloudDome = new THREE.Mesh(
-    new THREE.SphereGeometry(110, 48, 32),
+    new THREE.SphereGeometry(120, 48, 32),
     new THREE.MeshBasicMaterial({
       map: cloudTex,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.32,
       side: THREE.BackSide,
       depthWrite: false,
     })
@@ -623,54 +474,28 @@ export function createVrMuseumScene({
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   sun.shadow.camera.near = 1;
-  sun.shadow.camera.far = 60;
-  sun.shadow.camera.left = -14;
-  sun.shadow.camera.right = 14;
-  sun.shadow.camera.top = 14;
-  sun.shadow.camera.bottom = -14;
+  sun.shadow.camera.far = 80;
+  sun.shadow.camera.left = -16;
+  sun.shadow.camera.right = 16;
+  sun.shadow.camera.top = 16;
+  sun.shadow.camera.bottom = -16;
   scene.add(sun);
   scene.add(sun.target);
 
-  const fill = new THREE.DirectionalLight(0xffffff, 0.3);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.30);
   fill.position.set(6, 10, 10);
   scene.add(fill);
 
-  // Window glow panel
+  // Window light portal (helps daylight feel)
   const portal = new THREE.Mesh(
     new THREE.PlaneGeometry(openingW * 0.98, openingH * 0.98),
-    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.08 })
+    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.07 })
   );
   portal.position.set(0, openingBottom + openingH / 2, backZ + 0.02);
   windowWall.add(portal);
 
-  // Ceiling track
-  const trackMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#eaeaea'),
-    roughness: 0.55,
-    metalness: 0.05,
-  });
-
-  const track = new THREE.Mesh(new THREE.BoxGeometry(roomW * 0.82, 0.04, 0.04), trackMat);
-  track.position.set(0, roomH - 0.18, 0);
-  track.castShadow = true;
-  room.add(track);
-
-  // Soft ceiling spots
-  const spotCount = 5;
-  for (let i = 0; i < spotCount; i++) {
-    const z = lerp(-8, 10, i / (spotCount - 1));
-    const s = new THREE.SpotLight(0xffffff, 0.35, 20, Math.PI / 7, 0.6, 1.2);
-    s.position.set(0, roomH - 0.15, z);
-    s.target.position.set(0, 1.3, z - 1.4);
-    s.castShadow = true;
-    s.shadow.mapSize.set(1024, 1024);
-    room.add(s);
-    room.add(s.target);
-  }
-
   // Art frames
   const texLoader = new THREE.TextureLoader();
-
   const framesGroup = new THREE.Group();
   room.add(framesGroup);
 
@@ -742,7 +567,10 @@ export function createVrMuseumScene({
     outer.receiveShadow = true;
     g.add(outer);
 
-    const matte = new THREE.Mesh(new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.006), matteMat);
+    const matte = new THREE.Mesh(
+      new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.006),
+      matteMat
+    );
     matte.position.z = depth / 2 + 0.004;
     g.add(matte);
 
@@ -765,7 +593,7 @@ export function createVrMuseumScene({
     });
   }
 
-  // Placements
+  // Simple placements (same logic as your earlier file)
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const artY = 2.05;
 
@@ -805,7 +633,7 @@ export function createVrMuseumScene({
     }
   })();
 
-  // Controls: drag look + wheel move
+  // Controls
   let isDragging = false;
   let lastX = 0;
   let lastY = 0;
@@ -850,7 +678,6 @@ export function createVrMuseumScene({
     } catch {}
     renderer.domElement.style.cursor = 'grab';
 
-    // Click (not drag): raycast
     if (!dragMoved) {
       const rect = renderer.domElement.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -932,11 +759,10 @@ export function createVrMuseumScene({
     pitch = 0;
   }
 
-  // Loop
   function animate() {
     if (disposed) return;
 
-    // Cloud motion + keep dome centered
+    // Clouds drift (very subtle)
     cloudDome.position.copy(basePos);
     cloudTex.offset.x = (cloudTex.offset.x + 0.00003) % 1;
     cloudTex.offset.y = (cloudTex.offset.y + 0.00001) % 1;
@@ -952,7 +778,6 @@ export function createVrMuseumScene({
 
   requestAnimationFrame(animate);
 
-  // Dispose
   function dispose() {
     disposed = true;
     ro.disconnect();
