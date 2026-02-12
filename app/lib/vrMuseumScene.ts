@@ -52,146 +52,85 @@ function normalizeImageUrl(url: string) {
 
 /**
  * Build a single large floor texture by stamping the source image into a canvas.
- * This avoids visible tiling seams from RepeatWrapping.
+ * This avoids visible tiling seams from RepeatWrapping, while keeping wood detail.
  */
 function createStampedFloorTexture(
   image: HTMLImageElement,
   opts?: {
-    size?: number; // canvas size (power of two recommended)
-    stamps?: number; // how many tiles across/down
+    size?: number;
+    stampsX?: number;
+    stampsY?: number;
     seed?: number;
-    overlapPct?: number; // overlap between stamps
-    toneJitter?: number; // small brightness variation per stamp
-    jitterPct?: number; // small positional jitter
+    overlapPct?: number;
+    jitterPct?: number;
+    alpha?: number;
   }
 ) {
   const size = opts?.size ?? 2048;
-  const stamps = opts?.stamps ?? 6;
+  const stampsX = opts?.stampsX ?? 6;
+  const stampsY = opts?.stampsY ?? 6;
   const seed = opts?.seed ?? 424242;
-  const overlapPct = opts?.overlapPct ?? 0.10;
-  const toneJitter = opts?.toneJitter ?? 0.10;
-  const jitterPct = opts?.jitterPct ?? 0.06;
+  const overlapPct = opts?.overlapPct ?? 0.12;
+  const jitterPct = opts?.jitterPct ?? 0.03;
+  const alpha = opts?.alpha ?? 0.95;
 
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
-
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas 2D context unavailable');
 
-  // Base warm fill
-  ctx.fillStyle = '#d3b78b';
+  const rnd = mulberry32(seed);
+
+  // Subtle warm base (kept faint so it doesn't wash out detail)
+  ctx.fillStyle = '#d8c29a';
   ctx.fillRect(0, 0, size, size);
 
-  const rnd = mulberry32(seed);
-  const cell = size / stamps;
-  const overlap = cell * overlapPct;
+  const cellW = size / stampsX;
+  const cellH = size / stampsY;
+  const overlapW = cellW * overlapPct;
+  const overlapH = cellH * overlapPct;
 
-  // Helper to draw a stamp with soft edges so overlaps blend
-  const drawFeatheredStamp = (
-    sx: number,
-    sy: number,
-    sw: number,
-    sh: number,
-    dx: number,
-    dy: number,
-    dw: number,
-    dh: number
-  ) => {
-    // Draw stamp into an offscreen canvas so we can feather its alpha
-    const oc = document.createElement('canvas');
-    oc.width = Math.max(1, Math.floor(dw));
-    oc.height = Math.max(1, Math.floor(dh));
-    const octx = oc.getContext('2d');
-    if (!octx) return;
+  // Stamp tiles with slight overlap and rotations.
+  // IMPORTANT: no alpha-cutting or heavy blending that would erase wood detail.
+  ctx.globalAlpha = alpha;
+  for (let y = 0; y < stampsY; y++) {
+    for (let x = 0; x < stampsX; x++) {
+      const cx = x * cellW + cellW / 2;
+      const cy = y * cellH + cellH / 2;
 
-    octx.drawImage(image, sx, sy, sw, sh, 0, 0, oc.width, oc.height);
-
-    // Feather alpha at the edges
-    const feather = Math.floor(Math.min(oc.width, oc.height) * 0.06);
-    octx.globalCompositeOperation = 'destination-in';
-
-    // left
-    {
-      const g = octx.createLinearGradient(0, 0, feather, 0);
-      g.addColorStop(0, 'rgba(255,255,255,0)');
-      g.addColorStop(1, 'rgba(255,255,255,1)');
-      octx.fillStyle = g;
-      octx.fillRect(0, 0, feather, oc.height);
-    }
-    // right
-    {
-      const g = octx.createLinearGradient(oc.width - feather, 0, oc.width, 0);
-      g.addColorStop(0, 'rgba(255,255,255,1)');
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      octx.fillStyle = g;
-      octx.fillRect(oc.width - feather, 0, feather, oc.height);
-    }
-    // top
-    {
-      const g = octx.createLinearGradient(0, 0, 0, feather);
-      g.addColorStop(0, 'rgba(255,255,255,0)');
-      g.addColorStop(1, 'rgba(255,255,255,1)');
-      octx.fillStyle = g;
-      octx.fillRect(0, 0, oc.width, feather);
-    }
-    // bottom
-    {
-      const g = octx.createLinearGradient(0, oc.height - feather, 0, oc.height);
-      g.addColorStop(0, 'rgba(255,255,255,1)');
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      octx.fillStyle = g;
-      octx.fillRect(0, oc.height - feather, oc.width, feather);
-    }
-
-    octx.globalCompositeOperation = 'source-over';
-
-    // Draw into final canvas
-    ctx.drawImage(oc, dx, dy, dw, dh);
-  };
-
-  for (let y = 0; y < stamps; y++) {
-    for (let x = 0; x < stamps; x++) {
-      const cx = x * cell + cell / 2;
-      const cy = y * cell + cell / 2;
-
-      // Rotation in 90 degree steps helps hide obvious repetition
+      // 90-degree rotations hide repetition without warping texture
       const rotSteps = Math.floor(rnd() * 4);
       const rot = rotSteps * (Math.PI / 2);
 
-      // Slight per-stamp brightness variation
-      const b = 1 - toneJitter / 2 + rnd() * toneJitter;
+      // small positional jitter
+      const jx = (rnd() - 0.5) * cellW * jitterPct;
+      const jy = (rnd() - 0.5) * cellH * jitterPct;
 
-      // small jitter
-      const jx = (rnd() - 0.5) * cell * jitterPct;
-      const jy = (rnd() - 0.5) * cell * jitterPct;
-
-      const w = cell + overlap * 2;
-      const h = cell + overlap * 2;
+      const w = cellW + overlapW * 2;
+      const h = cellH + overlapH * 2;
 
       ctx.save();
       ctx.translate(cx + jx, cy + jy);
       ctx.rotate(rot);
 
-      // Stamp the full source image into each cell.
-      // If your source has obvious borders, we can crop here instead.
-      const dx = -w / 2;
-      const dy = -h / 2;
-
-      // Draw with feathering so overlaps blend
-      drawFeatheredStamp(0, 0, image.width, image.height, dx, dy, w, h);
-
-      // Multiply subtle tone tint
-      ctx.globalCompositeOperation = 'multiply';
-      ctx.fillStyle = `rgba(${Math.floor(255 * b)},${Math.floor(255 * b)},${Math.floor(
-        255 * b
-      )},0.22)`;
-      ctx.fillRect(dx, dy, w, h);
-      ctx.globalCompositeOperation = 'source-over';
+      ctx.drawImage(image, -w / 2, -h / 2, w, h);
 
       ctx.restore();
     }
   }
+  ctx.globalAlpha = 1;
+
+  // Add subtle grain/noise to break stamp boundaries without hiding wood
+  const img = ctx.getImageData(0, 0, size, size);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (rnd() - 0.5) * 10; // -5..+5
+    d[i] = clamp(d[i] + n, 0, 255);
+    d[i + 1] = clamp(d[i + 1] + n, 0, 255);
+    d[i + 2] = clamp(d[i + 2] + n, 0, 255);
+  }
+  ctx.putImageData(img, 0, 0);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -278,8 +217,8 @@ export function createVrMuseumScene({
 
   // Floor
   const floorMat = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
-    roughness: 0.62,
+    color: new THREE.Color('#ffffff'), // keep texture untinted
+    roughness: 0.58,
     metalness: 0.02,
   });
 
@@ -292,28 +231,24 @@ export function createVrMuseumScene({
   const floorImg = new Image();
   floorImg.src = '/floor.png';
   floorImg.crossOrigin = 'anonymous';
+
   floorImg.onload = () => {
     if (disposed) return;
 
     const stamped = createStampedFloorTexture(floorImg, {
       size: 2048,
-      stamps: 6,
+      stampsX: 5,
+      stampsY: 9, // more variation along long axis
       seed: 424242,
-      overlapPct: 0.12,
-      toneJitter: 0.10,
-      jitterPct: 0.05,
+      overlapPct: 0.14,
+      jitterPct: 0.03,
+      alpha: 0.95,
     });
-
-    // Scale the stamped texture across the floor by adjusting UV repeat on the material map
-    // Because this is ClampToEdge, we "zoom" by using repeat < 1 and offsets.
-    // Easier: set repeat to 1 and adjust texture transform via the floor geometry UVs.
-    // For now, keep it 1:1 and tune how the stamp looks using stamps/size above.
-    stamped.repeat.set(1, 1);
-    stamped.offset.set(0, 0);
 
     floorMat.map = stamped;
     floorMat.needsUpdate = true;
   };
+
   floorImg.onerror = () => {
     floorMat.color = new THREE.Color('#d6d6d6');
     floorMat.map = null;
