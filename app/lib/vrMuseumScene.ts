@@ -490,4 +490,4 @@ export function createVrMuseumScene({ container, artworks }: CreateArgs): VrMuse
   focusArtwork: () => {},
   clearFocus: () => {},
 };
-
+}
