@@ -570,8 +570,8 @@ export function createVrMuseumScene({
   scene.add(fill);
 
   // Art frames
-  const texLoader = new THREE.TextureTextureLoader?.(); // guard for weird builds
-  const safeTexLoader = texLoader instanceof THREE.TextureLoader ? texLoader : new THREE.TextureLoader();
+const safeTexLoader = new THREE.TextureLoader();
+
 
   const framesGroup = new THREE.Group();
   room.add(framesGroup);
