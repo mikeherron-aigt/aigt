@@ -345,7 +345,8 @@ export function createVrMuseumScene({ container, artworks, onArtworkClick }: Cre
     group.add(inner);
 
     // Art plane
-    const tex = texLoader.load(normalizeUrl(artwork.image_url || ""));
+    const tex = texLoader.load(normalizeUrl((artwork as any).imageUrl || ""));
+
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.anisotropy = 8;
 
