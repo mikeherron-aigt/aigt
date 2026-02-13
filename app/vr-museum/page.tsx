@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 export default function VrMuseumPage() {
   return (
     <main className="bg-white">
-
       {/* Hero */}
       <section className="border-b border-black/10 bg-neutral-50">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
@@ -61,14 +60,12 @@ export default function VrMuseumPage() {
         </div>
       </section>
 
-      {/* Interactive Environment */}
+      {/* Interactive Environment only */}
       <section className="border-b border-black/10">
         <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
-          <div className="overflow-hidden rounded-2xl border border-black/10 bg-neutral-50">
-            {/* Half viewport height. Adjust as needed */}
-            <div className="h-[50vh] w-full">
-              <VrMuseumClientShell />
-            </div>
+          {/* No gray card here. Just the interactive env filling the area. */}
+          <div className="h-[50vh] w-full">
+            <VrMuseumClientShell variant="embed" />
           </div>
         </div>
       </section>
@@ -137,6 +134,61 @@ export default function VrMuseumPage() {
         </div>
       </section>
 
+      {/* Use cases */}
+      <section className="border-b border-black/10">
+        <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
+          <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
+            Designed for institutional engagement
+          </h3>
+
+          <p className="mt-4 max-w-3xl text-[15px] leading-relaxed text-black/75 md:text-base">
+            The Virtual Museum may support a range of stewardship driven use cases, including:
+          </p>
+
+          <div className="mt-6 grid grid-cols-1 gap-3 text-[15px] text-black/75 md:max-w-3xl md:text-base">
+            <div className="border-l border-black/15 pl-4">Remote scholarly study and research</div>
+            <div className="border-l border-black/15 pl-4">Curatorial collaboration and exhibition planning</div>
+            <div className="border-l border-black/15 pl-4">International institutional visibility</div>
+            <div className="border-l border-black/15 pl-4">Archival documentation and contextualization</div>
+            <div className="border-l border-black/15 pl-4">Controlled private access for aligned partners</div>
+          </div>
+
+          <p className="mt-6 max-w-3xl text-[15px] leading-relaxed text-black/75 md:text-base">
+            Access is intentionally governed. The Virtual Museum is not intended to operate as an
+            open public platform. Participation and availability may be permissioned based on
+            audience, jurisdiction, and institutional context.
+          </p>
+        </div>
+      </section>
+
+      {/* Technology philosophy */}
+      <section className="border-b border-black/10">
+        <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
+            <div className="md:col-span-4">
+              <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
+                Infrastructure over innovation theater
+              </h3>
+            </div>
+            <div className="md:col-span-8">
+              <div className="space-y-5 text-[15px] leading-relaxed text-black/75 md:text-base">
+                <p>
+                  The underlying technology is selected for fidelity, stability, and longevity.
+                  Spatial representation, scale accuracy, material rendering, and controlled
+                  sequencing are prioritized over speed or novelty.
+                </p>
+                <p>
+                  The goal is not to showcase technology. It is to ensure that the digital
+                  environment upholds the same standards of care, seriousness, and credibility
+                  expected of any museum grade institution.
+                </p>
+                <p>Technology does not define the experience. Stewardship does.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Governance */}
       <section className="border-b border-black/10 bg-neutral-50">
         <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
@@ -146,23 +198,55 @@ export default function VrMuseumPage() {
 
           <div className="mt-5 max-w-3xl space-y-5 text-[15px] leading-relaxed text-black/75 md:text-base">
             <p>
-              The Virtual Museum is not intended to operate as a standalone business
-              or revenue generating platform. It exists as long term cultural and
-              institutional infrastructure.
+              The Virtual Museum is not intended to operate as a standalone business or revenue
+              generating platform. It exists as long term cultural and institutional infrastructure.
             </p>
             <p>
-              Governance, curatorial oversight, and narrative control remain aligned
-              with the broader stewardship framework. Participation in the Virtual
-              Museum does not create new economic rights, liquidity mechanisms, or
-              investor entitlements beyond those defined in the governing documents.
+              Governance, curatorial oversight, and narrative control remain aligned with the
+              broader stewardship framework. Participation in the Virtual Museum does not create
+              new economic rights, liquidity mechanisms, or investor entitlements beyond those
+              defined in the governing documents.
             </p>
-            <p>
-              Its value lies in trust, continuity, and institutional legitimacy over time.
-            </p>
+            <p>Its value lies in trust, continuity, and institutional legitimacy over time.</p>
           </div>
         </div>
       </section>
 
+      {/* Long horizon */}
+      <section>
+        <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
+          <h3 className="text-xl font-semibold tracking-tight md:text-2xl">
+            Built for the long horizon
+          </h3>
+
+          <div className="mt-5 max-w-3xl space-y-5 text-[15px] leading-relaxed text-black/75 md:text-base">
+            <p>
+              The Virtual Museum is a future facing initiative grounded in long duration thinking.
+              Development, access, and programming are expected to evolve deliberately and
+              responsibly, independent of short term timelines or external validation.
+            </p>
+            <p>
+              This platform is designed to mature alongside the collection itself, reinforcing its
+              narrative, preserving its context, and supporting institutional engagement across
+              decades rather than cycles.
+            </p>
+          </div>
+
+          <div className="mt-10 border-t border-black/10 pt-8">
+            <h4 className="text-sm font-semibold tracking-wide text-black/60">
+              Part of a broader stewardship framework
+            </h4>
+            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-black/60">
+              The Virtual Museum operates alongside physical museum infrastructure, institutional
+              partnerships, and archival systems as part of a unified approach to cultural stewardship.
+            </p>
+            <p className="mt-4 max-w-3xl text-xs leading-relaxed text-black/50">
+              Descriptions of future initiatives are provided for informational and stewardship context
+              only and do not constitute an offer, solicitation, or commitment.
+            </p>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
