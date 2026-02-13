@@ -551,6 +551,8 @@ export function createVrMuseumScene({
 });
 vistaMat.depthTest = false;
 vistaMat.depthWrite = false;
+  vistaMat.side = THREE.DoubleSide;
+
 
 const vista = new THREE.Mesh(
   new THREE.PlaneGeometry(openingW * 1.9, openingH * 1.9),
@@ -559,7 +561,7 @@ const vista = new THREE.Mesh(
 
 // Put it just outside the opening so it is always visible through the hole
 vista.position.set(0, openingBottom + openingH / 2, backZ - 0.02);
-vista.rotation.y = Math.PI;
+
 
 // Force it behind everything
 vista.renderOrder = -1000;
