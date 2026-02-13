@@ -10,7 +10,6 @@ export type VrMuseumSceneHandle = {
 type CreateArgs = {
   container: HTMLDivElement;
   artworks: MuseumArtwork[];
-  // kept for compatibility, not used (no modal)
   onArtworkClick?: (artwork: MuseumArtwork) => void;
 };
 
@@ -63,10 +62,6 @@ function normalizeImageUrl(url: string) {
   return url.startsWith('/') ? url : `/${url}`;
 }
 
-/**
- * Build a single large floor texture by stamping the source image into a canvas.
- * Feathered stamps reduce obvious seams.
- */
 function createStampedFloorTexture(
   image: HTMLImageElement,
   opts?: {
@@ -196,11 +191,10 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-12-perspective-only-fit');
+  console.log('VR_SCENE_VERSION', '2026-02-12-filmOffset-fit-v1');
 
   let disposed = false;
 
-  // Renderer
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
@@ -219,8 +213,6 @@ export function createVrMuseumScene({
   renderer.domElement.style.height = '100%';
   renderer.domElement.style.display = 'block';
   renderer.domElement.style.cursor = 'grab';
-
-  // Prevent page scroll while wheel is over the canvas
   renderer.domElement.style.overscrollBehavior = 'contain';
   (renderer.domElement.style as any).touchAction = 'none';
 
@@ -243,6 +235,7 @@ export function createVrMuseumScene({
     'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
   placard.style.color = '#1b1b1b';
 
+  // Plaque look: flat, square corners, engraved feel
   placard.style.borderRadius = '0px';
   placard.style.border = '1px solid rgba(0,0,0,0.30)';
   placard.style.backgroundImage =
@@ -309,7 +302,6 @@ export function createVrMuseumScene({
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#cfe7ff');
 
-  // Room sizing
   const roomW = 14;
   const roomH = 4.2;
   const roomD = 28;
@@ -317,8 +309,9 @@ export function createVrMuseumScene({
   const room = new THREE.Group();
   scene.add(room);
 
-  // FPS camera rig
+  // Camera rig
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 220);
+  camera.filmGauge = 35;
 
   const yawObj = new THREE.Object3D();
   const pitchObj = new THREE.Object3D();
@@ -425,7 +418,7 @@ export function createVrMuseumScene({
   addBaseboard(roomD, -roomW / 2 + baseboardT / 2, 0, Math.PI / 2);
   addBaseboard(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
 
-  // Window wall with /hamptons.jpg
+  // Window wall, vista is /hamptons.jpg
   const windowWall = new THREE.Group();
   room.add(windowWall);
 
@@ -720,8 +713,21 @@ export function createVrMuseumScene({
   let focusDuration = 1.25;
   let focusTargetRec: ArtMeshRecord | null = null;
 
-  const focusFrom = { pos: new THREE.Vector3(), yaw: 0, pitch: 0, fov: 55 };
-  const focusTo = { pos: new THREE.Vector3(), yaw: 0, pitch: 0, fov: 32 };
+  const focusFrom = {
+    pos: new THREE.Vector3(),
+    yaw: 0,
+    pitch: 0,
+    fov: 55,
+    filmOffset: 0,
+  };
+
+  const focusTo = {
+    pos: new THREE.Vector3(),
+    yaw: 0,
+    pitch: 0,
+    fov: 22,
+    filmOffset: 0,
+  };
 
   function cancelFocus() {
     focusActive = false;
@@ -731,10 +737,10 @@ export function createVrMuseumScene({
   function startFocusOnRecord(rec: ArtMeshRecord) {
     cancelFocus();
 
-    // Populate plaque content
+    // Plaque content
     showPlacard(rec.artwork);
 
-    // Measure plaque width reliably without flashing it
+    // Measure plaque width without flashing it
     placard.style.visibility = 'hidden';
     placard.style.opacity = '1';
     void placard.getBoundingClientRect();
@@ -751,8 +757,9 @@ export function createVrMuseumScene({
     focusFrom.yaw = yaw;
     focusFrom.pitch = pitch;
     focusFrom.fov = camera.fov;
+    focusFrom.filmOffset = camera.filmOffset || 0;
 
-    // Fit based on OUTER frame so black border stays visible
+    // Fit based on OUTER frame
     const frameW = rec.outerW;
     const frameH = rec.outerH;
 
@@ -763,16 +770,12 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    const artRight = new THREE.Vector3(1, 0, 0)
-      .applyQuaternion(rec.frameGroup.quaternion)
-      .normalize();
-
-    // Viewport math, reserve space for plaque
+    // Viewport math
     const w = Math.max(1, container.clientWidth);
     const h = Math.max(1, container.clientHeight);
 
     const margin = 18;
-    const gap = 14;
+    const gap = 12;
     const rightPad = 18;
     const leftPad = 12;
 
@@ -782,7 +785,8 @@ export function createVrMuseumScene({
     const usableWidthRatio = usableW / w;
     const usableHeightRatio = usableH / h;
 
-    const targetFov = 32;
+    // Narrow FOV and farther distance reduces perspective
+    const targetFov = 22;
     focusTo.fov = targetFov;
 
     const vFov = (targetFov * Math.PI) / 180;
@@ -793,22 +797,13 @@ export function createVrMuseumScene({
     const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
     const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
 
-    // Breathing room around the black frame
     const dist = Math.max(distForHeight, distForWidth) * 1.06;
 
-    // Shift so artwork centers in the usable left region
-    const centerNdcX = -1 + usableWidthRatio; // center of usable region in NDC
-    const shift = -centerNdcX * dist * Math.tan(hFov / 2);
-
-    focusTo.pos
-      .copy(worldCenter)
-      .add(normalOut.clone().multiplyScalar(dist))
-      .add(artRight.clone().multiplyScalar(shift));
-
-    // Keep same height as artwork center
+    // Position camera straight out from the artwork center (no sideways move)
+    focusTo.pos.copy(worldCenter).add(normalOut.clone().multiplyScalar(dist));
     focusTo.pos.y = worldCenter.y;
 
-    // Orient the yaw toward artwork center (no pitch)
+    // Yaw toward center, no pitch
     const lookDir = worldCenter.clone().sub(focusTo.pos);
     lookDir.y = 0;
     lookDir.normalize();
@@ -816,7 +811,16 @@ export function createVrMuseumScene({
     focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
     focusTo.pitch = 0;
 
-    // Ensure plaque starts hidden, fades in during focus
+    // Lens shift to place artwork in the left usable region
+    // Desired center of usable region in NDC:
+    // left edge = -1, width = 2 * usableWidthRatio, center = -1 + usableWidthRatio
+    const desiredCenterNdcX = -1 + usableWidthRatio;
+    const filmWidth = camera.getFilmWidth();
+    const filmOffsetMm = (desiredCenterNdcX * filmWidth) / 2;
+
+    focusTo.filmOffset = filmOffsetMm;
+
+    // Plaque fades in during focus
     placard.style.opacity = '0';
   }
 
@@ -844,6 +848,7 @@ export function createVrMuseumScene({
 
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
+
     if (Math.abs(dx) + Math.abs(dy) > 2) dragMoved = true;
 
     lastX = e.clientX;
@@ -888,7 +893,6 @@ export function createVrMuseumScene({
     e.preventDefault();
     e.stopPropagation();
 
-    // If focusing, ignore wheel movement so it does not fight the animation
     if (focusActive) return;
 
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObj.quaternion);
@@ -941,6 +945,7 @@ export function createVrMuseumScene({
     pitchObj.rotation.x = pitch;
 
     camera.fov = 55;
+    camera.filmOffset = 0;
     camera.updateProjectionMatrix();
   }
 
@@ -954,7 +959,6 @@ export function createVrMuseumScene({
       focusTime += dt;
       const t = clamp(focusTime / focusDuration, 0, 1);
 
-      // Fade plaque in during zoom (starts later)
       placard.style.opacity = String(clamp((t - 0.35) / 0.35, 0, 1));
 
       const e = easeInOutCubic(t);
@@ -973,6 +977,7 @@ export function createVrMuseumScene({
       pitchObj.rotation.x = pitch;
 
       camera.fov = lerp(focusFrom.fov, focusTo.fov, e);
+      camera.filmOffset = lerp(focusFrom.filmOffset, focusTo.filmOffset, e);
       camera.updateProjectionMatrix();
 
       if (t >= 1) {
@@ -1018,3 +1023,4 @@ export function createVrMuseumScene({
 
   return { dispose, focusArtwork, clearFocus };
 }
+
