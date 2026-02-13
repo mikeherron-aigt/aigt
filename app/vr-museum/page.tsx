@@ -1,5 +1,6 @@
 // app/vr-museum/page.tsx
 import type { Metadata } from "next";
+import Image from "next/image";
 import VrMuseumClientShell from "./VrMuseumClientShell";
 
 export const metadata: Metadata = {
@@ -23,11 +24,34 @@ export default function VrMuseumPage() {
                 Extending museum grade stewardship, access, and scholarship beyond
                 physical walls.
               </p>
+
+              {/* Standard vertical blocks */}
+              <div className="mt-8 space-y-3 max-w-xl">
+                <div className="border-l border-black/15 pl-4 text-[15px] leading-relaxed text-black/75 md:text-base">
+                  Museum-grade context, preserved digitally
+                </div>
+                <div className="border-l border-black/15 pl-4 text-[15px] leading-relaxed text-black/75 md:text-base">
+                  Accurate scale, curated spatial sequencing
+                </div>
+                <div className="border-l border-black/15 pl-4 text-[15px] leading-relaxed text-black/75 md:text-base">
+                  Controlled access for scholars and partners
+                </div>
+              </div>
             </div>
 
+            {/* Standard horizontal block with image */}
             <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white">
-              <div className="aspect-[16/10] w-full bg-gradient-to-br from-neutral-100 to-neutral-50" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.06),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(0,0,0,0.05),transparent_60%)]" />
+              <div className="relative aspect-[16/10] w-full">
+                <Image
+                  src="/vrmuseum.png"
+                  alt="Virtual Museum"
+                  fill
+                  priority
+                  className="object-cover"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.10),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(0,0,0,0.08),transparent_60%)]" />
+                <div className="pointer-events-none absolute inset-0 bg-black/5" />
+              </div>
             </div>
           </div>
         </div>
