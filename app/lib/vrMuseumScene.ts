@@ -580,7 +580,7 @@ export function createVrMuseumScene({
   // Lighting
   scene.add(new THREE.AmbientLight(0xffffff, 0.30));
 
-  const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.55);
+  const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.75);
   scene.add(hemi);
 
   // Sun
