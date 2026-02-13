@@ -1216,3 +1216,4 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
 
   return { dispose, focusArtwork, clearFocus };
 }
+}
