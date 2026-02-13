@@ -62,6 +62,37 @@ function normalizeImageUrl(url: string) {
   return url.startsWith('/') ? url : `/${url}`;
 }
 
+/**
+ * These paintings live in /public, so they can be referenced as "/<filename>.png"
+ * This ensures they always appear in the room, even if the caller does not pass artworks.
+ */
+const LOCAL_ARTWORK_FILES = [
+  '2024-JD-AG-0003.png',
+  '2024-JD-AG-0018.png',
+  '2025-JD-CD-0001.png',
+  '2025-JD-CD-0016.png',
+  '2025-JD-CD-0095.png',
+  '2025-JD-CD-0137.png',
+  '2025-JD-DW-0002.png',
+  '2025-JD-DW-0005.png',
+  '2025-JD-DW-0018.png',
+  '2025-JD-DW-0028.png',
+];
+
+function buildLocalArtworks(): MuseumArtwork[] {
+  return LOCAL_ARTWORK_FILES.map((file) => {
+    const id = file.replace(/\.png$/i, '');
+    return {
+      id,
+      imageUrl: normalizeImageUrl(`/${file}`),
+      title: id,
+      artist: 'John',
+      collection: 'Catalog',
+      sku: id,
+    } as any;
+  });
+}
+
 function createStampedFloorTexture(
   image: HTMLImageElement,
   opts?: {
@@ -201,6 +232,15 @@ export function createVrMuseumScene({
 
   let disposed = false;
 
+  // Always include the local paintings, then append anything passed in (de-duped by id)
+  const localArtworks = buildLocalArtworks();
+  const incoming = artworks ?? [];
+
+  const artworksInRoom: MuseumArtwork[] = [
+    ...localArtworks,
+    ...incoming.filter((a) => !localArtworks.some((b) => b.id === a.id)),
+  ];
+
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
@@ -211,7 +251,7 @@ export function createVrMuseumScene({
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.32;
+  renderer.toneMappingExposure = 1.12;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -579,34 +619,25 @@ export function createVrMuseumScene({
 
   // Lighting
   scene.add(new THREE.AmbientLight(0xffffff, 0.30));
-
-  const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.75);
+  const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.55);
   scene.add(hemi);
 
-  // Sun
   const sun = new THREE.DirectionalLight(0xffffff, 1.10);
-
-  // Outside, aligned with the window opening so it cannot "reach around" the wall
   sun.position.set(5.6, 10.5, backZ - 18.0);
-
-  // Aim slightly left into the room to rake shadows across the floor
   sun.target.position.set(-2.2, 1.2, backZ + 6.5);
-
   sun.castShadow = true;
 
-  // Shadow map resolution
   sun.shadow.mapSize.set(4096, 4096);
 
-  // 2 small setting recommendations (keep these)
+  // Keep these
   sun.shadow.bias = -0.00008;
   sun.shadow.normalBias = 0.02;
   sun.shadow.radius = 3;
 
-  // Shadow camera range
   sun.shadow.camera.near = 1;
   sun.shadow.camera.far = 120;
 
-  // PASS 1: "make the leak go away" bounds (big safety box)
+  // PASS 1: big bounds (leak prevention)
   sun.shadow.camera.left = -18;
   sun.shadow.camera.right = 18;
   sun.shadow.camera.top = 18;
@@ -615,34 +646,30 @@ export function createVrMuseumScene({
   scene.add(sun);
   scene.add(sun.target);
 
-  // Apply camera changes
   (sun.shadow.camera as THREE.OrthographicCamera).updateProjectionMatrix();
 
   // PASS 2: optional tighter bounds for crisper mullion shadows
-  // Turn this on only after you confirm the leak is gone.
   const USE_TIGHTER_SUN_SHADOW_BOUNDS = false;
-
   if (USE_TIGHTER_SUN_SHADOW_BOUNDS) {
     sun.shadow.camera.left = -14;
     sun.shadow.camera.right = 14;
     sun.shadow.camera.top = 16;
     sun.shadow.camera.bottom = -10;
-
     (sun.shadow.camera as THREE.OrthographicCamera).updateProjectionMatrix();
   }
 
-  // Soft interior bounce light (inside the room)
+  // Soft interior bounce
   const fill = new THREE.PointLight(0xffffff, 0.28, 60, 2.0);
   fill.position.set(0, roomH - 0.35, 2.0);
   fill.castShadow = false;
   scene.add(fill);
 
-  // Gallery ceiling spotlights (realistic shadows, aimed straight down)
+  // Gallery ceiling spotlights
   const addGallerySpot = (x: number, z: number) => {
     const s = new THREE.SpotLight(0xffffff, 0.85, 55, Math.PI / 5.2, 0.7, 1.6);
     s.position.set(x, roomH - 0.15, z);
 
-    // Aim straight down to avoid wall wash and "through wall" looking artifacts
+    // Aim straight down
     s.target.position.set(x, 0.0, z);
 
     s.castShadow = true;
@@ -656,7 +683,6 @@ export function createVrMuseumScene({
     scene.add(s.target);
   };
 
-  // 2x2 grid
   addGallerySpot(-3.6, 6.0);
   addGallerySpot(3.6, 6.0);
   addGallerySpot(-3.6, -6.0);
@@ -709,7 +735,7 @@ export function createVrMuseumScene({
   }) {
     const { artwork, position, rotationY, targetMaxWidth, targetMaxHeight } = opts;
 
-    const tex = await loadArtworkTexture(artwork.imageUrl);
+    const tex = await loadArtworkTexture((artwork as any).imageUrl);
 
     let aspect = 4 / 5;
     const img: any = tex?.image;
@@ -768,7 +794,7 @@ export function createVrMuseumScene({
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const artY = 2.05;
 
-  for (let i = 0; i < Math.min(artworks.length, 6); i++) {
+  for (let i = 0; i < Math.min(artworksInRoom.length, 6); i++) {
     const z = 9 - i * 5.2;
     placements.push({
       pos: new THREE.Vector3(roomW / 2 - 0.06, artY, z),
@@ -776,7 +802,7 @@ export function createVrMuseumScene({
     });
   }
 
-  for (let i = 6; i < artworks.length; i++) {
+  for (let i = 6; i < artworksInRoom.length; i++) {
     const idx = i - 6;
     const z = 9 - idx * 5.2;
     placements.push({
@@ -786,7 +812,7 @@ export function createVrMuseumScene({
   }
 
   (async () => {
-    for (let i = 0; i < artworks.length; i++) {
+    for (let i = 0; i < artworksInRoom.length; i++) {
       if (disposed) return;
 
       const p =
@@ -797,7 +823,7 @@ export function createVrMuseumScene({
         } as const);
 
       await addFramedArtwork({
-        artwork: artworks[i],
+        artwork: artworksInRoom[i],
         position: p.pos,
         rotationY: p.rotY,
         targetMaxWidth: 1.6,
@@ -840,7 +866,6 @@ export function createVrMuseumScene({
 
     showPlacard(rec.artwork);
 
-    // Measure plaque width without flashing it
     placard.style.visibility = 'hidden';
     placard.style.opacity = '1';
     void placard.getBoundingClientRect();
@@ -859,7 +884,6 @@ export function createVrMuseumScene({
     focusFrom.fov = camera.fov;
     focusFrom.filmOffset = camera.filmOffset || 0;
 
-    // Fit based on OUTER frame
     const frameW = rec.outerW;
     const frameH = rec.outerH;
 
@@ -870,17 +894,14 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    // Viewport math
     const w = Math.max(1, container.clientWidth);
     const h = Math.max(1, container.clientHeight);
 
-    // Pixels in DOM overlay space
     const margin = 18;
     const gap = 12;
     const rightPad = 18;
     const leftPad = 12;
 
-    // Rectangle where the painting must fit
     const regionLeft = leftPad + margin;
     const regionRight = w - (plaqueW + gap + rightPad) - margin;
     const regionTop = margin;
@@ -892,7 +913,6 @@ export function createVrMuseumScene({
     const usableWidthRatio = regionW / w;
     const usableHeightRatio = regionH / h;
 
-    // Camera optics for focus
     const targetFov = 22;
     focusTo.fov = targetFov;
 
@@ -900,17 +920,14 @@ export function createVrMuseumScene({
     const aspect = w / h;
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
 
-    // Distances to fit frame in the usable region
     const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
     const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
 
     const dist = Math.max(distForHeight, distForWidth) * 1.12;
 
-    // Position camera straight out from the artwork center (no sideways move)
     focusTo.pos.copy(worldCenter).add(normalOut.clone().multiplyScalar(dist));
     focusTo.pos.y = worldCenter.y;
 
-    // Yaw toward center, no pitch
     const lookDir = worldCenter.clone().sub(focusTo.pos);
     lookDir.y = 0;
     lookDir.normalize();
@@ -918,7 +935,6 @@ export function createVrMuseumScene({
     focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
     focusTo.pitch = 0;
 
-    // Lens shift so ART CENTER lands in the center of the usable region
     const regionCenterPx = (regionLeft + regionRight) / 2;
     const desiredCenterNdcX = (regionCenterPx / w) * 2 - 1;
 
