@@ -832,117 +832,114 @@ export function createVrMuseumScene({
     });
   }
 
-  // Placements: distribute across BOTH side walls + the solid back wall (frontWall at z = +roomD/2)
-  const placements: Array<{
-    pos: THREE.Vector3;
-    rotY: number;
-    targetMaxWidth: number;
-    targetMaxHeight: number;
-  }> = [];
+// Placements: one single row (same Y), evenly spaced per wall
+const placements: Array<{
+  pos: THREE.Vector3;
+  rotY: number;
+  targetMaxWidth: number;
+  targetMaxHeight: number;
+}> = [];
 
-  const makeWallSlots = (wall: 'right' | 'left' | 'back') => {
-    const slots: Array<{
-      pos: THREE.Vector3;
-      rotY: number;
-      targetMaxWidth: number;
-      targetMaxHeight: number;
-    }> = [];
+const artY = 2.05; // All paintings share the same vertical level
 
-    const yRows = 2;
-    const yTop = 2.85;
-    const yBot = 1.65;
-    const ys = yRows === 2 ? [yTop, yBot] : [2.2];
+// How many paintings per wall (split as evenly as possible)
+const total = artworksInRoom.length;
+const base = Math.floor(total / 3);
+const rem = total % 3;
 
-    const zMargin = 2.2;
-    const zUsable = roomD - zMargin * 2;
-    const zCols = 4;
-    const zStep = zUsable / (zCols - 1);
-    const zStart = roomD / 2 - zMargin;
+// Order matters: right, left, back
+const countRight = base + (rem > 0 ? 1 : 0);
+const countLeft = base + (rem > 1 ? 1 : 0);
+const countBack = total - countRight - countLeft;
 
-    if (wall === 'right' || wall === 'left') {
-      const x = wall === 'right' ? roomW / 2 - 0.06 : -roomW / 2 + 0.06;
-      const rotY = wall === 'right' ? -Math.PI / 2 : Math.PI / 2;
+// Common sizing target (keeps frames consistent)
+const targetMaxWidth = 1.7;
+const targetMaxHeight = 1.85;
 
-      for (const y of ys) {
-        for (let c = 0; c < zCols; c++) {
-          const z = zStart - c * zStep;
-          slots.push({
-            pos: new THREE.Vector3(x, y, z),
-            rotY,
-            targetMaxWidth: Math.min(1.7, zStep * 0.62),
-            targetMaxHeight: 1.85,
-          });
-        }
-      }
-      return slots;
-    }
+// Helper: evenly spaced positions along a segment with margins
+function evenPositions(count: number, start: number, end: number) {
+  if (count <= 0) return [];
+  if (count === 1) return [(start + end) / 2];
+  const step = (end - start) / (count - 1);
+  return Array.from({ length: count }, (_, i) => start + i * step);
+}
 
-    // back wall (solid wall at z = +roomD/2)
-    const z = roomD / 2 - 0.07;
-    const rotY = Math.PI;
+// Side walls use Z spacing, back wall uses X spacing
+const wallZMargin = 2.2;
+const zStart = roomD / 2 - wallZMargin;
+const zEnd = -roomD / 2 + wallZMargin;
 
-    const wallMarginX = 0.85;
-    const doorReserve = doorW + 1.05;
-    const usableW = roomW - wallMarginX * 2 - doorReserve;
+const wallXMargin = 1.15;
+const xStart = -roomW / 2 + wallXMargin;
+const xEnd = roomW / 2 - wallXMargin;
 
-    const xCols = 4;
-    const xStep = usableW / (xCols - 1);
-    const xStart = -roomW / 2 + wallMarginX;
+// Reserve space on back wall for the door (door is on the frontWall at z = +roomD/2)
+const doorReserveW = doorW + 1.35;
+const backUsableRightEdge = xEnd - doorReserveW; // shrink usable span so frames do not overlap door area
 
-    for (const y of ys) {
-      for (let c = 0; c < xCols; c++) {
-        const x = xStart + c * xStep;
-        slots.push({
-          pos: new THREE.Vector3(x, y, z),
-          rotY,
-          targetMaxWidth: Math.min(1.75, xStep * 0.65),
-          targetMaxHeight: 1.85,
-        });
-      }
-    }
-
-    return slots;
-  };
-
-  const rightSlots = makeWallSlots('right');
-  const leftSlots = makeWallSlots('left');
-  const backSlots = makeWallSlots('back');
-
-  // Round-robin fill so it "feels" even across side + back
-  const slotLists = [rightSlots, leftSlots, backSlots];
-  let placed = 0;
-
-  while (placed < artworksInRoom.length) {
-    let progressed = false;
-
-    for (let i = 0; i < slotLists.length && placed < artworksInRoom.length; i++) {
-      const list = slotLists[i];
-      const slot = list.shift();
-      if (!slot) continue;
-      placements.push(slot);
-      placed++;
-      progressed = true;
-    }
-
-    if (!progressed) break; // no more slots
+// Build RIGHT wall placements (x fixed, vary z)
+{
+  const x = roomW / 2 - 0.06;
+  const rotY = -Math.PI / 2;
+  const zs = evenPositions(countRight, zStart, zEnd);
+  for (const z of zs) {
+    placements.push({
+      pos: new THREE.Vector3(x, artY, z),
+      rotY,
+      targetMaxWidth,
+      targetMaxHeight,
+    });
   }
+}
 
-  (async () => {
-    for (let i = 0; i < artworksInRoom.length; i++) {
-      if (disposed) return;
+// Build LEFT wall placements (x fixed, vary z)
+{
+  const x = -roomW / 2 + 0.06;
+  const rotY = Math.PI / 2;
+  const zs = evenPositions(countLeft, zStart, zEnd);
+  for (const z of zs) {
+    placements.push({
+      pos: new THREE.Vector3(x, artY, z),
+      rotY,
+      targetMaxWidth,
+      targetMaxHeight,
+    });
+  }
+}
 
-      const p = placements[i];
-      if (!p) return;
+// Build BACK wall placements (z fixed, vary x), avoid door zone on the right side
+{
+  const z = roomD / 2 - 0.07;
+  const rotY = Math.PI;
 
-      await addFramedArtwork({
-        artwork: artworksInRoom[i],
-        position: p.pos,
-        rotationY: p.rotY,
-        targetMaxWidth: p.targetMaxWidth,
-        targetMaxHeight: p.targetMaxHeight,
-      });
-    }
-  })();
+  const xs = evenPositions(countBack, xStart, backUsableRightEdge);
+  for (const x of xs) {
+    placements.push({
+      pos: new THREE.Vector3(x, artY, z),
+      rotY,
+      targetMaxWidth,
+      targetMaxHeight,
+    });
+  }
+}
+
+(async () => {
+  for (let i = 0; i < artworksInRoom.length; i++) {
+    if (disposed) return;
+
+    const p = placements[i];
+    if (!p) return;
+
+    await addFramedArtwork({
+      artwork: artworksInRoom[i],
+      position: p.pos,
+      rotationY: p.rotY,
+      targetMaxWidth: p.targetMaxWidth,
+      targetMaxHeight: p.targetMaxHeight,
+    });
+  }
+})();
+
 
   // Focus animation state
   const clock = new THREE.Clock();
