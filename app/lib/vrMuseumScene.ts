@@ -505,6 +505,9 @@ export function createVrMuseumScene({
     ior: 1.45,
   });
 
+  glassMat.depthWrite = false;
+
+
   const glass = new THREE.Mesh(
     new THREE.PlaneGeometry(openingW - frameBorder * 1.6, openingH - frameBorder * 1.6),
     glassMat
@@ -542,14 +545,27 @@ export function createVrMuseumScene({
     t.needsUpdate = true;
   });
 
-  const vista = new THREE.Mesh(
-    new THREE.PlaneGeometry(openingW * 1.55, openingH * 1.55),
-    new THREE.MeshBasicMaterial({ map: vistaTex, toneMapped: false })
-  );
-  vista.position.set(0, openingBottom + openingH / 2, backZ - 1.2);
-  vista.rotation.y = Math.PI;
-  vista.renderOrder = -10;
-  scene.add(vista);
+  const vistaMat = new THREE.MeshBasicMaterial({
+  map: vistaTex,
+  toneMapped: false,
+});
+vistaMat.depthTest = false;
+vistaMat.depthWrite = false;
+
+const vista = new THREE.Mesh(
+  new THREE.PlaneGeometry(openingW * 1.9, openingH * 1.9),
+  vistaMat
+);
+
+// Put it just outside the opening so it is always visible through the hole
+vista.position.set(0, openingBottom + openingH / 2, backZ - 0.02);
+vista.rotation.y = Math.PI;
+
+// Force it behind everything
+vista.renderOrder = -1000;
+
+scene.add(vista);
+
 
   // Lighting
   scene.add(new THREE.AmbientLight(0xffffff, 0.62));
