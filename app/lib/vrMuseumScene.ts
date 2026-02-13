@@ -573,66 +573,77 @@ export function createVrMuseumScene({
   vistaMat.side = THREE.DoubleSide;
 
   const vista = new THREE.Mesh(new THREE.PlaneGeometry(openingW * 1.9, openingH * 1.9), vistaMat);
-
-  // Put it just outside the opening so it is always visible through the hole
   vista.position.set(0, openingBottom + openingH / 2, backZ - 0.02);
-
-  // Force it behind everything
   vista.renderOrder = -1000;
-
   scene.add(vista);
 
   // Lighting
-  // Global base illumination (museum bright, but not flat)
   scene.add(new THREE.AmbientLight(0xffffff, 0.30));
 
   const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.55);
   scene.add(hemi);
 
-  // Sun (the only strong patterned shadow source)
+  // Sun
   const sun = new THREE.DirectionalLight(0xffffff, 1.10);
 
-  // Keep sun outside, but aligned with the window opening (so it cannot "reach around" the wall)
-sun.position.set(5.6, 10.5, backZ - 18.0);
+  // Outside, aligned with the window opening so it cannot "reach around" the wall
+  sun.position.set(5.6, 10.5, backZ - 18.0);
 
-// Aim across the room the same way, preserving the window shadow direction
-sun.target.position.set(-2.2, 1.2, backZ + 6.5);
-
+  // Aim slightly left into the room to rake shadows across the floor
+  sun.target.position.set(-2.2, 1.2, backZ + 6.5);
 
   sun.castShadow = true;
 
+  // Shadow map resolution
   sun.shadow.mapSize.set(4096, 4096);
-  sun.shadow.camera.near = 2;
-  sun.shadow.camera.far = 70;
 
-  // Tight frustum for crisp mullion shadows and fewer artifacts
-  sun.shadow.camera.left = -10;
-  sun.shadow.camera.right = 10;
-  sun.shadow.camera.top = 10;
-  sun.shadow.camera.bottom = -6;
-
-  sun.shadow.radius = 3;
+  // 2 small setting recommendations (keep these)
   sun.shadow.bias = -0.00008;
   sun.shadow.normalBias = 0.02;
+  sun.shadow.radius = 3;
+
+  // Shadow camera range
+  sun.shadow.camera.near = 1;
+  sun.shadow.camera.far = 120;
+
+  // PASS 1: "make the leak go away" bounds (big safety box)
+  sun.shadow.camera.left = -18;
+  sun.shadow.camera.right = 18;
+  sun.shadow.camera.top = 18;
+  sun.shadow.camera.bottom = -18;
 
   scene.add(sun);
   scene.add(sun.target);
 
-  // Soft interior bounce light (inside the room, so it cannot "shine through" walls)
-const fill = new THREE.PointLight(0xffffff, 0.28, 60, 2.0);
-fill.position.set(0, roomH - 0.35, 2.0);
-fill.castShadow = false;
-scene.add(fill);
+  // Apply camera changes
+  (sun.shadow.camera as THREE.OrthographicCamera).updateProjectionMatrix();
 
+  // PASS 2: optional tighter bounds for crisper mullion shadows
+  // Turn this on only after you confirm the leak is gone.
+  const USE_TIGHTER_SUN_SHADOW_BOUNDS = false;
 
-  // Gallery ceiling lights (can cast shadows, tuned to not erase window pattern)
-  const gallerySpots: THREE.SpotLight[] = [];
+  if (USE_TIGHTER_SUN_SHADOW_BOUNDS) {
+    sun.shadow.camera.left = -14;
+    sun.shadow.camera.right = 14;
+    sun.shadow.camera.top = 16;
+    sun.shadow.camera.bottom = -10;
 
+    (sun.shadow.camera as THREE.OrthographicCamera).updateProjectionMatrix();
+  }
+
+  // Soft interior bounce light (inside the room)
+  const fill = new THREE.PointLight(0xffffff, 0.28, 60, 2.0);
+  fill.position.set(0, roomH - 0.35, 2.0);
+  fill.castShadow = false;
+  scene.add(fill);
+
+  // Gallery ceiling spotlights (realistic shadows, aimed straight down)
   const addGallerySpot = (x: number, z: number) => {
     const s = new THREE.SpotLight(0xffffff, 0.85, 55, Math.PI / 5.2, 0.7, 1.6);
     s.position.set(x, roomH - 0.15, z);
-    // Aim straight down to create clean floor pools, not wall wash
-s.target.position.set(x, 0.0, z);
+
+    // Aim straight down to avoid wall wash and "through wall" looking artifacts
+    s.target.position.set(x, 0.0, z);
 
     s.castShadow = true;
     s.shadow.mapSize.set(1024, 1024);
@@ -643,7 +654,6 @@ s.target.position.set(x, 0.0, z);
 
     scene.add(s);
     scene.add(s.target);
-    gallerySpots.push(s);
   };
 
   // 2x2 grid
@@ -915,7 +925,6 @@ s.target.position.set(x, 0.0, z);
     const filmWidth = camera.getFilmWidth();
     const filmOffsetMm = (desiredCenterNdcX * filmWidth) / 2;
 
-    // Reduce how hard we shift, then clamp so it can never shove the art off screen
     const shiftStrength = 0.85;
     const maxShift = filmWidth * 0.22;
     const targetOffset = (-filmOffsetMm) * shiftStrength;
