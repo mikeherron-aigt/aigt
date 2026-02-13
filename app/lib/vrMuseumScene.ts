@@ -837,7 +837,7 @@ export function createVrMuseumScene({
   const usableMin = doorRightEdge + doorPad;
   const usableMax = xRightLimit - cornerPad;
 
-  if (usableMax > usableMin && backCount > 0) {
+  if (usableMax > usableMin && countBack > 0) {
     // ---- spacing controls (tweak these) ----
     const minGap = 0.75;           // minimum space between frame OUTER edges (world units)
     const edgePadding = 0.35;      // keep frames off the boundaries a bit
@@ -860,7 +860,7 @@ export function createVrMuseumScene({
         targetMaxHeight,
       });
     } else {
-      const c = backCount;
+      const c = countBack;
 
       if (c === 1) {
         placements.push({
