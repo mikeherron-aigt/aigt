@@ -227,7 +227,7 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-13-side-and-back-walls-door-focus-exit');
+  console.log('VR_SCENE_VERSION', '2026-02-13-fixed-back-wall-right-of-door-centered');
 
   let disposed = false;
 
@@ -679,12 +679,13 @@ export function createVrMuseumScene({
   addGallerySpot(-3.6, -6.0);
   addGallerySpot(3.6, -6.0);
 
-  // Door on the back wall (the solid wall at z = +roomD/2)
+  // Door on the wall at z = +roomD/2
   const doorGroup = new THREE.Group();
   const doorW = 1.6;
   const doorH = 2.65;
   const doorT = 0.07;
 
+  // Keep the door where you had it
   const doorX = roomW / 2 - doorW / 2 - 0.55;
   const doorY = doorH / 2;
   const doorZ = roomD / 2 - 0.03;
@@ -832,145 +833,134 @@ export function createVrMuseumScene({
     });
   }
 
-// Placements: one single row (same Y), centered-first spacing per wall
-const placements: Array<{
-  pos: THREE.Vector3;
-  rotY: number;
-  targetMaxWidth: number;
-  targetMaxHeight: number;
-}> = [];
+  // Placements: one single row (same Y), centered-first spacing per wall
+  const placements: Array<{
+    pos: THREE.Vector3;
+    rotY: number;
+    targetMaxWidth: number;
+    targetMaxHeight: number;
+  }> = [];
 
-const artY = 2.05; // All paintings share the same vertical level
+  const artY = 2.05;
 
-// Required counts
-const countRightWall = 5;
-const countLeftWall = 5;
-const countDoorWall = 3;
+  // Required counts
+  const countRightWall = 5;
+  const countLeftWall = 5;
+  const countDoorWall = 3;
 
-// Common sizing target (keeps frames consistent)
-const targetMaxWidth = 1.7;
-const targetMaxHeight = 1.85;
+  const targetMaxWidth = 1.7;
+  const targetMaxHeight = 1.85;
 
-// Buffers so paintings are not too close to corners or to each other at wall junctions
-const cornerBuffer = 3.2; // increase if you want more separation near corners
-const wallZMargin = cornerBuffer; // keeps side wall paintings away from door wall corners
+  // Corner buffer so back-wall art is not too close to side-wall art
+  const wallZMargin = 3.2;
 
-// Side walls span in Z
-const zMin = -roomD / 2 + wallZMargin;
-const zMax = roomD / 2 - wallZMargin;
+  const zMin = -roomD / 2 + wallZMargin;
+  const zMax = roomD / 2 - wallZMargin;
 
-// Door wall span in X
-const wallXMargin = 1.15;
-const xMin = -roomW / 2 + wallXMargin;
-const xMax = roomW / 2 - wallXMargin;
+  function centeredPositions(count: number, min: number, max: number) {
+    if (count <= 0) return [];
+    const center = (min + max) / 2;
+    if (count === 1) return [center];
 
-// Door is now centered at doorX = 0
-const doorHalfW = doorW / 2;
-const doorClear = 0.95; // extra gap around the door opening
-const rightSpanStart = doorHalfW + doorClear;
-const rightSpanEnd = xMax - 0.75; // keep away from the far right corner a bit
+    const halfRange = Math.max(0.0001, (max - min) / 2);
+    const maxIndex = Math.floor((count - 1) / 2) || 1;
+    const step = halfRange / maxIndex;
 
-// Helper: centered-first positions
-function centeredPositions(count: number, min: number, max: number) {
-  if (count <= 0) return [];
-  const center = (min + max) / 2;
+    const out: number[] = [];
+    out.push(center);
 
-  if (count === 1) return [center];
+    for (let k = 1; out.length < count; k++) {
+      const p1 = center + step * k;
+      const p2 = center - step * k;
 
-  // We want: center, +step, -step, +2step, -2step, ...
-  const halfRange = Math.max(0.0001, (max - min) / 2);
+      if (out.length < count && p1 <= max) out.push(p1);
+      if (out.length < count && p2 >= min) out.push(p2);
+    }
 
-  // For 5 items we need offsets 0, 1, 1, 2, 2. So max offset index is 2.
-  // Generally max offset index is floor((count - 1) / 2)
-  const maxIndex = Math.floor((count - 1) / 2) || 1;
-  const step = halfRange / maxIndex;
-
-  const out: number[] = [];
-  out.push(center);
-
-  for (let k = 1; out.length < count; k++) {
-    const p1 = center + step * k;
-    const p2 = center - step * k;
-
-    if (out.length < count && p1 <= max) out.push(p1);
-    if (out.length < count && p2 >= min) out.push(p2);
+    return out.map((v) => clamp(v, min, max));
   }
 
-  // If floating point or clamp issues, hard clamp
-  return out.map((v) => clamp(v, min, max));
-}
+  // RIGHT wall (x fixed, vary z)
+  {
+    const x = roomW / 2 - 0.06;
+    const rotY = -Math.PI / 2;
 
-// Build RIGHT wall placements (x fixed, vary z)
-{
-  const x = roomW / 2 - 0.06;
-  const rotY = -Math.PI / 2;
-
-  const zs = centeredPositions(countRightWall, zMin, zMax);
-  for (const z of zs) {
-    placements.push({
-      pos: new THREE.Vector3(x, artY, z),
-      rotY,
-      targetMaxWidth,
-      targetMaxHeight,
-    });
+    const zs = centeredPositions(countRightWall, zMin, zMax);
+    for (const z of zs) {
+      placements.push({
+        pos: new THREE.Vector3(x, artY, z),
+        rotY,
+        targetMaxWidth,
+        targetMaxHeight,
+      });
+    }
   }
-}
 
-// Build LEFT wall placements (x fixed, vary z)
-{
-  const x = -roomW / 2 + 0.06;
-  const rotY = Math.PI / 2;
+  // LEFT wall (x fixed, vary z)
+  {
+    const x = -roomW / 2 + 0.06;
+    const rotY = Math.PI / 2;
 
-  const zs = centeredPositions(countLeftWall, zMin, zMax);
-  for (const z of zs) {
-    placements.push({
-      pos: new THREE.Vector3(x, artY, z),
-      rotY,
-      targetMaxWidth,
-      targetMaxHeight,
-    });
+    const zs = centeredPositions(countLeftWall, zMin, zMax);
+    for (const z of zs) {
+      placements.push({
+        pos: new THREE.Vector3(x, artY, z),
+        rotY,
+        targetMaxWidth,
+        targetMaxHeight,
+      });
+    }
   }
-}
 
-// Build DOOR wall placements (z fixed, vary x), ONLY on the right side of the door
-{
-  const z = roomD / 2 - 0.07; // wall plane
-  const rotY = Math.PI;
+  // BACK wall (the wall with the door) place 3 paintings on the RIGHT side of the door,
+  // centered in the open span between door and right corner
+  {
+    const z = roomD / 2 - 0.07;
+    const rotY = Math.PI;
 
-  const usableMin = Math.max(xMin, rightSpanStart);
-  const usableMax = Math.max(usableMin + 0.001, rightSpanEnd);
+    const wallXMargin = 1.15;
+    const xMax = roomW / 2 - wallXMargin;
 
-  const xs = centeredPositions(countDoorWall, usableMin, usableMax);
-  for (const x of xs) {
-    placements.push({
-      pos: new THREE.Vector3(x, artY, z),
-      rotY,
-      targetMaxWidth,
-      targetMaxHeight,
-    });
+    const rightCornerPad = 1.25; // lower to push closer to corner
+    const doorClear = 0.95; // raise to give more door breathing room
+
+    const doorRightEdge = doorX + doorW / 2;
+
+    const usableMin = doorRightEdge + doorClear;
+    const usableMax = xMax - rightCornerPad;
+
+    const span = Math.max(0.001, usableMax - usableMin);
+    const step = span / (countDoorWall + 1);
+    const xs = Array.from({ length: countDoorWall }, (_, i) => usableMin + step * (i + 1));
+
+    for (const x of xs) {
+      placements.push({
+        pos: new THREE.Vector3(x, artY, z),
+        rotY,
+        targetMaxWidth,
+        targetMaxHeight,
+      });
+    }
   }
-}
 
-// Apply placements to artworks in order.
-// If you have more artworks than 13, we only place the first 13.
-// If fewer, we place what we have.
-(async () => {
-  const n = Math.min(artworksInRoom.length, placements.length);
-  for (let i = 0; i < n; i++) {
-    if (disposed) return;
+  // Place artworks deterministically: 5 right, 5 left, 3 back
+  const orderedArtworks: MuseumArtwork[] = artworksInRoom.slice(0, 13);
 
-    const p = placements[i];
-    await addFramedArtwork({
-      artwork: artworksInRoom[i],
-      position: p.pos,
-      rotationY: p.rotY,
-      targetMaxWidth: p.targetMaxWidth,
-      targetMaxHeight: p.targetMaxHeight,
-    });
-  }
-})();
+  (async () => {
+    const n = Math.min(orderedArtworks.length, placements.length);
+    for (let i = 0; i < n; i++) {
+      if (disposed) return;
 
-
+      const p = placements[i];
+      await addFramedArtwork({
+        artwork: orderedArtworks[i],
+        position: p.pos,
+        rotationY: p.rotY,
+        targetMaxWidth: p.targetMaxWidth,
+        targetMaxHeight: p.targetMaxHeight,
+      });
+    }
+  })();
 
   // Focus animation state
   const clock = new THREE.Clock();
