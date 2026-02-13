@@ -20,8 +20,8 @@ type ArtMeshRecord = {
   frameGroup: THREE.Group;
   artW: number;
   artH: number;
-  outerW: number; // black outer frame width in world units
-  outerH: number; // black outer frame height in world units
+  outerW: number;
+  outerH: number;
 };
 
 function clamp(v: number, min: number, max: number) {
@@ -65,7 +65,7 @@ function normalizeImageUrl(url: string) {
 
 /**
  * Build a single large floor texture by stamping the source image into a canvas.
- * Feathered stamps remove the grid seams.
+ * Feathered stamps reduce obvious seams.
  */
 function createStampedFloorTexture(
   image: HTMLImageElement,
@@ -81,7 +81,7 @@ function createStampedFloorTexture(
 ) {
   const size = opts?.size ?? 2048;
   const stampsX = opts?.stampsX ?? 6;
-  const stampsY = opts?.stampsY ?? 10;
+  const stampsY = opts?.stampsY ?? 12;
   const seed = opts?.seed ?? 424242;
 
   const overlapPct = opts?.overlapPct ?? 0.30;
@@ -196,9 +196,11 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
+  console.log('VR_SCENE_VERSION', '2026-02-12-perspective-only-fit');
+
   let disposed = false;
 
+  // Renderer
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
@@ -218,6 +220,7 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
   renderer.domElement.style.display = 'block';
   renderer.domElement.style.cursor = 'grab';
 
+  // Prevent page scroll while wheel is over the canvas
   renderer.domElement.style.overscrollBehavior = 'contain';
   (renderer.domElement.style as any).touchAction = 'none';
 
@@ -296,8 +299,6 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
     if (placardTitle2) placardTitle2.textContent = String(title);
     if (placardCollection) placardCollection.textContent = String(collection);
     if (placardId) placardId.textContent = String(catalogId);
-
-    placard.style.opacity = '1';
   }
 
   function hidePlacard() {
@@ -308,6 +309,7 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#cfe7ff');
 
+  // Room sizing
   const roomW = 14;
   const roomH = 4.2;
   const roomD = 28;
@@ -315,7 +317,7 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
   const room = new THREE.Group();
   scene.add(room);
 
-  // Cameras
+  // FPS camera rig
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 220);
 
   const yawObj = new THREE.Object3D();
@@ -324,291 +326,12 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
   pitchObj.add(camera);
   scene.add(yawObj);
 
-
-  // Pose
   yawObj.position.set(0, 1.55, 6.6);
   let yaw = 0;
   let pitch = 0;
   const minPitch = -0.55;
   const maxPitch = 0.45;
 
-  // Animation state
-  const clock = new THREE.Clock();
-
-  // Phase A: perspective travel
-  let focusActive = false;
-  let focusTime = 0;
-  let focusDuration = 1.15;
-  let focusTargetRec: ArtMeshRecord | null = null;
-
-  const focusFrom = { pos: new THREE.Vector3(), yaw: 0, pitch: 0, fov: 55 };
-  const focusTo = { pos: new THREE.Vector3(), yaw: 0, pitch: 0, fov: 35 };
-
-  // Phase B: seamless ortho refinement (no jump)
-  let inspectTransitionActive = false;
-  let inspectTransitionTime = 0;
-  let inspectTransitionDuration = 0.55;
-
-  type OrthoPose = {
-    pos: THREE.Vector3;
-    quat: THREE.Quaternion;
-    halfH: number;
-  };
-
-  const orthoStart: OrthoPose = {
-    pos: new THREE.Vector3(),
-    quat: new THREE.Quaternion(),
-    halfH: 1,
-  };
-
-  const orthoEnd: OrthoPose = {
-    pos: new THREE.Vector3(),
-    quat: new THREE.Quaternion(),
-    halfH: 1,
-  };
-
-  let inspecting = false;
-  let inspectRec: ArtMeshRecord | null = null;
-
-  // Layout knobs
-  const VIEW_MARGIN_PX = 18;
-  const RIGHT_PAD_PX = 18; // matches placard.style.right
-  const GAP_PX = 14;
-  const LEFT_PAD_PX = 12;
-  const FRAME_BREATHING = 0.96; // breathing around black frame
-
-  function getPlacardReservedWidthPx() {
-    const rect = placard.getBoundingClientRect();
-    const w = rect.width || 290;
-    return Math.ceil(w + RIGHT_PAD_PX + GAP_PX);
-  }
-
-  function getUsableViewportPx() {
-    const w = Math.max(1, container.clientWidth);
-    const h = Math.max(1, container.clientHeight);
-
-    const reserved = getPlacardReservedWidthPx();
-
-    const usableW = Math.max(1, w - reserved - LEFT_PAD_PX - VIEW_MARGIN_PX);
-    const usableH = Math.max(1, h - VIEW_MARGIN_PX * 2);
-
-    return { w, h, usableW, usableH, reserved };
-  }
-
-  function setOrthoFrustumFromHalfH(halfH: number) {
-    const { usableW, usableH } = getUsableViewportPx();
-    const viewportAspect = usableW / Math.max(1, usableH);
-
-    const halfW = halfH * viewportAspect;
-
-    orthoCamera.left = -halfW;
-    orthoCamera.right = halfW;
-    orthoCamera.top = halfH;
-    orthoCamera.bottom = -halfH;
-    orthoCamera.near = 0.01;
-    orthoCamera.far = 400;
-    orthoCamera.updateProjectionMatrix();
-  }
-
-  // Compute final fit based on OUTER FRAME size, not the image plane
-  function computeFinalOrthoForRecord(rec: ArtMeshRecord, worldCenter: THREE.Vector3) {
-    const { w, usableW, usableH, reserved } = getUsableViewportPx();
-    const viewportAspect = usableW / Math.max(1, usableH);
-
-    const frameW = rec.outerW;
-    const frameH = rec.outerH;
-    const frameAspect = frameW / Math.max(1e-6, frameH);
-
-    // Half-height to fit frame fully in usable region
-    let halfH: number;
-    if (viewportAspect >= frameAspect) {
-      // height limits
-      halfH = (frameH / 2) / FRAME_BREATHING;
-    } else {
-      // width limits
-      halfH = (frameW / 2) / (viewportAspect * FRAME_BREATHING);
-    }
-
-    // Shift target so artwork is centered inside usable region (left side area)
-    const usableFrac = usableW / Math.max(1, w);
-    const centerNdcX = -1 + usableFrac; // center of usable region in [-1..1]
-
-    const halfW = halfH * viewportAspect;
-
-    // desired NDC location for the frame center
-    const desiredWorldOffsetAlongRight = centerNdcX * halfW;
-
-    // shift target opposite so object appears at desired NDC
-    const sideShiftWorld = -desiredWorldOffsetAlongRight;
-
-    return { halfH, sideShiftWorld, reserved };
-  }
-
-  function startInspectTransition(rec: ArtMeshRecord) {
-    inspectRec = rec;
-    inspecting = false;
-
-    inspectTransitionActive = true;
-    inspectTransitionTime = 0;
-
-    const worldCenter = new THREE.Vector3();
-    rec.frameGroup.getWorldPosition(worldCenter);
-
-    const artRight = new THREE.Vector3(1, 0, 0).applyQuaternion(rec.frameGroup.quaternion).normalize();
-    const artUp = new THREE.Vector3(0, 1, 0).applyQuaternion(rec.frameGroup.quaternion).normalize();
-    const normalOut = new THREE.Vector3(0, 0, 1).applyQuaternion(rec.frameGroup.quaternion).normalize();
-
-    // Ortho start: match current perspective view at the plane center (pixel stable)
-    const camWorldPos = new THREE.Vector3();
-    camera.getWorldPosition(camWorldPos);
-
-    const camWorldQuat = new THREE.Quaternion();
-    camera.getWorldQuaternion(camWorldQuat);
-
-    const viewDir = new THREE.Vector3(0, 0, -1).applyQuaternion(camWorldQuat).normalize();
-    const toCenter = worldCenter.clone().sub(camWorldPos);
-    const distAlongView = Math.max(0.01, toCenter.dot(viewDir));
-
-    const vFovRad = (camera.fov * Math.PI) / 180;
-    const halfHMatch = distAlongView * Math.tan(vFovRad / 2);
-
-    orthoStart.pos.copy(camWorldPos);
-    orthoStart.quat.copy(camWorldQuat);
-    orthoStart.halfH = halfHMatch;
-
-    // Ortho end: fit outer frame inside usable region, with plaque present
-    const { halfH: halfHEnd, sideShiftWorld } = computeFinalOrthoForRecord(rec, worldCenter);
-
-    const targetEnd = worldCenter.clone().add(artRight.clone().multiplyScalar(sideShiftWorld));
-
-    const dist = 10;
-    const posEnd = targetEnd.clone().add(normalOut.clone().multiplyScalar(dist));
-
-    const m = new THREE.Matrix4();
-    m.lookAt(posEnd, targetEnd, artUp);
-
-    orthoEnd.pos.copy(posEnd);
-    orthoEnd.quat.setFromRotationMatrix(m);
-    orthoEnd.halfH = halfHEnd;
-
-    // Switch immediately to ortho using the matched start state (no jump)
-    orthoCamera.position.copy(orthoStart.pos);
-    orthoCamera.quaternion.copy(orthoStart.quat);
-    setOrthoFrustumFromHalfH(orthoStart.halfH);
-    activeCamera = orthoCamera;
-
-    showPlacard(rec.artwork);
-    placard.style.opacity = '0';
-  }
-
-  function exitInspect() {
-    inspectTransitionActive = false;
-    inspecting = false;
-    inspectRec = null;
-    hidePlacard();
-    activeCamera = camera;
-  }
-
-  function cancelFocusAndInspect() {
-    focusActive = false;
-    focusTargetRec = null;
-    if (inspectTransitionActive || inspecting) exitInspect();
-  }
-
-  function startFocusOnRecord(rec: ArtMeshRecord) {
-function startFocusOnRecord(rec: ArtMeshRecord) {
-  cancelFocusAndInspect();
-
-  // Show plaque now so we can measure its real width
-  showPlacard(rec.artwork);
-
-  // Force accurate measurement without flashing it
-  placard.style.visibility = 'hidden';
-  placard.style.opacity = '1';
-  void placard.getBoundingClientRect(); // forces layout
-  const plaqueW = placard.getBoundingClientRect().width || 290;
-  placard.style.opacity = '0';
-  placard.style.visibility = 'visible';
-
-  // Start focus animation
-  focusActive = true;
-  focusTargetRec = rec;
-  focusTime = 0;
-
-  focusFrom.pos.copy(yawObj.position);
-  focusFrom.yaw = yaw;
-  focusFrom.pitch = pitch;
-  focusFrom.fov = camera.fov;
-
-  // Use the OUTER frame size so the black border is always visible
-  const frameW = rec.outerW;
-  const frameH = rec.outerH;
-
-  const worldCenter = new THREE.Vector3();
-  rec.frameGroup.getWorldPosition(worldCenter);
-
-  const normalOut = new THREE.Vector3(0, 0, 1)
-    .applyQuaternion(rec.frameGroup.quaternion)
-    .normalize();
-
-  const artRight = new THREE.Vector3(1, 0, 0)
-    .applyQuaternion(rec.frameGroup.quaternion)
-    .normalize();
-
-  // Viewport math
-  const w = Math.max(1, container.clientWidth);
-  const h = Math.max(1, container.clientHeight);
-
-  const margin = 18;
-  const gap = 14;
-  const rightPad = 18;
-  const leftPad = 12;
-
-  const usableW = Math.max(1, w - (plaqueW + gap + rightPad) - leftPad - margin);
-  const usableH = Math.max(1, h - margin * 2);
-
-  const usableWidthRatio = usableW / w;
-  const usableHeightRatio = usableH / h;
-
-  // Choose a slightly tighter FOV for less perspective distortion
-  const targetFov = 32;
-  focusTo.fov = targetFov;
-
-  const vFov = (targetFov * Math.PI) / 180;
-  const aspect = w / h;
-  const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
-
-  // Distance to fit height in usable height
-  const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
-
-  // Distance to fit width in usable width
-  const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
-
-  // Pick the larger distance so the whole frame always fits
-  const dist = Math.max(distForHeight, distForWidth) * 1.06; // breathing room
-
-  // Shift camera right so the painting sits in the left usable area
-  const centerNdcX = -1 + usableWidthRatio; // center of usable region in NDC
-  const shift = -centerNdcX * dist * Math.tan(hFov / 2);
-
-  // Final camera position
-  focusTo.pos.copy(worldCenter)
-    .add(normalOut.clone().multiplyScalar(dist))
-    .add(artRight.clone().multiplyScalar(shift));
-
-  // Keep the camera looking square at the artwork (no tilt)
-  focusTo.pos.y = worldCenter.y;
-
-  const lookDir = worldCenter.clone().sub(focusTo.pos);
-  lookDir.y = 0;
-  lookDir.normalize();
-
-  focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
-  focusTo.pitch = 0;
-}
-
-
-    
   // Materials
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
@@ -628,7 +351,7 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
     metalness: 0.02,
   });
 
-  // Room geometry
+  // Floor
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
@@ -658,11 +381,13 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
     floorMat.needsUpdate = true;
   };
 
+  // Ceiling
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), ceilingMat);
   ceiling.position.y = roomH;
   ceiling.rotation.x = Math.PI / 2;
   room.add(ceiling);
 
+  // Walls
   const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
   frontWall.position.set(0, roomH / 2, roomD / 2);
   frontWall.rotation.y = Math.PI;
@@ -700,16 +425,16 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
   addBaseboard(roomD, -roomW / 2 + baseboardT / 2, 0, Math.PI / 2);
   addBaseboard(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
 
-  // Window wall with hamptons.jpg
+  // Window wall with /hamptons.jpg
+  const windowWall = new THREE.Group();
+  room.add(windowWall);
+
   const backZ = -roomD / 2;
 
   const openingW = roomW * 0.86;
   const openingH = roomH * 0.62;
   const openingBottom = 0.55;
   const sideW = (roomW - openingW) / 2;
-
-  const windowWall = new THREE.Group();
-  room.add(windowWall);
 
   const bottomBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, openingBottom), wallMat);
   bottomBand.position.set(0, openingBottom / 2, backZ);
@@ -741,29 +466,29 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
   const frameBorder = 0.09;
   const mullionT = 0.035;
 
-  const frameGroup2 = new THREE.Group();
-  frameGroup2.position.set(0, openingBottom + openingH / 2, backZ + frameDepth / 2);
-  windowWall.add(frameGroup2);
+  const frameGroup = new THREE.Group();
+  frameGroup.position.set(0, openingBottom + openingH / 2, backZ + frameDepth / 2);
+  windowWall.add(frameGroup);
 
   const topBorder = new THREE.Mesh(new THREE.BoxGeometry(openingW, frameBorder, frameDepth), frameMat);
   topBorder.position.set(0, openingH / 2 - frameBorder / 2, 0);
   topBorder.castShadow = true;
-  frameGroup2.add(topBorder);
+  frameGroup.add(topBorder);
 
   const bottomBorder2 = new THREE.Mesh(new THREE.BoxGeometry(openingW, frameBorder, frameDepth), frameMat);
   bottomBorder2.position.set(0, -openingH / 2 + frameBorder / 2, 0);
   bottomBorder2.castShadow = true;
-  frameGroup2.add(bottomBorder2);
+  frameGroup.add(bottomBorder2);
 
   const leftBorder2 = new THREE.Mesh(new THREE.BoxGeometry(frameBorder, openingH, frameDepth), frameMat);
   leftBorder2.position.set(-openingW / 2 + frameBorder / 2, 0, 0);
   leftBorder2.castShadow = true;
-  frameGroup2.add(leftBorder2);
+  frameGroup.add(leftBorder2);
 
   const rightBorder2 = new THREE.Mesh(new THREE.BoxGeometry(frameBorder, openingH, frameDepth), frameMat);
   rightBorder2.position.set(openingW / 2 - frameBorder / 2, 0, 0);
   rightBorder2.castShadow = true;
-  frameGroup2.add(rightBorder2);
+  frameGroup.add(rightBorder2);
 
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color('#ffffff'),
@@ -794,12 +519,12 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
     windowWall.add(v);
   }
 
-  const yMid = openingBottom + openingH / 2;
+  const midY = openingBottom + openingH / 2;
   const hM = new THREE.Mesh(
     new THREE.BoxGeometry(openingW - frameBorder * 1.6, mullionT, frameDepth),
     frameMat
   );
-  hM.position.set(0, yMid, backZ + frameDepth / 2);
+  hM.position.set(0, midY, backZ + frameDepth / 2);
   hM.castShadow = true;
   windowWall.add(hM);
 
@@ -945,7 +670,7 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
     });
   }
 
-  // Placement
+  // Placements
   const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
   const artY = 2.05;
 
@@ -987,19 +712,129 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
     }
   })();
 
-  // Input controls
+  // Focus animation state
+  const clock = new THREE.Clock();
+
+  let focusActive = false;
+  let focusTime = 0;
+  let focusDuration = 1.25;
+  let focusTargetRec: ArtMeshRecord | null = null;
+
+  const focusFrom = { pos: new THREE.Vector3(), yaw: 0, pitch: 0, fov: 55 };
+  const focusTo = { pos: new THREE.Vector3(), yaw: 0, pitch: 0, fov: 32 };
+
+  function cancelFocus() {
+    focusActive = false;
+    focusTargetRec = null;
+  }
+
+  function startFocusOnRecord(rec: ArtMeshRecord) {
+    cancelFocus();
+
+    // Populate plaque content
+    showPlacard(rec.artwork);
+
+    // Measure plaque width reliably without flashing it
+    placard.style.visibility = 'hidden';
+    placard.style.opacity = '1';
+    void placard.getBoundingClientRect();
+    const plaqueW = placard.getBoundingClientRect().width || 290;
+    placard.style.opacity = '0';
+    placard.style.visibility = 'visible';
+
+    focusActive = true;
+    focusTargetRec = rec;
+    focusTime = 0;
+    focusDuration = 1.25;
+
+    focusFrom.pos.copy(yawObj.position);
+    focusFrom.yaw = yaw;
+    focusFrom.pitch = pitch;
+    focusFrom.fov = camera.fov;
+
+    // Fit based on OUTER frame so black border stays visible
+    const frameW = rec.outerW;
+    const frameH = rec.outerH;
+
+    const worldCenter = new THREE.Vector3();
+    rec.frameGroup.getWorldPosition(worldCenter);
+
+    const normalOut = new THREE.Vector3(0, 0, 1)
+      .applyQuaternion(rec.frameGroup.quaternion)
+      .normalize();
+
+    const artRight = new THREE.Vector3(1, 0, 0)
+      .applyQuaternion(rec.frameGroup.quaternion)
+      .normalize();
+
+    // Viewport math, reserve space for plaque
+    const w = Math.max(1, container.clientWidth);
+    const h = Math.max(1, container.clientHeight);
+
+    const margin = 18;
+    const gap = 14;
+    const rightPad = 18;
+    const leftPad = 12;
+
+    const usableW = Math.max(1, w - (plaqueW + gap + rightPad) - leftPad - margin);
+    const usableH = Math.max(1, h - margin * 2);
+
+    const usableWidthRatio = usableW / w;
+    const usableHeightRatio = usableH / h;
+
+    const targetFov = 32;
+    focusTo.fov = targetFov;
+
+    const vFov = (targetFov * Math.PI) / 180;
+    const aspect = w / h;
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+
+    // Distances to fit frame in usable viewport
+    const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
+    const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
+
+    // Breathing room around the black frame
+    const dist = Math.max(distForHeight, distForWidth) * 1.06;
+
+    // Shift so artwork centers in the usable left region
+    const centerNdcX = -1 + usableWidthRatio; // center of usable region in NDC
+    const shift = -centerNdcX * dist * Math.tan(hFov / 2);
+
+    focusTo.pos
+      .copy(worldCenter)
+      .add(normalOut.clone().multiplyScalar(dist))
+      .add(artRight.clone().multiplyScalar(shift));
+
+    // Keep same height as artwork center
+    focusTo.pos.y = worldCenter.y;
+
+    // Orient the yaw toward artwork center (no pitch)
+    const lookDir = worldCenter.clone().sub(focusTo.pos);
+    lookDir.y = 0;
+    lookDir.normalize();
+
+    focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
+    focusTo.pitch = 0;
+
+    // Ensure plaque starts hidden, fades in during focus
+    placard.style.opacity = '0';
+  }
+
+  // Controls
   let isDragging = false;
   let lastX = 0;
   let lastY = 0;
   let dragMoved = false;
 
   function onPointerDown(e: PointerEvent) {
-    cancelFocusAndInspect();
+    cancelFocus();
+    hidePlacard();
 
     isDragging = true;
     dragMoved = false;
     lastX = e.clientX;
     lastY = e.clientY;
+
     renderer.domElement.setPointerCapture(e.pointerId);
     renderer.domElement.style.cursor = 'grabbing';
   }
@@ -1053,7 +888,8 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
     e.preventDefault();
     e.stopPropagation();
 
-    cancelFocusAndInspect();
+    // If focusing, ignore wheel movement so it does not fight the animation
+    if (focusActive) return;
 
     const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObj.quaternion);
     forward.y = 0;
@@ -1073,20 +909,14 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
   renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
 
+  // Resize
   function resize() {
     const w = container.clientWidth;
     const h = container.clientHeight;
 
     renderer.setSize(w, h, false);
-
     camera.aspect = w / Math.max(1, h);
     camera.updateProjectionMatrix();
-
-    // If already in ortho transition or inspect, keep it stable by re-applying current halfH
-    if (inspectTransitionActive || inspecting) {
-      const halfH = Math.abs(orthoCamera.top);
-      setOrthoFrustumFromHalfH(halfH);
-    }
   }
 
   const ro = new ResizeObserver(() => resize());
@@ -1100,7 +930,8 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
   }
 
   function clearFocus() {
-    cancelFocusAndInspect();
+    cancelFocus();
+    hidePlacard();
 
     yawObj.position.set(0, 1.55, 6.6);
     yaw = 0;
@@ -1111,8 +942,6 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
 
     camera.fov = 55;
     camera.updateProjectionMatrix();
-
-    activeCamera = camera;
   }
 
   // Render loop
@@ -1121,12 +950,12 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
 
     const dt = clock.getDelta();
 
-    // Phase A
     if (focusActive) {
       focusTime += dt;
       const t = clamp(focusTime / focusDuration, 0, 1);
-      placard.style.opacity = String(clamp((t - 0.35) / 0.35, 0, 1));
 
+      // Fade plaque in during zoom (starts later)
+      placard.style.opacity = String(clamp((t - 0.35) / 0.35, 0, 1));
 
       const e = easeInOutCubic(t);
       const eY = easeOutCubic(clamp(t * 1.05, 0, 1));
@@ -1148,33 +977,6 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
 
       if (t >= 1) {
         focusActive = false;
-        const rec = focusTargetRec;
-        focusTargetRec = null;
-        if (rec) startInspectTransition(rec);
-      }
-    }
-
-    // Phase B
-    if (inspectTransitionActive && inspectRec) {
-      inspectTransitionTime += dt;
-      const t = clamp(inspectTransitionTime / inspectTransitionDuration, 0, 1);
-      const e = easeInOutCubic(t);
-
-      const pos = orthoStart.pos.clone().lerp(orthoEnd.pos, e);
-      const quat = orthoStart.quat.clone().slerp(orthoEnd.quat, e);
-      const halfH = lerp(orthoStart.halfH, orthoEnd.halfH, e);
-
-      orthoCamera.position.copy(pos);
-      orthoCamera.quaternion.copy(quat);
-      setOrthoFrustumFromHalfH(halfH);
-
-      const alpha = clamp((t - 0.10) / 0.55, 0, 1);
-      placard.style.opacity = String(alpha);
-
-      if (t >= 1) {
-        inspectTransitionActive = false;
-        inspecting = true;
-        placard.style.opacity = '1';
       }
     }
 
@@ -1215,5 +1017,4 @@ function startFocusOnRecord(rec: ArtMeshRecord) {
   }
 
   return { dispose, focusArtwork, clearFocus };
-}
 }
