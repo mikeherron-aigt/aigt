@@ -63,8 +63,7 @@ function normalizeImageUrl(url: string) {
 }
 
 /**
- * These paintings live in /public, so they can be referenced as "/<filename>.png"
- * This ensures they always appear in the room, even if the caller does not pass artworks.
+ * Paintings in /public
  */
 const LOCAL_ARTWORK_FILES = [
   '2024-JD-AG-0003.png',
@@ -110,7 +109,7 @@ function createStampedFloorTexture(
   const stampsY = opts?.stampsY ?? 12;
   const seed = opts?.seed ?? 424242;
 
-  const overlapPct = opts?.overlapPct ?? 0.30;
+  const overlapPct = opts?.overlapPct ?? 0.3;
   const jitterPct = opts?.jitterPct ?? 0.06;
   const alpha = opts?.alpha ?? 0.95;
 
@@ -228,14 +227,12 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-13-backwall-grid-door-focus-exit');
+  console.log('VR_SCENE_VERSION', '2026-02-13-side-and-back-walls-door-focus-exit');
 
   let disposed = false;
 
-  // Always include the local paintings, then append anything passed in (de-duped by id)
   const localArtworks = buildLocalArtworks();
   const incoming = artworks ?? [];
-
   const artworksInRoom: MuseumArtwork[] = [
     ...localArtworks,
     ...incoming.filter((a) => !localArtworks.some((b) => b.id === a.id)),
@@ -410,7 +407,7 @@ export function createVrMuseumScene({
       stampsX: 6,
       stampsY: 12,
       seed: 424242,
-      overlapPct: 0.30,
+      overlapPct: 0.3,
       jitterPct: 0.06,
       alpha: 0.95,
     });
@@ -566,7 +563,6 @@ export function createVrMuseumScene({
     opacity: 1.0,
     ior: 1.45,
   });
-
   glassMat.depthWrite = false;
 
   const glass = new THREE.Mesh(
@@ -620,11 +616,11 @@ export function createVrMuseumScene({
   scene.add(vista);
 
   // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.30));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
   const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.55);
   scene.add(hemi);
 
-  const sun = new THREE.DirectionalLight(0xffffff, 1.10);
+  const sun = new THREE.DirectionalLight(0xffffff, 1.1);
   sun.position.set(5.6, 10.5, backZ - 18.0);
   sun.target.position.set(-2.2, 1.2, backZ + 6.5);
   sun.castShadow = true;
@@ -636,8 +632,6 @@ export function createVrMuseumScene({
 
   sun.shadow.camera.near = 1;
   sun.shadow.camera.far = 120;
-
-  // PASS 1: big bounds
   sun.shadow.camera.left = -18;
   sun.shadow.camera.right = 18;
   sun.shadow.camera.top = 18;
@@ -647,7 +641,7 @@ export function createVrMuseumScene({
   scene.add(sun.target);
   (sun.shadow.camera as THREE.OrthographicCamera).updateProjectionMatrix();
 
-  // PASS 2: optional tighter bounds for crisper mullion shadows
+  // Optional tighter sun bounds
   const USE_TIGHTER_SUN_SHADOW_BOUNDS = false;
   if (USE_TIGHTER_SUN_SHADOW_BOUNDS) {
     sun.shadow.camera.left = -14;
@@ -685,19 +679,18 @@ export function createVrMuseumScene({
   addGallerySpot(-3.6, -6.0);
   addGallerySpot(3.6, -6.0);
 
-  // Door on the front wall (contemporary museum style door that leads to nothing)
+  // Door on the back wall (the solid wall at z = +roomD/2)
   const doorGroup = new THREE.Group();
   const doorW = 1.6;
   const doorH = 2.65;
   const doorT = 0.07;
 
-  // Place it on the front wall, right side
   const doorX = roomW / 2 - doorW / 2 - 0.55;
   const doorY = doorH / 2;
   const doorZ = roomD / 2 - 0.03;
 
   doorGroup.position.set(doorX, doorY, doorZ);
-  doorGroup.rotation.y = Math.PI; // face into the room
+  doorGroup.rotation.y = Math.PI;
   room.add(doorGroup);
 
   const doorFrameMat = new THREE.MeshStandardMaterial({
@@ -724,8 +717,6 @@ export function createVrMuseumScene({
     doorVoidMat
   );
   doorVoid.position.z = doorT / 2 + 0.002;
-  doorVoid.castShadow = false;
-  doorVoid.receiveShadow = false;
   doorGroup.add(doorVoid);
 
   const handleMat = new THREE.MeshStandardMaterial({
@@ -841,8 +832,7 @@ export function createVrMuseumScene({
     });
   }
 
-  // Placements: put ALL paintings on the front wall in an evenly spaced grid (so none end up outside)
-  // We reserve space on the right for the door.
+  // Placements: distribute across BOTH side walls + the solid back wall (frontWall at z = +roomD/2)
   const placements: Array<{
     pos: THREE.Vector3;
     rotY: number;
@@ -850,37 +840,91 @@ export function createVrMuseumScene({
     targetMaxHeight: number;
   }> = [];
 
-  const n = artworksInRoom.length;
-  const cols = Math.min(5, Math.max(1, n)); // up to 5 across
-  const rows = Math.max(1, Math.ceil(n / cols));
+  const makeWallSlots = (wall: 'right' | 'left' | 'back') => {
+    const slots: Array<{
+      pos: THREE.Vector3;
+      rotY: number;
+      targetMaxWidth: number;
+      targetMaxHeight: number;
+    }> = [];
 
-  const wallMarginX = 0.8;
-  const doorReserve = doorW + 1.0; // keep paintings away from the door
-  const usableW = roomW - wallMarginX * 2 - doorReserve;
+    const yRows = 2;
+    const yTop = 2.85;
+    const yBot = 1.65;
+    const ys = yRows === 2 ? [yTop, yBot] : [2.2];
 
-  const cellW = usableW / cols;
-  const topMarginY = 0.55;
-  const bottomMarginY = 0.55;
-  const usableH = roomH - topMarginY - bottomMarginY;
+    const zMargin = 2.2;
+    const zUsable = roomD - zMargin * 2;
+    const zCols = 4;
+    const zStep = zUsable / (zCols - 1);
+    const zStart = roomD / 2 - zMargin;
 
-  const cellH = usableH / rows;
+    if (wall === 'right' || wall === 'left') {
+      const x = wall === 'right' ? roomW / 2 - 0.06 : -roomW / 2 + 0.06;
+      const rotY = wall === 'right' ? -Math.PI / 2 : Math.PI / 2;
 
-  // Left aligned region, centered vertically
-  const leftStartX = -roomW / 2 + wallMarginX + cellW / 2;
+      for (const y of ys) {
+        for (let c = 0; c < zCols; c++) {
+          const z = zStart - c * zStep;
+          slots.push({
+            pos: new THREE.Vector3(x, y, z),
+            rotY,
+            targetMaxWidth: Math.min(1.7, zStep * 0.62),
+            targetMaxHeight: 1.85,
+          });
+        }
+      }
+      return slots;
+    }
 
-  for (let i = 0; i < n; i++) {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
+    // back wall (solid wall at z = +roomD/2)
+    const z = roomD / 2 - 0.07;
+    const rotY = Math.PI;
 
-    const x = leftStartX + col * cellW;
-    const y = bottomMarginY + cellH / 2 + (rows - 1 - row) * cellH;
+    const wallMarginX = 0.85;
+    const doorReserve = doorW + 1.05;
+    const usableW = roomW - wallMarginX * 2 - doorReserve;
 
-    placements.push({
-      pos: new THREE.Vector3(x, y, roomD / 2 - 0.07),
-      rotY: Math.PI,
-      targetMaxWidth: cellW * 0.78,
-      targetMaxHeight: cellH * 0.78,
-    });
+    const xCols = 4;
+    const xStep = usableW / (xCols - 1);
+    const xStart = -roomW / 2 + wallMarginX;
+
+    for (const y of ys) {
+      for (let c = 0; c < xCols; c++) {
+        const x = xStart + c * xStep;
+        slots.push({
+          pos: new THREE.Vector3(x, y, z),
+          rotY,
+          targetMaxWidth: Math.min(1.75, xStep * 0.65),
+          targetMaxHeight: 1.85,
+        });
+      }
+    }
+
+    return slots;
+  };
+
+  const rightSlots = makeWallSlots('right');
+  const leftSlots = makeWallSlots('left');
+  const backSlots = makeWallSlots('back');
+
+  // Round-robin fill so it "feels" even across side + back
+  const slotLists = [rightSlots, leftSlots, backSlots];
+  let placed = 0;
+
+  while (placed < artworksInRoom.length) {
+    let progressed = false;
+
+    for (let i = 0; i < slotLists.length && placed < artworksInRoom.length; i++) {
+      const list = slotLists[i];
+      const slot = list.shift();
+      if (!slot) continue;
+      placements.push(slot);
+      placed++;
+      progressed = true;
+    }
+
+    if (!progressed) break; // no more slots
   }
 
   (async () => {
@@ -888,7 +932,7 @@ export function createVrMuseumScene({
       if (disposed) return;
 
       const p = placements[i];
-      if (!p) continue;
+      if (!p) return;
 
       await addFramedArtwork({
         artwork: artworksInRoom[i],
@@ -950,7 +994,6 @@ export function createVrMuseumScene({
 
     showPlacard(rec.artwork);
 
-    // Measure plaque width without flashing it
     placard.style.visibility = 'hidden';
     placard.style.opacity = '1';
     void placard.getBoundingClientRect();
@@ -969,28 +1012,22 @@ export function createVrMuseumScene({
     focusFrom.fov = camera.fov;
     focusFrom.filmOffset = camera.filmOffset || 0;
 
-    // Fit based on OUTER frame
     const frameW = rec.outerW;
     const frameH = rec.outerH;
 
     const worldCenter = new THREE.Vector3();
     rec.frameGroup.getWorldPosition(worldCenter);
 
-    const normalOut = new THREE.Vector3(0, 0, 1)
-      .applyQuaternion(rec.frameGroup.quaternion)
-      .normalize();
+    const normalOut = new THREE.Vector3(0, 0, 1).applyQuaternion(rec.frameGroup.quaternion).normalize();
 
-    // Viewport math
     const w = Math.max(1, container.clientWidth);
     const h = Math.max(1, container.clientHeight);
 
-    // Pixels in DOM overlay space
     const margin = 18;
     const gap = 12;
     const rightPad = 18;
     const leftPad = 12;
 
-    // Rectangle where the painting must fit
     const regionLeft = leftPad + margin;
     const regionRight = w - (plaqueW + gap + rightPad) - margin;
     const regionTop = margin;
@@ -1002,7 +1039,6 @@ export function createVrMuseumScene({
     const usableWidthRatio = regionW / w;
     const usableHeightRatio = regionH / h;
 
-    // Camera optics for focus
     const targetFov = 22;
     focusTo.fov = targetFov;
 
@@ -1010,17 +1046,14 @@ export function createVrMuseumScene({
     const aspect = w / h;
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
 
-    // Distances to fit frame in the usable region
     const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
     const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
 
     const dist = Math.max(distForHeight, distForWidth) * 1.12;
 
-    // Position camera straight out from the artwork center (no sideways move)
     focusTo.pos.copy(worldCenter).add(normalOut.clone().multiplyScalar(dist));
     focusTo.pos.y = worldCenter.y;
 
-    // Yaw toward center, no pitch
     const lookDir = worldCenter.clone().sub(focusTo.pos);
     lookDir.y = 0;
     lookDir.normalize();
@@ -1028,17 +1061,15 @@ export function createVrMuseumScene({
     focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
     focusTo.pitch = 0;
 
-    // Lens shift so ART CENTER lands in the center of the usable region
     const regionCenterPx = (regionLeft + regionRight) / 2;
     const desiredCenterNdcX = (regionCenterPx / w) * 2 - 1;
 
     const filmWidth = camera.getFilmWidth();
     const filmOffsetMm = (desiredCenterNdcX * filmWidth) / 2;
 
-    // Reduce how hard we shift, then clamp so it can never shove the art off screen
     const shiftStrength = 0.85;
     const maxShift = filmWidth * 0.22;
-    const targetOffset = (-filmOffsetMm) * shiftStrength;
+    const targetOffset = -filmOffsetMm * shiftStrength;
 
     focusTo.filmOffset = clamp(targetOffset, -maxShift, maxShift);
 
@@ -1051,11 +1082,10 @@ export function createVrMuseumScene({
   let lastY = 0;
   let dragMoved = false;
 
-  // When focused, a click should zoom back out to the center
+  // When focused, click exits focus back to center
   let clickToExitFocus = false;
 
   function onPointerDown(e: PointerEvent) {
-    // If we are focused (or focusing), do not start a drag. One click exits focus.
     if (focusActive || focusTargetRec) {
       clickToExitFocus = true;
       dragMoved = false;
@@ -1107,7 +1137,6 @@ export function createVrMuseumScene({
   }
 
   function onPointerUp(e: PointerEvent) {
-    // If we were focused and this was a click (not a drag), zoom back out to center
     if (clickToExitFocus) {
       clickToExitFocus = false;
 
