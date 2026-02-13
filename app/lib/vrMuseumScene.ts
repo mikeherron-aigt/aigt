@@ -324,8 +324,6 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
   pitchObj.add(camera);
   scene.add(yawObj);
 
-  const orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 400);
-  let activeCamera: THREE.Camera = camera;
 
   // Pose
   yawObj.position.set(0, 1.55, 6.6);
@@ -518,44 +516,99 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
   }
 
   function startFocusOnRecord(rec: ArtMeshRecord) {
-    cancelFocusAndInspect();
+function startFocusOnRecord(rec: ArtMeshRecord) {
+  cancelFocusAndInspect();
 
-    focusActive = true;
-    focusTargetRec = rec;
-    focusTime = 0;
+  // Show plaque now so we can measure its real width
+  showPlacard(rec.artwork);
 
-    focusFrom.pos.copy(yawObj.position);
-    focusFrom.yaw = yaw;
-    focusFrom.pitch = pitch;
-    focusFrom.fov = camera.fov;
+  // Force accurate measurement without flashing it
+  placard.style.visibility = 'hidden';
+  placard.style.opacity = '1';
+  void placard.getBoundingClientRect(); // forces layout
+  const plaqueW = placard.getBoundingClientRect().width || 290;
+  placard.style.opacity = '0';
+  placard.style.visibility = 'visible';
 
-    const worldPos = new THREE.Vector3();
-    rec.frameGroup.getWorldPosition(worldPos);
+  // Start focus animation
+  focusActive = true;
+  focusTargetRec = rec;
+  focusTime = 0;
 
-    const normalOut = new THREE.Vector3(0, 0, 1).applyQuaternion(rec.frameGroup.quaternion).normalize();
+  focusFrom.pos.copy(yawObj.position);
+  focusFrom.yaw = yaw;
+  focusFrom.pitch = pitch;
+  focusFrom.fov = camera.fov;
 
-    const targetFov = 35;
-    const vFovRad = (targetFov * Math.PI) / 180;
+  // Use the OUTER frame size so the black border is always visible
+  const frameW = rec.outerW;
+  const frameH = rec.outerH;
 
-    // End phase A: make it feel like a controlled approach but not final fit.
-    const fillPct = 0.90;
-    const neededDist = (rec.outerH / 2) / Math.tan(vFovRad / 2) / fillPct;
-    const dist = clamp(neededDist, 1.35, 5.2);
+  const worldCenter = new THREE.Vector3();
+  rec.frameGroup.getWorldPosition(worldCenter);
 
-    focusTo.pos.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
-    focusTo.pos.y = worldPos.y;
+  const normalOut = new THREE.Vector3(0, 0, 1)
+    .applyQuaternion(rec.frameGroup.quaternion)
+    .normalize();
 
-    const lookDir = worldPos.clone().sub(focusTo.pos);
-    lookDir.y = 0;
-    lookDir.normalize();
+  const artRight = new THREE.Vector3(1, 0, 0)
+    .applyQuaternion(rec.frameGroup.quaternion)
+    .normalize();
 
-    focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
-    focusTo.pitch = 0;
-    focusTo.fov = targetFov;
+  // Viewport math
+  const w = Math.max(1, container.clientWidth);
+  const h = Math.max(1, container.clientHeight);
 
-    activeCamera = camera;
-  }
+  const margin = 18;
+  const gap = 14;
+  const rightPad = 18;
+  const leftPad = 12;
 
+  const usableW = Math.max(1, w - (plaqueW + gap + rightPad) - leftPad - margin);
+  const usableH = Math.max(1, h - margin * 2);
+
+  const usableWidthRatio = usableW / w;
+  const usableHeightRatio = usableH / h;
+
+  // Choose a slightly tighter FOV for less perspective distortion
+  const targetFov = 32;
+  focusTo.fov = targetFov;
+
+  const vFov = (targetFov * Math.PI) / 180;
+  const aspect = w / h;
+  const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+
+  // Distance to fit height in usable height
+  const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
+
+  // Distance to fit width in usable width
+  const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
+
+  // Pick the larger distance so the whole frame always fits
+  const dist = Math.max(distForHeight, distForWidth) * 1.06; // breathing room
+
+  // Shift camera right so the painting sits in the left usable area
+  const centerNdcX = -1 + usableWidthRatio; // center of usable region in NDC
+  const shift = -centerNdcX * dist * Math.tan(hFov / 2);
+
+  // Final camera position
+  focusTo.pos.copy(worldCenter)
+    .add(normalOut.clone().multiplyScalar(dist))
+    .add(artRight.clone().multiplyScalar(shift));
+
+  // Keep the camera looking square at the artwork (no tilt)
+  focusTo.pos.y = worldCenter.y;
+
+  const lookDir = worldCenter.clone().sub(focusTo.pos);
+  lookDir.y = 0;
+  lookDir.normalize();
+
+  focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
+  focusTo.pitch = 0;
+}
+
+
+    
   // Materials
   const wallMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
@@ -982,7 +1035,7 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
 
       const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(new THREE.Vector2(x, y), activeCamera);
+      raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
 
       const targets = clickableMeshes.map((m) => m.clickable);
       const hits = raycaster.intersectObjects(targets, true);
@@ -1072,6 +1125,8 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
     if (focusActive) {
       focusTime += dt;
       const t = clamp(focusTime / focusDuration, 0, 1);
+      placard.style.opacity = String(clamp((t - 0.35) / 0.35, 0, 1));
+
 
       const e = easeInOutCubic(t);
       const eY = easeOutCubic(clamp(t * 1.05, 0, 1));
@@ -1123,7 +1178,7 @@ console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
       }
     }
 
-    renderer.render(scene, activeCamera);
+    renderer.render(scene, camera);
     requestAnimationFrame(animate);
   }
 
