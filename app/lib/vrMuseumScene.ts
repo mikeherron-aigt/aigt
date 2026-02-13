@@ -821,38 +821,43 @@ export function createVrMuseumScene({
     });
   }
 
- // BACK wall: 3 works, centered in the open span, with guaranteed spacing
+// Build BACK wall placements (z fixed, vary x), 3 paintings to the RIGHT of the door,
+// centered in the open section between the door and the right corner, with enforced spacing.
 {
   const z = roomD / 2 - 0.07;
   const rotY = Math.PI;
 
+  const backWallCount = 3;
+
+  // Span bounds (right side centered between door and corner)
   const wallXMargin = 1.15;
   const xRightLimit = roomW / 2 - wallXMargin;
 
+  // doorX/doorW already exist above in your file (door placement)
   const doorRightEdge = doorX + doorW / 2;
 
-  const doorPad = 1.0;
-  const cornerPad = 1.1;
+  const doorPad = 1.0;     // gap from door edge
+  const cornerPad = 1.1;   // gap from corner
 
   const usableMin = doorRightEdge + doorPad;
   const usableMax = xRightLimit - cornerPad;
 
-  if (usableMax > usableMin && countBack > 0) {
+  if (usableMax > usableMin) {
     // ---- spacing controls (tweak these) ----
-    const minGap = 0.75;           // minimum space between frame OUTER edges (world units)
-    const edgePadding = 0.35;      // keep frames off the boundaries a bit
+    const minGap = 0.85;      // minimum space between frame OUTER edges
+    const edgePadding = 0.35; // keeps the set off the boundaries
     // ---------------------------------------
 
-    // conservative estimate of outer frame width so we can enforce gap
-    // (your frames are ~ targetMaxWidth + frame thickness, plus a bit)
+    // Conservative estimate of outer frame width so we can enforce gap
     const estOuterW = targetMaxWidth + 0.25;
 
     const spanMin = usableMin + edgePadding + estOuterW / 2;
     const spanMax = usableMax - edgePadding - estOuterW / 2;
 
     const span = spanMax - spanMin;
+
+    // If span is too small, just center what we can
     if (span <= 0) {
-      // fallback: single centered if we somehow have no room
       placements.push({
         pos: new THREE.Vector3((usableMin + usableMax) / 2, artY, z),
         rotY,
@@ -860,48 +865,28 @@ export function createVrMuseumScene({
         targetMaxHeight,
       });
     } else {
-      const c = countBack;
+      const center = (spanMin + spanMax) / 2;
 
-      if (c === 1) {
+      // Step must be >= (frame width + min gap), but also must fit inside span
+      const requiredStep = estOuterW + minGap;
+      const maxStepBySpan = span / (backWallCount - 1);
+      const step = Math.min(Math.max(requiredStep, 0.01), maxStepBySpan);
+
+      // 3 paintings: left, center, right (centered in the open span)
+      const xs = [center - step, center, center + step];
+
+      for (const x of xs) {
         placements.push({
-          pos: new THREE.Vector3((spanMin + spanMax) / 2, artY, z),
+          pos: new THREE.Vector3(clamp(x, spanMin, spanMax), artY, z),
           rotY,
           targetMaxWidth,
           targetMaxHeight,
         });
-      } else {
-        // desired center-out positions: [center, center+step, center-step] etc
-        const center = (spanMin + spanMax) / 2;
-
-        // compute a step that is at least (estOuterW + minGap)
-        const requiredStep = estOuterW + minGap;
-
-        // also ensure we fit within the available span
-        const maxStepBySpan = span / (c - 1);
-
-        const step = Math.min(Math.max(requiredStep, 0.01), maxStepBySpan);
-
-        // build symmetric offsets
-        const xs: number[] = [];
-        if (c === 2) {
-          xs.push(center - step / 2, center + step / 2);
-        } else {
-          // 3 paintings: left, center, right
-          xs.push(center - step, center, center + step);
-        }
-
-        for (const x of xs) {
-          placements.push({
-            pos: new THREE.Vector3(clamp(x, spanMin, spanMax), artY, z),
-            rotY,
-            targetMaxWidth,
-            targetMaxHeight,
-          });
-        }
       }
     }
   }
 }
+
 
 
   // RIGHT wall (x fixed, vary z), centered from the middle going outward
