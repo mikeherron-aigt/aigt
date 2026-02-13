@@ -569,33 +569,33 @@ vista.renderOrder = -1000;
 scene.add(vista);
 
 
-  // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.52));
+ // Lighting
+scene.add(new THREE.AmbientLight(0xffffff, 0.52));
+
 const sun = new THREE.DirectionalLight(0xffffff, 0.85);
+sun.position.set(22, 1.6, backZ - 28);
+sun.target.position.set(0, 0.05, backZ + 2.5);
+sun.castShadow = true;
 
-  sun.position.set(22, 1.6, backZ - 28;
-  sun.target.position.set(0, 0.05, backZ + 2.5;
-  sun.castShadow = true;
-  sun.shadow.mapSize.set(4096, 4096);
-  sun.shadow.camera.near = 1;
-  sun.shadow.camera.far = 90;
-  sun.shadow.camera.left = -22;
-  sun.shadow.camera.right = 22;
-  sun.shadow.camera.top = 22;
-  sun.shadow.camera.bottom = -22;
-  scene.add(sun);
-  scene.add(sun.target);
+sun.shadow.mapSize.set(4096, 4096);
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 90;
+sun.shadow.camera.left = -22;
+sun.shadow.camera.right = 22;
+sun.shadow.camera.top = 22;
+sun.shadow.camera.bottom = -22;
 
-  // Softer shadow edges
 sun.shadow.radius = 8;
-
-// Reduce acne without detaching shadows
 sun.shadow.bias = -0.00008;
 sun.shadow.normalBias = 0.02;
 
-  const fill = new THREE.DirectionalLight(0xffffff, 0.30);
-  fill.position.set(6, 10, 10);
-  scene.add(fill);
+scene.add(sun);
+scene.add(sun.target);
+
+const fill = new THREE.DirectionalLight(0xffffff, 0.30);
+fill.position.set(6, 10, 10);
+scene.add(fill);
+
 
   // Art frames
   const texLoader = new THREE.TextureLoader();
