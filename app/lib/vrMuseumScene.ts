@@ -1,3 +1,4 @@
+// app/lib/vrMuseumScene.ts
 import * as THREE from 'three';
 import type { MuseumArtwork } from '@/app/components/VrMuseumEmbed';
 
@@ -13,6 +14,8 @@ type CreateArgs = {
   onArtworkClick?: (artwork: MuseumArtwork) => void;
 };
 
+type WallTag = 'left' | 'right' | 'back';
+
 type ArtMeshRecord = {
   artwork: MuseumArtwork;
   clickable: THREE.Object3D;
@@ -21,6 +24,15 @@ type ArtMeshRecord = {
   artH: number;
   outerW: number;
   outerH: number;
+  wall: WallTag;
+};
+
+type Placement = {
+  pos: THREE.Vector3;
+  rotY: number;
+  targetMaxWidth: number;
+  targetMaxHeight: number;
+  wall: WallTag;
 };
 
 function clamp(v: number, min: number, max: number) {
@@ -136,13 +148,7 @@ function createStampedFloorTexture(
 
   const featherPx = Math.max(18, Math.floor(Math.min(drawW, drawH) * 0.08));
 
-  const featherStamp = (
-    src: HTMLImageElement,
-    w: number,
-    h: number,
-    feather: number,
-    flipX: number
-  ) => {
+  const featherStamp = (src: HTMLImageElement, w: number, h: number, feather: number, flipX: number) => {
     const t = document.createElement('canvas');
     t.width = Math.max(2, Math.ceil(w));
     t.height = Math.max(2, Math.ceil(h));
@@ -222,21 +228,83 @@ function createStampedFloorTexture(
   return tex;
 }
 
+function centeredPositions(count: number, min: number, max: number) {
+  if (count <= 0) return [];
+  const span = max - min;
+  const center = (min + max) / 2;
+  if (count === 1) return [center];
+
+  // Build symmetric slots around center: 0, +1, -1, +2, -2, ...
+  const offsets: number[] = [0];
+  for (let k = 1; offsets.length < count; k++) {
+    offsets.push(k);
+    if (offsets.length < count) offsets.push(-k);
+  }
+
+  // Step chosen to fit the farthest index inside the span
+  const far = Math.max(...offsets.map((o) => Math.abs(o)));
+  const step = far === 0 ? 0 : (span * 0.5) / far;
+
+  return offsets.slice(0, count).map((o) => center + o * step);
+}
+
+function layoutBackWallUsingRealWidths(opts: {
+  records: ArtMeshRecord[];
+  usableMinX: number;
+  usableMaxX: number;
+  gap: number; // desired empty space between OUTER frame edges
+}) {
+  const { records, usableMinX, usableMaxX, gap } = opts;
+
+  const back = records
+    .filter((r) => r.wall === 'back')
+    .sort((a, b) => a.frameGroup.position.x - b.frameGroup.position.x);
+
+  if (back.length === 0) return;
+
+  const spanW = Math.max(0.0001, usableMaxX - usableMinX);
+
+  const framesW = back.reduce((sum, r) => sum + r.outerW, 0);
+  const desiredGapsW = gap * Math.max(0, back.length - 1);
+  const desiredRunW = framesW + desiredGapsW;
+
+  const effectiveGap =
+    desiredRunW <= spanW
+      ? gap
+      : Math.max(0.14, (spanW - framesW) / Math.max(1, back.length - 1));
+
+  const runW = framesW + effectiveGap * Math.max(0, back.length - 1);
+
+  const startX = usableMinX + (spanW - runW) / 2;
+
+  let cursor = startX;
+  for (const r of back) {
+    const half = r.outerW / 2;
+    r.frameGroup.position.x = cursor + half;
+    cursor += r.outerW + effectiveGap;
+  }
+}
+
 export function createVrMuseumScene({
   container,
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-13-back-wall-fixed-spacing-scope-safe');
+  console.log('VR_SCENE_VERSION', '2026-02-13-backwall-real-spacing');
 
   let disposed = false;
 
   const localArtworks = buildLocalArtworks();
   const incoming = artworks ?? [];
-  const artworksInRoom: MuseumArtwork[] = [
+  const merged: MuseumArtwork[] = [
     ...localArtworks,
     ...incoming.filter((a) => !localArtworks.some((b) => b.id === a.id)),
   ];
+
+  // Force the intended distribution when we have enough works:
+  // 5 right, 5 left, 3 back
+  const DESIRED_TOTAL = 13;
+  const artworksInRoom = merged.slice(0, Math.min(merged.length, DESIRED_TOTAL));
 
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -262,7 +330,7 @@ export function createVrMuseumScene({
   if (!container.style.position) container.style.position = 'relative';
   container.appendChild(renderer.domElement);
 
-  // Plaque overlay
+  // Placard overlay
   const placard = document.createElement('div');
   placard.style.position = 'absolute';
   placard.style.top = '50%';
@@ -273,19 +341,16 @@ export function createVrMuseumScene({
   placard.style.pointerEvents = 'none';
   placard.style.opacity = '0';
   placard.style.transition = 'opacity 220ms ease';
-
   placard.style.fontFamily =
     'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
   placard.style.color = '#1b1b1b';
-
   placard.style.borderRadius = '0px';
   placard.style.border = '1px solid rgba(0,0,0,0.30)';
   placard.style.backgroundImage =
     'linear-gradient(180deg, rgba(246,244,238,0.98) 0%, rgba(236,233,224,0.98) 100%), repeating-linear-gradient(90deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.00) 3px, rgba(0,0,0,0.00) 6px)';
   placard.style.padding = '14px 14px 12px 14px';
   placard.style.lineHeight = '1.25';
-  placard.style.boxShadow =
-    'inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -2px 6px rgba(0,0,0,0.12)';
+  placard.style.boxShadow = 'inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -2px 6px rgba(0,0,0,0.12)';
 
   placard.innerHTML = `
     <div style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: rgba(0,0,0,.55); margin-bottom: 10px;">
@@ -329,8 +394,7 @@ export function createVrMuseumScene({
     const catalogId = anyA.sku ?? anyA.catalogId ?? artwork.id ?? 'ID';
 
     if (placardArtist) placardArtist.textContent = String(artist);
-    if (placardTitle)
-      placardTitle.innerHTML = `<span style="font-style: italic;">${String(title)}</span>`;
+    if (placardTitle) placardTitle.innerHTML = `<span style="font-style: italic;">${String(title)}</span>`;
     if (placardTitle2) placardTitle2.textContent = String(title);
     if (placardCollection) placardCollection.textContent = String(collection);
     if (placardId) placardId.textContent = String(catalogId);
@@ -374,15 +438,15 @@ export function createVrMuseumScene({
     color: new THREE.Color('#ffffff'),
     roughness: 0.94,
     metalness: 0.0,
+    side: THREE.DoubleSide,
   });
-  wallMat.side = THREE.DoubleSide;
 
   const ceilingMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#fbfbfb'),
     roughness: 0.98,
     metalness: 0.0,
+    side: THREE.DoubleSide,
   });
-  ceilingMat.side = THREE.DoubleSide;
 
   const floorMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
@@ -532,10 +596,7 @@ export function createVrMuseumScene({
   topBorder.castShadow = true;
   frameGroup.add(topBorder);
 
-  const bottomBorder2 = new THREE.Mesh(
-    new THREE.BoxGeometry(openingW, frameBorder, frameDepth),
-    frameMat
-  );
+  const bottomBorder2 = new THREE.Mesh(new THREE.BoxGeometry(openingW, frameBorder, frameDepth), frameMat);
   bottomBorder2.position.set(0, -openingH / 2 + frameBorder / 2, 0);
   bottomBorder2.castShadow = true;
   frameGroup.add(bottomBorder2);
@@ -545,10 +606,7 @@ export function createVrMuseumScene({
   leftBorder2.castShadow = true;
   frameGroup.add(leftBorder2);
 
-  const rightBorder2 = new THREE.Mesh(
-    new THREE.BoxGeometry(frameBorder, openingH, frameDepth),
-    frameMat
-  );
+  const rightBorder2 = new THREE.Mesh(new THREE.BoxGeometry(frameBorder, openingH, frameDepth), frameMat);
   rightBorder2.position.set(openingW / 2 - frameBorder / 2, 0, 0);
   rightBorder2.castShadow = true;
   frameGroup.add(rightBorder2);
@@ -602,10 +660,7 @@ export function createVrMuseumScene({
     t.needsUpdate = true;
   });
 
-  const vistaMat = new THREE.MeshBasicMaterial({
-    map: vistaTex,
-    toneMapped: false,
-  });
+  const vistaMat = new THREE.MeshBasicMaterial({ map: vistaTex, toneMapped: false });
   vistaMat.depthTest = false;
   vistaMat.depthWrite = false;
   vistaMat.side = THREE.DoubleSide;
@@ -641,6 +696,15 @@ export function createVrMuseumScene({
   scene.add(sun.target);
   (sun.shadow.camera as THREE.OrthographicCamera).updateProjectionMatrix();
 
+  const USE_TIGHTER_SUN_SHADOW_BOUNDS = false;
+  if (USE_TIGHTER_SUN_SHADOW_BOUNDS) {
+    sun.shadow.camera.left = -14;
+    sun.shadow.camera.right = 14;
+    sun.shadow.camera.top = 16;
+    sun.shadow.camera.bottom = -10;
+    (sun.shadow.camera as THREE.OrthographicCamera).updateProjectionMatrix();
+  }
+
   const fill = new THREE.PointLight(0xffffff, 0.28, 60, 2.0);
   fill.position.set(0, roomH - 0.35, 2.0);
   fill.castShadow = false;
@@ -667,14 +731,14 @@ export function createVrMuseumScene({
   addGallerySpot(-3.6, -6.0);
   addGallerySpot(3.6, -6.0);
 
-  // Door (location not important, so we place it so the right side has room)
+  // Door on the back wall (solid wall at z = +roomD/2)
   const doorGroup = new THREE.Group();
   const doorW = 1.6;
   const doorH = 2.65;
   const doorT = 0.07;
 
-  // Door moved left to guarantee a usable span to the right
-  const doorX = -2.6;
+  // Door position is not important per your note
+  const doorX = roomW / 2 - doorW / 2 - 0.55;
   const doorY = doorH / 2;
   const doorZ = roomD / 2 - 0.03;
 
@@ -701,10 +765,7 @@ export function createVrMuseumScene({
   doorFrame.receiveShadow = true;
   doorGroup.add(doorFrame);
 
-  const doorVoid = new THREE.Mesh(
-    new THREE.PlaneGeometry(doorW - 0.12, doorH - 0.12),
-    doorVoidMat
-  );
+  const doorVoid = new THREE.Mesh(new THREE.PlaneGeometry(doorW - 0.12, doorH - 0.12), doorVoidMat);
   doorVoid.position.z = doorT / 2 + 0.002;
   doorGroup.add(doorVoid);
 
@@ -763,8 +824,9 @@ export function createVrMuseumScene({
     rotationY: number;
     targetMaxWidth: number;
     targetMaxHeight: number;
+    wall: WallTag;
   }) {
-    const { artwork, position, rotationY, targetMaxWidth, targetMaxHeight } = opts;
+    const { artwork, position, rotationY, targetMaxWidth, targetMaxHeight, wall } = opts;
 
     const tex = await loadArtworkTexture((artwork as any).imageUrl);
 
@@ -818,165 +880,129 @@ export function createVrMuseumScene({
       artH,
       outerW,
       outerH,
+      wall,
     });
   }
 
-  // ------------------------------------------------------------
-  // PLACEMENTS (this is the part you keep breaking via scope)
-  // This is a clean, compiling, self-contained layout:
-  // - Back wall: exactly 3 works, to the right of the door, with adjustable spacing
-  // - Side walls: 5 each, centered from the middle outward
-  // ------------------------------------------------------------
-
-  const placements: Array<{
-    pos: THREE.Vector3;
-    rotY: number;
-    targetMaxWidth: number;
-    targetMaxHeight: number;
-  }> = [];
+  // Placements: one single row (same Y), side walls centered, back wall right of door then spaced by real widths
+  const placements: Placement[] = [];
 
   const artY = 2.05;
 
-  // sizing (consistent across all walls)
+  // Counts: 5 right, 5 left, 3 back if possible
+  const total = artworksInRoom.length;
+  const wantBack = 3;
+  const wantSideEach = 5;
+
+  const countBack = Math.min(wantBack, total);
+  const remaining = total - countBack;
+
+  const countLeft = Math.min(wantSideEach, Math.max(0, Math.ceil(remaining / 2)));
+  const countRight = Math.min(wantSideEach, Math.max(0, remaining - countLeft));
+
   const targetMaxWidth = 1.7;
   const targetMaxHeight = 1.85;
 
-  function centeredPositions(count: number, min: number, max: number) {
-    if (count <= 0) return [];
-    const center = (min + max) / 2;
-    if (count === 1) return [center];
+  // Side walls spacing along Z, centered at z=0 and expanded outward
+  const wallZMargin = 2.2;
+  const zMin = -roomD / 2 + wallZMargin;
+  const zMax = roomD / 2 - wallZMargin;
 
-    const halfRange = Math.max(0.0001, (max - min) / 2);
-    const maxIndex = Math.floor((count - 1) / 2) || 1;
-    const step = halfRange / maxIndex;
-
-    const out: number[] = [center];
-    for (let k = 1; out.length < count; k++) {
-      const p1 = center + step * k;
-      const p2 = center - step * k;
-      if (out.length < count && p1 <= max) out.push(p1);
-      if (out.length < count && p2 >= min) out.push(p2);
+  // Build RIGHT wall
+  {
+    const x = roomW / 2 - 0.06;
+    const rotY = -Math.PI / 2;
+    const zs = centeredPositions(countRight, zMin, zMax);
+    for (const z of zs) {
+      placements.push({
+        pos: new THREE.Vector3(x, artY, z),
+        rotY,
+        targetMaxWidth,
+        targetMaxHeight,
+        wall: 'right',
+      });
     }
-    return out.map((v) => clamp(v, min, max));
   }
 
-  // Counts: 3 back, 5 right, 5 left (if fewer works, it still places what exists)
-  const backWallCount = 3;
-  const rightWallCount = 5;
-  const leftWallCount = 5;
+  // Build LEFT wall
+  {
+    const x = -roomW / 2 + 0.06;
+    const rotY = Math.PI / 2;
+    const zs = centeredPositions(countLeft, zMin, zMax);
+    for (const z of zs) {
+      placements.push({
+        pos: new THREE.Vector3(x, artY, z),
+        rotY,
+        targetMaxWidth,
+        targetMaxHeight,
+        wall: 'left',
+      });
+    }
+  }
 
-  // BACK wall placements: 3 works in the open span between door and right corner
+  // Back wall: initial rough placement to the right of the door, then re-layout after frames load
+  let backUsableMinX = 0;
+  let backUsableMaxX = 0;
+
   {
     const z = roomD / 2 - 0.07;
     const rotY = Math.PI;
 
-    const wallXMargin = 1.15;
-    const xRightLimit = roomW / 2 - wallXMargin;
-
     const doorRightEdge = doorX + doorW / 2;
 
     const doorPad = 1.0;
-    const cornerPad = 1.1;
+    const cornerPad = 1.15;
 
-    const usableMin = doorRightEdge + doorPad;
-    const usableMax = xRightLimit - cornerPad;
+    const wallXMargin = 1.05;
+    const wallRight = roomW / 2 - wallXMargin;
 
-    if (usableMax > usableMin) {
-      // Adjust these to increase spacing between the 3 back wall paintings
-      const minGap = 1.0;       // bigger = more space between frames
-      const edgePadding = 0.35; // keeps set off the boundaries
+    backUsableMinX = doorRightEdge + doorPad;
+    backUsableMaxX = wallRight - cornerPad;
 
-      // Estimate outer frame width for spacing math
-      const estOuterW = targetMaxWidth + 0.25;
-
-      const spanMin = usableMin + edgePadding + estOuterW / 2;
-      const spanMax = usableMax - edgePadding - estOuterW / 2;
-      const span = spanMax - spanMin;
-
-      if (span > 0) {
-        const center = (spanMin + spanMax) / 2;
-
-        const requiredStep = estOuterW + minGap;
-        const maxStepBySpan = span / (backWallCount - 1);
-        const step = Math.min(Math.max(requiredStep, 0.01), maxStepBySpan);
-
-        const xs = [center - step, center, center + step];
-
-        for (const x of xs) {
-          placements.push({
-            pos: new THREE.Vector3(clamp(x, spanMin, spanMax), artY, z),
-            rotY,
-            targetMaxWidth,
-            targetMaxHeight,
-          });
-        }
-      } else {
-        // fallback
-        placements.push({
-          pos: new THREE.Vector3((usableMin + usableMax) / 2, artY, z),
-          rotY,
-          targetMaxWidth,
-          targetMaxHeight,
-        });
-      }
+    if (backUsableMaxX <= backUsableMinX) {
+      backUsableMinX = 0.5;
+      backUsableMaxX = roomW / 2 - 1.6;
     }
-  }
 
-  // RIGHT wall placements (center from middle outward)
-  {
-    const x = roomW / 2 - 0.06;
-    const rotY = -Math.PI / 2;
+    const center = (backUsableMinX + backUsableMaxX) / 2;
 
-    const wallZMargin = 3.2;
-    const zMin = -roomD / 2 + wallZMargin;
-    const zMax = roomD / 2 - wallZMargin;
-
-    const zs = centeredPositions(rightWallCount, zMin, zMax);
-    for (const z of zs) {
+    // Rough initial offsets. Real spacing happens after frames load.
+    const dxs = [-1.4, 0, 1.4].slice(0, countBack);
+    for (const dx of dxs) {
       placements.push({
-        pos: new THREE.Vector3(x, artY, z),
+        pos: new THREE.Vector3(center + dx, artY, z),
         rotY,
         targetMaxWidth,
         targetMaxHeight,
+        wall: 'back',
       });
     }
   }
 
-  // LEFT wall placements (center from middle outward)
-  {
-    const x = -roomW / 2 + 0.06;
-    const rotY = Math.PI / 2;
-
-    const wallZMargin = 3.2;
-    const zMin = -roomD / 2 + wallZMargin;
-    const zMax = roomD / 2 - wallZMargin;
-
-    const zs = centeredPositions(leftWallCount, zMin, zMax);
-    for (const z of zs) {
-      placements.push({
-        pos: new THREE.Vector3(x, artY, z),
-        rotY,
-        targetMaxWidth,
-        targetMaxHeight,
-      });
-    }
-  }
-
-  // Place artworks: back first, then right, then left, until we run out
+  // Build frames
   (async () => {
     const n = Math.min(artworksInRoom.length, placements.length);
     for (let i = 0; i < n; i++) {
       if (disposed) return;
-
       const p = placements[i];
+
       await addFramedArtwork({
         artwork: artworksInRoom[i],
         position: p.pos,
         rotationY: p.rotY,
         targetMaxWidth: p.targetMaxWidth,
         targetMaxHeight: p.targetMaxHeight,
+        wall: p.wall,
       });
     }
+
+    // Enforce spacing between the 3 back-wall works using their real widths
+    layoutBackWallUsingRealWidths({
+      records: clickableMeshes,
+      usableMinX: backUsableMinX,
+      usableMaxX: backUsableMaxX,
+      gap: 0.85, // increase for more space between back-wall frames
+    });
   })();
 
   // Focus animation state
@@ -1234,7 +1260,6 @@ export function createVrMuseumScene({
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
   renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
 
-  // Resize
   function resize() {
     const w = container.clientWidth;
     const h = container.clientHeight;
@@ -1258,7 +1283,6 @@ export function createVrMuseumScene({
     clearFocusToCenter();
   }
 
-  // Render loop
   function animate() {
     if (disposed) return;
 
@@ -1289,9 +1313,7 @@ export function createVrMuseumScene({
       camera.filmOffset = lerp(focusFrom.filmOffset, focusTo.filmOffset, e);
       camera.updateProjectionMatrix();
 
-      if (t >= 1) {
-        focusActive = false;
-      }
+      if (t >= 1) focusActive = false;
     }
 
     renderer.render(scene, camera);
