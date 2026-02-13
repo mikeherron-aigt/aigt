@@ -592,11 +592,12 @@ export function createVrMuseumScene({
   // Sun (the only strong patterned shadow source)
   const sun = new THREE.DirectionalLight(0xffffff, 1.10);
 
-  // Sun is outside to the RIGHT of the window
-  sun.position.set(10.5, 10.5, backZ - 18.0);
+  // Keep sun outside, but aligned with the window opening (so it cannot "reach around" the wall)
+sun.position.set(5.6, 10.5, backZ - 18.0);
 
-  // Aim slightly left into the room to rake shadows across the floor
-  sun.target.position.set(-2.2, 1.2, backZ + 6.5);
+// Aim across the room the same way, preserving the window shadow direction
+sun.target.position.set(-2.2, 1.2, backZ + 6.5);
+
 
   sun.castShadow = true;
 
