@@ -3,7 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import VrMuseumEmbed, { type MuseumArtwork, type VrMuseumEmbedHandle } from '@/app/components/VrMuseumEmbed';
 
-export default function VrMuseumClient() {
+type Props = {
+  variant?: 'page' | 'embed';
+};
+
+export default function VrMuseumClient({ variant = 'page' }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedArtwork, setSelectedArtwork] = useState<MuseumArtwork | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -47,7 +51,6 @@ export default function VrMuseumClient() {
     return () => window.removeEventListener('wheel', onWheel as any);
   }, [selectedArtwork]);
 
-  // Replace this with your real data if you have it already
   const artworks: MuseumArtwork[] = useMemo(
     () => [
       {
@@ -78,6 +81,152 @@ export default function VrMuseumClient() {
     []
   );
 
+  // EMBED MODE: no page chrome, no gray background wrapper, no headline/subhead, no expand.
+  // This is what will fill your red box.
+  if (variant === 'embed') {
+    return (
+      <div
+        ref={containerRef}
+        className="relative h-full w-full overflow-hidden rounded-[22px] border border-black/10 bg-[#0b0b0b]"
+      >
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          className="absolute right-4 top-4 z-[5] flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-2 text-[13px] text-white/85 backdrop-blur hover:bg-black/55"
+        >
+          {isFullscreen ? '✕ Exit' : '⛶ Fullscreen'}
+        </button>
+
+        <VrMuseumEmbed
+          ref={embedRef}
+          artworks={artworks}
+          onArtworkClick={(art) => {
+            setTimeout(() => setSelectedArtwork(art), 350);
+          }}
+        />
+
+        {selectedArtwork && (
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) closeOverlay();
+            }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9999,
+              background: 'rgba(0,0,0,0.88)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 24,
+            }}
+          >
+            <button
+              type="button"
+              onClick={closeOverlay}
+              style={{
+                position: 'absolute',
+                top: 24,
+                right: 24,
+                width: 44,
+                height: 44,
+                borderRadius: 999,
+                border: '1px solid rgba(255,255,255,0.2)',
+                background: 'rgba(20,20,20,0.8)',
+                color: '#fff',
+                cursor: 'pointer',
+                backdropFilter: 'blur(10px)',
+                fontSize: 18,
+                display: 'grid',
+                placeItems: 'center',
+              }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+
+            <div
+              style={{
+                width: 'min(1200px, 94vw)',
+                display: 'grid',
+                gridTemplateColumns: 'minmax(0, 1fr) 360px',
+                gap: 28,
+                alignItems: 'start',
+              }}
+            >
+              <div
+                style={{
+                  borderRadius: 20,
+                  background: '#0d0d0d',
+                  padding: 20,
+                  boxShadow: '0 30px 100px rgba(0,0,0,0.6)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                }}
+              >
+                <img
+                  src={selectedArtwork.imageUrl}
+                  alt={selectedArtwork.title}
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '82vh',
+                    objectFit: 'contain',
+                    borderRadius: 14,
+                    display: 'block',
+                    margin: '0 auto',
+                    background: '#0b0b0b',
+                  }}
+                />
+              </div>
+
+              <div
+                style={{
+                  borderRadius: 20,
+                  background: 'rgba(18,18,18,0.85)',
+                  padding: 22,
+                  color: '#fff',
+                  backdropFilter: 'blur(14px)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                  boxShadow: '0 30px 100px rgba(0,0,0,0.45)',
+                }}
+              >
+                <div style={{ fontSize: 20, fontWeight: 620, lineHeight: 1.2 }}>
+                  {selectedArtwork.title}
+                </div>
+
+                <div style={{ marginTop: 8, color: 'rgba(255,255,255,0.70)' }}>
+                  {selectedArtwork.artist}
+                  {selectedArtwork.year ? `, ${selectedArtwork.year}` : ''}
+                </div>
+
+                <div style={{ marginTop: 22 }}>
+                  <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1 }}>COLLECTION</div>
+                  <div style={{ marginTop: 4 }}>{selectedArtwork.collection || 'Unassigned'}</div>
+                </div>
+
+                <div style={{ marginTop: 18 }}>
+                  <div style={{ fontSize: 11, opacity: 0.5, letterSpacing: 1 }}>CATALOG ID</div>
+                  <div style={{ marginTop: 4, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }}>
+                    {selectedArtwork.id}
+                  </div>
+                </div>
+
+                {selectedArtwork.description && (
+                  <p style={{ marginTop: 18, fontSize: 12, lineHeight: 1.65, color: 'rgba(255,255,255,0.70)' }}>
+                    {selectedArtwork.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // PAGE MODE: your existing layout unchanged
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#ffffff' }}>
       <div className="w-full" style={{ backgroundColor: '#f5f5f5' }}>
@@ -140,8 +289,7 @@ export default function VrMuseumClient() {
                 ref={embedRef}
                 artworks={artworks}
                 onArtworkClick={(art) => {
-                   setTimeout(() => setSelectedArtwork(art), 350);
-                
+                  setTimeout(() => setSelectedArtwork(art), 350);
                 }}
               />
 
@@ -254,7 +402,14 @@ export default function VrMuseumClient() {
                       </div>
 
                       {selectedArtwork.description && (
-                        <p style={{ marginTop: 18, fontSize: 12, lineHeight: 1.65, color: 'rgba(255,255,255,0.70)' }}>
+                        <p
+                          style={{
+                            marginTop: 18,
+                            fontSize: 12,
+                            lineHeight: 1.65,
+                            color: 'rgba(255,255,255,0.70)',
+                          }}
+                        >
                           {selectedArtwork.description}
                         </p>
                       )}
@@ -263,6 +418,7 @@ export default function VrMuseumClient() {
                 </div>
               )}
             </div>
+
           </div>
         </div>
       </div>
