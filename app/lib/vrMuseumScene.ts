@@ -227,7 +227,7 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-13-back-wall-3-right-of-door-always-visible');
+  console.log('VR_SCENE_VERSION', '2026-02-13-back-wall-fixed-spacing-scope-safe');
 
   let disposed = false;
 
@@ -667,13 +667,13 @@ export function createVrMuseumScene({
   addGallerySpot(-3.6, -6.0);
   addGallerySpot(3.6, -6.0);
 
-  // Door (location is not important, so we place it where it guarantees room for 3 works to its right)
+  // Door (location not important, so we place it so the right side has room)
   const doorGroup = new THREE.Group();
   const doorW = 1.6;
   const doorH = 2.65;
   const doorT = 0.07;
 
-  // This is the key: door is moved left so the right side span exists
+  // Door moved left to guarantee a usable span to the right
   const doorX = -2.6;
   const doorY = doorH / 2;
   const doorZ = roomD / 2 - 0.03;
@@ -821,81 +821,108 @@ export function createVrMuseumScene({
     });
   }
 
-// Build BACK wall placements (z fixed, vary x), 3 paintings to the RIGHT of the door,
-// centered in the open section between the door and the right corner, with enforced spacing.
-// NOTE: this block is self-contained and does NOT rely on targetMaxWidth/targetMaxHeight vars.
-{
-  const z = roomD / 2 - 0.07;
-  const rotY = Math.PI;
+  // ------------------------------------------------------------
+  // PLACEMENTS (this is the part you keep breaking via scope)
+  // This is a clean, compiling, self-contained layout:
+  // - Back wall: exactly 3 works, to the right of the door, with adjustable spacing
+  // - Side walls: 5 each, centered from the middle outward
+  // ------------------------------------------------------------
 
+  const placements: Array<{
+    pos: THREE.Vector3;
+    rotY: number;
+    targetMaxWidth: number;
+    targetMaxHeight: number;
+  }> = [];
+
+  const artY = 2.05;
+
+  // sizing (consistent across all walls)
+  const targetMaxWidth = 1.7;
+  const targetMaxHeight = 1.85;
+
+  function centeredPositions(count: number, min: number, max: number) {
+    if (count <= 0) return [];
+    const center = (min + max) / 2;
+    if (count === 1) return [center];
+
+    const halfRange = Math.max(0.0001, (max - min) / 2);
+    const maxIndex = Math.floor((count - 1) / 2) || 1;
+    const step = halfRange / maxIndex;
+
+    const out: number[] = [center];
+    for (let k = 1; out.length < count; k++) {
+      const p1 = center + step * k;
+      const p2 = center - step * k;
+      if (out.length < count && p1 <= max) out.push(p1);
+      if (out.length < count && p2 >= min) out.push(p2);
+    }
+    return out.map((v) => clamp(v, min, max));
+  }
+
+  // Counts: 3 back, 5 right, 5 left (if fewer works, it still places what exists)
   const backWallCount = 3;
+  const rightWallCount = 5;
+  const leftWallCount = 5;
 
-  // Span bounds (right side between door and corner)
-  const wallXMargin = 1.15;
-  const xRightLimit = roomW / 2 - wallXMargin;
+  // BACK wall placements: 3 works in the open span between door and right corner
+  {
+    const z = roomD / 2 - 0.07;
+    const rotY = Math.PI;
 
-  // doorX/doorW already exist above in your file (door placement)
-  const doorRightEdge = doorX + doorW / 2;
+    const wallXMargin = 1.15;
+    const xRightLimit = roomW / 2 - wallXMargin;
 
-  const doorPad = 1.0;     // gap from door edge
-  const cornerPad = 1.1;   // gap from corner
+    const doorRightEdge = doorX + doorW / 2;
 
-  const usableMin = doorRightEdge + doorPad;
-  const usableMax = xRightLimit - cornerPad;
+    const doorPad = 1.0;
+    const cornerPad = 1.1;
 
-  if (usableMax > usableMin) {
-    // ---- spacing controls (tweak these) ----
-    const minGap = 0.85;      // minimum space between frame OUTER edges
-    const edgePadding = 0.35; // keeps the set off the boundaries
-    // ---------------------------------------
+    const usableMin = doorRightEdge + doorPad;
+    const usableMax = xRightLimit - cornerPad;
 
-    // Target sizing for these back-wall works (matches your previous defaults)
-    const backTargetMaxWidth = 1.7;
-    const backTargetMaxHeight = 1.85;
+    if (usableMax > usableMin) {
+      // Adjust these to increase spacing between the 3 back wall paintings
+      const minGap = 1.0;       // bigger = more space between frames
+      const edgePadding = 0.35; // keeps set off the boundaries
 
-    // Conservative estimate of outer frame width for spacing math (independent of aspect)
-    const estOuterW = backTargetMaxWidth + 0.25;
+      // Estimate outer frame width for spacing math
+      const estOuterW = targetMaxWidth + 0.25;
 
-    const spanMin = usableMin + edgePadding + estOuterW / 2;
-    const spanMax = usableMax - edgePadding - estOuterW / 2;
+      const spanMin = usableMin + edgePadding + estOuterW / 2;
+      const spanMax = usableMax - edgePadding - estOuterW / 2;
+      const span = spanMax - spanMin;
 
-    const span = spanMax - spanMin;
+      if (span > 0) {
+        const center = (spanMin + spanMax) / 2;
 
-    if (span <= 0) {
-      // fallback: center one if the span is too tight
-      placements.push({
-        pos: new THREE.Vector3((usableMin + usableMax) / 2, artY, z),
-        rotY,
-        targetMaxWidth: backTargetMaxWidth,
-        targetMaxHeight: backTargetMaxHeight,
-      });
-    } else {
-      const center = (spanMin + spanMax) / 2;
+        const requiredStep = estOuterW + minGap;
+        const maxStepBySpan = span / (backWallCount - 1);
+        const step = Math.min(Math.max(requiredStep, 0.01), maxStepBySpan);
 
-      // Step must be >= (frame width + min gap), but must also fit inside span
-      const requiredStep = estOuterW + minGap;
-      const maxStepBySpan = span / (backWallCount - 1);
-      const step = Math.min(Math.max(requiredStep, 0.01), maxStepBySpan);
+        const xs = [center - step, center, center + step];
 
-      // 3 paintings: left, center, right (centered in open span)
-      const xs = [center - step, center, center + step];
-
-      for (const x of xs) {
+        for (const x of xs) {
+          placements.push({
+            pos: new THREE.Vector3(clamp(x, spanMin, spanMax), artY, z),
+            rotY,
+            targetMaxWidth,
+            targetMaxHeight,
+          });
+        }
+      } else {
+        // fallback
         placements.push({
-          pos: new THREE.Vector3(clamp(x, spanMin, spanMax), artY, z),
+          pos: new THREE.Vector3((usableMin + usableMax) / 2, artY, z),
           rotY,
-          targetMaxWidth: backTargetMaxWidth,
-          targetMaxHeight: backTargetMaxHeight,
+          targetMaxWidth,
+          targetMaxHeight,
         });
       }
     }
   }
-}
 
-
-
-
-  // RIGHT wall (x fixed, vary z), centered from the middle going outward
+  // RIGHT wall placements (center from middle outward)
   {
     const x = roomW / 2 - 0.06;
     const rotY = -Math.PI / 2;
@@ -904,7 +931,7 @@ export function createVrMuseumScene({
     const zMin = -roomD / 2 + wallZMargin;
     const zMax = roomD / 2 - wallZMargin;
 
-    const zs = centeredPositions(rightCount, zMin, zMax);
+    const zs = centeredPositions(rightWallCount, zMin, zMax);
     for (const z of zs) {
       placements.push({
         pos: new THREE.Vector3(x, artY, z),
@@ -915,7 +942,7 @@ export function createVrMuseumScene({
     }
   }
 
-  // LEFT wall (x fixed, vary z), centered from the middle going outward
+  // LEFT wall placements (center from middle outward)
   {
     const x = -roomW / 2 + 0.06;
     const rotY = Math.PI / 2;
@@ -924,7 +951,7 @@ export function createVrMuseumScene({
     const zMin = -roomD / 2 + wallZMargin;
     const zMax = roomD / 2 - wallZMargin;
 
-    const zs = centeredPositions(leftCount, zMin, zMax);
+    const zs = centeredPositions(leftWallCount, zMin, zMax);
     for (const z of zs) {
       placements.push({
         pos: new THREE.Vector3(x, artY, z),
@@ -935,7 +962,7 @@ export function createVrMuseumScene({
     }
   }
 
-  // Place artworks in the SAME order as placements: back first, then right, then left
+  // Place artworks: back first, then right, then left, until we run out
   (async () => {
     const n = Math.min(artworksInRoom.length, placements.length);
     for (let i = 0; i < n; i++) {
