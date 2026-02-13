@@ -227,7 +227,7 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-13-back-wall-always-filled-first');
+  console.log('VR_SCENE_VERSION', '2026-02-13-back-wall-3-right-of-door-always-visible');
 
   let disposed = false;
 
@@ -277,6 +277,7 @@ export function createVrMuseumScene({
   placard.style.fontFamily =
     'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
   placard.style.color = '#1b1b1b';
+
   placard.style.borderRadius = '0px';
   placard.style.border = '1px solid rgba(0,0,0,0.30)';
   placard.style.backgroundImage =
@@ -640,13 +641,11 @@ export function createVrMuseumScene({
   scene.add(sun.target);
   (sun.shadow.camera as THREE.OrthographicCamera).updateProjectionMatrix();
 
-  // Soft interior bounce
   const fill = new THREE.PointLight(0xffffff, 0.28, 60, 2.0);
   fill.position.set(0, roomH - 0.35, 2.0);
   fill.castShadow = false;
   scene.add(fill);
 
-  // Gallery ceiling spotlights
   const addGallerySpot = (x: number, z: number) => {
     const s = new THREE.SpotLight(0xffffff, 0.85, 55, Math.PI / 5.2, 0.7, 1.6);
     s.position.set(x, roomH - 0.15, z);
@@ -668,13 +667,14 @@ export function createVrMuseumScene({
   addGallerySpot(-3.6, -6.0);
   addGallerySpot(3.6, -6.0);
 
-  // Door
+  // Door (location is not important, so we place it where it guarantees room for 3 works to its right)
   const doorGroup = new THREE.Group();
   const doorW = 1.6;
   const doorH = 2.65;
   const doorT = 0.07;
 
-  const doorX = roomW / 2 - doorW / 2 - 0.55;
+  // This is the key: door is moved left so the right side span exists
+  const doorX = -2.6;
   const doorY = doorH / 2;
   const doorZ = roomD / 2 - 0.03;
 
@@ -821,9 +821,7 @@ export function createVrMuseumScene({
     });
   }
 
-  // ---------
-  // PLACEMENTS (back wall always gets first 3 if available)
-  // ---------
+  // Placements: 3 on back wall (right of door), 5 on each side wall when enough works exist
   const total = artworksInRoom.length;
 
   const desiredBack = 3;
@@ -832,6 +830,7 @@ export function createVrMuseumScene({
   const backCount = Math.min(desiredBack, total);
   const remaining = Math.max(0, total - backCount);
 
+  // Keep the "5 and 5" goal, but adapt when total < 13
   const rightCount = Math.min(desiredSide, Math.ceil(remaining / 2));
   const leftCount = Math.min(desiredSide, Math.max(0, remaining - rightCount));
 
@@ -869,48 +868,37 @@ export function createVrMuseumScene({
     return out.map((v) => clamp(v, min, max));
   }
 
-  // BACK / DOOR WALL (z fixed, vary x), centered as a tight 3-piece cluster on the RIGHT of the door
+  // BACK wall (door wall). Fill the span between door and the right corner, centered in that open section.
   {
     const z = roomD / 2 - 0.07;
     const rotY = Math.PI;
 
     const wallXMargin = 1.15;
-    const xMax = roomW / 2 - wallXMargin;
+    const xRightLimit = roomW / 2 - wallXMargin;
 
     const doorRightEdge = doorX + doorW / 2;
 
-    const doorClear = 1.0;
-    const rightCornerPad = 1.9;
+    const doorPad = 1.0;
+    const cornerPad = 1.1;
 
-    const usableMin = doorRightEdge + doorClear;
-    const usableMax = Math.max(usableMin + 0.001, xMax - rightCornerPad);
+    const usableMin = doorRightEdge + doorPad;
+    const usableMax = xRightLimit - cornerPad;
 
-    const usableCenter = (usableMin + usableMax) / 2;
-
-    const estOuterW = targetMaxWidth + 0.09;
-    const desiredGap = 0.75;
-    const desiredGroupWidth = estOuterW * 3 + desiredGap * 2;
-
-    const maxGroupWidth = usableMax - usableMin;
-    const groupWidth = Math.min(desiredGroupWidth, maxGroupWidth);
-
-    const groupMin = clamp(usableCenter - groupWidth / 2, usableMin, usableMax - groupWidth);
-    const groupMax = groupMin + groupWidth;
-
-    const step = (groupMax - groupMin) / (Math.max(1, backCount) + 1);
-    const xs = Array.from({ length: backCount }, (_, i) => groupMin + step * (i + 1));
-
-    for (const x of xs) {
-      placements.push({
-        pos: new THREE.Vector3(x, artY, z),
-        rotY,
-        targetMaxWidth,
-        targetMaxHeight,
-      });
+    if (usableMax > usableMin && backCount > 0) {
+      const step = (usableMax - usableMin) / (backCount + 1);
+      for (let i = 0; i < backCount; i++) {
+        const x = usableMin + step * (i + 1);
+        placements.push({
+          pos: new THREE.Vector3(x, artY, z),
+          rotY,
+          targetMaxWidth,
+          targetMaxHeight,
+        });
+      }
     }
   }
 
-  // RIGHT wall (x fixed, vary z)
+  // RIGHT wall (x fixed, vary z), centered from the middle going outward
   {
     const x = roomW / 2 - 0.06;
     const rotY = -Math.PI / 2;
@@ -930,7 +918,7 @@ export function createVrMuseumScene({
     }
   }
 
-  // LEFT wall (x fixed, vary z)
+  // LEFT wall (x fixed, vary z), centered from the middle going outward
   {
     const x = -roomW / 2 + 0.06;
     const rotY = Math.PI / 2;
@@ -1222,6 +1210,7 @@ export function createVrMuseumScene({
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
   renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
 
+  // Resize
   function resize() {
     const w = container.clientWidth;
     const h = container.clientHeight;
@@ -1245,6 +1234,7 @@ export function createVrMuseumScene({
     clearFocusToCenter();
   }
 
+  // Render loop
   function animate() {
     if (disposed) return;
 
