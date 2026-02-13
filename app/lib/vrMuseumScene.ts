@@ -337,11 +337,17 @@ export function createVrMuseumScene({
     metalness: 0.0,
   });
 
+  wallMat.side = THREE.DoubleSide;
+
+
   const ceilingMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#fbfbfb'),
     roughness: 0.98,
     metalness: 0.0,
   });
+
+  ceilingMat.side = THREE.DoubleSide;
+
 
   const floorMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
@@ -384,6 +390,8 @@ export function createVrMuseumScene({
   ceiling.position.y = roomH;
   ceiling.rotation.x = Math.PI / 2;
   ceiling.receiveShadow = true;
+  ceiling.castShadow = true;
+
   room.add(ceiling);
 
   // Walls
@@ -391,18 +399,24 @@ export function createVrMuseumScene({
   frontWall.position.set(0, roomH / 2, roomD / 2);
   frontWall.rotation.y = Math.PI;
   frontWall.receiveShadow = true;
+  frontWall.castShadow = true;
+
   room.add(frontWall);
 
   const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
   leftWall.position.set(-roomW / 2, roomH / 2, 0);
   leftWall.rotation.y = Math.PI / 2;
   leftWall.receiveShadow = true;
+  leftWall.castShadow = true;
+
   room.add(leftWall);
 
   const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
   rightWall.position.set(roomW / 2, roomH / 2, 0);
   rightWall.rotation.y = -Math.PI / 2;
   rightWall.receiveShadow = true;
+  rightWall.castShadow = true;
+
   room.add(rightWall);
 
   // Baseboards
@@ -443,6 +457,8 @@ export function createVrMuseumScene({
   const bottomBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, openingBottom), wallMat);
   bottomBand.position.set(0, openingBottom / 2, backZ);
   bottomBand.receiveShadow = true;
+  bottomBand.castShadow = true;
+
   windowWall.add(bottomBand);
 
   const topY0 = openingBottom + openingH;
@@ -450,16 +466,19 @@ export function createVrMuseumScene({
   const topBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, topH), wallMat);
   topBand.position.set(0, topY0 + topH / 2, backZ);
   topBand.receiveShadow = true;
+  topBand.castShadow = true;
   windowWall.add(topBand);
 
   const leftBand = new THREE.Mesh(new THREE.PlaneGeometry(sideW, openingH), wallMat);
   leftBand.position.set(-(openingW / 2 + sideW / 2), openingBottom + openingH / 2, backZ);
   leftBand.receiveShadow = true;
+  leftBand.castShadow = true;
   windowWall.add(leftBand);
 
   const rightBand = new THREE.Mesh(new THREE.PlaneGeometry(sideW, openingH), wallMat);
   rightBand.position.set(openingW / 2 + sideW / 2, openingBottom + openingH / 2, backZ);
   rightBand.receiveShadow = true;
+  rightBand.castShadow = true;
   windowWall.add(rightBand);
 
   addBaseboard(roomW, 0, backZ + baseboardT / 2, 0);
