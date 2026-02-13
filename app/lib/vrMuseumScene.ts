@@ -818,7 +818,7 @@ export function createVrMuseumScene({
     const filmWidth = camera.getFilmWidth();
     const filmOffsetMm = (desiredCenterNdcX * filmWidth) / 2;
 
-    focusTo.filmOffset = filmOffsetMm;
+    focusTo.filmOffset = -filmOffsetMm;
 
     // Plaque fades in during focus
     placard.style.opacity = '0';
