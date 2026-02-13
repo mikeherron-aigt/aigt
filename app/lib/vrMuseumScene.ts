@@ -771,54 +771,52 @@ export function createVrMuseumScene({
       .normalize();
 
     // Viewport math
-    const w = Math.max(1, container.clientWidth);
-    const h = Math.max(1, container.clientHeight);
+const w = Math.max(1, container.clientWidth);
+const h = Math.max(1, container.clientHeight);
 
-    const margin = 18;
-    const gap = 12;
-    const rightPad = 18;
-    const leftPad = 12;
+// These are pixels in the DOM overlay space
+const margin = 18;
+const gap = 12;
+const rightPad = 18;
+const leftPad = 12;
 
-    const usableW = Math.max(1, w - (plaqueW + gap + rightPad) - leftPad - margin);
-    const usableH = Math.max(1, h - margin * 2);
+// Define the exact rectangle (in pixels) where the artwork must fit
+const regionLeft = leftPad + margin;
+const regionRight = w - (plaqueW + gap + rightPad) - margin;
+const regionTop = margin;
+const regionBottom = h - margin;
 
-    const usableWidthRatio = usableW / w;
-    const usableHeightRatio = usableH / h;
+const regionW = Math.max(1, regionRight - regionLeft);
+const regionH = Math.max(1, regionBottom - regionTop);
 
-    // Narrow FOV and farther distance reduces perspective
-    const targetFov = 22;
-    focusTo.fov = targetFov;
+const usableWidthRatio = regionW / w;
+const usableHeightRatio = regionH / h;
 
-    const vFov = (targetFov * Math.PI) / 180;
-    const aspect = w / h;
-    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+// Narrow FOV and farther distance reduces perspective
+const targetFov = 22;
+focusTo.fov = targetFov;
 
-    // Distances to fit frame in usable viewport
-    const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
-    const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
+const vFov = (targetFov * Math.PI) / 180;
+const aspect = w / h;
+const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
 
-    const dist = Math.max(distForHeight, distForWidth) * 1.06;
+// Distances to fit frame in the usable region
+const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
+const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
 
-    // Position camera straight out from the artwork center (no sideways move)
-    focusTo.pos.copy(worldCenter).add(normalOut.clone().multiplyScalar(dist));
-    focusTo.pos.y = worldCenter.y;
+// A touch of breathing room so the black frame never kisses the edge
+const dist = Math.max(distForHeight, distForWidth) * 1.08;
 
-    // Yaw toward center, no pitch
-    const lookDir = worldCenter.clone().sub(focusTo.pos);
-    lookDir.y = 0;
-    lookDir.normalize();
+// Lens shift so the ART CENTER lands in the CENTER of the usable region
+const regionCenterPx = (regionLeft + regionRight) / 2;
+const desiredCenterNdcX = (regionCenterPx / w) * 2 - 1;
 
-    focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
-    focusTo.pitch = 0;
+const filmWidth = camera.getFilmWidth();
+const filmOffsetMm = (desiredCenterNdcX * filmWidth) / 2;
 
-    // Lens shift to place artwork in the left usable region
-    // Desired center of usable region in NDC:
-    // left edge = -1, width = 2 * usableWidthRatio, center = -1 + usableWidthRatio
-    const desiredCenterNdcX = -1 + usableWidthRatio;
-    const filmWidth = camera.getFilmWidth();
-    const filmOffsetMm = (desiredCenterNdcX * filmWidth) / 2;
+// Keep the negative sign so the artwork stays on the left
+focusTo.filmOffset = -filmOffsetMm;
 
-    focusTo.filmOffset = -filmOffsetMm;
 
     // Plaque fades in during focus
     placard.style.opacity = '0';
