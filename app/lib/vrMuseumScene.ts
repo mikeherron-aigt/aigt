@@ -581,8 +581,8 @@ export function createVrMuseumScene({
   const sun = new THREE.DirectionalLight(0xffffff, 1.05);
 
   // Sun is outside the window: z must be less than backZ
-  sun.position.set(-10.5, 11.0, backZ - 18.0);
-  sun.target.position.set(0.0, 1.2, backZ + 6.5);
+  sun.position.set(10.5, 11.0, backZ - 18.0);
+  sun.target.position.set(-2.2, 1.2, backZ + 6.5);
 
   sun.castShadow = true;
 
