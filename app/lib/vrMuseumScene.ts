@@ -226,8 +226,7 @@ export function createVrMuseumScene({
   renderer.domElement.style.display = 'block';
   renderer.domElement.style.cursor = 'grab';
 
-  // Prevent the browser from treating wheel/touchpad over the museum as page scroll
-  // Also improves touch behavior on some browsers
+  // Stop page scroll while interacting with the museum
   renderer.domElement.style.overscrollBehavior = 'contain';
   (renderer.domElement.style as any).touchAction = 'none';
 
@@ -385,8 +384,8 @@ export function createVrMuseumScene({
 
   // Layout knobs for inspect view
   const PLAQUE_SAFE_W_PX = 380; // reserve space for plaque on the right
-  const VIEW_MARGIN_PX = 34; // additional breathing room
-  const ART_SIDE_SHIFT_FRAC = 0.40; // how far left the artwork is placed (0.30..0.48)
+  const VIEW_MARGIN_PX = 34; // breathing room
+  const ART_SIDE_SHIFT_FRAC = 0.40; // shift artwork left to make space for plaque
 
   function getVisibleAspectForArt() {
     const w = Math.max(1, container.clientWidth);
@@ -405,19 +404,29 @@ export function createVrMuseumScene({
     };
   }
 
+  /**
+   * This is the key fix:
+   * We were shifting the camera target to make room for the plaque, but the ortho frustum
+   * did not guarantee the full artwork remained visible after that shift.
+   * We now increase the ortho frustum until BOTH conditions are true:
+   * - vertical fit
+   * - horizontal fit including the side shift
+   */
   function updateOrthoFrustumToArtwork(rec: ArtMeshRecord) {
     const { aspect } = getVisibleAspectForArt();
+    const fillPct = 0.95;
 
-    // Ensure full artwork fits in usable area
-    const fillPct = 0.96;
+    const sideShiftWorld = rec.artW * ART_SIDE_SHIFT_FRAC;
 
-    const halfHNeeded = (rec.artH / 2) / fillPct;
-    const halfWNeeded = (rec.artW / 2) / fillPct;
+    const halfHNeededVert = (rec.artH / 2) / fillPct;
 
-    // In ortho, width = height * aspect
-    const halfHFromW = halfWNeeded / Math.max(0.0001, aspect);
+    // Need enough width to cover: sideShift + artW/2
+    const halfWNeededWithShift = (sideShiftWorld + rec.artW / 2) / fillPct;
 
-    const halfH = Math.max(halfHNeeded, halfHFromW);
+    // In ortho, halfW = halfH * aspect
+    const halfHNeededFromWidth = halfWNeededWithShift / Math.max(0.0001, aspect);
+
+    const halfH = Math.max(halfHNeededVert, halfHNeededFromWidth);
     const halfW = halfH * aspect;
 
     orthoCamera.left = -halfW;
@@ -448,7 +457,7 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    // Shift target to the right so the artwork appears left on screen
+    // Shift target right so the artwork sits left on screen
     const sideShift = rec.artW * ART_SIDE_SHIFT_FRAC;
 
     // Distance does not affect scale in ortho, keep it safe for clipping
@@ -508,7 +517,6 @@ export function createVrMuseumScene({
     const dist = clamp(neededDist, 1.25, 4.5);
 
     focusTo.pos.copy(worldPos).add(normalOut.clone().multiplyScalar(dist));
-    // End at exact artwork center height
     focusTo.pos.y = worldPos.y;
 
     const lookDir = worldPos.clone().sub(focusTo.pos);
@@ -701,7 +709,7 @@ export function createVrMuseumScene({
   // Glass
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color('#ffffff'),
-    roughness: 0.03,
+    roughness: 0.04,
     metalness: 0.0,
     transmission: 0.96,
     thickness: 0.03,
@@ -743,7 +751,10 @@ export function createVrMuseumScene({
     windowWall.add(h);
   }
 
-  // Stable outside view
+  /**
+   * Window view: use hamptons.jpg only (no extra sand/ocean planes).
+   * This fixes the simplified horizon band you noticed.
+   */
   const vistaLoader = new THREE.TextureLoader();
   const vistaTex = vistaLoader.load('/hamptons.jpg', (t) => {
     t.colorSpace = THREE.SRGBColorSpace;
@@ -760,55 +771,17 @@ export function createVrMuseumScene({
     toneMapped: false,
   });
 
-  const vista = new THREE.Mesh(new THREE.PlaneGeometry(openingW * 3.0, openingH * 3.0), vistaMat);
+  // Place the image just behind the glass so it always reads as the outside view
+  const vista = new THREE.Mesh(
+    new THREE.PlaneGeometry(openingW * 1.55, openingH * 1.55),
+    vistaMat
+  );
 
   const windowCenterY = openingBottom + openingH / 2;
-  vista.position.set(0, windowCenterY, backZ - 40);
+  vista.position.set(0, windowCenterY, backZ - 1.2);
   vista.rotation.y = Math.PI;
   vista.renderOrder = -10;
   scene.add(vista);
-
-  // Optional outside depth
-  const outsideGroup = new THREE.Group();
-  scene.add(outsideGroup);
-
-  const outsideY = -3.0;
-
-  const sand = new THREE.Mesh(
-    new THREE.PlaneGeometry(220, 220),
-    new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#cdbb95'),
-      roughness: 0.98,
-      metalness: 0.0,
-    })
-  );
-  sand.rotation.x = -Math.PI / 2;
-  sand.position.set(0, outsideY, backZ - 35);
-  outsideGroup.add(sand);
-
-  const ocean = new THREE.Mesh(
-    new THREE.PlaneGeometry(340, 340),
-    new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#2f6f9a'),
-      roughness: 0.30,
-      metalness: 0.10,
-    })
-  );
-  ocean.rotation.x = -Math.PI / 2;
-  ocean.position.set(0, outsideY - 0.15, backZ - 120);
-  outsideGroup.add(ocean);
-
-  const haze = new THREE.Mesh(
-    new THREE.PlaneGeometry(260, 95),
-    new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.08,
-      depthWrite: false,
-    })
-  );
-  haze.position.set(0, 18, backZ - 155);
-  outsideGroup.add(haze);
 
   // Lighting
   scene.add(new THREE.AmbientLight(0xffffff, 0.62));
@@ -1039,9 +1012,8 @@ export function createVrMuseumScene({
     }
   }
 
-  // Wheel movement inside museum only when cursor is over renderer
+  // Wheel movement inside museum only (no page scroll)
   function onWheel(e: WheelEvent) {
-    // Stop the browser from scrolling the page while interacting with the museum
     e.preventDefault();
     e.stopPropagation();
 
@@ -1063,8 +1035,6 @@ export function createVrMuseumScene({
   renderer.domElement.addEventListener('pointermove', onPointerMove);
   renderer.domElement.addEventListener('pointerup', onPointerUp);
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
-
-  // IMPORTANT: passive must be false or preventDefault will be ignored
   renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
 
   // Resize
