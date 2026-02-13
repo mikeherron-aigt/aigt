@@ -823,13 +823,14 @@ export function createVrMuseumScene({
 
 // Build BACK wall placements (z fixed, vary x), 3 paintings to the RIGHT of the door,
 // centered in the open section between the door and the right corner, with enforced spacing.
+// NOTE: this block is self-contained and does NOT rely on targetMaxWidth/targetMaxHeight vars.
 {
   const z = roomD / 2 - 0.07;
   const rotY = Math.PI;
 
   const backWallCount = 3;
 
-  // Span bounds (right side centered between door and corner)
+  // Span bounds (right side between door and corner)
   const wallXMargin = 1.15;
   const xRightLimit = roomW / 2 - wallXMargin;
 
@@ -848,44 +849,49 @@ export function createVrMuseumScene({
     const edgePadding = 0.35; // keeps the set off the boundaries
     // ---------------------------------------
 
-    // Conservative estimate of outer frame width so we can enforce gap
-    const estOuterW = targetMaxWidth + 0.25;
+    // Target sizing for these back-wall works (matches your previous defaults)
+    const backTargetMaxWidth = 1.7;
+    const backTargetMaxHeight = 1.85;
+
+    // Conservative estimate of outer frame width for spacing math (independent of aspect)
+    const estOuterW = backTargetMaxWidth + 0.25;
 
     const spanMin = usableMin + edgePadding + estOuterW / 2;
     const spanMax = usableMax - edgePadding - estOuterW / 2;
 
     const span = spanMax - spanMin;
 
-    // If span is too small, just center what we can
     if (span <= 0) {
+      // fallback: center one if the span is too tight
       placements.push({
         pos: new THREE.Vector3((usableMin + usableMax) / 2, artY, z),
         rotY,
-        targetMaxWidth,
-        targetMaxHeight,
+        targetMaxWidth: backTargetMaxWidth,
+        targetMaxHeight: backTargetMaxHeight,
       });
     } else {
       const center = (spanMin + spanMax) / 2;
 
-      // Step must be >= (frame width + min gap), but also must fit inside span
+      // Step must be >= (frame width + min gap), but must also fit inside span
       const requiredStep = estOuterW + minGap;
       const maxStepBySpan = span / (backWallCount - 1);
       const step = Math.min(Math.max(requiredStep, 0.01), maxStepBySpan);
 
-      // 3 paintings: left, center, right (centered in the open span)
+      // 3 paintings: left, center, right (centered in open span)
       const xs = [center - step, center, center + step];
 
       for (const x of xs) {
         placements.push({
           pos: new THREE.Vector3(clamp(x, spanMin, spanMax), artY, z),
           rotY,
-          targetMaxWidth,
-          targetMaxHeight,
+          targetMaxWidth: backTargetMaxWidth,
+          targetMaxHeight: backTargetMaxHeight,
         });
       }
     }
   }
 }
+
 
 
 
