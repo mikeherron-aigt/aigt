@@ -87,7 +87,7 @@ export default function VrMuseumClient({ variant = 'page' }: Props) {
     return (
       <div
         ref={containerRef}
-        className="relative h-full w-full overflow-hidden rounded-[22px] border border-black/10 bg-[#0b0b0b]"
+        className="relative h-full w-full overflow-hidden rounded-none border border 0 bg-[#0b0b0b]"
       >
         <button
           type="button"
