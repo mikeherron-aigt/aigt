@@ -1,5 +1,6 @@
-import * as THREE from 'three';
-import type { MuseumArtwork } from '@/app/components/VrMuseumEmbed';
+// app/lib/vrMuseumScene.ts
+import * as THREE from "three";
+import type { MuseumArtwork } from "@/app/components/VrMuseumEmbed";
 
 export type VrMuseumSceneHandle = {
   dispose: () => void;
@@ -17,1030 +18,829 @@ type ArtMeshRecord = {
   artwork: MuseumArtwork;
   clickable: THREE.Object3D;
   frameGroup: THREE.Group;
-  artPlane: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
+  // plane that shows the art image (so we can compute aspect + bounds reliably)
+  artPlane: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshStandardMaterial>;
+  // full frame bounds in local space for better sizing
+  frameBoundsLocal: THREE.Box3;
 };
 
 function clamp(v: number, min: number, max: number) {
   return Math.max(min, Math.min(max, v));
 }
-
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
-
 function easeInOutCubic(t: number) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-function mulberry32(seed: number) {
-  let t = seed >>> 0;
-  return () => {
-    t += 0x6d2b79f5;
-    let x = Math.imul(t ^ (t >>> 15), 1 | t);
-    x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
-    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function normalizeImageUrl(url: string) {
+function normalizeUrl(url: string) {
   if (!url) return url;
-  if (
-    url.startsWith('http://') ||
-    url.startsWith('https://') ||
-    url.startsWith('data:') ||
-    url.startsWith('blob:')
-  ) {
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
     return url;
   }
-  return url.startsWith('/') ? url : `/${url}`;
+  if (!url.startsWith("/")) return `/${url}`;
+  return url;
 }
 
-/**
- * Build a single large floor texture by stamping the source image into a canvas.
- * This avoids visible tiling seams from RepeatWrapping.
- */
-function createStampedFloorTexture(
-  image: HTMLImageElement,
-  opts?: {
-    size?: number;
-    stampsX?: number;
-    stampsY?: number;
-    seed?: number;
-    overlapPct?: number;
-    jitterPct?: number;
-    alpha?: number;
-  }
-) {
-  const size = opts?.size ?? 2048;
-  const stampsX = opts?.stampsX ?? 6;
-  const stampsY = opts?.stampsY ?? 6;
-  const seed = opts?.seed ?? 424242;
-  const overlapPct = opts?.overlapPct ?? 0.12;
-  const jitterPct = opts?.jitterPct ?? 0.03;
-  const alpha = opts?.alpha ?? 0.95;
-
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas 2D context unavailable');
-
-  const rnd = mulberry32(seed);
-
-  // faint warm base
-  ctx.fillStyle = '#d8c29a';
-  ctx.fillRect(0, 0, size, size);
-
-  const cellW = size / stampsX;
-  const cellH = size / stampsY;
-  const overlapW = cellW * overlapPct;
-  const overlapH = cellH * overlapPct;
-
-  // stamp with overlap and tiny jitter, no rotations (keep plank direction consistent)
-  ctx.globalAlpha = alpha;
-
-  for (let y = 0; y < stampsY; y++) {
-    for (let x = 0; x < stampsX; x++) {
-      const cx = x * cellW + cellW / 2;
-      const cy = y * cellH + cellH / 2;
-
-      const jx = (rnd() - 0.5) * cellW * jitterPct;
-      const jy = (rnd() - 0.5) * cellH * jitterPct;
-
-      const w = cellW + overlapW * 2;
-      const h = cellH + overlapH * 2;
-
-      ctx.save();
-      ctx.translate(cx + jx, cy + jy);
-
-      // optional mirror flip only
-      const flipX = rnd() < 0.5 ? -1 : 1;
-      ctx.scale(flipX, 1);
-
-      ctx.drawImage(image, -w / 2, -h / 2, w, h);
-      ctx.restore();
-    }
-  }
-
-  ctx.globalAlpha = 1;
-
-  // subtle noise to break stamp boundaries
-  const img = ctx.getImageData(0, 0, size, size);
-  const d = img.data;
-  for (let i = 0; i < d.length; i += 4) {
-    const n = (rnd() - 0.5) * 10; // -5..+5
-    d[i] = clamp(d[i] + n, 0, 255);
-    d[i + 1] = clamp(d[i + 1] + n, 0, 255);
-    d[i + 2] = clamp(d[i + 2] + n, 0, 255);
-  }
-  ctx.putImageData(img, 0, 0);
-
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.wrapS = THREE.ClampToEdgeWrapping;
-  tex.wrapT = THREE.ClampToEdgeWrapping;
-  tex.anisotropy = 16;
-  tex.minFilter = THREE.LinearMipmapLinearFilter;
-  tex.magFilter = THREE.LinearFilter;
-  tex.needsUpdate = true;
-  return tex;
+function setDomStyles(el: HTMLElement, styles: Partial<CSSStyleDeclaration>) {
+  Object.assign(el.style, styles);
 }
 
-function createPlacardEl(container: HTMLDivElement) {
-  const placard = document.createElement('div');
-  placard.setAttribute('data-placard', 'true');
+export function createVrMuseumScene({ container, artworks, onArtworkClick }: CreateArgs): VrMuseumSceneHandle {
+  console.log("VR_SCENE_VERSION", "2026-02-13-window-shadow-focus-v1");
 
-  // Real plaque vibe: square corners, engraved feel, subtle bevel, no drop shadow
-  placard.style.position = 'absolute';
-  placard.style.right = '64px';
-  placard.style.top = '50%';
-  placard.style.transform = 'translateY(-50%)';
-  placard.style.width = '420px';
-  placard.style.padding = '22px 22px 18px 22px';
-  placard.style.background =
-    'linear-gradient(180deg, rgba(250,248,242,0.98), rgba(243,240,232,0.98))';
-  placard.style.border = '1px solid rgba(0,0,0,0.18)';
-  placard.style.borderRadius = '0px';
-  placard.style.boxShadow =
-    'inset 0 1px 0 rgba(255,255,255,0.75), inset 0 -2px 4px rgba(0,0,0,0.10), inset 0 0 0 1px rgba(0,0,0,0.04)';
-  placard.style.color = '#1a1a1a';
-  placard.style.fontFamily =
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
-  placard.style.letterSpacing = '0.02em';
-  placard.style.userSelect = 'none';
-  placard.style.pointerEvents = 'none';
-  placard.style.opacity = '0';
-  placard.style.transition = 'opacity 220ms ease';
-
-  placard.innerHTML = `
-    <div style="font-size:12px; letter-spacing:0.18em; color:#6b6b6b;">MUSEUM LABEL</div>
-    <div style="margin-top:10px; font-size:26px; font-weight:650; letter-spacing:0.01em;" data-artist></div>
-    <div style="margin-top:6px; font-size:18px; font-style:italic; color:#2a2a2a;" data-title></div>
-
-    <div style="margin-top:14px; height:1px; background:rgba(0,0,0,0.16);"></div>
-
-    <div style="margin-top:14px; display:grid; grid-template-columns:120px 1fr; row-gap:8px; column-gap:18px; font-size:16px;">
-      <div style="color:#7a7a7a;">Collection</div><div style="font-weight:550;" data-collection></div>
-      <div style="color:#7a7a7a;">Title</div><div style="font-weight:550;" data-title2></div>
-      <div style="color:#7a7a7a;">Catalog ID</div><div style="font-weight:550;" data-catalog></div>
-    </div>
-  `;
-
-  // ensure container can host absolute overlay
-  const style = window.getComputedStyle(container);
-  if (style.position === 'static') container.style.position = 'relative';
-
-  container.appendChild(placard);
-
-  const setPlacard = (a?: MuseumArtwork) => {
-    const artist = placard.querySelector('[data-artist]') as HTMLDivElement | null;
-    const title = placard.querySelector('[data-title]') as HTMLDivElement | null;
-    const collection = placard.querySelector('[data-collection]') as HTMLDivElement | null;
-    const title2 = placard.querySelector('[data-title2]') as HTMLDivElement | null;
-    const catalog = placard.querySelector('[data-catalog]') as HTMLDivElement | null;
-
-    if (!artist || !title || !collection || !title2 || !catalog) return;
-
-    if (!a) {
-      artist.textContent = '';
-      title.textContent = '';
-      collection.textContent = '';
-      title2.textContent = '';
-      catalog.textContent = '';
-      return;
-    }
-
-    artist.textContent = a.artist ?? '';
-    title.textContent = a.title ?? '';
-    collection.textContent = a.collection ?? '';
-    title2.textContent = a.title ?? '';
-    catalog.textContent = (a as any).catalogId ?? (a as any).catalog_id ?? a.id ?? '';
-  };
-
-  const showPlacard = (yes: boolean) => {
-    placard.style.opacity = yes ? '1' : '0';
-  };
-
-  // responsive sizing: keep it secondary
-  const resizePlacard = (w: number) => {
-    // About 15% smaller than earlier: clamp width
-    const target = clamp(Math.round(w * 0.26), 300, 420);
-    placard.style.width = `${target}px`;
-    placard.style.right = `${Math.round(clamp(w * 0.04, 22, 64))}px`;
-  };
-
-  return { placard, setPlacard, showPlacard, resizePlacard };
-}
-
-export function createVrMuseumScene({
-  container,
-  artworks,
-  onArtworkClick,
-}: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
 
+  // ----------------------------
   // Renderer
-  const renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: true,
-    powerPreference: 'high-performance',
-  });
-
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(container.clientWidth, container.clientHeight, false);
+  // ----------------------------
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.06;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  renderer.domElement.style.width = '100%';
-  renderer.domElement.style.height = '100%';
-  renderer.domElement.style.display = 'block';
-  renderer.domElement.style.cursor = 'grab';
-  renderer.domElement.style.touchAction = 'none'; // important for wheel/pointer
   container.appendChild(renderer.domElement);
 
-  // Scene
+  // Prevent the page from scrolling when the mouse wheel is over the museum
+  // Important: must be non-passive to call preventDefault.
+  const onWheel = (e: WheelEvent) => {
+    // Always prevent page scroll while pointer is over the canvas.
+    // We still use the wheel for movement or zoom inside the museum.
+    e.preventDefault();
+
+    if (focusState.active) {
+      // While focused, wheel zooms in/out slightly (dolly) without changing final framing logic.
+      const delta = clamp(e.deltaY, -200, 200);
+      focusState.userDolly += delta * 0.0009;
+      focusState.userDolly = clamp(focusState.userDolly, -0.18, 0.18);
+      return;
+    }
+
+    // While exploring: wheel moves forward/back
+    const delta = clamp(e.deltaY, -200, 200);
+    const dir = new THREE.Vector3();
+    activeCamera.getWorldDirection(dir);
+    dir.y = 0;
+    dir.normalize();
+
+    const step = (delta * 0.006) * -1; // scroll down moves forward
+    moveVelocity.addScaledVector(dir, step);
+  };
+  renderer.domElement.addEventListener("wheel", onWheel, { passive: false });
+
+  // ----------------------------
+  // Scene + Camera
+  // ----------------------------
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#cfe7ff');
+  scene.background = new THREE.Color(0x9c9c9c);
 
-  // Room sizing
-  const roomW = 14;
-  const roomH = 4.2;
-  const roomD = 28;
+  const exploreCamera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.05, 250);
+  const inspectCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 400);
 
-  const room = new THREE.Group();
-  scene.add(room);
+  let activeCamera: THREE.PerspectiveCamera | THREE.OrthographicCamera = exploreCamera;
 
-  // Camera rig
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 220);
+  // Start pose
+  exploreCamera.position.set(0, 1.55, 9.5);
+  exploreCamera.lookAt(0, 1.45, 0);
 
-  const yawObj = new THREE.Object3D();
-  const pitchObj = new THREE.Object3D();
-  yawObj.add(pitchObj);
-  pitchObj.add(camera);
-  scene.add(yawObj);
-
-  yawObj.position.set(0, 1.55, 6.6);
-
-  let yaw = 0;
-  let pitch = 0;
-  const minPitch = -0.55;
-  const maxPitch = 0.45;
-
-  // Materials
-  const wallMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#ffffff'),
-    roughness: 0.94,
-    metalness: 0.0,
-  });
-
-  const ceilingMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#fbfbfb'),
-    roughness: 0.98,
-    metalness: 0.0,
-  });
+  // ----------------------------
+  // Room Geometry
+  // ----------------------------
+  const roomW = 24;
+  const roomD = 22;
+  const roomH = 6.2;
+  const backZ = -roomD * 0.5;
+  const frontZ = roomD * 0.5;
 
   // Floor
+  const floorGeo = new THREE.PlaneGeometry(roomW, roomD, 1, 1);
   const floorMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#ffffff'),
-    roughness: 0.78,
+    color: 0xffffff,
+    roughness: 0.85,
     metalness: 0.0,
   });
-
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), floorMat);
+  const floor = new THREE.Mesh(floorGeo, floorMat);
   floor.rotation.x = -Math.PI / 2;
+  floor.position.y = 0;
   floor.receiveShadow = true;
-  room.add(floor);
+  scene.add(floor);
 
-  // Seam-free stamped floor
-  const floorImg = new Image();
-  floorImg.src = '/floor.png';
-  floorImg.crossOrigin = 'anonymous';
+  // Walls (simple)
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0xa1a1a1, roughness: 1.0, metalness: 0.0 });
 
-  floorImg.onload = () => {
-    if (disposed) return;
+  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
+  backWall.position.set(0, roomH / 2, backZ);
+  backWall.receiveShadow = true;
+  scene.add(backWall);
 
-    const stamped = createStampedFloorTexture(floorImg, {
-      size: 2048,
-      stampsX: 5,
-      stampsY: 9,
-      seed: 424242,
-      overlapPct: 0.14,
-      jitterPct: 0.03,
-      alpha: 0.95,
-    });
-
-    floorMat.map = stamped;
-    floorMat.needsUpdate = true;
-  };
-
-  floorImg.onerror = () => {
-    floorMat.color = new THREE.Color('#d6d6d6');
-    floorMat.map = null;
-    floorMat.needsUpdate = true;
-  };
-
-  // Ceiling
-  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), ceilingMat);
-  ceiling.position.y = roomH;
-  ceiling.rotation.x = Math.PI / 2;
-  room.add(ceiling);
-
-  // Walls
   const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
-  frontWall.position.set(0, roomH / 2, roomD / 2);
+  frontWall.position.set(0, roomH / 2, frontZ);
   frontWall.rotation.y = Math.PI;
-  room.add(frontWall);
+  frontWall.receiveShadow = true;
+  scene.add(frontWall);
 
   const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
   leftWall.position.set(-roomW / 2, roomH / 2, 0);
   leftWall.rotation.y = Math.PI / 2;
-  room.add(leftWall);
+  leftWall.receiveShadow = true;
+  scene.add(leftWall);
 
   const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
   rightWall.position.set(roomW / 2, roomH / 2, 0);
   rightWall.rotation.y = -Math.PI / 2;
-  room.add(rightWall);
+  rightWall.receiveShadow = true;
+  scene.add(rightWall);
 
-  // Baseboards
-  const baseboardMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#f1f1f1'),
-    roughness: 0.85,
-    metalness: 0.0,
-  });
+  // Ceiling
+  const ceil = new THREE.Mesh(
+    new THREE.PlaneGeometry(roomW, roomD),
+    new THREE.MeshStandardMaterial({ color: 0x8f8f8f, roughness: 1.0 })
+  );
+  ceil.rotation.x = Math.PI / 2;
+  ceil.position.y = roomH;
+  scene.add(ceil);
 
-  const baseboardH = 0.09;
-  const baseboardT = 0.03;
+  // ----------------------------
+  // Window: frame + glass + outside image (hamptons.jpg)
+  // ----------------------------
+  const windowGroup = new THREE.Group();
+  scene.add(windowGroup);
 
-  function addBaseboard(length: number, x: number, z: number, rotY: number) {
-    const geo = new THREE.BoxGeometry(length, baseboardH, baseboardT);
-    const mesh = new THREE.Mesh(geo, baseboardMat);
-    mesh.position.set(x, baseboardH / 2, z);
-    mesh.rotation.y = rotY;
-    room.add(mesh);
+  const windowW = 16.8;
+  const windowH = 2.9;
+  const windowY = 2.6;
+
+  // Window opening frame
+  const frameDepth = 0.15;
+  const frameThickness = 0.12;
+  const frameColor = new THREE.Color(0x9b9b9b);
+  const frameMat = new THREE.MeshStandardMaterial({ color: frameColor, roughness: 0.9 });
+
+  const makeFrameBar = (w: number, h: number) => new THREE.Mesh(new THREE.BoxGeometry(w, h, frameDepth), frameMat);
+
+  const topBar = makeFrameBar(windowW + frameThickness * 2, frameThickness);
+  topBar.position.set(0, windowY + windowH / 2 + frameThickness / 2, backZ + 0.02);
+  const botBar = makeFrameBar(windowW + frameThickness * 2, frameThickness);
+  botBar.position.set(0, windowY - windowH / 2 - frameThickness / 2, backZ + 0.02);
+  const leftBar = makeFrameBar(frameThickness, windowH + frameThickness * 2);
+  leftBar.position.set(-windowW / 2 - frameThickness / 2, windowY, backZ + 0.02);
+  const rightBar = makeFrameBar(frameThickness, windowH + frameThickness * 2);
+  rightBar.position.set(windowW / 2 + frameThickness / 2, windowY, backZ + 0.02);
+
+  windowGroup.add(topBar, botBar, leftBar, rightBar);
+
+  // Window mullions (verticals + middle horizontal)
+  const mullionMat = new THREE.MeshStandardMaterial({ color: 0x8c8c8c, roughness: 0.95 });
+  const mullionW = 0.06;
+
+  const hMullion = new THREE.Mesh(new THREE.BoxGeometry(windowW, mullionW, frameDepth), mullionMat);
+  hMullion.position.set(0, windowY, backZ + 0.03);
+  windowGroup.add(hMullion);
+
+  const vCount = 3; // 4 panels = 3 vertical mullions
+  for (let i = 1; i <= vCount; i++) {
+    const x = -windowW / 2 + (windowW * i) / (vCount + 1);
+    const vMullion = new THREE.Mesh(new THREE.BoxGeometry(mullionW, windowH + mullionW, frameDepth), mullionMat);
+    vMullion.position.set(x, windowY, backZ + 0.03);
+    windowGroup.add(vMullion);
   }
 
-  addBaseboard(roomW, 0, roomD / 2 - baseboardT / 2, 0);
-  addBaseboard(roomD, -roomW / 2 + baseboardT / 2, 0, Math.PI / 2);
-  addBaseboard(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
+  // Outside image plane (slightly behind the glass)
+  const texLoader = new THREE.TextureLoader();
+  const hamptonsTex = texLoader.load(normalizeUrl("/hamptons.jpg"));
+  hamptonsTex.colorSpace = THREE.SRGBColorSpace;
+  hamptonsTex.anisotropy = 8;
 
-  // Window wall
-  const windowWall = new THREE.Group();
-  room.add(windowWall);
+  // Add a small blur feel by lowering minFilter/magFilter quality slightly.
+  // This is not a true blur, but it helps it feel less like a billboard.
+  hamptonsTex.minFilter = THREE.LinearMipmapLinearFilter;
+  hamptonsTex.magFilter = THREE.LinearFilter;
 
-  const backZ = -roomD / 2;
-
-  const openingW = roomW * 0.86;
-  const openingH = roomH * 0.62;
-  const openingBottom = 0.55;
-  const sideW = (roomW - openingW) / 2;
-
-  const bottomBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, openingBottom), wallMat);
-  bottomBand.position.set(0, openingBottom / 2, backZ);
-  windowWall.add(bottomBand);
-
-  const topY0 = openingBottom + openingH;
-  const topH = roomH - topY0;
-  const topBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, topH), wallMat);
-  topBand.position.set(0, topY0 + topH / 2, backZ);
-  windowWall.add(topBand);
-
-  const leftBand = new THREE.Mesh(new THREE.PlaneGeometry(sideW, openingH), wallMat);
-  leftBand.position.set(-(openingW / 2 + sideW / 2), openingBottom + openingH / 2, backZ);
-  windowWall.add(leftBand);
-
-  const rightBand = new THREE.Mesh(new THREE.PlaneGeometry(sideW, openingH), wallMat);
-  rightBand.position.set(openingW / 2 + sideW / 2, openingBottom + openingH / 2, backZ);
-  windowWall.add(rightBand);
-
-  addBaseboard(roomW, 0, backZ + baseboardT / 2, 0);
-
-  // Window frame
-  const frameMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#f7f7f7'),
-    roughness: 0.55,
-    metalness: 0.0,
-  });
-
-  const frameDepth = 0.06;
-  const frameBorder = 0.09;
-  const mullionT = 0.035;
-
-  const frameGroup = new THREE.Group();
-  frameGroup.position.set(0, openingBottom + openingH / 2, backZ + frameDepth / 2);
-  windowWall.add(frameGroup);
-
-  const topBorder = new THREE.Mesh(
-    new THREE.BoxGeometry(openingW, frameBorder, frameDepth),
-    frameMat
+  const outsidePlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(windowW, windowH),
+    new THREE.MeshStandardMaterial({
+      map: hamptonsTex,
+      roughness: 1.0,
+      metalness: 0.0,
+    })
   );
-  topBorder.position.set(0, openingH / 2 - frameBorder / 2, 0);
-  topBorder.castShadow = true;
-  frameGroup.add(topBorder);
+  outsidePlane.position.set(0, windowY, backZ - 0.35);
+  // Flip so it faces into the room
+  outsidePlane.rotation.y = Math.PI;
+  outsidePlane.receiveShadow = false;
+  outsidePlane.castShadow = false;
+  windowGroup.add(outsidePlane);
 
-  const bottomBorder2 = new THREE.Mesh(
-    new THREE.BoxGeometry(openingW, frameBorder, frameDepth),
-    frameMat
-  );
-  bottomBorder2.position.set(0, -openingH / 2 + frameBorder / 2, 0);
-  bottomBorder2.castShadow = true;
-  frameGroup.add(bottomBorder2);
-
-  const leftBorder2 = new THREE.Mesh(
-    new THREE.BoxGeometry(frameBorder, openingH, frameDepth),
-    frameMat
-  );
-  leftBorder2.position.set(-openingW / 2 + frameBorder / 2, 0, 0);
-  leftBorder2.castShadow = true;
-  frameGroup.add(leftBorder2);
-
-  const rightBorder2 = new THREE.Mesh(
-    new THREE.BoxGeometry(frameBorder, openingH, frameDepth),
-    frameMat
-  );
-  rightBorder2.position.set(openingW / 2 - frameBorder / 2, 0, 0);
-  rightBorder2.castShadow = true;
-  frameGroup.add(rightBorder2);
-
-  // Glass
+  // Glass plane (subtle reflect)
   const glassMat = new THREE.MeshPhysicalMaterial({
-    color: new THREE.Color('#ffffff'),
-    roughness: 0.03,
+    color: 0xffffff,
+    roughness: 0.15,
     metalness: 0.0,
-    transmission: 0.96,
-    thickness: 0.03,
+    transmission: 0.7,
+    thickness: 0.02,
     transparent: true,
-    opacity: 1.0,
-    ior: 1.45,
+    opacity: 0.35,
+    ior: 1.35,
   });
+  const glassPlane = new THREE.Mesh(new THREE.PlaneGeometry(windowW, windowH), glassMat);
+  glassPlane.position.set(0, windowY, backZ + 0.04);
+  // Glass should NOT cast strong shadows
+  glassPlane.castShadow = false;
+  glassPlane.receiveShadow = false;
+  windowGroup.add(glassPlane);
 
-  const glass = new THREE.Mesh(
-    new THREE.PlaneGeometry(openingW - frameBorder * 1.6, openingH - frameBorder * 1.6),
-    glassMat
-  );
-  glass.position.set(0, openingBottom + openingH / 2, backZ + frameDepth + 0.01);
-  windowWall.add(glass);
+  // ----------------------------
+  // Lighting tuned to hamptons.jpg (sun feels on the right side)
+  // ----------------------------
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-  // Mullions
-  const cols = 4;
-  const rows = 2;
-
-  for (let c = 1; c < cols; c++) {
-    const x = -openingW / 2 + (openingW * c) / cols;
-    const v = new THREE.Mesh(
-      new THREE.BoxGeometry(mullionT, openingH - frameBorder * 1.6, frameDepth),
-      frameMat
-    );
-    v.position.set(x, openingBottom + openingH / 2, backZ + frameDepth / 2);
-    v.castShadow = true;
-    windowWall.add(v);
-  }
-
-  for (let r = 1; r < rows; r++) {
-    const y = openingBottom + (openingH * r) / rows;
-    const h = new THREE.Mesh(
-      new THREE.BoxGeometry(openingW - frameBorder * 1.6, mullionT, frameDepth),
-      frameMat
-    );
-    h.position.set(0, y, backZ + frameDepth / 2);
-    h.castShadow = true;
-    windowWall.add(h);
-  }
-
-  // Outside vista: stable /hamptons.jpg plane
-  const vistaLoader = new THREE.TextureLoader();
-  const vistaTex = vistaLoader.load('/hamptons.jpg', (t) => {
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 12);
-    t.minFilter = THREE.LinearMipmapLinearFilter;
-    t.magFilter = THREE.LinearFilter;
-    t.wrapS = THREE.ClampToEdgeWrapping;
-    t.wrapT = THREE.ClampToEdgeWrapping;
-    t.needsUpdate = true;
-  });
-
-  const vistaMat = new THREE.MeshBasicMaterial({
-    map: vistaTex,
-    toneMapped: false,
-  });
-
-  const vista = new THREE.Mesh(
-    new THREE.PlaneGeometry(openingW * 3.0, openingH * 3.0),
-    vistaMat
-  );
-
-  const windowCenterY = openingBottom + openingH / 2;
-  vista.position.set(0, windowCenterY, backZ - 40);
-  vista.rotation.y = Math.PI;
-  vista.renderOrder = -10;
-  scene.add(vista);
-
-  // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.52));
-
-  const sun = new THREE.DirectionalLight(0xffffff, 0.85);
-
-  // Sun matches the photo: far right, low-ish, outside window, aimed into left interior
-  sun.position.set(85, 2.2, backZ - 60);
-  sun.target.position.set(-25, 0.2, 10);
-
+  // Key light coming from the right side of the window, angled into the room
+  const sun = new THREE.DirectionalLight(0xffffff, 0.95);
+  // Right side, slightly above window height, outside-ish
+  sun.position.set(18, 4.2, backZ - 6);
+  // Aim toward mid-floor, slightly left, deeper into the room
+  sun.target.position.set(-3.5, 0.0, 4.5);
   sun.castShadow = true;
+
+  // Shadow tuning: larger frustum and soft radius for longer, fuzzier shadows
   sun.shadow.mapSize.set(4096, 4096);
   sun.shadow.camera.near = 1;
-  sun.shadow.camera.far = 180;
-  sun.shadow.camera.left = -22;
-  sun.shadow.camera.right = 22;
+  sun.shadow.camera.far = 80;
+  sun.shadow.camera.left = -28;
+  sun.shadow.camera.right = 28;
   sun.shadow.camera.top = 22;
   sun.shadow.camera.bottom = -22;
 
-  // Softer edges but still defined
-  sun.shadow.radius = 5;
+  // Softer shadow edges
+  sun.shadow.radius = 10;
 
-  // Reduce acne without detaching shadows
+  // Reduce acne
   sun.shadow.bias = -0.00008;
   sun.shadow.normalBias = 0.02;
 
   scene.add(sun);
   scene.add(sun.target);
 
-  const fill = new THREE.DirectionalLight(0xffffff, 0.30);
-  fill.position.set(6, 10, 10);
+  // Gentle fill from above-left so the room is not dead
+  const fill = new THREE.DirectionalLight(0xffffff, 0.25);
+  fill.position.set(-10, 10, 8);
   scene.add(fill);
 
-  // Art frames
-const safeTexLoader = new THREE.TextureLoader();
-
-
+  // ----------------------------
+  // Art Frames
+  // ----------------------------
   const framesGroup = new THREE.Group();
-  room.add(framesGroup);
+  scene.add(framesGroup);
 
-  const frameOuterMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#1a1a1a'),
-    roughness: 0.35,
-    metalness: 0.12,
-  });
+  // Place artworks on the right wall for now
+  const artWallX = roomW / 2 - 0.02;
+  const artBaseY = 2.1;
+  const artStartZ = -3.0;
+  const artGapZ = 3.3;
 
-  const matteMat = new THREE.MeshStandardMaterial({
-    color: new THREE.Color('#f8f8f8'),
-    roughness: 0.98,
-    metalness: 0.0,
-  });
+  const artRecords: ArtMeshRecord[] = [];
 
-  const clickableMeshes: ArtMeshRecord[] = [];
+  // Frame look
+  const frameOuterMat = new THREE.MeshStandardMaterial({ color: 0x0f0f0f, roughness: 0.6 });
+  const frameInnerMat = new THREE.MeshStandardMaterial({ color: 0x202020, roughness: 0.6 });
 
-  function loadArtworkTexture(url: string): Promise<THREE.Texture | null> {
-    const src = normalizeImageUrl(url);
-    return new Promise((resolve) => {
-      safeTexLoader.load(
-        src,
-        (tex) => {
-          tex.colorSpace = THREE.SRGBColorSpace;
-          tex.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 8);
-          tex.minFilter = THREE.LinearMipmapLinearFilter;
-          tex.magFilter = THREE.LinearFilter;
-          tex.needsUpdate = true;
-          resolve(tex);
-        },
-        undefined,
-        () => resolve(null)
-      );
-    });
-  }
+  // For click tests
+  const raycaster = new THREE.Raycaster();
+  const pointerNdc = new THREE.Vector2();
 
-  async function addFramedArtwork(opts: {
-    artwork: MuseumArtwork;
-    position: THREE.Vector3;
-    rotationY: number;
-    targetMaxWidth: number;
-    targetMaxHeight: number;
-  }) {
-    const { artwork, position, rotationY, targetMaxWidth, targetMaxHeight } = opts;
+  // Helper: create a framed artwork as a group
+  function createArtworkFrame(artwork: MuseumArtwork, index: number) {
+    const group = new THREE.Group();
 
-    const tex = await loadArtworkTexture(artwork.imageUrl);
+    // Use provided aspect ratio if present, otherwise guess 1:1
+    const imgW = (artwork as any).image_width ?? 1000;
+    const imgH = (artwork as any).image_height ?? 1000;
+    const aspect = imgW > 0 && imgH > 0 ? imgW / imgH : 1;
 
-    let aspect = 4 / 5;
-    const img: any = tex?.image;
-    if (img?.width && img?.height) aspect = img.width / img.height;
+    // World size of visible art plane
+    const artHeight = 2.0;
+    const artWidth = artHeight * aspect;
 
-    let artW = targetMaxWidth;
-    let artH = artW / aspect;
-    if (artH > targetMaxHeight) {
-      artH = targetMaxHeight;
-      artW = artH * aspect;
-    }
+    // Frame sizes (breathing room around the art image)
+    const frameBorder = 0.12;
+    const frameDepth = 0.10;
 
-    const g = new THREE.Group();
-    g.position.copy(position);
-    g.rotation.y = rotationY;
+    const outerW = artWidth + frameBorder * 2;
+    const outerH = artHeight + frameBorder * 2;
 
-    const depth = 0.08;
-    const frameT = 0.09;
-
-    const outer = new THREE.Mesh(
-      new THREE.BoxGeometry(artW + frameT, artH + frameT, depth),
-      frameOuterMat
-    );
+    // Frame outer
+    const outer = new THREE.Mesh(new THREE.BoxGeometry(outerW, outerH, frameDepth), frameOuterMat);
     outer.castShadow = true;
     outer.receiveShadow = true;
-    g.add(outer);
+    group.add(outer);
 
-    const matte = new THREE.Mesh(
-      new THREE.BoxGeometry(artW + 0.03, artH + 0.03, 0.006),
-      matteMat
-    );
-    matte.position.z = depth / 2 + 0.004;
-    g.add(matte);
+    // Frame inner recess
+    const inner = new THREE.Mesh(new THREE.BoxGeometry(artWidth + frameBorder * 0.6, artHeight + frameBorder * 0.6, frameDepth * 0.75), frameInnerMat);
+    inner.position.z = frameDepth * 0.12;
+    inner.castShadow = true;
+    inner.receiveShadow = true;
+    group.add(inner);
 
-    const artMat = new THREE.MeshBasicMaterial({
-      color: tex ? 0xffffff : 0x2b2b2b,
-      map: tex ?? undefined,
+    // Art plane
+    const tex = texLoader.load(normalizeUrl(artwork.image_url || ""));
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 8;
+
+    const artMat = new THREE.MeshStandardMaterial({
+      map: tex,
+      roughness: 0.9,
+      metalness: 0.0,
     });
 
-    const artPlane = new THREE.Mesh(new THREE.PlaneGeometry(artW, artH), artMat);
-    artPlane.position.z = depth / 2 + 0.01;
-    artPlane.userData.__artworkId = artwork.id;
-    g.add(artPlane);
+    const artPlane = new THREE.Mesh(new THREE.PlaneGeometry(artWidth, artHeight), artMat);
+    // Sit slightly in front of the inner recess
+    artPlane.position.z = frameDepth * 0.52;
+    artPlane.castShadow = false;
+    artPlane.receiveShadow = false;
+    group.add(artPlane);
 
-    framesGroup.add(g);
+    // Position on right wall and face inward
+    const z = artStartZ + index * artGapZ;
+    group.position.set(artWallX, artBaseY, z);
+    group.rotation.y = -Math.PI / 2;
 
-    clickableMeshes.push({
+    // Clickable object: use the artPlane (best hit target)
+    const clickable = artPlane;
+
+    // Frame bounds local for sizing math
+    const bounds = new THREE.Box3().setFromObject(outer);
+    const boundsLocal = bounds.clone();
+    // Convert to local by inverse of group matrix after update
+    group.updateMatrixWorld(true);
+    const inv = new THREE.Matrix4().copy(group.matrixWorld).invert();
+    boundsLocal.applyMatrix4(inv);
+
+    framesGroup.add(group);
+
+    const rec: ArtMeshRecord = {
       artwork,
-      clickable: artPlane,
-      frameGroup: g,
+      clickable,
+      frameGroup: group,
       artPlane,
-    });
+      frameBoundsLocal: boundsLocal,
+    };
+    artRecords.push(rec);
   }
 
-  // Placements
-  const placements: Array<{ pos: THREE.Vector3; rotY: number }> = [];
-  const artY = 2.05;
+  artworks.forEach((a, i) => createArtworkFrame(a, i));
 
-  for (let i = 0; i < Math.min(artworks.length, 6); i++) {
-    const z = 9 - i * 5.2;
-    placements.push({
-      pos: new THREE.Vector3(roomW / 2 - 0.06, artY, z),
-      rotY: -Math.PI / 2,
-    });
+  // ----------------------------
+  // Placard (museum label) overlay
+  // ----------------------------
+  const placard = document.createElement("div");
+  placard.setAttribute("data-museum-placard", "true");
+  setDomStyles(placard, {
+    position: "absolute",
+    right: "5.5%",
+    top: "50%",
+    transform: "translateY(-50%)",
+    width: "min(36vw, 520px)",
+    maxWidth: "520px",
+    background: "#f3f0e8",
+    color: "#1a1a1a",
+    padding: "18px 20px",
+    boxSizing: "border-box",
+    border: "1px solid rgba(0,0,0,0.18)",
+    borderRadius: "0px",
+    boxShadow: "none",
+    opacity: "0",
+    pointerEvents: "none",
+    transition: "opacity 220ms ease",
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial",
+  });
+
+  // Subtle engraved vibe using inset highlights and a faint bevel line
+  placard.style.boxShadow =
+    "inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -1px 0 rgba(0,0,0,0.06)";
+
+  placard.innerHTML = `
+    <div style="letter-spacing:0.18em; font-size:12px; opacity:0.65; margin-bottom:10px;">MUSEUM LABEL</div>
+    <div data-p-artist style="font-size:26px; font-weight:650; margin:0 0 6px 0;">Artist</div>
+    <div data-p-title style="font-size:18px; font-style:italic; margin:0 0 14px 0; opacity:0.9;">Title</div>
+    <div style="height:1px; background:rgba(0,0,0,0.14); margin: 10px 0 14px 0;"></div>
+    <div style="display:grid; grid-template-columns: 120px 1fr; column-gap:18px; row-gap:8px; font-size:16px;">
+      <div style="opacity:0.55;">Collection</div>
+      <div data-p-collection style="font-weight:520;">Collection</div>
+
+      <div style="opacity:0.55;">Title</div>
+      <div data-p-title2 style="font-weight:520;">Title</div>
+
+      <div style="opacity:0.55;">Catalog ID</div>
+      <div data-p-id style="font-weight:520;">ID</div>
+    </div>
+  `;
+
+  // Ensure container can hold absolute overlay
+  const prevPos = getComputedStyle(container).position;
+  if (prevPos === "static" || !prevPos) {
+    container.style.position = "relative";
+  }
+  container.appendChild(placard);
+
+  function setPlacardForArtwork(a: MuseumArtwork) {
+    const artist = (a as any).artist || (a as any).artist_name || "Artist";
+    const title = (a as any).title || "Untitled";
+    const collection = (a as any).collection || (a as any).collection_name || "Collection";
+    const id = (a as any).catalog_id || (a as any).sku || (a as any).id || "";
+
+    const elArtist = placard.querySelector('[data-p-artist]') as HTMLElement | null;
+    const elTitle = placard.querySelector('[data-p-title]') as HTMLElement | null;
+    const elCollection = placard.querySelector('[data-p-collection]') as HTMLElement | null;
+    const elTitle2 = placard.querySelector('[data-p-title2]') as HTMLElement | null;
+    const elId = placard.querySelector('[data-p-id]') as HTMLElement | null;
+
+    if (elArtist) elArtist.textContent = String(artist);
+    if (elTitle) elTitle.textContent = String(title);
+    if (elCollection) elCollection.textContent = String(collection);
+    if (elTitle2) elTitle2.textContent = String(title);
+    if (elId) elId.textContent = String(id);
   }
 
-  for (let i = 6; i < artworks.length; i++) {
-    const idx = i - 6;
-    const z = 9 - idx * 5.2;
-    placements.push({
-      pos: new THREE.Vector3(-roomW / 2 + 0.06, artY, z),
-      rotY: Math.PI / 2,
-    });
+  function showPlacard(show: boolean) {
+    placard.style.opacity = show ? "1" : "0";
   }
 
-  (async () => {
-    for (let i = 0; i < artworks.length; i++) {
-      if (disposed) return;
-      const p =
-        placements[i] ?? ({
-          pos: new THREE.Vector3(roomW / 2 - 0.06, artY, 9 - i * 5.2),
-          rotY: -Math.PI / 2,
-        } as const);
-
-      await addFramedArtwork({
-        artwork: artworks[i],
-        position: p.pos,
-        rotationY: p.rotY,
-        targetMaxWidth: 1.6,
-        targetMaxHeight: 2.0,
-      });
-    }
-  })();
-
-  // Placard overlay
-  const { placard, setPlacard, showPlacard, resizePlacard } = createPlacardEl(container);
-
-  // Inspect overlay (pixel-perfect, no perspective)
-  const overlayScene = new THREE.Scene();
-  const overlayCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 10);
-  overlayCam.position.set(0, 0, 5);
-
-  const overlayBg = new THREE.Mesh(
-    new THREE.PlaneGeometry(2, 2),
-    new THREE.MeshBasicMaterial({ color: 0x8f8f8f })
-  );
-  overlayBg.position.z = -1;
-  overlayScene.add(overlayBg);
-
-  const overlayArtMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true });
-  const overlayArt = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), overlayArtMat);
-  overlayArt.position.z = 0;
-  overlayScene.add(overlayArt);
-
-  let isInspecting = false;
-  let inspectT = 0;
-  let inspectFromPos = new THREE.Vector3();
-  let inspectToPos = new THREE.Vector3();
-  let inspectFromYaw = 0;
-  let inspectToYaw = 0;
-  let inspectFromPitch = 0;
-  let inspectToPitch = 0;
-  let inspectRec: ArtMeshRecord | null = null;
-
-  function cancelInspect() {
-    isInspecting = false;
-    inspectT = 0;
-    inspectRec = null;
-    showPlacard(false);
-    setPlacard(undefined);
-
-    // restore normal scene background
-    scene.background = new THREE.Color('#cfe7ff');
-  }
-
-  // Fit artwork on left side, preserve aspect, never crop
-  function layoutOverlayForTexture(tex: THREE.Texture) {
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-
-    // right area for placard (slightly smaller), and a narrow gap
-    const rightFrac = 0.30; // placard area
-    const gapPx = Math.max(18, Math.round(w * 0.02));
-
-    const leftWpx = Math.max(1, Math.round(w * (1 - rightFrac)) - gapPx);
-
-    const img: any = tex.image;
-    const texAspect =
-      img && img.width && img.height ? img.width / img.height : 1;
-
-    // available pixel box for artwork in left area with breathing room
-    const pad = Math.round(Math.min(leftWpx, h) * 0.06);
-    const availW = Math.max(1, leftWpx - pad * 2);
-    const availH = Math.max(1, h - pad * 2);
-
-    // fit contain
-    let drawW = availW;
-    let drawH = drawW / texAspect;
-    if (drawH > availH) {
-      drawH = availH;
-      drawW = drawH * texAspect;
-    }
-
-    // convert to NDC width/height on ortho (-1..1)
-    const ndcW = (drawW / w) * 2;
-    const ndcH = (drawH / h) * 2;
-
-    overlayArt.scale.set(ndcW, ndcH, 1);
-
-    // position artwork centered within left area
-    const leftCenterXpx = pad + (availW / 2);
-    const leftCenterXNdc = (leftCenterXpx / w) * 2 - 1;
-
-    overlayArt.position.set(leftCenterXNdc, 0, 0);
-
-    // place placard to the right, centered vertically
-    const placardRightPx = Math.round(clamp(w * 0.04, 22, 64));
-    placard.style.right = `${placardRightPx}px`;
-    placard.style.top = '50%';
-    placard.style.transform = 'translateY(-50%)';
-
-    resizePlacard(w);
-  }
-
-  function startInspect(rec: ArtMeshRecord) {
-    const tex = rec.artPlane.material.map;
-    if (!tex) return;
-
-    inspectRec = rec;
-
-    // show placard data
-    setPlacard(rec.artwork);
-    showPlacard(true);
-
-    // Layout overlay and swap background to neutral gray
-    scene.background = new THREE.Color('#8f8f8f');
-    overlayArtMat.map = tex;
-    overlayArtMat.needsUpdate = true;
-    layoutOverlayForTexture(tex);
-
-    // animate camera movement into a stable "inspect spot" looking at the work
-    const worldPos = new THREE.Vector3();
-    rec.frameGroup.getWorldPosition(worldPos);
-
-    const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(rec.frameGroup.quaternion);
-    const targetPos = worldPos.clone().add(forward.clone().multiplyScalar(2.6));
-
-    // lift camera so the final framing feels less "snap"
-    targetPos.y = 1.75;
-
-    inspectFromPos.copy(yawObj.position);
-    inspectToPos.copy(targetPos);
-
-    // yaw to face artwork
-    const lookDir = worldPos.clone().sub(targetPos);
-    lookDir.y = 0;
-    lookDir.normalize();
-
-    inspectFromYaw = yaw;
-    inspectToYaw = Math.atan2(-lookDir.x, -lookDir.z);
-
-    inspectFromPitch = pitch;
-    inspectToPitch = 0;
-
-    isInspecting = true;
-    inspectT = 0;
-  }
-
-  // Controls
-  let isDragging = false;
+  // ----------------------------
+  // Explore controls (drag to look, wheel to move)
+  // ----------------------------
+  let isPointerDown = false;
   let lastX = 0;
   let lastY = 0;
-  let dragMoved = false;
 
-  function onPointerDown(e: PointerEvent) {
-    if (isInspecting) return; // lock while zooming
-    isDragging = true;
-    dragMoved = false;
+  // yaw around Y, pitch around X
+  let yaw = 0;
+  let pitch = 0;
+
+  // movement smoothing
+  const moveVelocity = new THREE.Vector3();
+
+  const onPointerDown = (e: PointerEvent) => {
+    if (focusState.active) return;
+
+    isPointerDown = true;
     lastX = e.clientX;
     lastY = e.clientY;
     renderer.domElement.setPointerCapture(e.pointerId);
-    renderer.domElement.style.cursor = 'grabbing';
-  }
+  };
 
-  function onPointerMove(e: PointerEvent) {
-    if (!isDragging) return;
-    if (isInspecting) return;
+  const onPointerMove = (e: PointerEvent) => {
+    if (!isPointerDown) return;
+    if (focusState.active) return;
 
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
-
-    if (Math.abs(dx) + Math.abs(dy) > 2) dragMoved = true;
-
     lastX = e.clientX;
     lastY = e.clientY;
 
     yaw -= dx * 0.0032;
     pitch -= dy * 0.0032;
-    pitch = clamp(pitch, minPitch, maxPitch);
+    pitch = clamp(pitch, -1.25, 1.25);
+  };
 
-    yawObj.rotation.y = yaw;
-    pitchObj.rotation.x = pitch;
-  }
-
-  function onPointerUp(e: PointerEvent) {
-    if (!isDragging) return;
-
-    isDragging = false;
+  const onPointerUp = (e: PointerEvent) => {
+    isPointerDown = false;
     try {
       renderer.domElement.releasePointerCapture(e.pointerId);
-    } catch {}
-    renderer.domElement.style.cursor = 'grab';
-
-    if (isInspecting) return;
-
-    if (!dragMoved) {
-      const rect = renderer.domElement.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-
-      const raycaster = new THREE.Raycaster();
-      raycaster.setFromCamera(new THREE.Vector2(x, y), camera);
-
-      const targets = clickableMeshes.map((m) => m.clickable);
-      const hits = raycaster.intersectObjects(targets, true);
-
-      if (hits.length) {
-        const hit = hits[0].object;
-        const id = (hit.userData?.__artworkId as string) ?? '';
-        const rec = clickableMeshes.find((m) => m.artwork.id === id);
-        if (rec) {
-          onArtworkClick?.(rec.artwork);
-          startInspect(rec);
-        }
-      }
+    } catch {
+      // ignore
     }
+  };
+
+  renderer.domElement.addEventListener("pointerdown", onPointerDown);
+  renderer.domElement.addEventListener("pointermove", onPointerMove);
+  renderer.domElement.addEventListener("pointerup", onPointerUp);
+  renderer.domElement.addEventListener("pointercancel", onPointerUp);
+
+  // ----------------------------
+  // Focus / Inspect logic (pixel-perfect, no snap)
+  // Goal: artwork left, placard right, keep aspect ratio, always fully visible.
+  // Use OrthographicCamera and compute frustum to fit the entire frame bounds.
+  // ----------------------------
+  const focusState = {
+    active: false,
+    animStart: 0,
+    animDurMs: 1100,
+    fromPos: new THREE.Vector3(),
+    toPos: new THREE.Vector3(),
+    fromQuat: new THREE.Quaternion(),
+    toQuat: new THREE.Quaternion(),
+    fromZoom: 1,
+    toZoom: 1,
+    targetId: "" as string,
+    targetRec: null as ArtMeshRecord | null,
+    userDolly: 0,
+    // keep a stable inspect basis
+    inspectRight: new THREE.Vector3(),
+    inspectUp: new THREE.Vector3(),
+    inspectForward: new THREE.Vector3(),
+    inspectCenter: new THREE.Vector3(),
+  };
+
+  function cancelFocusAndInspect() {
+    focusState.active = false;
+    focusState.targetId = "";
+    focusState.targetRec = null;
+    focusState.userDolly = 0;
+    activeCamera = exploreCamera;
+    showPlacard(false);
   }
 
-  function onWheel(e: WheelEvent) {
-    // If mouse is over the museum canvas, prevent page scroll and only move camera
-    e.preventDefault();
+  function computeInspectPose(rec: ArtMeshRecord) {
+    // World center of the frame group (use bounds for better center)
+    rec.frameGroup.updateMatrixWorld(true);
 
-    if (isInspecting) return;
+    const bounds = new THREE.Box3().setFromObject(rec.frameGroup);
+    const center = bounds.getCenter(new THREE.Vector3());
+    const size = bounds.getSize(new THREE.Vector3());
 
-    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObj.quaternion);
-    forward.y = 0;
-    forward.normalize();
+    // The artwork normal (facing into the room)
+    const forward = new THREE.Vector3(1, 0, 0); // local +X before rotation? safer: derive from group
+    rec.frameGroup.getWorldDirection(forward); // this returns -Z direction of object, so we compute normal explicitly
+    // Better: compute normal using group's world matrix basis.
+    const basis = new THREE.Matrix3().setFromMatrix4(rec.frameGroup.matrixWorld);
+    const xAxis = new THREE.Vector3(1, 0, 0).applyMatrix3(basis).normalize(); // local X axis in world
+    const zAxis = new THREE.Vector3(0, 0, 1).applyMatrix3(basis).normalize(); // local Z axis in world
+    // The frame faces along its local +Z for the artPlane, but the whole group is rotated.
+    // Our artPlane is a PlaneGeometry facing +Z. So its normal is group's local +Z in world.
+    const normal = zAxis.clone().normalize();
 
-    const step = e.deltaY * 0.004;
-    yawObj.position.addScaledVector(forward, step);
+    // Place camera slightly in front of the art (toward the room)
+    const distance = 2.4; // will be refined by ortho frustum sizing, this is just for depth separation
+    const camPos = center.clone().add(normal.clone().multiplyScalar(distance));
 
-    const margin = 0.9;
-    yawObj.position.x = clamp(yawObj.position.x, -roomW / 2 + margin, roomW / 2 - margin);
-    yawObj.position.z = clamp(yawObj.position.z, -roomD / 2 + margin, roomD / 2 - margin);
+    // Camera should look at the center
+    const lookAt = center.clone();
+
+    // Build a stable camera orientation: up is world up
+    const up = new THREE.Vector3(0, 1, 0);
+
+    // Compute right axis so we can offset the art to the left on screen
+    const right = new THREE.Vector3().crossVectors(up, normal).normalize();
+    const trueUp = new THREE.Vector3().crossVectors(normal, right).normalize();
+
+    // We want the artwork to sit on the left side of the screen, with the placard on the right.
+    // With an orthographic camera, we can shift the camera's "center" (lookAt) slightly to the right,
+    // which pushes the artwork left on screen.
+    const screenOffsetRight = 0.22; // normalized-ish, refined below with viewport sizing
+    const offset = right.clone().multiplyScalar(screenOffsetRight * Math.max(size.x, size.y));
+
+    const shiftedLookAt = lookAt.clone().add(offset);
+    const shiftedCamPos = camPos.clone().add(offset);
+
+    // Save basis
+    focusState.inspectRight.copy(right);
+    focusState.inspectUp.copy(trueUp);
+    focusState.inspectForward.copy(normal);
+    focusState.inspectCenter.copy(lookAt);
+
+    return { camPos: shiftedCamPos, lookAt: shiftedLookAt, bounds, boundsCenter: center, boundsSize: size, normal, right, up: trueUp };
   }
 
-  renderer.domElement.addEventListener('pointerdown', onPointerDown);
-  renderer.domElement.addEventListener('pointermove', onPointerMove);
-  renderer.domElement.addEventListener('pointerup', onPointerUp);
-  renderer.domElement.addEventListener('pointercancel', onPointerUp);
+  function fitOrthoToFrame(rec: ArtMeshRecord) {
+    // We compute camera frustum so that the entire frame is visible,
+    // while keeping a little breathing room around the black frame.
+    const { boundsSize } = computeInspectPose(rec);
 
-  // passive must be false or preventDefault will be ignored
-  renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
+    const viewportW = container.clientWidth;
+    const viewportH = container.clientHeight;
 
-  // Resize
-  function resize() {
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+    // Reserve space on the right for the placard (roughly)
+    // We keep the art fully visible in the remaining width.
+    const placardFrac = 0.34; // approx. placard width share
+    const gapFrac = 0.03; // spacing between art and placard
+    const usableW = viewportW * (1 - placardFrac - gapFrac);
+    const usableH = viewportH;
 
-    resizePlacard(w);
+    const usableAspect = usableW / usableH;
 
-    if (isInspecting && inspectRec?.artPlane.material.map) {
-      layoutOverlayForTexture(inspectRec.artPlane.material.map);
+    // boundsSize is in world units. We fit its width/height into usableAspect.
+    const frameW = boundsSize.x;
+    const frameH = boundsSize.y;
+
+    const breathing = 1.06; // slight breathing room
+    const targetW = frameW * breathing;
+    const targetH = frameH * breathing;
+
+    // Fit into usable viewport
+    const neededHalfW = (targetW / 2);
+    const neededHalfH = (targetH / 2);
+
+    // Convert to full frustum by aspect constraints
+    let halfW = neededHalfW;
+    let halfH = neededHalfH;
+
+    // Ensure the frame fits both dimensions under usable aspect
+    const currentAspect = halfW / halfH;
+    if (currentAspect > usableAspect) {
+      // too wide, increase height
+      halfH = halfW / usableAspect;
+    } else {
+      // too tall, increase width
+      halfW = halfH * usableAspect;
     }
+
+    inspectCamera.left = -halfW;
+    inspectCamera.right = halfW;
+    inspectCamera.top = halfH;
+    inspectCamera.bottom = -halfH;
+
+    inspectCamera.near = 0.01;
+    inspectCamera.far = 400;
+    inspectCamera.zoom = 1;
+
+    inspectCamera.updateProjectionMatrix();
   }
 
-  const ro = new ResizeObserver(() => resize());
-  ro.observe(container);
-  resize();
+  function focusArtworkByRecord(rec: ArtMeshRecord) {
+    focusState.active = true;
+    focusState.animStart = performance.now();
+    focusState.targetId = String((rec.artwork as any).id ?? (rec.artwork as any).sku ?? "");
+    focusState.targetRec = rec;
+    focusState.userDolly = 0;
+
+    // From: current explore camera
+    focusState.fromPos.copy(exploreCamera.position);
+    focusState.fromQuat.copy(exploreCamera.quaternion);
+    focusState.fromZoom = 1;
+
+    // Configure inspect camera frustum to guarantee full art visibility
+    fitOrthoToFrame(rec);
+
+    // Compute inspect pose
+    const pose = computeInspectPose(rec);
+
+    // To: inspect camera placed in front, oriented flat
+    inspectCamera.position.copy(pose.camPos);
+    inspectCamera.up.set(0, 1, 0);
+    inspectCamera.lookAt(pose.lookAt);
+    inspectCamera.updateMatrixWorld(true);
+
+    focusState.toPos.copy(inspectCamera.position);
+    focusState.toQuat.copy(inspectCamera.quaternion);
+    focusState.toZoom = 1;
+
+    // Start inspect camera as a copy of explore camera, then animate to ortho pose
+    inspectCamera.position.copy(focusState.fromPos);
+    inspectCamera.quaternion.copy(focusState.fromQuat);
+    inspectCamera.zoom = 1;
+    inspectCamera.updateProjectionMatrix();
+    inspectCamera.updateMatrixWorld(true);
+
+    activeCamera = inspectCamera;
+
+    setPlacardForArtwork(rec.artwork);
+    showPlacard(true);
+
+    if (onArtworkClick) onArtworkClick(rec.artwork);
+  }
 
   function focusArtwork(id: string) {
-    const rec = clickableMeshes.find((m) => m.artwork.id === id);
+    const rec = artRecords.find((r) => String((r.artwork as any).id ?? (r.artwork as any).sku ?? "") === id);
     if (!rec) return;
-    startInspect(rec);
+    focusArtworkByRecord(rec);
   }
 
   function clearFocus() {
-    cancelInspect();
-
-    yawObj.position.set(0, 1.55, 6.6);
-    yaw = 0;
-    pitch = 0;
-    yawObj.rotation.y = yaw;
-    pitchObj.rotation.x = pitch;
+    cancelFocusAndInspect();
   }
+
+  // ----------------------------
+  // Click artwork
+  // ----------------------------
+  function onClickCanvas(e: PointerEvent) {
+    if (focusState.active) return;
+
+    const rect = renderer.domElement.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+    pointerNdc.set(x, y);
+
+    raycaster.setFromCamera(pointerNdc, exploreCamera);
+
+    const clickables = artRecords.map((r) => r.clickable);
+    const hits = raycaster.intersectObjects(clickables, true);
+    if (!hits.length) return;
+
+    const hitObj = hits[0].object;
+    const rec = artRecords.find((r) => r.clickable === hitObj || r.clickable.children.includes(hitObj));
+    if (!rec) return;
+
+    focusArtworkByRecord(rec);
+  }
+
+  renderer.domElement.addEventListener("click", onClickCanvas);
+
+  // ----------------------------
+  // Resize handling
+  // ----------------------------
+  const ro = new ResizeObserver(() => {
+    if (disposed) return;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    renderer.setSize(w, h);
+    exploreCamera.aspect = w / h;
+    exploreCamera.updateProjectionMatrix();
+
+    if (focusState.active && focusState.targetRec) {
+      fitOrthoToFrame(focusState.targetRec);
+    }
+  });
+  ro.observe(container);
+
+  // ----------------------------
+  // Animation loop
+  // ----------------------------
+  const tmpDir = new THREE.Vector3();
 
   function animate() {
     if (disposed) return;
 
-    // animate inspect camera motion to avoid harsh snap
-    if (isInspecting && inspectRec) {
-      inspectT = clamp(inspectT + 1 / 60 / 1.0, 0, 1); // about 1s
-      const t = easeInOutCubic(inspectT);
+    // Explore camera orientation
+    if (!focusState.active) {
+      // Apply look
+      const qYaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+      const qPitch = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), pitch);
+      exploreCamera.quaternion.copy(qYaw).multiply(qPitch);
 
-      yawObj.position.lerpVectors(inspectFromPos, inspectToPos, t);
-      yaw = lerp(inspectFromYaw, inspectToYaw, t);
-      pitch = lerp(inspectFromPitch, inspectToPitch, t);
+      // Apply movement velocity with damping
+      exploreCamera.position.add(moveVelocity);
+      moveVelocity.multiplyScalar(0.82);
 
-      yawObj.rotation.y = yaw;
-      pitchObj.rotation.x = pitch;
+      // Keep camera above floor
+      exploreCamera.position.y = clamp(exploreCamera.position.y, 1.1, 2.4);
 
-      // once finished, keep stable
-      if (inspectT >= 1) {
-        isInspecting = false;
+      // Clamp inside room bounds
+      exploreCamera.position.x = clamp(exploreCamera.position.x, -roomW / 2 + 0.8, roomW / 2 - 0.8);
+      exploreCamera.position.z = clamp(exploreCamera.position.z, backZ + 1.1, frontZ - 1.1);
+    } else {
+      // Focus animation (no snap, ends exactly on computed pose)
+      const now = performance.now();
+      const tRaw = clamp((now - focusState.animStart) / focusState.animDurMs, 0, 1);
+      const t = easeInOutCubic(tRaw);
+
+      // Interpolate camera pose
+      inspectCamera.position.set(
+        lerp(focusState.fromPos.x, focusState.toPos.x, t),
+        lerp(focusState.fromPos.y, focusState.toPos.y, t),
+        lerp(focusState.fromPos.z, focusState.toPos.z, t)
+      );
+      inspectCamera.quaternion.slerpQuaternions(focusState.fromQuat, focusState.toQuat, t);
+
+      // Optional user dolly while focused (subtle)
+      if (focusState.userDolly !== 0) {
+        tmpDir.copy(focusState.inspectForward).normalize();
+        // Pull camera slightly closer/farther along normal
+        inspectCamera.position.addScaledVector(tmpDir, focusState.userDolly);
+      }
+
+      inspectCamera.updateMatrixWorld(true);
+
+      // When finished, lock to exact end state (no jump because we already are there)
+      if (tRaw >= 1) {
+        inspectCamera.position.copy(focusState.toPos);
+        inspectCamera.quaternion.copy(focusState.toQuat);
+        inspectCamera.updateMatrixWorld(true);
+
+        // Keep the final camera stable, but still allow a little user dolly.
+        if (focusState.userDolly !== 0) {
+          tmpDir.copy(focusState.inspectForward).normalize();
+          inspectCamera.position.addScaledVector(tmpDir, focusState.userDolly);
+          inspectCamera.updateMatrixWorld(true);
+        }
       }
     }
 
-    renderer.render(scene, camera);
-
-    // When inspecting, render overlay artwork on top for pixel-perfect, no perspective
-    if (inspectRec?.artPlane.material.map) {
-      renderer.autoClear = false;
-      renderer.clearDepth();
-      renderer.render(overlayScene, overlayCam);
-      renderer.autoClear = true;
-    }
-
+    renderer.render(scene, activeCamera);
     requestAnimationFrame(animate);
   }
-
   requestAnimationFrame(animate);
 
+  // ----------------------------
+  // Dispose
+  // ----------------------------
   function dispose() {
     disposed = true;
     ro.disconnect();
 
-    renderer.domElement.removeEventListener('pointerdown', onPointerDown);
-    renderer.domElement.removeEventListener('pointermove', onPointerMove);
-    renderer.domElement.removeEventListener('pointerup', onPointerUp);
-    renderer.domElement.removeEventListener('pointercancel', onPointerUp);
-    renderer.domElement.removeEventListener('wheel', onWheel as any);
+    renderer.domElement.removeEventListener("pointerdown", onPointerDown);
+    renderer.domElement.removeEventListener("pointermove", onPointerMove);
+    renderer.domElement.removeEventListener("pointerup", onPointerUp);
+    renderer.domElement.removeEventListener("pointercancel", onPointerUp);
+    renderer.domElement.removeEventListener("wheel", onWheel as any);
+    renderer.domElement.removeEventListener("click", onClickCanvas);
 
     scene.traverse((obj) => {
       const anyObj: any = obj;
       if (anyObj.geometry?.dispose) anyObj.geometry.dispose();
 
-      const mat = anyObj.material;
-      if (mat) {
-        const mats = Array.isArray(mat) ? mat : [mat];
-        for (const m of mats) {
-          if (m.map?.dispose) m.map.dispose();
-          if (m.dispose) m.dispose();
-        }
-      }
-    });
-
-    overlayScene.traverse((obj) => {
-      const anyObj: any = obj;
-      if (anyObj.geometry?.dispose) anyObj.geometry.dispose();
       const mat = anyObj.material;
       if (mat) {
         const mats = Array.isArray(mat) ? mat : [mat];
