@@ -64,7 +64,7 @@ export default function VrMuseumPage() {
       <section className="border-b border-black/10">
         <div className="mx-auto max-w-6xl px-6 py-10 md:py-14">
           {/* No gray card here. Just the interactive env filling the area. */}
-          <div className="h-[50vh] w-full">
+          <div className="h-[80vh] w-full">
             <VrMuseumClientShell variant="embed" />
           </div>
         </div>
