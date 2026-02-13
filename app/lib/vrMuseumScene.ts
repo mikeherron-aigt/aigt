@@ -617,10 +617,12 @@ export function createVrMuseumScene({
   scene.add(sun);
   scene.add(sun.target);
 
-  // Gentle directional fill (no shadows)
-  const fill = new THREE.DirectionalLight(0xffffff, 0.14);
-  fill.position.set(8, 14, 10);
-  scene.add(fill);
+  // Soft interior bounce light (inside the room, so it cannot "shine through" walls)
+const fill = new THREE.PointLight(0xffffff, 0.28, 60, 2.0);
+fill.position.set(0, roomH - 0.35, 2.0);
+fill.castShadow = false;
+scene.add(fill);
+
 
   // Gallery ceiling lights (can cast shadows, tuned to not erase window pattern)
   const gallerySpots: THREE.SpotLight[] = [];
@@ -628,7 +630,8 @@ export function createVrMuseumScene({
   const addGallerySpot = (x: number, z: number) => {
     const s = new THREE.SpotLight(0xffffff, 0.85, 55, Math.PI / 5.2, 0.7, 1.6);
     s.position.set(x, roomH - 0.15, z);
-    s.target.position.set(x * 0.55, 0.9, z * 0.55);
+    // Aim straight down to create clean floor pools, not wall wash
+s.target.position.set(x, 0.0, z);
 
     s.castShadow = true;
     s.shadow.mapSize.set(1024, 1024);
