@@ -25,7 +25,7 @@ export default function VrMuseumPage() {
               </p>
             </div>
 
-            {/* Hero image placeholder block (swap for your real hero image if you have one) */}
+            {/* Hero image placeholder */}
             <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white">
               <div className="aspect-[16/10] w-full bg-gradient-to-br from-neutral-100 to-neutral-50" />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.06),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(0,0,0,0.05),transparent_60%)]" />
@@ -34,7 +34,7 @@ export default function VrMuseumPage() {
         </div>
       </section>
 
-      {/* Intro narrative */}
+      {/* Intro + Interactive */}
       <section className="border-b border-black/10">
         <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
           <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
@@ -59,12 +59,34 @@ export default function VrMuseumPage() {
             </p>
           </div>
 
-        
-                {/* If VrMuseumClientShell renders its own sizing, it will fill this container. */}
-                <div className="aspect-[16/9] w-full">
-                  <VrMuseumClientShell />
+          <div className="mt-10 rounded-2xl border border-black/10 bg-white p-6 md:p-8">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <div className="text-xs font-semibold tracking-widest text-black/50">
+                  INTERACTIVE
                 </div>
-            
+                <h3 className="mt-2 text-xl font-semibold tracking-tight md:text-2xl">
+                  Explore a sample gallery
+                </h3>
+                <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-black/70 md:text-base">
+                  Drag to look, scroll to move, and click a work to focus. Click
+                  again to return to center.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 overflow-hidden rounded-xl border border-black/10 bg-neutral-50">
+              <div className="aspect-[16/9] w-full">
+                <VrMuseumClientShell />
+              </div>
+            </div>
+
+            <p className="mt-4 max-w-3xl text-xs leading-relaxed text-black/50">
+              This preview environment is provided for informational and stewardship
+              context. Availability and access are governed.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Built for seriousness */}
@@ -79,9 +101,10 @@ export default function VrMuseumPage() {
             <div className="md:col-span-8">
               <div className="space-y-5 text-[15px] leading-relaxed text-black/75 md:text-base">
                 <p>
-                  The Virtual Museum is not designed as a mass market platform, a gaming
-                  experience, or a consumer facing monetized digital product. It does
-                  not prioritize virality, engagement metrics, or consumer traffic.
+                  The Virtual Museum is not designed as a mass market platform, a
+                  gaming experience, or a consumer facing monetized digital product.
+                  It does not prioritize virality, engagement metrics, or consumer
+                  traffic.
                 </p>
                 <p>
                   Instead, it functions as an institutional access layer. A controlled
@@ -90,8 +113,8 @@ export default function VrMuseumPage() {
                   scholarly narrative.
                 </p>
                 <p>
-                  Technology is used quietly and intentionally, in service of preservation,
-                  access, and institutional integrity rather than novelty.
+                  Technology is used quietly and intentionally, in service of
+                  preservation, access, and institutional integrity rather than novelty.
                 </p>
               </div>
             </div>
@@ -99,7 +122,7 @@ export default function VrMuseumPage() {
         </div>
       </section>
 
-      {/* Complement section */}
+      {/* A complement */}
       <section className="border-b border-black/10 bg-neutral-50">
         <div className="mx-auto max-w-6xl px-6 py-14 md:py-16">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:items-start">
@@ -110,13 +133,15 @@ export default function VrMuseumPage() {
             </div>
             <div className="md:col-span-8">
               <div className="space-y-5 text-[15px] leading-relaxed text-black/75 md:text-base">
-                <p>The Virtual Museum does not replace the physical museum. It extends it.</p>
                 <p>
-                  Where the physical museum provides place, presence, and material authority,
-                  the Virtual Museum provides reach and continuity. Together, they form a
-                  unified institutional framework that supports exhibition planning, scholarly
-                  engagement, and long term narrative stewardship without compromising
-                  custodial control of the works.
+                  The Virtual Museum does not replace the physical museum. It extends it.
+                </p>
+                <p>
+                  Where the physical museum provides place, presence, and material
+                  authority, the Virtual Museum provides reach and continuity. Together,
+                  they form a unified institutional framework that supports exhibition
+                  planning, scholarly engagement, and long term narrative stewardship
+                  without compromising custodial control of the works.
                 </p>
                 <p>
                   This dual structure allows the collection to remain both deeply grounded
@@ -141,16 +166,10 @@ export default function VrMuseumPage() {
 
           <div className="mt-6 grid grid-cols-1 gap-3 text-[15px] text-black/75 md:max-w-3xl md:text-base">
             <div className="border-l border-black/15 pl-4">Remote scholarly study and research</div>
-            <div className="border-l border-black/15 pl-4">
-              Curatorial collaboration and exhibition planning
-            </div>
+            <div className="border-l border-black/15 pl-4">Curatorial collaboration and exhibition planning</div>
             <div className="border-l border-black/15 pl-4">International institutional visibility</div>
-            <div className="border-l border-black/15 pl-4">
-              Archival documentation and contextualization
-            </div>
-            <div className="border-l border-black/15 pl-4">
-              Controlled private access for aligned partners
-            </div>
+            <div className="border-l border-black/15 pl-4">Archival documentation and contextualization</div>
+            <div className="border-l border-black/15 pl-4">Controlled private access for aligned partners</div>
           </div>
 
           <p className="mt-6 max-w-3xl text-[15px] leading-relaxed text-black/75 md:text-base">
