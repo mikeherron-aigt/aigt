@@ -821,82 +821,88 @@ export function createVrMuseumScene({
     });
   }
 
-  // Placements: 3 on back wall (right of door), 5 on each side wall when enough works exist
-  const total = artworksInRoom.length;
+ // BACK wall: 3 works, centered in the open span, with guaranteed spacing
+{
+  const z = roomD / 2 - 0.07;
+  const rotY = Math.PI;
 
-  const desiredBack = 3;
-  const desiredSide = 5;
+  const wallXMargin = 1.15;
+  const xRightLimit = roomW / 2 - wallXMargin;
 
-  const backCount = Math.min(desiredBack, total);
-  const remaining = Math.max(0, total - backCount);
+  const doorRightEdge = doorX + doorW / 2;
 
-  // Keep the "5 and 5" goal, but adapt when total < 13
-  const rightCount = Math.min(desiredSide, Math.ceil(remaining / 2));
-  const leftCount = Math.min(desiredSide, Math.max(0, remaining - rightCount));
+  const doorPad = 1.0;
+  const cornerPad = 1.1;
 
-  const placements: Array<{
-    pos: THREE.Vector3;
-    rotY: number;
-    targetMaxWidth: number;
-    targetMaxHeight: number;
-  }> = [];
+  const usableMin = doorRightEdge + doorPad;
+  const usableMax = xRightLimit - cornerPad;
 
-  const artY = 2.05;
-  const targetMaxWidth = 1.7;
-  const targetMaxHeight = 1.85;
+  if (usableMax > usableMin && backCount > 0) {
+    // ---- spacing controls (tweak these) ----
+    const minGap = 0.75;           // minimum space between frame OUTER edges (world units)
+    const edgePadding = 0.35;      // keep frames off the boundaries a bit
+    // ---------------------------------------
 
-  function centeredPositions(count: number, min: number, max: number) {
-    if (count <= 0) return [];
-    const center = (min + max) / 2;
-    if (count === 1) return [center];
+    // conservative estimate of outer frame width so we can enforce gap
+    // (your frames are ~ targetMaxWidth + frame thickness, plus a bit)
+    const estOuterW = targetMaxWidth + 0.25;
 
-    const halfRange = Math.max(0.0001, (max - min) / 2);
-    const maxIndex = Math.floor((count - 1) / 2) || 1;
-    const step = halfRange / maxIndex;
+    const spanMin = usableMin + edgePadding + estOuterW / 2;
+    const spanMax = usableMax - edgePadding - estOuterW / 2;
 
-    const out: number[] = [];
-    out.push(center);
+    const span = spanMax - spanMin;
+    if (span <= 0) {
+      // fallback: single centered if we somehow have no room
+      placements.push({
+        pos: new THREE.Vector3((usableMin + usableMax) / 2, artY, z),
+        rotY,
+        targetMaxWidth,
+        targetMaxHeight,
+      });
+    } else {
+      const c = backCount;
 
-    for (let k = 1; out.length < count; k++) {
-      const p1 = center + step * k;
-      const p2 = center - step * k;
-
-      if (out.length < count && p1 <= max) out.push(p1);
-      if (out.length < count && p2 >= min) out.push(p2);
-    }
-
-    return out.map((v) => clamp(v, min, max));
-  }
-
-  // BACK wall (door wall). Fill the span between door and the right corner, centered in that open section.
-  {
-    const z = roomD / 2 - 0.07;
-    const rotY = Math.PI;
-
-    const wallXMargin = 1.15;
-    const xRightLimit = roomW / 2 - wallXMargin;
-
-    const doorRightEdge = doorX + doorW / 2;
-
-    const doorPad = 1.0;
-    const cornerPad = 1.1;
-
-    const usableMin = doorRightEdge + doorPad;
-    const usableMax = xRightLimit - cornerPad;
-
-    if (usableMax > usableMin && backCount > 0) {
-      const step = (usableMax - usableMin) / (backCount + 1);
-      for (let i = 0; i < backCount; i++) {
-        const x = usableMin + step * (i + 1);
+      if (c === 1) {
         placements.push({
-          pos: new THREE.Vector3(x, artY, z),
+          pos: new THREE.Vector3((spanMin + spanMax) / 2, artY, z),
           rotY,
           targetMaxWidth,
           targetMaxHeight,
         });
+      } else {
+        // desired center-out positions: [center, center+step, center-step] etc
+        const center = (spanMin + spanMax) / 2;
+
+        // compute a step that is at least (estOuterW + minGap)
+        const requiredStep = estOuterW + minGap;
+
+        // also ensure we fit within the available span
+        const maxStepBySpan = span / (c - 1);
+
+        const step = Math.min(Math.max(requiredStep, 0.01), maxStepBySpan);
+
+        // build symmetric offsets
+        const xs: number[] = [];
+        if (c === 2) {
+          xs.push(center - step / 2, center + step / 2);
+        } else {
+          // 3 paintings: left, center, right
+          xs.push(center - step, center, center + step);
+        }
+
+        for (const x of xs) {
+          placements.push({
+            pos: new THREE.Vector3(clamp(x, spanMin, spanMax), artY, z),
+            rotY,
+            targetMaxWidth,
+            targetMaxHeight,
+          });
+        }
       }
     }
   }
+}
+
 
   // RIGHT wall (x fixed, vary z), centered from the middle going outward
   {
