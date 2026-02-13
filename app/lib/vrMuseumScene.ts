@@ -383,22 +383,26 @@ export function createVrMuseumScene({
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), ceilingMat);
   ceiling.position.y = roomH;
   ceiling.rotation.x = Math.PI / 2;
+  ceiling.receiveShadow = true;
   room.add(ceiling);
 
   // Walls
   const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
   frontWall.position.set(0, roomH / 2, roomD / 2);
   frontWall.rotation.y = Math.PI;
+  frontWall.receiveShadow = true;
   room.add(frontWall);
 
   const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
   leftWall.position.set(-roomW / 2, roomH / 2, 0);
   leftWall.rotation.y = Math.PI / 2;
+  leftWall.receiveShadow = true;
   room.add(leftWall);
 
   const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
   rightWall.position.set(roomW / 2, roomH / 2, 0);
   rightWall.rotation.y = -Math.PI / 2;
+  rightWall.receiveShadow = true;
   room.add(rightWall);
 
   // Baseboards
@@ -416,6 +420,8 @@ export function createVrMuseumScene({
     const mesh = new THREE.Mesh(geo, baseboardMat);
     mesh.position.set(x, baseboardH / 2, z);
     mesh.rotation.y = rotY;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     room.add(mesh);
   }
 
@@ -436,20 +442,24 @@ export function createVrMuseumScene({
 
   const bottomBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, openingBottom), wallMat);
   bottomBand.position.set(0, openingBottom / 2, backZ);
+  bottomBand.receiveShadow = true;
   windowWall.add(bottomBand);
 
   const topY0 = openingBottom + openingH;
   const topH = roomH - topY0;
   const topBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, topH), wallMat);
   topBand.position.set(0, topY0 + topH / 2, backZ);
+  topBand.receiveShadow = true;
   windowWall.add(topBand);
 
   const leftBand = new THREE.Mesh(new THREE.PlaneGeometry(sideW, openingH), wallMat);
   leftBand.position.set(-(openingW / 2 + sideW / 2), openingBottom + openingH / 2, backZ);
+  leftBand.receiveShadow = true;
   windowWall.add(leftBand);
 
   const rightBand = new THREE.Mesh(new THREE.PlaneGeometry(sideW, openingH), wallMat);
   rightBand.position.set(openingW / 2 + sideW / 2, openingBottom + openingH / 2, backZ);
+  rightBand.receiveShadow = true;
   windowWall.add(rightBand);
 
   addBaseboard(roomW, 0, backZ + baseboardT / 2, 0);
@@ -507,7 +517,6 @@ export function createVrMuseumScene({
 
   glassMat.depthWrite = false;
 
-
   const glass = new THREE.Mesh(
     new THREE.PlaneGeometry(openingW - frameBorder * 1.6, openingH - frameBorder * 1.6),
     glassMat
@@ -546,56 +555,57 @@ export function createVrMuseumScene({
   });
 
   const vistaMat = new THREE.MeshBasicMaterial({
-  map: vistaTex,
-  toneMapped: false,
-});
-vistaMat.depthTest = false;
-vistaMat.depthWrite = false;
+    map: vistaTex,
+    toneMapped: false,
+  });
+  vistaMat.depthTest = false;
+  vistaMat.depthWrite = false;
   vistaMat.side = THREE.DoubleSide;
 
+  const vista = new THREE.Mesh(new THREE.PlaneGeometry(openingW * 1.9, openingH * 1.9), vistaMat);
 
-const vista = new THREE.Mesh(
-  new THREE.PlaneGeometry(openingW * 1.9, openingH * 1.9),
-  vistaMat
-);
+  // Put it just outside the opening so it is always visible through the hole
+  vista.position.set(0, openingBottom + openingH / 2, backZ - 0.02);
 
-// Put it just outside the opening so it is always visible through the hole
-vista.position.set(0, openingBottom + openingH / 2, backZ - 0.02);
+  // Force it behind everything
+  vista.renderOrder = -1000;
 
+  scene.add(vista);
 
-// Force it behind everything
-vista.renderOrder = -1000;
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.22));
 
-scene.add(vista);
+  const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.38);
+  scene.add(hemi);
 
+  const sun = new THREE.DirectionalLight(0xffffff, 1.05);
 
- // Lighting
-scene.add(new THREE.AmbientLight(0xffffff, 0.52));
+  // Sun is outside the window: z must be less than backZ
+  sun.position.set(-10.5, 11.0, backZ - 18.0);
+  sun.target.position.set(0.0, 1.2, backZ + 6.5);
 
-const sun = new THREE.DirectionalLight(0xffffff, 0.85);
-sun.position.set(22, 1.6, backZ - 28);
-sun.target.position.set(0, 0.05, backZ + 2.5);
-sun.castShadow = true;
+  sun.castShadow = true;
 
-sun.shadow.mapSize.set(4096, 4096);
-sun.shadow.camera.near = 1;
-sun.shadow.camera.far = 90;
-sun.shadow.camera.left = -22;
-sun.shadow.camera.right = 22;
-sun.shadow.camera.top = 22;
-sun.shadow.camera.bottom = -22;
+  sun.shadow.mapSize.set(4096, 4096);
+  sun.shadow.camera.near = 2;
+  sun.shadow.camera.far = 70;
 
-sun.shadow.radius = 8;
-sun.shadow.bias = -0.00008;
-sun.shadow.normalBias = 0.02;
+  // Tighten frustum around the room for sharper window shadows
+  sun.shadow.camera.left = -12;
+  sun.shadow.camera.right = 12;
+  sun.shadow.camera.top = 14;
+  sun.shadow.camera.bottom = -10;
 
-scene.add(sun);
-scene.add(sun.target);
+  sun.shadow.radius = 6;
+  sun.shadow.bias = -0.00012;
+  sun.shadow.normalBias = 0.012;
 
-const fill = new THREE.DirectionalLight(0xffffff, 0.30);
-fill.position.set(6, 10, 10);
-scene.add(fill);
+  scene.add(sun);
+  scene.add(sun.target);
 
+  const fill = new THREE.DirectionalLight(0xffffff, 0.16);
+  fill.position.set(8, 14, 10);
+  scene.add(fill);
 
   // Art frames
   const texLoader = new THREE.TextureLoader();
