@@ -106,7 +106,13 @@ function createStampedFloorTexture(
 
   const featherPx = Math.max(18, Math.floor(Math.min(drawW, drawH) * 0.08));
 
-  const featherStamp = (src: HTMLImageElement, w: number, h: number, feather: number, flipX: number) => {
+  const featherStamp = (
+    src: HTMLImageElement,
+    w: number,
+    h: number,
+    feather: number,
+    flipX: number
+  ) => {
     const t = document.createElement('canvas');
     t.width = Math.max(2, Math.ceil(w));
     t.height = Math.max(2, Math.ceil(h));
@@ -191,7 +197,7 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-12-filmOffset-fit-v1');
+  console.log('VR_SCENE_VERSION', '2026-02-12-filmOffset-clamp-v1');
 
   let disposed = false;
 
@@ -235,7 +241,6 @@ export function createVrMuseumScene({
     'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
   placard.style.color = '#1b1b1b';
 
-  // Plaque look: flat, square corners, engraved feel
   placard.style.borderRadius = '0px';
   placard.style.border = '1px solid rgba(0,0,0,0.30)';
   placard.style.backgroundImage =
@@ -418,7 +423,7 @@ export function createVrMuseumScene({
   addBaseboard(roomD, -roomW / 2 + baseboardT / 2, 0, Math.PI / 2);
   addBaseboard(roomD, roomW / 2 - baseboardT / 2, 0, Math.PI / 2);
 
-  // Window wall, vista is /hamptons.jpg
+  // Window wall and vista
   const windowWall = new THREE.Group();
   room.add(windowWall);
 
@@ -468,7 +473,10 @@ export function createVrMuseumScene({
   topBorder.castShadow = true;
   frameGroup.add(topBorder);
 
-  const bottomBorder2 = new THREE.Mesh(new THREE.BoxGeometry(openingW, frameBorder, frameDepth), frameMat);
+  const bottomBorder2 = new THREE.Mesh(
+    new THREE.BoxGeometry(openingW, frameBorder, frameDepth),
+    frameMat
+  );
   bottomBorder2.position.set(0, -openingH / 2 + frameBorder / 2, 0);
   bottomBorder2.castShadow = true;
   frameGroup.add(bottomBorder2);
@@ -478,7 +486,10 @@ export function createVrMuseumScene({
   leftBorder2.castShadow = true;
   frameGroup.add(leftBorder2);
 
-  const rightBorder2 = new THREE.Mesh(new THREE.BoxGeometry(frameBorder, openingH, frameDepth), frameMat);
+  const rightBorder2 = new THREE.Mesh(
+    new THREE.BoxGeometry(frameBorder, openingH, frameDepth),
+    frameMat
+  );
   rightBorder2.position.set(openingW / 2 - frameBorder / 2, 0, 0);
   rightBorder2.castShadow = true;
   frameGroup.add(rightBorder2);
@@ -737,7 +748,6 @@ export function createVrMuseumScene({
   function startFocusOnRecord(rec: ArtMeshRecord) {
     cancelFocus();
 
-    // Plaque content
     showPlacard(rec.artwork);
 
     // Measure plaque width without flashing it
@@ -771,54 +781,67 @@ export function createVrMuseumScene({
       .normalize();
 
     // Viewport math
-const w = Math.max(1, container.clientWidth);
-const h = Math.max(1, container.clientHeight);
+    const w = Math.max(1, container.clientWidth);
+    const h = Math.max(1, container.clientHeight);
 
-// These are pixels in the DOM overlay space
-const margin = 18;
-const gap = 12;
-const rightPad = 18;
-const leftPad = 12;
+    // Pixels in DOM overlay space
+    const margin = 18;
+    const gap = 12;
+    const rightPad = 18;
+    const leftPad = 12;
 
-// Define the exact rectangle (in pixels) where the artwork must fit
-const regionLeft = leftPad + margin;
-const regionRight = w - (plaqueW + gap + rightPad) - margin;
-const regionTop = margin;
-const regionBottom = h - margin;
+    // Rectangle where the painting must fit
+    const regionLeft = leftPad + margin;
+    const regionRight = w - (plaqueW + gap + rightPad) - margin;
+    const regionTop = margin;
+    const regionBottom = h - margin;
 
-const regionW = Math.max(1, regionRight - regionLeft);
-const regionH = Math.max(1, regionBottom - regionTop);
+    const regionW = Math.max(1, regionRight - regionLeft);
+    const regionH = Math.max(1, regionBottom - regionTop);
 
-const usableWidthRatio = regionW / w;
-const usableHeightRatio = regionH / h;
+    const usableWidthRatio = regionW / w;
+    const usableHeightRatio = regionH / h;
 
-// Narrow FOV and farther distance reduces perspective
-const targetFov = 22;
-focusTo.fov = targetFov;
+    // Camera optics for focus
+    const targetFov = 22;
+    focusTo.fov = targetFov;
 
-const vFov = (targetFov * Math.PI) / 180;
-const aspect = w / h;
-const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
+    const vFov = (targetFov * Math.PI) / 180;
+    const aspect = w / h;
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect);
 
-// Distances to fit frame in the usable region
-const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
-const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
+    // Distances to fit frame in the usable region
+    const distForHeight = (frameH / 2) / (Math.tan(vFov / 2) * usableHeightRatio);
+    const distForWidth = (frameW / 2) / (Math.tan(hFov / 2) * usableWidthRatio);
 
-// A touch of breathing room so the black frame never kisses the edge
-const dist = Math.max(distForHeight, distForWidth) * 1.08;
+    const dist = Math.max(distForHeight, distForWidth) * 1.12;
 
-// Lens shift so the ART CENTER lands in the CENTER of the usable region
-const regionCenterPx = (regionLeft + regionRight) / 2;
-const desiredCenterNdcX = (regionCenterPx / w) * 2 - 1;
+    // Position camera straight out from the artwork center (no sideways move)
+    focusTo.pos.copy(worldCenter).add(normalOut.clone().multiplyScalar(dist));
+    focusTo.pos.y = worldCenter.y;
 
-const filmWidth = camera.getFilmWidth();
-const filmOffsetMm = (desiredCenterNdcX * filmWidth) / 2;
+    // Yaw toward center, no pitch
+    const lookDir = worldCenter.clone().sub(focusTo.pos);
+    lookDir.y = 0;
+    lookDir.normalize();
 
-// Keep the negative sign so the artwork stays on the left
-focusTo.filmOffset = -filmOffsetMm;
+    focusTo.yaw = Math.atan2(-lookDir.x, -lookDir.z);
+    focusTo.pitch = 0;
 
+    // Lens shift so ART CENTER lands in the center of the usable region
+    const regionCenterPx = (regionLeft + regionRight) / 2;
+    const desiredCenterNdcX = (regionCenterPx / w) * 2 - 1;
 
-    // Plaque fades in during focus
+    const filmWidth = camera.getFilmWidth();
+    const filmOffsetMm = (desiredCenterNdcX * filmWidth) / 2;
+
+    // Reduce how hard we shift, then clamp so it can never shove the art off screen
+    const shiftStrength = 0.85;
+    const maxShift = filmWidth * 0.22;
+    const targetOffset = (-filmOffsetMm) * shiftStrength;
+
+    focusTo.filmOffset = clamp(targetOffset, -maxShift, maxShift);
+
     placard.style.opacity = '0';
   }
 
@@ -1021,4 +1044,3 @@ focusTo.filmOffset = -filmOffsetMm;
 
   return { dispose, focusArtwork, clearFocus };
 }
-
