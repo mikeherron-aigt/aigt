@@ -123,14 +123,12 @@ function createStampedFloorTexture(
     const tctx = t.getContext('2d');
     if (!tctx) return null;
 
-    // Draw image (optionally mirrored)
     tctx.save();
     tctx.translate(w / 2, h / 2);
     tctx.scale(flipX, 1);
     tctx.drawImage(src, -w / 2, -h / 2, w, h);
     tctx.restore();
 
-    // Feather alpha edges
     tctx.globalCompositeOperation = 'destination-in';
 
     const fx = Math.min(0.49, feather / w);
@@ -180,7 +178,7 @@ function createStampedFloorTexture(
   const img = ctx.getImageData(0, 0, size, size);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4) {
-    const n = (rnd() - 0.5) * 10; // -5..+5
+    const n = (rnd() - 0.5) * 10;
     d[i] = clamp(d[i] + n, 0, 255);
     d[i + 1] = clamp(d[i + 1] + n, 0, 255);
     d[i + 2] = clamp(d[i + 2] + n, 0, 255);
@@ -202,7 +200,7 @@ function createStampedFloorTexture(
 export function createVrMuseumScene({
   container,
   artworks,
-  onArtworkClick: _onArtworkClick, // intentionally unused
+  onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
   let disposed = false;
 
@@ -226,23 +224,26 @@ export function createVrMuseumScene({
   renderer.domElement.style.display = 'block';
   renderer.domElement.style.cursor = 'grab';
 
-  // Stop page scroll while interacting with the museum
   renderer.domElement.style.overscrollBehavior = 'contain';
   (renderer.domElement.style as any).touchAction = 'none';
 
-  // Ensure the container can host overlays
   if (!container.style.position) container.style.position = 'relative';
 
   container.appendChild(renderer.domElement);
 
-  // Museum placard overlay (wall plaque style)
+  // Placard overlay
   const placard = document.createElement('div');
   placard.style.position = 'absolute';
   placard.style.top = '50%';
-  placard.style.right = '34px';
+
+  // Tighter right margin and smaller plaque for more artwork space
+  placard.style.right = '18px';
   placard.style.transform = 'translateY(-50%)';
-  placard.style.width = '340px';
-  placard.style.maxWidth = '36vw';
+
+  // Smaller (about 15%)
+  placard.style.width = '290px';
+  placard.style.maxWidth = '32vw';
+
   placard.style.pointerEvents = 'none';
   placard.style.opacity = '0';
   placard.style.transition = 'opacity 220ms ease';
@@ -251,37 +252,33 @@ export function createVrMuseumScene({
     'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
   placard.style.color = '#1b1b1b';
 
-  // Plaque look: square corners, no drop shadow, subtle inset bevel
   placard.style.borderRadius = '0px';
   placard.style.border = '1px solid rgba(0,0,0,0.30)';
-
-  // Warm museum tone + faint brushed texture
   placard.style.backgroundImage =
     'linear-gradient(180deg, rgba(246,244,238,0.98) 0%, rgba(236,233,224,0.98) 100%), repeating-linear-gradient(90deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.00) 3px, rgba(0,0,0,0.00) 6px)';
 
-  placard.style.padding = '18px 18px 16px 18px';
+  // Slightly tighter padding
+  placard.style.padding = '14px 14px 12px 14px';
   placard.style.lineHeight = '1.25';
-
-  // Inner bevel / engraved feel
   placard.style.boxShadow =
     'inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -2px 6px rgba(0,0,0,0.12)';
 
   placard.innerHTML = `
-    <div style="font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: rgba(0,0,0,.55); margin-bottom: 12px;">
+    <div style="font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: rgba(0,0,0,.55); margin-bottom: 10px;">
       Museum Label
     </div>
 
-    <div data-artist style="font-size: 18px; font-weight: 650; margin-bottom: 6px;">
+    <div data-artist style="font-size: 17px; font-weight: 650; margin-bottom: 5px;">
       Artist Name
     </div>
 
-    <div data-title style="font-size: 15px; color: rgba(0,0,0,.86); margin-bottom: 10px;">
+    <div data-title style="font-size: 14px; color: rgba(0,0,0,.86); margin-bottom: 9px;">
       <span style="font-style: italic;">Artwork Title</span>
     </div>
 
-    <div style="height:1px; background: rgba(0,0,0,.18); margin: 12px 0;"></div>
+    <div style="height:1px; background: rgba(0,0,0,.18); margin: 10px 0;"></div>
 
-    <div style="display:grid; grid-template-columns: 92px 1fr; gap: 8px 12px; font-size: 13px; color: rgba(0,0,0,.78);">
+    <div style="display:grid; grid-template-columns: 86px 1fr; gap: 7px 10px; font-size: 12px; color: rgba(0,0,0,.78);">
       <div style="color: rgba(0,0,0,.55);">Collection</div>
       <div data-collection>Collection Name</div>
 
@@ -308,9 +305,8 @@ export function createVrMuseumScene({
     const catalogId = anyA.sku ?? anyA.catalogId ?? artwork.id ?? 'ID';
 
     if (placardArtist) placardArtist.textContent = String(artist);
-    if (placardTitle) placardTitle.innerHTML = `<span style="font-style: italic;">${String(
-      title
-    )}</span>`;
+    if (placardTitle)
+      placardTitle.innerHTML = `<span style="font-style: italic;">${String(title)}</span>`;
     if (placardTitle2) placardTitle2.textContent = String(title);
     if (placardCollection) placardCollection.textContent = String(collection);
     if (placardId) placardId.textContent = String(catalogId);
@@ -326,7 +322,6 @@ export function createVrMuseumScene({
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#cfe7ff');
 
-  // Room sizing
   const roomW = 14;
   const roomH = 4.2;
   const roomD = 28;
@@ -334,7 +329,6 @@ export function createVrMuseumScene({
   const room = new THREE.Group();
   scene.add(room);
 
-  // Camera rig (yaw body, pitch head)
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 220);
 
   const yawObj = new THREE.Object3D();
@@ -343,20 +337,15 @@ export function createVrMuseumScene({
   pitchObj.add(camera);
   scene.add(yawObj);
 
-  // Ortho inspection camera (not parented to rig)
   const orthoCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.01, 400);
-
-  // Render and raycast using this
   let activeCamera: THREE.Camera = camera;
 
-  // Start pose
   yawObj.position.set(0, 1.55, 6.6);
   let yaw = 0;
   let pitch = 0;
   const minPitch = -0.55;
   const maxPitch = 0.45;
 
-  // Focus animation state
   const clock = new THREE.Clock();
 
   let focusActive = false;
@@ -378,56 +367,59 @@ export function createVrMuseumScene({
     fov: 35,
   };
 
-  // Inspection state
   let inspecting = false;
   let inspectRec: ArtMeshRecord | null = null;
 
   // Layout knobs for inspect view
-  const PLAQUE_SAFE_W_PX = 380; // reserve space for plaque on the right
-  const VIEW_MARGIN_PX = 34; // breathing room
-  const ART_SIDE_SHIFT_FRAC = 0.40; // shift artwork left to make space for plaque
+  // We compute these from the live placard width so we always preserve aspect ratio and maximize size.
+  const VIEW_MARGIN_PX = 18; // tighter margins
+  const GAP_PX = 14; // smaller gap between artwork and plaque
+  const ART_LEFT_BREATHING_PX = 12; // small left margin
 
-  function getVisibleAspectForArt() {
+  function getPlacardReservedWidthPx() {
+    // Use actual rendered width (or fallback), plus right margin and gap
+    const w = placard.getBoundingClientRect().width || 290;
+    // right: 18px already, but include it plus a little safety
+    return Math.ceil(w + 18 + GAP_PX);
+  }
+
+  function getUsableArtViewportPx() {
     const w = Math.max(1, container.clientWidth);
     const h = Math.max(1, container.clientHeight);
 
-    // Effective area the artwork can occupy (leave right side for plaque)
-    const usableW = Math.max(1, w - PLAQUE_SAFE_W_PX - VIEW_MARGIN_PX);
-    const usableH = Math.max(1, h - VIEW_MARGIN_PX);
+    const reserved = getPlacardReservedWidthPx();
 
-    return {
-      aspect: usableW / usableH,
-      usableW,
-      usableH,
-      w,
-      h,
-    };
+    const usableW = Math.max(1, w - reserved - ART_LEFT_BREATHING_PX - VIEW_MARGIN_PX);
+    const usableH = Math.max(1, h - VIEW_MARGIN_PX * 2);
+
+    return { w, h, usableW, usableH, reserved };
   }
 
-  /**
-   * This is the key fix:
-   * We were shifting the camera target to make room for the plaque, but the ortho frustum
-   * did not guarantee the full artwork remained visible after that shift.
-   * We now increase the ortho frustum until BOTH conditions are true:
-   * - vertical fit
-   * - horizontal fit including the side shift
-   */
   function updateOrthoFrustumToArtwork(rec: ArtMeshRecord) {
-    const { aspect } = getVisibleAspectForArt();
-    const fillPct = 0.95;
+    // Maintain artwork aspect ratio strictly (ortho does not distort geometry).
+    // We maximize the size by fitting within usableW x usableH.
+    const { usableW, usableH } = getUsableArtViewportPx();
 
-    const sideShiftWorld = rec.artW * ART_SIDE_SHIFT_FRAC;
+    const viewportAspect = usableW / Math.max(1, usableH);
+    const artAspect = rec.artW / Math.max(1e-6, rec.artH);
 
-    const halfHNeededVert = (rec.artH / 2) / fillPct;
+    // Fit by whichever dimension is limiting, keep a tiny buffer
+    const buffer = 0.97;
 
-    // Need enough width to cover: sideShift + artW/2
-    const halfWNeededWithShift = (sideShiftWorld + rec.artW / 2) / fillPct;
+    let halfH: number;
+    let halfW: number;
 
-    // In ortho, halfW = halfH * aspect
-    const halfHNeededFromWidth = halfWNeededWithShift / Math.max(0.0001, aspect);
-
-    const halfH = Math.max(halfHNeededVert, halfHNeededFromWidth);
-    const halfW = halfH * aspect;
+    if (viewportAspect >= artAspect) {
+      // Height limits (we have more width than needed)
+      halfH = (rec.artH / 2) / buffer;
+      halfW = halfH * viewportAspect;
+    } else {
+      // Width limits
+      // width in ortho = 2*halfW, and that width maps to usableW area
+      // so halfW should be based on art width, while halfH follows viewport aspect
+      halfW = (rec.artW / 2) / buffer;
+      halfH = halfW / viewportAspect;
+    }
 
     orthoCamera.left = -halfW;
     orthoCamera.right = halfW;
@@ -457,10 +449,29 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    // Shift target right so the artwork sits left on screen
-    const sideShift = rec.artW * ART_SIDE_SHIFT_FRAC;
+    // Compute how far to shift the camera target right so that, on screen,
+    // the artwork is centered inside the usable viewport (left side area).
+    const { w, usableW, reserved } = getUsableArtViewportPx();
 
-    // Distance does not affect scale in ortho, keep it safe for clipping
+    // Fraction of full canvas occupied by reserved (plaque side)
+    const reservedFrac = reserved / Math.max(1, w);
+    const usableFrac = usableW / Math.max(1, w);
+
+    // We want the artwork centered in the usable region, whose center is at:
+    // x = -0.5 + (usableFrac/2) in NDC terms.
+    // That implies a camera target shift in world units proportional to ortho halfW.
+    // In ortho, 1 NDC x unit corresponds to halfW world units.
+    updateOrthoFrustumToArtwork(rec);
+
+    const halfW = Math.abs(orthoCamera.right);
+
+    const centerNdcX = -1 + usableFrac; // center of usable region in [-1..1]
+    const targetShiftWorld = (centerNdcX * 0.5) * (2 * halfW);
+
+    // If targetShiftWorld is negative, that would move target left. We need target right
+    // to make artwork appear left, so invert sign.
+    const sideShift = -targetShiftWorld;
+
     const dist = 10;
 
     const target = worldPos.clone().add(artRight.clone().multiplyScalar(sideShift));
@@ -469,6 +480,7 @@ export function createVrMuseumScene({
     orthoCamera.up.copy(artUp);
     orthoCamera.lookAt(target);
 
+    // Recompute frustum again after target shift since reserved width could change on layout
     updateOrthoFrustumToArtwork(rec);
 
     activeCamera = orthoCamera;
@@ -508,7 +520,6 @@ export function createVrMuseumScene({
       .applyQuaternion(rec.frameGroup.quaternion)
       .normalize();
 
-    // Distance needed for artwork to fill screen (based on vertical FOV + artH)
     const targetFov = 35;
     const vFovRad = (targetFov * Math.PI) / 180;
     const fillPct = 0.92;
@@ -543,7 +554,6 @@ export function createVrMuseumScene({
     metalness: 0.0,
   });
 
-  // Floor
   const floorMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
     roughness: 0.58,
@@ -555,7 +565,6 @@ export function createVrMuseumScene({
   floor.receiveShadow = true;
   room.add(floor);
 
-  // Stamped floor from /floor.png
   const floorImg = new Image();
   floorImg.src = '/floor.png';
   floorImg.crossOrigin = 'anonymous';
@@ -583,13 +592,11 @@ export function createVrMuseumScene({
     floorMat.needsUpdate = true;
   };
 
-  // Ceiling
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), ceilingMat);
   ceiling.position.y = roomH;
   ceiling.rotation.x = Math.PI / 2;
   room.add(ceiling);
 
-  // Walls
   const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
   frontWall.position.set(0, roomH / 2, roomD / 2);
   frontWall.rotation.y = Math.PI;
@@ -638,7 +645,6 @@ export function createVrMuseumScene({
   const openingBottom = 0.55;
   const sideW = (roomW - openingW) / 2;
 
-  // Wall pieces around opening
   const bottomBand = new THREE.Mesh(new THREE.PlaneGeometry(roomW, openingBottom), wallMat);
   bottomBand.position.set(0, openingBottom / 2, backZ);
   windowWall.add(bottomBand);
@@ -659,7 +665,6 @@ export function createVrMuseumScene({
 
   addBaseboard(roomW, 0, backZ + baseboardT / 2, 0);
 
-  // Hollow window frame
   const frameMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#f7f7f7'),
     roughness: 0.55,
@@ -706,7 +711,6 @@ export function createVrMuseumScene({
   rightBorder2.castShadow = true;
   frameGroup.add(rightBorder2);
 
-  // Glass
   const glassMat = new THREE.MeshPhysicalMaterial({
     color: new THREE.Color('#ffffff'),
     roughness: 0.04,
@@ -725,7 +729,6 @@ export function createVrMuseumScene({
   glass.position.set(0, openingBottom + openingH / 2, backZ + frameDepth + 0.01);
   windowWall.add(glass);
 
-  // Mullions
   const cols = 4;
   const rows = 2;
 
@@ -751,10 +754,7 @@ export function createVrMuseumScene({
     windowWall.add(h);
   }
 
-  /**
-   * Window view: use hamptons.jpg only (no extra sand/ocean planes).
-   * This fixes the simplified horizon band you noticed.
-   */
+  // Window view: hamptons.jpg only
   const vistaLoader = new THREE.TextureLoader();
   const vistaTex = vistaLoader.load('/hamptons.jpg', (t) => {
     t.colorSpace = THREE.SRGBColorSpace;
@@ -771,7 +771,6 @@ export function createVrMuseumScene({
     toneMapped: false,
   });
 
-  // Place the image just behind the glass so it always reads as the outside view
   const vista = new THREE.Mesh(
     new THREE.PlaneGeometry(openingW * 1.55, openingH * 1.55),
     vistaMat
@@ -1012,7 +1011,6 @@ export function createVrMuseumScene({
     }
   }
 
-  // Wheel movement inside museum only (no page scroll)
   function onWheel(e: WheelEvent) {
     e.preventDefault();
     e.stopPropagation();
@@ -1047,7 +1045,12 @@ export function createVrMuseumScene({
     camera.aspect = w / Math.max(1, h);
     camera.updateProjectionMatrix();
 
-    if (inspectRec) updateOrthoFrustumToArtwork(inspectRec);
+    if (inspectRec) {
+      // If plaque size changes due to responsive layout, keep maximizing art size
+      updateOrthoFrustumToArtwork(inspectRec);
+      // Recenter after frustum update
+      enterOrthoInspect(inspectRec);
+    }
   }
 
   const ro = new ResizeObserver(() => resize());
@@ -1146,10 +1149,7 @@ export function createVrMuseumScene({
     renderer.dispose();
 
     if (placard.parentElement === container) container.removeChild(placard);
-
-    if (renderer.domElement.parentElement === container) {
-      container.removeChild(renderer.domElement);
-    }
+    if (renderer.domElement.parentElement === container) container.removeChild(renderer.domElement);
   }
 
   return { dispose, focusArtwork, clearFocus };
