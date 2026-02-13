@@ -211,7 +211,7 @@ export function createVrMuseumScene({
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
+  renderer.toneMappingExposure = 1.12;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -336,18 +336,14 @@ export function createVrMuseumScene({
     roughness: 0.94,
     metalness: 0.0,
   });
-
   wallMat.side = THREE.DoubleSide;
-
 
   const ceilingMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#fbfbfb'),
     roughness: 0.98,
     metalness: 0.0,
   });
-
   ceilingMat.side = THREE.DoubleSide;
-
 
   const floorMat = new THREE.MeshStandardMaterial({
     color: new THREE.Color('#ffffff'),
@@ -391,7 +387,6 @@ export function createVrMuseumScene({
   ceiling.rotation.x = Math.PI / 2;
   ceiling.receiveShadow = true;
   ceiling.castShadow = true;
-
   room.add(ceiling);
 
   // Walls
@@ -400,7 +395,6 @@ export function createVrMuseumScene({
   frontWall.rotation.y = Math.PI;
   frontWall.receiveShadow = true;
   frontWall.castShadow = true;
-
   room.add(frontWall);
 
   const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
@@ -408,7 +402,6 @@ export function createVrMuseumScene({
   leftWall.rotation.y = Math.PI / 2;
   leftWall.receiveShadow = true;
   leftWall.castShadow = true;
-
   room.add(leftWall);
 
   const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(roomD, roomH), wallMat);
@@ -416,7 +409,6 @@ export function createVrMuseumScene({
   rightWall.rotation.y = -Math.PI / 2;
   rightWall.receiveShadow = true;
   rightWall.castShadow = true;
-
   room.add(rightWall);
 
   // Baseboards
@@ -458,7 +450,6 @@ export function createVrMuseumScene({
   bottomBand.position.set(0, openingBottom / 2, backZ);
   bottomBand.receiveShadow = true;
   bottomBand.castShadow = true;
-
   windowWall.add(bottomBand);
 
   const topY0 = openingBottom + openingH;
@@ -592,15 +583,19 @@ export function createVrMuseumScene({
   scene.add(vista);
 
   // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.22));
+  // Global base illumination (museum bright, but not flat)
+  scene.add(new THREE.AmbientLight(0xffffff, 0.30));
 
-  const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.38);
+  const hemi = new THREE.HemisphereLight(0xcfe7ff, 0xf2e6cf, 0.55);
   scene.add(hemi);
 
-  const sun = new THREE.DirectionalLight(0xffffff, 1.05);
+  // Sun (the only strong patterned shadow source)
+  const sun = new THREE.DirectionalLight(0xffffff, 1.10);
 
-  // Sun is outside the window: z must be less than backZ
-  sun.position.set(10.5, 11.0, backZ - 18.0);
+  // Sun is outside to the RIGHT of the window
+  sun.position.set(10.5, 10.5, backZ - 18.0);
+
+  // Aim slightly left into the room to rake shadows across the floor
   sun.target.position.set(-2.2, 1.2, backZ + 6.5);
 
   sun.castShadow = true;
@@ -609,22 +604,49 @@ export function createVrMuseumScene({
   sun.shadow.camera.near = 2;
   sun.shadow.camera.far = 70;
 
-  // Tighten frustum around the room for sharper window shadows
-  sun.shadow.camera.left = -12;
-  sun.shadow.camera.right = 12;
-  sun.shadow.camera.top = 14;
-  sun.shadow.camera.bottom = -10;
+  // Tight frustum for crisp mullion shadows and fewer artifacts
+  sun.shadow.camera.left = -10;
+  sun.shadow.camera.right = 10;
+  sun.shadow.camera.top = 10;
+  sun.shadow.camera.bottom = -6;
 
-  sun.shadow.radius = 6;
-  sun.shadow.bias = -0.00012;
-  sun.shadow.normalBias = 0.012;
+  sun.shadow.radius = 3;
+  sun.shadow.bias = -0.00008;
+  sun.shadow.normalBias = 0.02;
 
   scene.add(sun);
   scene.add(sun.target);
 
-  const fill = new THREE.DirectionalLight(0xffffff, 0.16);
+  // Gentle directional fill (no shadows)
+  const fill = new THREE.DirectionalLight(0xffffff, 0.14);
   fill.position.set(8, 14, 10);
   scene.add(fill);
+
+  // Gallery ceiling lights (can cast shadows, tuned to not erase window pattern)
+  const gallerySpots: THREE.SpotLight[] = [];
+
+  const addGallerySpot = (x: number, z: number) => {
+    const s = new THREE.SpotLight(0xffffff, 0.85, 55, Math.PI / 5.2, 0.7, 1.6);
+    s.position.set(x, roomH - 0.15, z);
+    s.target.position.set(x * 0.55, 0.9, z * 0.55);
+
+    s.castShadow = true;
+    s.shadow.mapSize.set(1024, 1024);
+    s.shadow.camera.near = 0.5;
+    s.shadow.camera.far = 50;
+    s.shadow.bias = -0.00005;
+    s.shadow.normalBias = 0.015;
+
+    scene.add(s);
+    scene.add(s.target);
+    gallerySpots.push(s);
+  };
+
+  // 2x2 grid
+  addGallerySpot(-3.6, 6.0);
+  addGallerySpot(3.6, 6.0);
+  addGallerySpot(-3.6, -6.0);
+  addGallerySpot(3.6, -6.0);
 
   // Art frames
   const texLoader = new THREE.TextureLoader();
