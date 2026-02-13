@@ -832,7 +832,7 @@ export function createVrMuseumScene({
     });
   }
 
-// Placements: one single row (same Y), evenly spaced per wall
+// Placements: one single row (same Y), centered-first spacing per wall
 const placements: Array<{
   pos: THREE.Vector3;
   rotY: number;
@@ -842,46 +842,70 @@ const placements: Array<{
 
 const artY = 2.05; // All paintings share the same vertical level
 
-// How many paintings per wall (split as evenly as possible)
-const total = artworksInRoom.length;
-const base = Math.floor(total / 3);
-const rem = total % 3;
-
-// Order matters: right, left, back
-const countRight = base + (rem > 0 ? 1 : 0);
-const countLeft = base + (rem > 1 ? 1 : 0);
-const countBack = total - countRight - countLeft;
+// Required counts
+const countRightWall = 5;
+const countLeftWall = 5;
+const countDoorWall = 3;
 
 // Common sizing target (keeps frames consistent)
 const targetMaxWidth = 1.7;
 const targetMaxHeight = 1.85;
 
-// Helper: evenly spaced positions along a segment with margins
-function evenPositions(count: number, start: number, end: number) {
-  if (count <= 0) return [];
-  if (count === 1) return [(start + end) / 2];
-  const step = (end - start) / (count - 1);
-  return Array.from({ length: count }, (_, i) => start + i * step);
-}
+// Buffers so paintings are not too close to corners or to each other at wall junctions
+const cornerBuffer = 3.2; // increase if you want more separation near corners
+const wallZMargin = cornerBuffer; // keeps side wall paintings away from door wall corners
 
-// Side walls use Z spacing, back wall uses X spacing
-const wallZMargin = 2.2;
-const zStart = roomD / 2 - wallZMargin;
-const zEnd = -roomD / 2 + wallZMargin;
+// Side walls span in Z
+const zMin = -roomD / 2 + wallZMargin;
+const zMax = roomD / 2 - wallZMargin;
 
+// Door wall span in X
 const wallXMargin = 1.15;
-const xStart = -roomW / 2 + wallXMargin;
-const xEnd = roomW / 2 - wallXMargin;
+const xMin = -roomW / 2 + wallXMargin;
+const xMax = roomW / 2 - wallXMargin;
 
-// Reserve space on back wall for the door (door is on the frontWall at z = +roomD/2)
-const doorReserveW = doorW + 1.35;
-const backUsableRightEdge = xEnd - doorReserveW; // shrink usable span so frames do not overlap door area
+// Door is now centered at doorX = 0
+const doorHalfW = doorW / 2;
+const doorClear = 0.95; // extra gap around the door opening
+const rightSpanStart = doorHalfW + doorClear;
+const rightSpanEnd = xMax - 0.75; // keep away from the far right corner a bit
+
+// Helper: centered-first positions
+function centeredPositions(count: number, min: number, max: number) {
+  if (count <= 0) return [];
+  const center = (min + max) / 2;
+
+  if (count === 1) return [center];
+
+  // We want: center, +step, -step, +2step, -2step, ...
+  const halfRange = Math.max(0.0001, (max - min) / 2);
+
+  // For 5 items we need offsets 0, 1, 1, 2, 2. So max offset index is 2.
+  // Generally max offset index is floor((count - 1) / 2)
+  const maxIndex = Math.floor((count - 1) / 2) || 1;
+  const step = halfRange / maxIndex;
+
+  const out: number[] = [];
+  out.push(center);
+
+  for (let k = 1; out.length < count; k++) {
+    const p1 = center + step * k;
+    const p2 = center - step * k;
+
+    if (out.length < count && p1 <= max) out.push(p1);
+    if (out.length < count && p2 >= min) out.push(p2);
+  }
+
+  // If floating point or clamp issues, hard clamp
+  return out.map((v) => clamp(v, min, max));
+}
 
 // Build RIGHT wall placements (x fixed, vary z)
 {
   const x = roomW / 2 - 0.06;
   const rotY = -Math.PI / 2;
-  const zs = evenPositions(countRight, zStart, zEnd);
+
+  const zs = centeredPositions(countRightWall, zMin, zMax);
   for (const z of zs) {
     placements.push({
       pos: new THREE.Vector3(x, artY, z),
@@ -896,7 +920,8 @@ const backUsableRightEdge = xEnd - doorReserveW; // shrink usable span so frames
 {
   const x = -roomW / 2 + 0.06;
   const rotY = Math.PI / 2;
-  const zs = evenPositions(countLeft, zStart, zEnd);
+
+  const zs = centeredPositions(countLeftWall, zMin, zMax);
   for (const z of zs) {
     placements.push({
       pos: new THREE.Vector3(x, artY, z),
@@ -907,12 +932,15 @@ const backUsableRightEdge = xEnd - doorReserveW; // shrink usable span so frames
   }
 }
 
-// Build BACK wall placements (z fixed, vary x), avoid door zone on the right side
+// Build DOOR wall placements (z fixed, vary x), ONLY on the right side of the door
 {
-  const z = roomD / 2 - 0.07;
+  const z = roomD / 2 - 0.07; // wall plane
   const rotY = Math.PI;
 
-  const xs = evenPositions(countBack, xStart, backUsableRightEdge);
+  const usableMin = Math.max(xMin, rightSpanStart);
+  const usableMax = Math.max(usableMin + 0.001, rightSpanEnd);
+
+  const xs = centeredPositions(countDoorWall, usableMin, usableMax);
   for (const x of xs) {
     placements.push({
       pos: new THREE.Vector3(x, artY, z),
@@ -923,13 +951,15 @@ const backUsableRightEdge = xEnd - doorReserveW; // shrink usable span so frames
   }
 }
 
+// Apply placements to artworks in order.
+// If you have more artworks than 13, we only place the first 13.
+// If fewer, we place what we have.
 (async () => {
-  for (let i = 0; i < artworksInRoom.length; i++) {
+  const n = Math.min(artworksInRoom.length, placements.length);
+  for (let i = 0; i < n; i++) {
     if (disposed) return;
 
     const p = placements[i];
-    if (!p) return;
-
     await addFramedArtwork({
       artwork: artworksInRoom[i],
       position: p.pos,
@@ -939,6 +969,7 @@ const backUsableRightEdge = xEnd - doorReserveW; // shrink usable span so frames
     });
   }
 })();
+
 
 
   // Focus animation state
