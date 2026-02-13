@@ -227,7 +227,7 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-13-back-wall-centered-in-open-span');
+  console.log('VR_SCENE_VERSION', '2026-02-13-back-wall-always-filled-first');
 
   let disposed = false;
 
@@ -277,7 +277,6 @@ export function createVrMuseumScene({
   placard.style.fontFamily =
     'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"';
   placard.style.color = '#1b1b1b';
-
   placard.style.borderRadius = '0px';
   placard.style.border = '1px solid rgba(0,0,0,0.30)';
   placard.style.backgroundImage =
@@ -669,7 +668,7 @@ export function createVrMuseumScene({
   addGallerySpot(-3.6, -6.0);
   addGallerySpot(3.6, -6.0);
 
-  // Door on the wall at z = +roomD/2
+  // Door
   const doorGroup = new THREE.Group();
   const doorW = 1.6;
   const doorH = 2.65;
@@ -822,7 +821,20 @@ export function createVrMuseumScene({
     });
   }
 
-  // Placements: 5 on each side wall, 3 on the door wall (right of door), centered like your red squares
+  // ---------
+  // PLACEMENTS (back wall always gets first 3 if available)
+  // ---------
+  const total = artworksInRoom.length;
+
+  const desiredBack = 3;
+  const desiredSide = 5;
+
+  const backCount = Math.min(desiredBack, total);
+  const remaining = Math.max(0, total - backCount);
+
+  const rightCount = Math.min(desiredSide, Math.ceil(remaining / 2));
+  const leftCount = Math.min(desiredSide, Math.max(0, remaining - rightCount));
+
   const placements: Array<{
     pos: THREE.Vector3;
     rotY: number;
@@ -831,18 +843,8 @@ export function createVrMuseumScene({
   }> = [];
 
   const artY = 2.05;
-
-  const countRightWall = 5;
-  const countLeftWall = 5;
-  const countBackWall = 3;
-
   const targetMaxWidth = 1.7;
   const targetMaxHeight = 1.85;
-
-  // Keep the last side-wall painting away from the back-wall corner
-  const wallZMargin = 3.2;
-  const zMin = -roomD / 2 + wallZMargin;
-  const zMax = roomD / 2 - wallZMargin;
 
   function centeredPositions(count: number, min: number, max: number) {
     if (count <= 0) return [];
@@ -867,12 +869,57 @@ export function createVrMuseumScene({
     return out.map((v) => clamp(v, min, max));
   }
 
+  // BACK / DOOR WALL (z fixed, vary x), centered as a tight 3-piece cluster on the RIGHT of the door
+  {
+    const z = roomD / 2 - 0.07;
+    const rotY = Math.PI;
+
+    const wallXMargin = 1.15;
+    const xMax = roomW / 2 - wallXMargin;
+
+    const doorRightEdge = doorX + doorW / 2;
+
+    const doorClear = 1.0;
+    const rightCornerPad = 1.9;
+
+    const usableMin = doorRightEdge + doorClear;
+    const usableMax = Math.max(usableMin + 0.001, xMax - rightCornerPad);
+
+    const usableCenter = (usableMin + usableMax) / 2;
+
+    const estOuterW = targetMaxWidth + 0.09;
+    const desiredGap = 0.75;
+    const desiredGroupWidth = estOuterW * 3 + desiredGap * 2;
+
+    const maxGroupWidth = usableMax - usableMin;
+    const groupWidth = Math.min(desiredGroupWidth, maxGroupWidth);
+
+    const groupMin = clamp(usableCenter - groupWidth / 2, usableMin, usableMax - groupWidth);
+    const groupMax = groupMin + groupWidth;
+
+    const step = (groupMax - groupMin) / (Math.max(1, backCount) + 1);
+    const xs = Array.from({ length: backCount }, (_, i) => groupMin + step * (i + 1));
+
+    for (const x of xs) {
+      placements.push({
+        pos: new THREE.Vector3(x, artY, z),
+        rotY,
+        targetMaxWidth,
+        targetMaxHeight,
+      });
+    }
+  }
+
   // RIGHT wall (x fixed, vary z)
   {
     const x = roomW / 2 - 0.06;
     const rotY = -Math.PI / 2;
 
-    const zs = centeredPositions(countRightWall, zMin, zMax);
+    const wallZMargin = 3.2;
+    const zMin = -roomD / 2 + wallZMargin;
+    const zMax = roomD / 2 - wallZMargin;
+
+    const zs = centeredPositions(rightCount, zMin, zMax);
     for (const z of zs) {
       placements.push({
         pos: new THREE.Vector3(x, artY, z),
@@ -888,7 +935,11 @@ export function createVrMuseumScene({
     const x = -roomW / 2 + 0.06;
     const rotY = Math.PI / 2;
 
-    const zs = centeredPositions(countLeftWall, zMin, zMax);
+    const wallZMargin = 3.2;
+    const zMin = -roomD / 2 + wallZMargin;
+    const zMax = roomD / 2 - wallZMargin;
+
+    const zs = centeredPositions(leftCount, zMin, zMax);
     for (const z of zs) {
       placements.push({
         pos: new THREE.Vector3(x, artY, z),
@@ -899,68 +950,15 @@ export function createVrMuseumScene({
     }
   }
 
-  // DOOR wall (z fixed, vary x), but centered in the open span so it matches your red squares
-  {
-    const z = roomD / 2 - 0.07;
-    const rotY = Math.PI;
-
-    // Wall boundaries (keep away from edges)
-    const wallXMargin = 1.15;
-    const xMax = roomW / 2 - wallXMargin;
-
-    // Door boundaries
-    const doorRightEdge = doorX + doorW / 2;
-
-    // Keep some breathing room next to door and corner
-    const doorClear = 1.0;
-    const rightCornerPad = 1.9;
-
-    const usableMinRaw = doorRightEdge + doorClear;
-    const usableMaxRaw = xMax - rightCornerPad;
-
-    // If the usable span is weirdly small, fall back to a minimal safe span
-    const usableMin = usableMinRaw;
-    const usableMax = Math.max(usableMin + 0.001, usableMaxRaw);
-
-    const usableCenter = (usableMin + usableMax) / 2;
-
-    // This is the key: choose a fixed "group width" so the 3 paintings sit as a centered cluster
-    // like your red squares, instead of spreading all the way to the corner.
-    const estOuterW = targetMaxWidth + 0.09; // approx frame width
-    const desiredGap = 0.75;
-    const desiredGroupWidth = estOuterW * 3 + desiredGap * 2;
-
-    const maxGroupWidth = usableMax - usableMin;
-    const groupWidth = Math.min(desiredGroupWidth, maxGroupWidth);
-
-    const groupMin = clamp(usableCenter - groupWidth / 2, usableMin, usableMax - groupWidth);
-    const groupMax = groupMin + groupWidth;
-
-    // Place at 1/4, 2/4, 3/4 of the group span
-    const step = (groupMax - groupMin) / (countBackWall + 1);
-    const xs = Array.from({ length: countBackWall }, (_, i) => groupMin + step * (i + 1));
-
-    for (const x of xs) {
-      placements.push({
-        pos: new THREE.Vector3(x, artY, z),
-        rotY,
-        targetMaxWidth,
-        targetMaxHeight,
-      });
-    }
-  }
-
-  // Place artworks deterministically: 5 right, 5 left, 3 door wall
-  const orderedArtworks: MuseumArtwork[] = artworksInRoom.slice(0, 13);
-
+  // Place artworks in the SAME order as placements: back first, then right, then left
   (async () => {
-    const n = Math.min(orderedArtworks.length, placements.length);
+    const n = Math.min(artworksInRoom.length, placements.length);
     for (let i = 0; i < n; i++) {
       if (disposed) return;
 
       const p = placements[i];
       await addFramedArtwork({
-        artwork: orderedArtworks[i],
+        artwork: artworksInRoom[i],
         position: p.pos,
         rotationY: p.rotY,
         targetMaxWidth: p.targetMaxWidth,
@@ -1107,7 +1105,6 @@ export function createVrMuseumScene({
   let lastY = 0;
   let dragMoved = false;
 
-  // When focused, click exits focus back to center
   let clickToExitFocus = false;
 
   function onPointerDown(e: PointerEvent) {
@@ -1225,7 +1222,6 @@ export function createVrMuseumScene({
   renderer.domElement.addEventListener('pointercancel', onPointerUp);
   renderer.domElement.addEventListener('wheel', onWheel, { passive: false });
 
-  // Resize
   function resize() {
     const w = container.clientWidth;
     const h = container.clientHeight;
@@ -1249,7 +1245,6 @@ export function createVrMuseumScene({
     clearFocusToCenter();
   }
 
-  // Render loop
   function animate() {
     if (disposed) return;
 
