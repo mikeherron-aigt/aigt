@@ -59,39 +59,12 @@ export default function VrMuseumPage() {
             </p>
           </div>
 
-          {/* Interactive embed (exactly where you asked for it) */}
-          <div className="mt-10">
-            <div className="rounded-2xl border border-black/10 bg-white p-6 md:p-8">
-              <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-                <div>
-                  <div className="text-xs font-semibold tracking-widest text-black/50">
-                    INTERACTIVE
-                  </div>
-                  <h3 className="mt-2 text-xl font-semibold tracking-tight md:text-2xl">
-                    Explore a sample gallery
-                  </h3>
-                  <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-black/70 md:text-base">
-                    Drag to look, scroll to move, and click a work to focus. Click
-                    again to return to center.
-                  </p>
-                </div>
-              </div>
-
-              {/* This is your existing working VR client shell. No restructuring. */}
-              <div className="mt-6 overflow-hidden rounded-xl border border-black/10 bg-neutral-50">
+        
                 {/* If VrMuseumClientShell renders its own sizing, it will fill this container. */}
                 <div className="aspect-[16/9] w-full">
                   <VrMuseumClientShell />
                 </div>
-              </div>
-
-              <p className="mt-4 max-w-3xl text-xs leading-relaxed text-black/50">
-                This preview environment is provided for informational and stewardship
-                context. Availability and access are governed.
-              </p>
-            </div>
-          </div>
-        </div>
+            
       </section>
 
       {/* Built for seriousness */}
