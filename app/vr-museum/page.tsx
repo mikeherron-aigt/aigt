@@ -11,28 +11,7 @@ export const metadata: Metadata = {
 export default function VrMuseumPage() {
   return (
     <main className="bg-white">
-      {/* Hero */}
-      <section className="border-b border-black/10 bg-neutral-50">
-        <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
-            <div>
-              <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                The Virtual Museum
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-relaxed text-black/70 md:text-lg">
-                Extending museum grade stewardship, access, and scholarship beyond
-                physical walls.
-              </p>
-            </div>
-
-            {/* Hero image placeholder */}
-            <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white">
-              <div className="aspect-[16/10] w-full bg-gradient-to-br from-neutral-100 to-neutral-50" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.06),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(0,0,0,0.05),transparent_60%)]" />
-            </div>
-          </div>
-        </div>
-      </section>
+    
 
       {/* Intro + Interactive */}
       <section className="border-b border-black/10">
