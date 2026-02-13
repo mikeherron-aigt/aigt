@@ -570,21 +570,28 @@ scene.add(vista);
 
 
   // Lighting
-  scene.add(new THREE.AmbientLight(0xffffff, 0.62));
+  scene.add(new THREE.AmbientLight(0xffffff, 0.52));
+const sun = new THREE.DirectionalLight(0xffffff, 0.85);
 
-  const sun = new THREE.DirectionalLight(0xffffff, 0.95);
-  sun.position.set(0, 7.5, -18);
-  sun.target.position.set(0, 1.4, -6);
+  sun.position.set(22, 1.6, backZ - 28;
+  sun.target.position.set(0, 0.05, backZ + 2.5;
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.set(4096, 4096);
   sun.shadow.camera.near = 1;
   sun.shadow.camera.far = 90;
-  sun.shadow.camera.left = -16;
-  sun.shadow.camera.right = 16;
-  sun.shadow.camera.top = 16;
-  sun.shadow.camera.bottom = -16;
+  sun.shadow.camera.left = -22;
+  sun.shadow.camera.right = 22;
+  sun.shadow.camera.top = 22;
+  sun.shadow.camera.bottom = -22;
   scene.add(sun);
   scene.add(sun.target);
+
+  // Softer shadow edges
+sun.shadow.radius = 8;
+
+// Reduce acne without detaching shadows
+sun.shadow.bias = -0.00008;
+sun.shadow.normalBias = 0.02;
 
   const fill = new THREE.DirectionalLight(0xffffff, 0.30);
   fill.position.set(6, 10, 10);
