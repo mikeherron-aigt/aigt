@@ -196,6 +196,7 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
+console.log('VR_SCENE_VERSION', '2026-02-12-placard-fit-v2');
   let disposed = false;
 
   const renderer = new THREE.WebGLRenderer({
