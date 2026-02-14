@@ -234,14 +234,12 @@ function centeredPositions(count: number, min: number, max: number) {
   const center = (min + max) / 2;
   if (count === 1) return [center];
 
-  // Build symmetric slots around center: 0, +1, -1, +2, -2, ...
   const offsets: number[] = [0];
   for (let k = 1; offsets.length < count; k++) {
     offsets.push(k);
     if (offsets.length < count) offsets.push(-k);
   }
 
-  // Step chosen to fit the farthest index inside the span
   const far = Math.max(...offsets.map((o) => Math.abs(o)));
   const step = far === 0 ? 0 : (span * 0.5) / far;
 
@@ -252,7 +250,7 @@ function layoutBackWallUsingRealWidths(opts: {
   records: ArtMeshRecord[];
   usableMinX: number;
   usableMaxX: number;
-  gap: number; // desired empty space between OUTER frame edges
+  gap: number;
 }) {
   const { records, usableMinX, usableMaxX, gap } = opts;
 
@@ -290,7 +288,7 @@ export function createVrMuseumScene({
   artworks,
   onArtworkClick: _onArtworkClick,
 }: CreateArgs): VrMuseumSceneHandle {
-  console.log('VR_SCENE_VERSION', '2026-02-13-backwall-real-spacing');
+  console.log('VR_SCENE_VERSION', '2026-02-13-backwall-centered-gap-knob');
 
   let disposed = false;
 
@@ -731,13 +729,13 @@ export function createVrMuseumScene({
   addGallerySpot(-3.6, -6.0);
   addGallerySpot(3.6, -6.0);
 
-  // Door on the back wall (solid wall at z = +roomD/2)
+  // Door on the front wall (z = +roomD/2)
   const doorGroup = new THREE.Group();
   const doorW = 1.6;
   const doorH = 2.65;
   const doorT = 0.07;
 
-  // Door position is not important per your note
+  // Door position is not important
   const doorX = roomW / 2 - doorW / 2 - 0.55;
   const doorY = doorH / 2;
   const doorZ = roomD / 2 - 0.03;
@@ -884,7 +882,7 @@ export function createVrMuseumScene({
     });
   }
 
-  // Placements: one single row (same Y), side walls centered, back wall right of door then spaced by real widths
+  // Placements: one single row (same Y), side walls centered, back wall centered on wall
   const placements: Placement[] = [];
 
   const artY = 2.05;
@@ -902,6 +900,10 @@ export function createVrMuseumScene({
 
   const targetMaxWidth = 1.7;
   const targetMaxHeight = 1.85;
+
+  // Change this one number to control distance between the 3 back-wall paintings
+  // This is the desired empty space between OUTER frame edges (in world units)
+  const BACK_WALL_GAP = 0.85;
 
   // Side walls spacing along Z, centered at z=0 and expanded outward
   const wallZMargin = 2.2;
@@ -940,7 +942,7 @@ export function createVrMuseumScene({
     }
   }
 
-  // Back wall: initial rough placement to the right of the door, then re-layout after frames load
+  // Back wall paintings: centered on the wall, independent of the door
   let backUsableMinX = 0;
   let backUsableMaxX = 0;
 
@@ -948,29 +950,18 @@ export function createVrMuseumScene({
     const z = roomD / 2 - 0.07;
     const rotY = Math.PI;
 
-    const doorRightEdge = doorX + doorW / 2;
+    // Entire wall usable range, symmetric so the layout centers at x = 0
+    const wallMargin = 1.25;
+    backUsableMinX = -roomW / 2 + wallMargin;
+    backUsableMaxX = roomW / 2 - wallMargin;
 
-    const doorPad = 5.0;
-    const cornerPad = 1.15;
+    // Rough initial placement so they start near center while textures load
+    const approxStep = targetMaxWidth + BACK_WALL_GAP;
+    const dxs = [-approxStep, 0, approxStep].slice(0, countBack);
 
-    const wallXMargin = 1.05;
-    const wallRight = roomW / 2 - wallXMargin;
-
-    backUsableMinX = doorRightEdge + doorPad;
-    backUsableMaxX = wallRight - cornerPad;
-
-    if (backUsableMaxX <= backUsableMinX) {
-      backUsableMinX = 0.5;
-      backUsableMaxX = roomW / 2 - 1.6;
-    }
-
-    const center = (backUsableMinX + backUsableMaxX) / 2;
-
-    // Rough initial offsets. Real spacing happens after frames load.
-    const dxs = [-1.4, 0, 1.4].slice(0, countBack);
     for (const dx of dxs) {
       placements.push({
-        pos: new THREE.Vector3(center + dx, artY, z),
+        pos: new THREE.Vector3(dx, artY, z),
         rotY,
         targetMaxWidth,
         targetMaxHeight,
@@ -996,12 +987,12 @@ export function createVrMuseumScene({
       });
     }
 
-    // Enforce spacing between the 3 back-wall works using their real widths
+    // Final back wall layout using real frame widths and your spacing knob
     layoutBackWallUsingRealWidths({
       records: clickableMeshes,
       usableMinX: backUsableMinX,
       usableMaxX: backUsableMaxX,
-      gap: 0.85, // increase for more space between back-wall frames
+      gap: BACK_WALL_GAP,
     });
   })();
 
