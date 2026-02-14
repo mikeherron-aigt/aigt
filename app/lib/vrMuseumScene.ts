@@ -950,7 +950,7 @@ export function createVrMuseumScene({
 
     const doorRightEdge = doorX + doorW / 2;
 
-    const doorPad = 1.0;
+    const doorPad = 2.5;
     const cornerPad = 1.15;
 
     const wallXMargin = 1.05;
