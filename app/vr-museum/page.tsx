@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function VrMuseumPage() {
   return (
     <main className="bg-white">
-      {/* Hero */}
+      {/* NEW: Top hero + details appended above your existing content */}
       <section className="border-b border-black/10 bg-neutral-50">
         <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
@@ -20,15 +20,15 @@ export default function VrMuseumPage() {
               <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">
                 The Virtual Museum
               </h1>
+
               <p className="mt-4 max-w-xl text-base leading-relaxed text-black/70 md:text-lg">
                 Extending museum grade stewardship, access, and scholarship beyond
                 physical walls.
               </p>
 
-              {/* Standard vertical blocks */}
               <div className="mt-8 space-y-3 max-w-xl">
                 <div className="border-l border-black/15 pl-4 text-[15px] leading-relaxed text-black/75 md:text-base">
-                  Museum-grade context, preserved digitally
+                  Museum grade context, preserved digitally
                 </div>
                 <div className="border-l border-black/15 pl-4 text-[15px] leading-relaxed text-black/75 md:text-base">
                   Accurate scale, curated spatial sequencing
@@ -39,7 +39,6 @@ export default function VrMuseumPage() {
               </div>
             </div>
 
-            {/* Standard horizontal block with image */}
             <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white">
               <div className="relative aspect-[16/10] w-full">
                 <Image
@@ -56,6 +55,8 @@ export default function VrMuseumPage() {
           </div>
         </div>
       </section>
+
+      {/* Your existing page content below (unchanged) */}
 
       {/* Permanent digital extension */}
       <section className="border-b border-black/10">
